@@ -1,0 +1,25 @@
+[package]
+name = "test-wasm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# casper-client = { path = "../sdk-old", features = ["sdk"] }
+casper-client = { path = "../casper-client-sdk", features = ["sdk"] }
+rand = "0.8.5"
+getrandom = { version = "0.2.10", features = ["js"] }
+wasm-bindgen = "*"
+wasm-bindgen-futures = "*"
+wee_alloc = "*"
+js-sys = "*"
+
+[lib]
+crate-type = ["cdylib"]
+name = "mytest"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mytest"
+path = "src/main.rs"
