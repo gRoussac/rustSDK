@@ -7,13 +7,14 @@ edition = "2021"
 
 [dependencies]
 # casper-client = { path = "../sdk-old", features = ["sdk"] }
-casper-client = { path = "../casper-client-rs-sdk", features = ["sdk"] }
+casper-client = { path = "../casper-client-rs-sdk" }
 rand = "0.8.5"
 getrandom = { version = "0.2.10", features = ["js"] }
 wasm-bindgen = "*"
 wasm-bindgen-futures = "*"
-wee_alloc = "*"
+wee_alloc = { version = "*", optional = true }
 js-sys = "*"
+console_error_panic_hook = { version = "*", optional = true }
 
 [lib]
 crate-type = ["cdylib"]
@@ -23,3 +24,6 @@ path = "src/lib.rs"
 [[bin]]
 name = "mytest"
 path = "src/main.rs"
+
+[features]
+default = ["console_error_panic_hook"]
