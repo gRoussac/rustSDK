@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 # casper-client = { path = "../sdk-old", features = ["sdk"] }
-casper-client = { path = "../casper-client-rs-sdk" }
+casper-client = { path = "../casper-client-rs-sdk", default-features = false, features = [
+  "sdk",
+] }
 rand = "0.8.5"
 getrandom = { version = "0.2.10", features = ["js"] }
 wasm-bindgen = "*"
