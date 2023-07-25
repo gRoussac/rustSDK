@@ -1,0 +1,27 @@
+[package]
+name = "casper-client"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1", default-features = false, features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+reqwest = { version = "0.11.18", features = ["json"] }
+once_cell = "*"
+jsonrpc-lite = "0.6.0"
+casper-types = { version = "3.0.0", default-features = false }
+casper-hashing = { version = "2.0.0", git = "https://github.com/gRoussac/casper-node/", default-features = false, branch = "casper-hashing-dev" }
+
+thiserror = "=1.0.34"
+schemars = "0.8"
+getrandom = { version = "0.2.10", features = ["js"] }
+
+[lib]
+name = "casper_client"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+sdk = ["casper-types/json-schema"]
