@@ -8,11 +8,10 @@ Casper Labs Rust SDK Demo
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 ```
 
-# Intall
+# Install
 
 ```shell
 git clone --recurse-submodules https://github.com/casper-ecosystem/rustSDK.git
-git checkout dev
 cd casper-client-rs-sdk
 cargo build
 cd ..
