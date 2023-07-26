@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 # casper-client = { path = "../sdk-old", features = ["sdk"] }
-casper-types = { version = "3.0.0", path = "../../casper-node/types" }
+casper-types = { version = "3.0.0", git = "https://github.com/casper-network/casper-node.git", branch = "rustSDK", default-features = false }
 casper-client = { path = "../casper-client-rs-sdk", default-features = false, features = [
   "sdk",
 ] }

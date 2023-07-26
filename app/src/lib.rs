@@ -1,5 +1,4 @@
 use core::fmt;
-use std::fmt::Display;
 
 use casper_client::{
     get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier, JsonRpcId, Verbosity,
