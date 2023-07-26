@@ -1,7 +1,12 @@
+/* global BigInt */
+
 import { useEffect, useState } from 'react';
 import './App.css';
 
-import init, { SDK, InitOutput } from 'mytest';
+import init, { SDK, InitOutput, _Verbosity } from 'mytest';
+
+const host = 'http://localhost:3000';
+const verbosity = new _Verbosity(2);
 
 function App() {
   const [wasm, setWasm] = useState();
@@ -25,7 +30,7 @@ function App() {
     const sdk = SDK.new();
     console.log(sdk);
     try {
-      const hash_as_string = await sdk.get_state_root_hash();
+      const hash_as_string = await sdk.get_state_root_hash(host, BigInt('8'));
       setHash(hash_as_string);
       const hash = JSON.parse(hash_as_string);
       setHash(hash);
