@@ -1,4 +1,4 @@
-[submodule "casper-client-rs-sdk"]
-	path = casper-client-rs-sdk
+[submodule "casper-client-rs"]
+	path = casper-client-rs
 	url = https://github.com/casper-ecosystem/casper-client-rs
 	branch = rustSDK
