@@ -28,24 +28,24 @@ export class SDK {
 * @param {string} node_address
 * @param {bigint} block_identifier_height
 * @param {number} verbosity
-* @returns {Promise<string>}
+* @returns {Promise<any>}
 */
-  get_state_root_hash(node_address: string, block_identifier_height: bigint, verbosity: number): Promise<string>;
+  get_state_root_hash(node_address: string, block_identifier_height: bigint, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {bigint} block_identifier_height
 * @param {number} verbosity
-* @returns {Promise<string>}
+* @returns {Promise<any>}
 */
-  chain_get_block(node_address: string, block_identifier_height: bigint, verbosity: number): Promise<string>;
+  chain_get_block(node_address: string, block_identifier_height: bigint, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {DeployHash} deploy_hash
 * @param {boolean} finalized_approvals
 * @param {number} verbosity
-* @returns {Promise<string>}
+* @returns {Promise<any>}
 */
-  info_get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity: number): Promise<string>;
+  info_get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity: number): Promise<any>;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;

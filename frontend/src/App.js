@@ -34,7 +34,6 @@ function App() {
         BigInt('8'),
         Verbosity.High
       );
-      const hash = JSON.parse(get_state_root_hash);
       setHash(hash);
       console.log('js get_state_root_hash', get_state_root_hash);
 
@@ -43,8 +42,8 @@ function App() {
         BigInt('8'),
         Verbosity.High
       );
-      const block = JSON.parse(chain_get_block);
-      console.log('js chain_get_block', block);
+      // const block = JSON.parse(chain_get_block);
+      console.log('js chain_get_block', chain_get_block);
 
       let hex_str =
         '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445';
@@ -55,8 +54,7 @@ function App() {
         true,
         Verbosity.High
       );
-      const info = JSON.parse(info_get_deploy);
-      console.log('js  info', info);
+      console.log('js  info', info_get_deploy);
     } catch (error) {
       console.error(error);
     }

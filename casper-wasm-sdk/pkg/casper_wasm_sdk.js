@@ -307,7 +307,7 @@ export class SDK {
     * @param {string} node_address
     * @param {bigint} block_identifier_height
     * @param {number} verbosity
-    * @returns {Promise<string>}
+    * @returns {Promise<any>}
     */
     get_state_root_hash(node_address, block_identifier_height, verbosity) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -319,7 +319,7 @@ export class SDK {
     * @param {string} node_address
     * @param {bigint} block_identifier_height
     * @param {number} verbosity
-    * @returns {Promise<string>}
+    * @returns {Promise<any>}
     */
     chain_get_block(node_address, block_identifier_height, verbosity) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -332,7 +332,7 @@ export class SDK {
     * @param {DeployHash} deploy_hash
     * @param {boolean} finalized_approvals
     * @param {number} verbosity
-    * @returns {Promise<string>}
+    * @returns {Promise<any>}
     */
     info_get_deploy(node_address, deploy_hash, finalized_approvals, verbosity) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -378,10 +378,6 @@ async function __wbg_load(module, imports) {
 function __wbg_get_imports() {
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
-        const ret = getStringFromWasm0(arg0, arg1);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbg_log_4081ddb49513a403 = function(arg0, arg1) {
         let deferred0_0;
         let deferred0_1;
@@ -392,6 +388,10 @@ function __wbg_get_imports() {
         } finally {
             wasm.__wbindgen_free(deferred0_0, deferred0_1, 1);
         }
+    };
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        const ret = getStringFromWasm0(arg0, arg1);
+        return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
@@ -662,8 +662,8 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1307 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 311, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper1312 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 316, __wbg_adapter_26);
         return addHeapObject(ret);
     };
 

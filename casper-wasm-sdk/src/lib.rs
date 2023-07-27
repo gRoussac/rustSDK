@@ -27,7 +27,7 @@ impl SDK {
         node_address: &str,
         block_identifier_height: u64,
         verbosity: Verbosity,
-    ) -> String {
+    ) -> JsValue {
         log("state_root_hash!".to_string());
         log(format!("{node_address}"));
         log(format!("{block_identifier_height}"));
@@ -41,17 +41,18 @@ impl SDK {
         .unwrap();
         println!("State root hash: {state_root_hash}");
         log(format!("State root hash: {state_root_hash}"));
-        state_root_hash.to_string()
+        wasm_bindgen::JsValue::from_str(&state_root_hash.to_string())
     }
 
+    #[wasm_bindgen]
     pub async fn chain_get_block(
         &mut self,
         node_address: &str,
         block_identifier_height: u64,
         verbosity: Verbosity,
-    ) -> String {
+    ) -> JsValue {
         log("chain_get_block!".to_string());
-        let block = get_block(
+        let block_result = get_block(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
             node_address,
             verbosity.into(),
@@ -59,8 +60,10 @@ impl SDK {
         )
         .await
         .unwrap();
-        log(format!("chain_get_block: {block}"));
-        block.to_string()
+        log(format!("chain_get_block: {:?}", block_result));
+
+        // Convert the block result to a JsValue using serde-wasm-bindgen
+        wasm_bindgen::JsValue::from_str(&block_result.to_string())
     }
 
     pub async fn info_get_deploy(
@@ -69,7 +72,7 @@ impl SDK {
         deploy_hash: DeployHash,
         finalized_approvals: bool,
         verbosity: Verbosity,
-    ) -> String {
+    ) -> JsValue {
         log("info_get_deploy!".to_string());
         match get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
@@ -82,11 +85,11 @@ impl SDK {
         {
             Ok(info_get_deploy) => {
                 log(format!("info_get_deploy: {info_get_deploy}"));
-                info_get_deploy.to_string()
+                wasm_bindgen::JsValue::from_str(&info_get_deploy.to_string())
             }
             Err(err) => {
                 log(format!("Error occurred in get_deploy: {:?}", err));
-                "{\"error\": true}".to_string()
+                wasm_bindgen::JsValue::from_str("{\"error\": true}")
             }
         }
     }
