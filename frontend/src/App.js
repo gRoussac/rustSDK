@@ -45,6 +45,7 @@ function App() {
       );
       const block = JSON.parse(chain_get_block);
       console.log('js chain_get_block', block);
+
       let hex_str =
         '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445';
       let deploy_hash = new DeployHash(hex_str);
