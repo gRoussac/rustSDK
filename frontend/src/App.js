@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
-import init, { SDK, Verbosity, DeployHash } from 'mytest';
+import init, { SDK, Verbosity, DeployHash } from 'casper-web-sdk';
 
 const host = 'http://localhost:3000';
 
