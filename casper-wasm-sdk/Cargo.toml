@@ -1,5 +1,5 @@
 [package]
-name = "casper-web-sdk"
+name = "casper-wasm-sdk"
 version = "0.1.0"
 edition = "2021"
 
@@ -22,5 +22,5 @@ console_error_panic_hook = { version = "*", optional = true }
 
 [lib]
 crate-type = ["cdylib"]
-name = "casper_web_sdk"
+name = "casper_wasm_sdk"
 path = "src/lib.rs"

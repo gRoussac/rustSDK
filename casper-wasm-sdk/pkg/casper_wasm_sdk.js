@@ -382,7 +382,7 @@ function __wbg_get_imports() {
         const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_log_047c255c80308ee8 = function(arg0, arg1) {
+    imports.wbg.__wbg_log_4081ddb49513a403 = function(arg0, arg1) {
         let deferred0_0;
         let deferred0_1;
         try {
@@ -704,7 +704,7 @@ async function __wbg_init(input) {
     if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
-        input = new URL('casper_web_sdk_bg.wasm', import.meta.url);
+        input = new URL('casper_wasm_sdk_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
