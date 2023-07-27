@@ -1,14 +1,18 @@
 use core::fmt;
 
 use casper_client::{
-    get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier, JsonRpcId, Verbosity,
+    get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier, JsonRpcId,
+    Verbosity as _Verbosity,
 };
 
-use casper_types::DeployHash;
+use casper_types::DeployHash as _DeployHash;
 use rand::Rng;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{
+    convert::{FromWasmAbi, IntoWasmAbi},
+    prelude::*,
+};
 
-static VERBOSITY: Verbosity = Verbosity::High;
+static VERBOSITY: _Verbosity = _Verbosity::High;
 
 #[wasm_bindgen]
 pub struct SDK {}
@@ -29,7 +33,7 @@ impl SDK {
         &mut self,
         node_address: &str,
         block_identifier_height: u64,
-        //  verbosity: _Verbosity,
+        verbosity: Verbosity,
     ) -> String {
         log("state_root_hash!".to_string());
         log(format!("{node_address}"));
@@ -38,7 +42,7 @@ impl SDK {
         let state_root_hash = get_state_root_hash(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
             node_address,
-            VERBOSITY,
+            verbosity.into(),
             Some(BlockIdentifier::Height(block_identifier_height)),
         )
         .await
@@ -52,12 +56,13 @@ impl SDK {
         &mut self,
         node_address: &str,
         block_identifier_height: u64,
+        verbosity: Verbosity,
     ) -> String {
         log("chain_get_block!".to_string());
         let block = get_block(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
             node_address,
-            VERBOSITY,
+            verbosity.into(),
             Some(BlockIdentifier::Height(block_identifier_height)),
         )
         .await
@@ -69,14 +74,15 @@ impl SDK {
     pub async fn info_get_deploy(
         &mut self,
         node_address: &str,
-        deploy_hash: _DeployHash,
+        deploy_hash: DeployHash,
         finalized_approvals: bool,
+        verbosity: Verbosity,
     ) -> String {
         log("info_get_deploy!".to_string());
         let info_get_deploy = get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
             node_address,
-            VERBOSITY,
+            verbosity.into(),
             deploy_hash.into(),
             finalized_approvals,
         )
@@ -88,47 +94,59 @@ impl SDK {
 }
 
 #[wasm_bindgen]
-#[derive(Debug)]
-// Newtype wrapper for the original `casper_client::Verbosity` enum
-pub struct _Verbosity(Verbosity);
+pub struct DeployHash(_DeployHash);
 
-impl From<_Verbosity> for Verbosity {
-    fn from(_verbosity: _Verbosity) -> Self {
-        _verbosity.0
+// Implement conversions between _DeployHash and DeployHash
+impl From<DeployHash> for _DeployHash {
+    fn from(val: DeployHash) -> Self {
+        val.0
     }
 }
-
-impl From<Verbosity> for _Verbosity {
-    fn from(verbosity: Verbosity) -> Self {
-        _Verbosity(verbosity)
-    }
-}
-
-impl fmt::Display for _Verbosity {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.0 {
-            Verbosity::Low => write!(f, "Verbosity level: Low"),
-            Verbosity::Medium => write!(f, "Verbosity level: Medium"),
-            Verbosity::High => write!(f, "Verbosity level: High"),
-        }
-    }
-}
-
-// Newtype wrapper for the original `casper_types::DeployHash` type
-#[wasm_bindgen]
-pub struct _DeployHash(DeployHash);
 
 impl From<_DeployHash> for DeployHash {
-    fn from(_deploy_hash: _DeployHash) -> Self {
-        _deploy_hash.0
+    fn from(val: _DeployHash) -> Self {
+        DeployHash(val)
     }
 }
 
-impl From<DeployHash> for _DeployHash {
-    fn from(deploy_hash: DeployHash) -> Self {
-        _DeployHash(deploy_hash)
+// Implement wasm-bindgen traits for DeployHash
+#[wasm_bindgen]
+impl DeployHash {
+    #[wasm_bindgen(constructor)]
+    pub fn new(abi: Vec<u8>) -> Self {
+        let mut bytes = [0u8; 32];
+        bytes.copy_from_slice(&abi[..32]);
+        DeployHash(_DeployHash::new(bytes.into()))
+    }
+
+    #[wasm_bindgen(js_name = intoAbi)]
+    pub fn into_abi(&self) -> Vec<u8> {
+        self.0.as_ref().to_vec()
     }
 }
+
+macro_rules! impl_from_enum {
+    ($from:ty, $to:ty; $($variant:ident),*) => {
+        impl From<$from> for $to {
+            fn from(val: $from) -> Self {
+                match val {
+                    $(
+                        <$from>::$variant => <$to>::$variant,
+                    )*
+                }
+            }
+        }
+    };
+}
+
+#[wasm_bindgen]
+pub enum Verbosity {
+    Low,
+    Medium,
+    High,
+}
+
+impl_from_enum!(Verbosity, _Verbosity; Low, Medium, High);
 
 #[wasm_bindgen]
 extern "C" {
