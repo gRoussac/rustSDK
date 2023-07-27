@@ -13,13 +13,13 @@ curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 ```shell
 git clone --recurse-submodules https://github.com/casper-ecosystem/rustSDK.git
 
-// compiling the rust-client-rs-sdk is not required but just in case
-cd ./casper-client-rs-sdk
+// compiling the casper-client-rs is not required but just in case
+cd ./casper-client-rs
 cargo build
 
-cd ./app
+cd ./casper-web-sdk
 rustup target add wasm32-unknown-unknown
-// app compilation will trigger sdk wasm compilation (wasm-pack build --target web --no-default-features --features sdk)
+// app compilation will trigger sdk wasm compilation (in casper-client-rs will translate to wasm-pack build --target web --no-default-features --features sdk)
 wasm-pack build --target web
 
 cd ./frontend
