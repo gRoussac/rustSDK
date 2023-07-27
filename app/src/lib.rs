@@ -5,7 +5,7 @@ use casper_client::{
     Verbosity as _Verbosity,
 };
 
-use casper_types::DeployHash as _DeployHash;
+use casper_types::{DeployHash as _DeployHash, Digest};
 use rand::Rng;
 use wasm_bindgen::{
     convert::{FromWasmAbi, IntoWasmAbi},
@@ -79,7 +79,7 @@ impl SDK {
         verbosity: Verbosity,
     ) -> String {
         log("info_get_deploy!".to_string());
-        let info_get_deploy = get_deploy(
+        match get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
             node_address,
             verbosity.into(),
@@ -87,9 +87,16 @@ impl SDK {
             finalized_approvals,
         )
         .await
-        .unwrap();
-        log(format!("info_get_deploy: {info_get_deploy}"));
-        info_get_deploy.to_string()
+        {
+            Ok(info_get_deploy) => {
+                log(format!("info_get_deploy: {info_get_deploy}"));
+                info_get_deploy.to_string()
+            }
+            Err(err) => {
+                log(format!("Error occurred in get_deploy: {:?}", err));
+                "{\"error\": true}".to_string()
+            }
+        }
     }
 }
 
@@ -109,19 +116,15 @@ impl From<_DeployHash> for DeployHash {
     }
 }
 
-// Implement wasm-bindgen traits for DeployHash
 #[wasm_bindgen]
 impl DeployHash {
+    // Constructor to create an instance of DeployHash from a hexadecimal string
     #[wasm_bindgen(constructor)]
-    pub fn new(abi: Vec<u8>) -> Self {
-        let mut bytes = [0u8; 32];
-        bytes.copy_from_slice(&abi[..32]);
-        DeployHash(_DeployHash::new(bytes.into()))
-    }
-
-    #[wasm_bindgen(js_name = intoAbi)]
-    pub fn into_abi(&self) -> Vec<u8> {
-        self.0.as_ref().to_vec()
+    pub fn new(hex_str: &str) -> Result<DeployHash, JsValue> {
+        let bytes = hex::decode(hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+        let mut hash = [0u8; 32];
+        hash.copy_from_slice(&bytes);
+        Ok(DeployHash(Digest::from(hash).into()))
     }
 }
 

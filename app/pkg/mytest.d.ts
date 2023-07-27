@@ -12,13 +12,9 @@ export enum Verbosity {
 export class DeployHash {
   free(): void;
 /**
-* @param {Uint8Array} abi
+* @param {string} hex_str
 */
-  constructor(abi: Uint8Array);
-/**
-* @returns {Uint8Array}
-*/
-  intoAbi(): Uint8Array;
+  constructor(hex_str: string);
 }
 /**
 */
@@ -62,8 +58,7 @@ export interface InitOutput {
   readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly __wbg_deployhash_free: (a: number) => void;
-  readonly deployhash_new: (a: number, b: number) => number;
-  readonly deployhash_intoAbi: (a: number, b: number) => void;
+  readonly deployhash_new: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
