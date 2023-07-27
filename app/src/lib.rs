@@ -1,5 +1,3 @@
-use core::fmt;
-
 use casper_client::{
     get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier, JsonRpcId,
     Verbosity as _Verbosity,
@@ -7,12 +5,7 @@ use casper_client::{
 
 use casper_types::{DeployHash as _DeployHash, Digest};
 use rand::Rng;
-use wasm_bindgen::{
-    convert::{FromWasmAbi, IntoWasmAbi},
-    prelude::*,
-};
-
-static VERBOSITY: _Verbosity = _Verbosity::High;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct SDK {}
@@ -38,7 +31,6 @@ impl SDK {
         log("state_root_hash!".to_string());
         log(format!("{node_address}"));
         log(format!("{block_identifier_height}"));
-        log(format!("{:?}", VERBOSITY));
         let state_root_hash = get_state_root_hash(
             JsonRpcId::from(rand::thread_rng().gen::<i64>()),
             node_address,
