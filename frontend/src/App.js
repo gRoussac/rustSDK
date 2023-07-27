@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
-import init, { SDK, InitOutput, _Verbosity } from 'mytest';
+import init, { SDK, Verbosity, DeployHash } from 'mytest';
 
 const host = 'http://localhost:3000';
-const verbosity = new _Verbosity(2);
+console.log(Verbosity.High);
 
 function App() {
   const [wasm, setWasm] = useState();
@@ -30,11 +30,33 @@ function App() {
     const sdk = SDK.new();
     console.log(sdk);
     try {
-      const hash_as_string = await sdk.get_state_root_hash(host, BigInt('8'));
-      setHash(hash_as_string);
-      const hash = JSON.parse(hash_as_string);
+      const get_state_root_hash = await sdk.get_state_root_hash(
+        host,
+        BigInt('8'),
+        Verbosity.High
+      );
+      const hash = JSON.parse(get_state_root_hash);
       setHash(hash);
-      console.log(hash);
+      console.log('js get_state_root_hash', get_state_root_hash);
+
+      const chain_get_block = await sdk.chain_get_block(
+        host,
+        BigInt('8'),
+        Verbosity.High
+      );
+      const block = JSON.parse(chain_get_block);
+      console.log('js chain_get_block', block);
+      const deploy_hash = new DeployHash(
+        '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445'
+      );
+      const info_get_deploy = await sdk.info_get_deploy(
+        host,
+        deploy_hash,
+        true,
+        Verbosity.High
+      );
+      const info = JSON.parse(info_get_deploy);
+      chain_get_block.log('js  info', info);
     } catch (error) {
       console.error(error);
     }
