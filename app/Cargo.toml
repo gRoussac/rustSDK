@@ -17,6 +17,7 @@ wasm-bindgen = "*"
 wasm-bindgen-futures = "*"
 wee_alloc = { version = "*", optional = true }
 js-sys = "*"
+hex = "0.4"
 console_error_panic_hook = { version = "*", optional = true }
 
 [lib]

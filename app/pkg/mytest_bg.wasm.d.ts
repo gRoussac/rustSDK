@@ -7,8 +7,7 @@ export function sdk_get_state_root_hash(a: number, b: number, c: number, d: numb
 export function sdk_chain_get_block(a: number, b: number, c: number, d: number, e: number): number;
 export function sdk_info_get_deploy(a: number, b: number, c: number, d: number, e: number, f: number): number;
 export function __wbg_deployhash_free(a: number): void;
-export function deployhash_new(a: number, b: number): number;
-export function deployhash_intoAbi(a: number, b: number): void;
+export function deployhash_new(a: number, b: number, c: number): void;
 export function __wbindgen_malloc(a: number, b: number): number;
 export function __wbindgen_realloc(a: number, b: number, c: number, d: number): number;
 export const __wbindgen_export_2: WebAssembly.Table;

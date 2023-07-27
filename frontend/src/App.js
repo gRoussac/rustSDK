@@ -46,9 +46,9 @@ function App() {
       );
       const block = JSON.parse(chain_get_block);
       console.log('js chain_get_block', block);
-      const deploy_hash = new DeployHash(
-        '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445'
-      );
+      let hex_str =
+        '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445';
+      let deploy_hash = new DeployHash(hex_str);
       const info_get_deploy = await sdk.info_get_deploy(
         host,
         deploy_hash,
@@ -56,7 +56,7 @@ function App() {
         Verbosity.High
       );
       const info = JSON.parse(info_get_deploy);
-      chain_get_block.log('js  info', info);
+      console.log('js  info', info);
     } catch (error) {
       console.error(error);
     }
