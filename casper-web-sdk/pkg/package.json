@@ -1,0 +1,14 @@
+{
+  "name": "casper-web-sdk",
+  "version": "0.1.0",
+  "files": [
+    "casper_web_sdk_bg.wasm",
+    "casper_web_sdk.js",
+    "casper_web_sdk.d.ts"
+  ],
+  "module": "casper_web_sdk.js",
+  "types": "casper_web_sdk.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
