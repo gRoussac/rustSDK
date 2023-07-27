@@ -6,7 +6,6 @@ import './App.css';
 import init, { SDK, Verbosity, DeployHash } from 'mytest';
 
 const host = 'http://localhost:3000';
-console.log(Verbosity.High);
 
 function App() {
   const [wasm, setWasm] = useState();
