@@ -17,7 +17,7 @@ git clone --recurse-submodules https://github.com/casper-ecosystem/rustSDK.git
 cd ./casper-client-rs
 cargo build
 
-cd ./casper-web-sdk
+cd ./casper-wasm-sdk
 rustup target add wasm32-unknown-unknown
 // app compilation will trigger sdk wasm compilation (in casper-client-rs will translate to wasm-pack build --target web --no-default-features --features sdk)
 wasm-pack build --target web
