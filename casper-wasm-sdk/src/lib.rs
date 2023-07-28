@@ -2,9 +2,9 @@ use casper_client::{
     get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier, JsonRpcId,
     Verbosity as _Verbosity,
 };
-
 use casper_types::{DeployHash as _DeployHash, Digest};
 use rand::Rng;
+use serde_wasm_bindgen;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -21,28 +21,6 @@ impl SDK {
     pub fn new() -> Self {
         SDK {}
     }
-    #[wasm_bindgen]
-    pub async fn get_state_root_hash(
-        &mut self,
-        node_address: &str,
-        block_identifier_height: u64,
-        verbosity: Verbosity,
-    ) -> JsValue {
-        log("state_root_hash!".to_string());
-        log(format!("{node_address}"));
-        log(format!("{block_identifier_height}"));
-        let state_root_hash = get_state_root_hash(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>()),
-            node_address,
-            verbosity.into(),
-            Some(BlockIdentifier::Height(block_identifier_height)),
-        )
-        .await
-        .unwrap();
-        println!("State root hash: {state_root_hash}");
-        log(format!("State root hash: {state_root_hash}"));
-        wasm_bindgen::JsValue::from_str(&state_root_hash.to_string())
-    }
 
     #[wasm_bindgen]
     pub async fn chain_get_block(
@@ -52,20 +30,29 @@ impl SDK {
         verbosity: Verbosity,
     ) -> JsValue {
         log("chain_get_block!".to_string());
-        let block_result = get_block(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>()),
+        match get_block(
+            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
             Some(BlockIdentifier::Height(block_identifier_height)),
         )
         .await
-        .unwrap();
-        log(format!("chain_get_block: {:?}", block_result));
-
-        // Convert the block result to a JsValue using serde-wasm-bindgen
-        wasm_bindgen::JsValue::from_str(&block_result.to_string())
+        {
+            Ok(block_result) => match serde_wasm_bindgen::to_value(&block_result) {
+                Ok(json) => json,
+                Err(err) => {
+                    error(format!("Error serializing block to JSON: {:?}", err));
+                    JsValue::null()
+                }
+            },
+            Err(err) => {
+                error(format!("Error occurred in chain_get_block: {:?}", err));
+                JsValue::null()
+            }
+        }
     }
 
+    #[wasm_bindgen]
     pub async fn info_get_deploy(
         &mut self,
         node_address: &str,
@@ -73,9 +60,9 @@ impl SDK {
         finalized_approvals: bool,
         verbosity: Verbosity,
     ) -> JsValue {
-        log("info_get_deploy!".to_string());
+        //log("info_get_deploy!".to_string());
         match get_deploy(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>()),
+            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
             deploy_hash.into(),
@@ -83,13 +70,46 @@ impl SDK {
         )
         .await
         {
-            Ok(info_get_deploy) => {
-                log(format!("info_get_deploy: {info_get_deploy}"));
-                wasm_bindgen::JsValue::from_str(&info_get_deploy.to_string())
-            }
+            Ok(info_get_deploy) => match serde_wasm_bindgen::to_value(&info_get_deploy) {
+                Ok(json) => json,
+                Err(err) => {
+                    error(format!("Error serializing block to JSON: {:?}", err));
+                    JsValue::null()
+                }
+            },
             Err(err) => {
-                log(format!("Error occurred in get_deploy: {:?}", err));
-                wasm_bindgen::JsValue::from_str("{\"error\": true}")
+                error(format!("Error occurred in info_get_deploy: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[wasm_bindgen]
+    pub async fn get_state_root_hash(
+        &mut self,
+        node_address: &str,
+        block_identifier_height: u64,
+        verbosity: Verbosity,
+    ) -> JsValue {
+        //  log("state_root_hash!".to_string());
+        match get_state_root_hash(
+            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+            node_address,
+            verbosity.into(),
+            Some(BlockIdentifier::Height(block_identifier_height)),
+        )
+        .await
+        {
+            Ok(state_root_hash) => match serde_wasm_bindgen::to_value(&state_root_hash) {
+                Ok(json) => json,
+                Err(err) => {
+                    error(format!("Error serializing block to JSON: {:?}", err));
+                    JsValue::null()
+                }
+            },
+            Err(err) => {
+                error(format!("Error occurred in chain_get_block: {:?}", err));
+                JsValue::null()
             }
         }
     }
@@ -152,4 +172,10 @@ extern "C" {
     // `log(..)`
     #[wasm_bindgen(js_namespace = console)]
     pub fn log(s: String);
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    pub fn error(s: String);
 }
