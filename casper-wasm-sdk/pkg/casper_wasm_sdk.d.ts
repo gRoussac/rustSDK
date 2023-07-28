@@ -46,6 +46,14 @@ export class SDK {
 * @returns {Promise<any>}
 */
   get_state_root_hash(node_address: string, block_identifier_height: bigint, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {string} account_identifier
+* @param {bigint} block_identifier_height
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  state_get_account_info(node_address: string, account_identifier: string, block_identifier_height: bigint, verbosity: number): Promise<any>;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -57,6 +65,7 @@ export interface InitOutput {
   readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_deployhash_free: (a: number) => void;
   readonly deployhash_new: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;

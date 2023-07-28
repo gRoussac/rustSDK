@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
-import init, { SDK, Verbosity, DeployHash } from 'casper-wasm-sdk';
+import init, { SDK, Verbosity, DeployHash, PublicKey } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
 
@@ -54,6 +54,14 @@ function App() {
         Verbosity.High
       );
       console.log('js info_get_deploy', info_get_deploy);
+
+      const state_get_account_info = await sdk.state_get_account_info(
+        host,
+        '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce',
+        BigInt('8'),
+        Verbosity.High
+      );
+      console.log('js state_get_account_info', state_get_account_info);
     } catch (error) {
       console.error(error);
     }

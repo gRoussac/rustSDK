@@ -1,10 +1,10 @@
 use casper_client::{
-    get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier, JsonRpcId,
-    Verbosity as _Verbosity,
+    get_account, get_block, get_deploy, get_state_root_hash, rpcs::common::BlockIdentifier,
+    JsonRpcId, Verbosity as _Verbosity,
 };
-use casper_types::{DeployHash as _DeployHash, Digest};
+
+use casper_types::{bytesrepr::FromBytes, DeployHash as _DeployHash, Digest, PublicKey};
 use rand::Rng;
-use serde_wasm_bindgen;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -29,7 +29,6 @@ impl SDK {
         block_identifier_height: u64,
         verbosity: Verbosity,
     ) -> JsValue {
-        log("chain_get_block!".to_string());
         match get_block(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
@@ -109,6 +108,60 @@ impl SDK {
             },
             Err(err) => {
                 error(format!("Error occurred in chain_get_block: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[wasm_bindgen]
+    pub async fn state_get_account_info(
+        &mut self,
+        node_address: &str,
+        account_identifier: String,
+        block_identifier_height: u64,
+        verbosity: Verbosity,
+    ) -> JsValue {
+        log("state_get_account_info!".to_string());
+        log(format!("Account Identifier: {:?}", account_identifier));
+        let account_identifier_bytes: Vec<u8> = match hex::decode(account_identifier) {
+            Ok(bytes) => bytes,
+            Err(err) => {
+                log(format!("Error decoding account identifier: {:?}", err).to_string());
+                return JsValue::null();
+            }
+        };
+        let account_identifier = match PublicKey::from_bytes(&account_identifier_bytes) {
+            Ok((public_key, remainder)) if remainder.is_empty() => public_key,
+            _ => {
+                // Handle the case when the account identifier has an unsupported format or other errors
+                error("Error converting account identifier".to_string());
+                return JsValue::null();
+            }
+        };
+
+        match get_account(
+            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+            node_address,
+            verbosity.into(),
+            Some(BlockIdentifier::Height(block_identifier_height)),
+            account_identifier,
+        )
+        .await
+        {
+            Ok(state_get_account_info) => {
+                match serde_wasm_bindgen::to_value(&state_get_account_info) {
+                    Ok(json) => json,
+                    Err(err) => {
+                        error(format!("Error serializing block to JSON: {:?}", err));
+                        JsValue::null()
+                    }
+                }
+            }
+            Err(err) => {
+                error(format!(
+                    "Error occurred in state_get_account_info: {:?}",
+                    err
+                ));
                 JsValue::null()
             }
         }
