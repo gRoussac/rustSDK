@@ -10,7 +10,7 @@ const host = 'http://localhost:3000';
 function App() {
   const [wasm, setWasm] = useState();
   const [ready, setReady] = useState(false);
-  const [hash, setHash] = useState({});
+  const [hash, setHash] = useState('');
 
   let test = false;
 
@@ -34,7 +34,7 @@ function App() {
         BigInt('8'),
         Verbosity.High
       );
-      setHash(hash);
+      setHash(get_state_root_hash.result.state_root_hash);
       console.log('js get_state_root_hash', get_state_root_hash);
 
       const chain_get_block = await sdk.chain_get_block(
@@ -42,7 +42,6 @@ function App() {
         BigInt('8'),
         Verbosity.High
       );
-      // const block = JSON.parse(chain_get_block);
       console.log('js chain_get_block', chain_get_block);
 
       let hex_str =
@@ -54,7 +53,7 @@ function App() {
         true,
         Verbosity.High
       );
-      console.log('js  info', info_get_deploy);
+      console.log('js info_get_deploy', info_get_deploy);
     } catch (error) {
       console.error(error);
     }
@@ -75,7 +74,7 @@ function App() {
           <br /> <br />
           State root hash
           <br /> <br />
-          {hash && hash.result && hash.result.state_root_hash}
+          {hash}
           <br />
         </div>
       </>

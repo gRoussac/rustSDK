@@ -18,6 +18,9 @@ wasm-bindgen-futures = "*"
 wee_alloc = { version = "*", optional = true }
 js-sys = "*"
 hex = "0.4"
+# serde = { version = "1.0", features = ["derive"] }
+# serde_json = "1.0"
+serde-wasm-bindgen = "0.5.0"
 console_error_panic_hook = { version = "*", optional = true }
 
 [lib]
