@@ -32,8 +32,8 @@ impl GlobalStateIdentifier {
 }
 
 impl From<GlobalStateIdentifier> for _GlobalStateIdentifier {
-    fn from(wrapper: GlobalStateIdentifier) -> Self {
-        wrapper.0
+    fn from(global_state_identifier: GlobalStateIdentifier) -> Self {
+        global_state_identifier.0
     }
 }
 

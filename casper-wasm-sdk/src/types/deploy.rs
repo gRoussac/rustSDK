@@ -18,13 +18,13 @@ impl Deploy {
 }
 
 impl From<Deploy> for _Deploy {
-    fn from(val: Deploy) -> Self {
-        val.0
+    fn from(deploy: Deploy) -> Self {
+        deploy.0
     }
 }
 
 impl From<_Deploy> for Deploy {
-    fn from(val: _Deploy) -> Self {
-        Deploy(val)
+    fn from(deploy: _Deploy) -> Self {
+        Deploy(deploy)
     }
 }
