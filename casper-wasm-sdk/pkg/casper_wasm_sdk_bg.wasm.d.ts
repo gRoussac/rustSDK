@@ -1,7 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export function sdk_info_get_deploy(a: number, b: number, c: number, d: number, e: number, f: number): number;
+export function sdk_state_get_balance(a: number, b: number, c: number, d: number, e: number, f: number): number;
 export function log(a: number, b: number): void;
+export function sdk_chain_get_block(a: number, b: number, c: number, d: number, e: number): number;
+export function __wbg_sdk_free(a: number): void;
+export function sdk_new(): number;
 export function __wbg_blockhash_free(a: number): void;
 export function blockhash_new(a: number, b: number): number;
 export function blockhash_toBytes(a: number, b: number): void;
@@ -23,20 +28,15 @@ export function __wbg_path_free(a: number): void;
 export function path_new(a: number): number;
 export function __wbg_uref_free(a: number): void;
 export function uref_new(a: number, b: number, c: number): number;
-export function __wbg_sdk_free(a: number): void;
-export function sdk_new(): number;
-export function sdk_chain_get_block(a: number, b: number, c: number, d: number, e: number): number;
-export function sdk_info_get_deploy(a: number, b: number, c: number, d: number, e: number, f: number): number;
-export function sdk_get_state_root_hash(a: number, b: number, c: number, d: number, e: number): number;
-export function sdk_state_get_account_info(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
-export function sdk_state_get_balance(a: number, b: number, c: number, d: number, e: number, f: number): number;
-export function sdk_state_get_dictionary_item(a: number, b: number, c: number, d: number, e: number, f: number): number;
-export function sdk_query_global_state(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function globalstateidentifier_fromBlockHeight(a: number): number;
 export function globalstateidentifier_fromBlockHash(a: number): number;
 export function __wbg_deployhash_free(a: number): void;
 export function __wbg_globalstateidentifier_free(a: number): void;
 export function globalstateidentifier_new(a: number): number;
+export function sdk_state_get_dictionary_item(a: number, b: number, c: number, d: number, e: number, f: number): number;
+export function sdk_state_get_account_info(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
+export function sdk_get_state_root_hash(a: number, b: number, c: number, d: number, e: number): number;
+export function sdk_query_global_state(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function __wbindgen_malloc(a: number, b: number): number;
 export function __wbindgen_realloc(a: number, b: number, c: number, d: number): number;
 export const __wbindgen_export_2: WebAssembly.Table;
