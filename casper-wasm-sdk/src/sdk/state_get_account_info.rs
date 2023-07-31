@@ -18,7 +18,7 @@ impl SDK {
         &mut self,
         node_address: &str,
         account_identifier: String,
-        block_identifier: BlockIdentifier,
+        block_identifier: Option<BlockIdentifier>,
         verbosity: Verbosity,
     ) -> JsValue {
         //log("state_get_account_info!");
@@ -41,7 +41,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
-            Some(block_identifier.into()),
+            block_identifier.map(Into::into),
             account_identifier,
         )
         .await;
