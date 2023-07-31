@@ -15,7 +15,7 @@ impl SDK {
     pub async fn get_state_root_hash(
         &mut self,
         node_address: &str,
-        block_identifier: BlockIdentifier,
+        block_identifier: Option<BlockIdentifier>,
         verbosity: Verbosity,
     ) -> JsValue {
         //log("state_root_hash!");
@@ -23,7 +23,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
-            Some(block_identifier.into()),
+            block_identifier.map(Into::into),
         )
         .await;
         serialize_result(result)

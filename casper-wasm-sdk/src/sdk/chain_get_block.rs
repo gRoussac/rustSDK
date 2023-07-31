@@ -14,7 +14,7 @@ impl SDK {
     pub async fn chain_get_block(
         &mut self,
         node_address: &str,
-        block_identifier: BlockIdentifier,
+        block_identifier: Option<BlockIdentifier>,
         verbosity: Verbosity,
     ) -> JsValue {
         //log("chain_get_block!");
@@ -22,7 +22,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
-            Some(block_identifier.into()),
+            block_identifier.map(Into::into),
         )
         .await;
         serialize_result(result)
