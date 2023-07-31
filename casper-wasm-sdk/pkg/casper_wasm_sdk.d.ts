@@ -128,17 +128,6 @@ export class Path {
 export class SDK {
   free(): void;
 /**
-* @returns {SDK}
-*/
-  static new(): SDK;
-/**
-* @param {string} node_address
-* @param {BlockIdentifier} block_identifier
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  chain_get_block(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
-/**
 * @param {string} node_address
 * @param {DeployHash} deploy_hash
 * @param {boolean} finalized_approvals
@@ -146,21 +135,6 @@ export class SDK {
 * @returns {Promise<any>}
 */
   info_get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {BlockIdentifier} block_identifier
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  get_state_root_hash(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {string} account_identifier
-* @param {BlockIdentifier} block_identifier
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  state_get_account_info(node_address: string, account_identifier: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {Digest} state_root_hash
@@ -171,12 +145,38 @@ export class SDK {
   state_get_balance(node_address: string, state_root_hash: Digest, purse: URef, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
+* @param {BlockIdentifier} block_identifier
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  chain_get_block(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
+/**
+* @returns {SDK}
+*/
+  static new(): SDK;
+/**
+* @param {string} node_address
 * @param {Digest} state_root_hash
 * @param {DictionaryItemIdentifier} dictionary_item_identifier
 * @param {number} verbosity
 * @returns {Promise<any>}
 */
   state_get_dictionary_item(node_address: string, state_root_hash: Digest, dictionary_item_identifier: DictionaryItemIdentifier, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {string} account_identifier
+* @param {BlockIdentifier} block_identifier
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  state_get_account_info(node_address: string, account_identifier: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {BlockIdentifier} block_identifier
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  get_state_root_hash(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {GlobalStateIdentifier} global_state_identifier
@@ -202,7 +202,12 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly log: (a: number, b: number) => void;
+  readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly __wbg_sdk_free: (a: number) => void;
+  readonly sdk_new: () => number;
   readonly __wbg_blockhash_free: (a: number) => void;
   readonly blockhash_new: (a: number, b: number) => number;
   readonly blockhash_toBytes: (a: number, b: number) => void;
@@ -224,20 +229,15 @@ export interface InitOutput {
   readonly path_new: (a: number) => number;
   readonly __wbg_uref_free: (a: number) => void;
   readonly uref_new: (a: number, b: number, c: number) => number;
-  readonly __wbg_sdk_free: (a: number) => void;
-  readonly sdk_new: () => number;
-  readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
   readonly globalstateidentifier_fromBlockHash: (a: number) => number;
   readonly __wbg_deployhash_free: (a: number) => void;
   readonly __wbg_globalstateidentifier_free: (a: number) => void;
   readonly globalstateidentifier_new: (a: number) => number;
+  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
