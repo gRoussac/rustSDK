@@ -1,5 +1,6 @@
 use wasm_bindgen::prelude::*;
 
+pub mod account_put_deploy;
 pub mod chain_get_block;
 pub mod get_state_root_hash;
 pub mod info_get_deploy;

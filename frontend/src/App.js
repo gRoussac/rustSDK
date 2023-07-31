@@ -14,6 +14,7 @@ import init, {
   BlockIdentifier,
   GlobalStateIdentifier,
   Path,
+  Deploy,
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
@@ -119,6 +120,18 @@ function App() {
         Verbosity.High
       );
       console.log('js query_global_state', query_global_state);
+
+      const deployJson =
+        '{"hash":"8e403531b00823aaac1035a6133ef9e9ae66572a792aba11d97d73295010e1ec","header":{"account":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","timestamp":"2023-07-31T15:36:18.964Z","ttl":"30m","gas_price":1,"body_hash":"0f7bbc79a5f02f2621347005c62fb440d8d07d5c97e2cd11da090da24989f61f","dependencies":[],"chain_name":"integration-test"},"payment":{"ModuleBytes":{"module_bytes":"","args":[["amount",{"bytes":"058e31a6553a","cl_type":"U512"}]]}},"session":{"StoredContractByHash":{"hash":"9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477","entry_point":"decimals","args":[]}},"approvals":[{"signer":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","signature":"0136987c507b09238895836c7e61f480da4e08a71ac655e2f9e3235e15b0d6454712d7b6942609d7fcf3e40d57915a639cc476d03889478a7b07ff583aea93c807"}]}';
+
+      let deploy = await new Deploy(JSON.parse(deployJson));
+      console.log(deploy);
+      const account_put_deploy = await sdk.account_put_deploy(
+        host,
+        deploy,
+        Verbosity.High
+      );
+      console.log('js account_put_deploy', account_put_deploy);
     } catch (error) {
       console.error(error);
     }

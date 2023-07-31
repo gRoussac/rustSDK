@@ -21,7 +21,7 @@ impl SDK {
         dictionary_item_identifier: DictionaryItemIdentifier,
         verbosity: Verbosity,
     ) -> JsValue {
-        //log("state_get_dictionary_item!".to_string());
+        //log("state_get_dictionary_item!");
         let result: Result<SuccessResponse<GetDictionaryItemResult>, Error> = get_dictionary_item(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
