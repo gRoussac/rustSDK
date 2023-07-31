@@ -10,8 +10,8 @@ pub enum Verbosity {
 }
 
 impl From<Verbosity> for _Verbosity {
-    fn from(wrapper: Verbosity) -> Self {
-        match wrapper {
+    fn from(verbosity: Verbosity) -> Self {
+        match verbosity {
             Verbosity::Low => _Verbosity::Low,
             Verbosity::Medium => _Verbosity::Medium,
             Verbosity::High => _Verbosity::High,

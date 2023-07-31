@@ -5,11 +5,34 @@
 */
 export function log(s: string): void;
 /**
+* @param {Uint8Array} key
+* @returns {TransferAddr}
+*/
+export function fromTransfer(key: Uint8Array): TransferAddr;
+/**
 */
 export enum Verbosity {
   Low = 0,
   Medium = 1,
   High = 2,
+}
+/**
+*/
+export class AccountHash {
+  free(): void;
+/**
+* @param {any} account_hash
+*/
+  constructor(account_hash: any);
+/**
+* @returns {string}
+*/
+  toFormattedString(): string;
+/**
+* @param {string} input
+* @returns {AccountHash}
+*/
+  static fromFormattedStr(input: string): AccountHash;
 }
 /**
 */
@@ -63,6 +86,19 @@ export class DeployHash {
 }
 /**
 */
+export class DictionaryAddr {
+  free(): void;
+/**
+* @param {Uint8Array} bytes
+*/
+  constructor(bytes: Uint8Array);
+/**
+* @returns {Uint8Array}
+*/
+  to_vec(): Uint8Array;
+}
+/**
+*/
 export class DictionaryItemIdentifier {
   free(): void;
 /**
@@ -79,6 +115,23 @@ export class Digest {
 * @param {Uint8Array} bytes
 */
   constructor(bytes: Uint8Array);
+}
+/**
+*/
+export class EraId {
+  free(): void;
+/**
+* @param {bigint} value
+*/
+  constructor(value: bigint);
+/**
+* @returns {Uint8Array}
+*/
+  to_le_bytes(): Uint8Array;
+/**
+* @returns {bigint}
+*/
+  value(): bigint;
 }
 /**
 */
@@ -106,6 +159,19 @@ export class GlobalStateIdentifier {
 }
 /**
 */
+export class HashAddr {
+  free(): void;
+/**
+* @param {Uint8Array} bytes
+*/
+  constructor(bytes: Uint8Array);
+/**
+* @returns {Uint8Array}
+*/
+  to_vec(): Uint8Array;
+}
+/**
+*/
 export class Key {
   free(): void;
 /**
@@ -122,6 +188,67 @@ export class Key {
 * @returns {Key}
 */
   static fromDeployInfo(key: DeployHash): Key;
+/**
+* @param {AccountHash} key
+* @returns {Key}
+*/
+  static fromAccount(key: AccountHash): Key;
+/**
+* @param {HashAddr} key
+* @returns {Key}
+*/
+  static fromHash(key: HashAddr): Key;
+/**
+* @param {Uint8Array} key
+* @returns {TransferAddr}
+*/
+  static fromTransfer(key: Uint8Array): TransferAddr;
+/**
+* @param {EraId} key
+* @returns {Key}
+*/
+  static fromEraInfo(key: EraId): Key;
+/**
+* @param {URefAddr} key
+* @returns {Key}
+*/
+  static fromBalance(key: URefAddr): Key;
+/**
+* @param {AccountHash} key
+* @returns {Key}
+*/
+  static fromBid(key: AccountHash): Key;
+/**
+* @param {AccountHash} key
+* @returns {Key}
+*/
+  static fromWithdraw(key: AccountHash): Key;
+/**
+* @param {DictionaryAddr} key
+* @returns {Key}
+*/
+  static fromDictionary(key: DictionaryAddr): Key;
+/**
+* @returns {Key}
+*/
+  static fromSystemContractRegistry(): Key;
+/**
+* @returns {Key}
+*/
+  static fromEraSummary(): Key;
+/**
+* @param {AccountHash} key
+* @returns {Key}
+*/
+  static fromUnbond(key: AccountHash): Key;
+/**
+* @returns {Key}
+*/
+  static fromChainspecRegistry(): Key;
+/**
+* @returns {Key}
+*/
+  static fromChecksumRegistry(): Key;
 }
 /**
 */
@@ -137,33 +264,9 @@ export class Path {
 export class SDK {
   free(): void;
 /**
-* @param {string} node_address
-* @param {string} account_identifier
-* @param {BlockIdentifier} block_identifier
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  state_get_account_info(node_address: string, account_identifier: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {Digest} state_root_hash
-* @param {URef} purse
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  state_get_balance(node_address: string, state_root_hash: Digest, purse: URef, verbosity: number): Promise<any>;
-/**
 * @returns {SDK}
 */
   static new(): SDK;
-/**
-* @param {string} node_address
-* @param {DeployHash} deploy_hash
-* @param {boolean} finalized_approvals
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  info_get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {BlockIdentifier} block_identifier
@@ -173,11 +276,27 @@ export class SDK {
   get_state_root_hash(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
+* @param {string} account_identifier
+* @param {BlockIdentifier} block_identifier
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  state_get_account_info(node_address: string, account_identifier: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
 * @param {Deploy} deploy
 * @param {number} verbosity
 * @returns {Promise<any>}
 */
   account_put_deploy(node_address: string, deploy: Deploy, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {DeployHash} deploy_hash
+* @param {boolean} finalized_approvals
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  info_get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {GlobalStateIdentifier} global_state_identifier
@@ -189,6 +308,13 @@ export class SDK {
   query_global_state(node_address: string, global_state_identifier: GlobalStateIdentifier, key: Key, path: Path, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
+* @param {BlockIdentifier} block_identifier
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
+  chain_get_block(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
 * @param {Digest} state_root_hash
 * @param {DictionaryItemIdentifier} dictionary_item_identifier
 * @param {number} verbosity
@@ -197,11 +323,21 @@ export class SDK {
   state_get_dictionary_item(node_address: string, state_root_hash: Digest, dictionary_item_identifier: DictionaryItemIdentifier, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
-* @param {BlockIdentifier} block_identifier
+* @param {Digest} state_root_hash
+* @param {URef} purse
 * @param {number} verbosity
 * @returns {Promise<any>}
 */
-  chain_get_block(node_address: string, block_identifier: BlockIdentifier, verbosity: number): Promise<any>;
+  state_get_balance(node_address: string, state_root_hash: Digest, purse: URef, verbosity: number): Promise<any>;
+}
+/**
+*/
+export class TransferAddr {
+  free(): void;
+/**
+* @param {Uint8Array} bytes
+*/
+  constructor(bytes: Uint8Array);
 }
 /**
 */
@@ -213,18 +349,34 @@ export class URef {
 */
   constructor(address: Uint8Array, access_rights: number);
 }
+/**
+*/
+export class URefAddr {
+  free(): void;
+/**
+* @param {Uint8Array} bytes
+*/
+  constructor(bytes: Uint8Array);
+/**
+* @returns {Uint8Array}
+*/
+  to_vec(): Uint8Array;
+}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly log: (a: number, b: number) => void;
   readonly __wbg_sdk_free: (a: number) => void;
   readonly sdk_new: () => number;
-  readonly __wbg_deploy_free: (a: number) => void;
-  readonly deploy_new: (a: number) => number;
-  readonly __wbg_deployhash_free: (a: number) => void;
+  readonly __wbg_accounthash_free: (a: number) => void;
+  readonly accounthash_new: (a: number, b: number) => void;
+  readonly accounthash_toFormattedString: (a: number, b: number) => void;
+  readonly accounthash_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
+  readonly dictionaryaddr_to_vec: (a: number, b: number) => void;
+  readonly hashaddr_new: (a: number, b: number, c: number) => void;
   readonly deployhash_new: (a: number, b: number, c: number) => void;
   readonly __wbg_digest_free: (a: number) => void;
   readonly digest_new: (a: number, b: number, c: number) => void;
@@ -237,14 +389,31 @@ export interface InitOutput {
   readonly key_new: (a: number, b: number) => void;
   readonly key_fromURef: (a: number) => number;
   readonly key_fromDeployInfo: (a: number) => number;
+  readonly key_fromAccount: (a: number) => number;
+  readonly key_fromHash: (a: number) => number;
+  readonly key_fromTransfer: (a: number, b: number) => number;
+  readonly key_fromEraInfo: (a: number) => number;
+  readonly key_fromBalance: (a: number) => number;
+  readonly key_fromBid: (a: number) => number;
+  readonly key_fromWithdraw: (a: number) => number;
+  readonly key_fromDictionary: (a: number) => number;
+  readonly key_fromSystemContractRegistry: () => number;
+  readonly key_fromEraSummary: () => number;
+  readonly key_fromUnbond: (a: number) => number;
+  readonly key_fromChainspecRegistry: () => number;
+  readonly key_fromChecksumRegistry: () => number;
   readonly __wbg_path_free: (a: number) => void;
   readonly path_new: (a: number) => number;
-  readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly hashaddr_to_vec: (a: number, b: number) => void;
+  readonly __wbg_dictionaryaddr_free: (a: number) => void;
+  readonly __wbg_hashaddr_free: (a: number) => void;
+  readonly __wbg_deployhash_free: (a: number) => void;
   readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly log: (a: number, b: number) => void;
-  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly transferaddr_new: (a: number, b: number, c: number) => void;
+  readonly fromTransfer: (a: number, b: number) => number;
+  readonly urefaddr_new: (a: number, b: number, c: number) => void;
+  readonly urefaddr_to_vec: (a: number, b: number) => void;
   readonly __wbg_blockhash_free: (a: number) => void;
   readonly blockhash_new: (a: number, b: number) => number;
   readonly blockhash_toBytes: (a: number, b: number) => void;
@@ -252,11 +421,24 @@ export interface InitOutput {
   readonly blockidentifier_new: (a: number) => number;
   readonly blockidentifier_from_hash: (a: number) => number;
   readonly blockidentifier_fromHeight: (a: number) => number;
+  readonly __wbg_deploy_free: (a: number) => void;
+  readonly deploy_new: (a: number) => number;
   readonly __wbg_dictionaryitemidentifier_free: (a: number) => void;
   readonly dictionaryitemidentifier_new: (a: number, b: number, c: number) => number;
+  readonly __wbg_eraid_free: (a: number) => void;
+  readonly eraid_new: (a: number) => number;
+  readonly eraid_to_le_bytes: (a: number, b: number) => void;
+  readonly eraid_value: (a: number) => number;
   readonly __wbg_uref_free: (a: number) => void;
   readonly uref_new: (a: number, b: number, c: number) => number;
+  readonly __wbg_urefaddr_free: (a: number) => void;
+  readonly __wbg_transferaddr_free: (a: number) => void;
+  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;

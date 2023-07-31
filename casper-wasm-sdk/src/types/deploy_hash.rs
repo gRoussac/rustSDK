@@ -6,14 +6,14 @@ use wasm_bindgen::prelude::*;
 pub struct DeployHash(_DeployHash);
 
 impl From<DeployHash> for _DeployHash {
-    fn from(val: DeployHash) -> Self {
-        val.0
+    fn from(deploy_hash: DeployHash) -> Self {
+        deploy_hash.0
     }
 }
 
 impl From<_DeployHash> for DeployHash {
-    fn from(val: _DeployHash) -> Self {
-        DeployHash(val)
+    fn from(deploy_hash: _DeployHash) -> Self {
+        DeployHash(deploy_hash)
     }
 }
 

@@ -1,6 +1,7 @@
 use super::SDK;
 use crate::{
     helpers::serialize_result,
+    js::externs::log,
     types::{deploy_hash::DeployHash, verbosity::Verbosity},
 };
 use casper_client::{
@@ -20,6 +21,7 @@ impl SDK {
         verbosity: Verbosity,
     ) -> JsValue {
         //log("info_get_deploy!");
+        log(&format!("{:?}", verbosity));
         let result: Result<SuccessResponse<GetDeployResult>, Error> = get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
