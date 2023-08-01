@@ -11,9 +11,9 @@ pub struct URef(_URef);
 #[wasm_bindgen]
 impl URef {
     #[wasm_bindgen(constructor)]
-    pub fn new(hex_str: &str, access_rights: u8) -> Result<URef, JsValue> {
+    pub fn new(uref_hex_str: &str, access_rights: u8) -> Result<URef, JsValue> {
         // Convert the input hexadecimal string to bytes
-        let bytes = match hex::decode(hex_str) {
+        let bytes = match hex::decode(uref_hex_str) {
             Ok(bytes) => bytes,
             Err(error) => return Err(JsValue::from_str(&format!("Invalid hex string: {}", error))),
         };
@@ -27,9 +27,9 @@ impl URef {
     }
 
     #[wasm_bindgen(js_name = "fromUint8Array")]
-    pub fn from_bytes(address: Vec<u8>, access_rights: u8) -> Self {
+    pub fn from_bytes(bytes: Vec<u8>, access_rights: u8) -> Self {
         let mut address_array = [0u8; 32];
-        address_array[..address.len()].copy_from_slice(&address);
+        address_array[..bytes.len()].copy_from_slice(&bytes);
 
         URef(_URef::new(
             address_array,

@@ -13,11 +13,12 @@ pub struct DeployHash(_DeployHash);
 #[wasm_bindgen]
 impl DeployHash {
     #[wasm_bindgen(constructor)]
-    pub fn new(hex_str: &str) -> Result<DeployHash, JsValue> {
-        let bytes = hex::decode(hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+    pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, JsValue> {
+        let bytes = hex::decode(deploy_hash_hex_str)
+            .map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
         let mut hash = [0u8; _Digest::LENGTH];
         hash.copy_from_slice(&bytes);
-        Ok(_DeployHash::new(Digest::from(hash).into()).into())
+        Self::from_digest(Digest::from(hash))
     }
 
     pub fn from_digest(digest: Digest) -> Result<DeployHash, JsValue> {
@@ -59,7 +60,7 @@ impl ToBytes for DeployHash {
 
 impl FromBytes for DeployHash {
     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
-        let (inner, remainder) = Digest::from_bytes(bytes)?;
-        Ok((DeployHash::from(inner), remainder))
+        let (digest, remainder) = Digest::from_bytes(bytes)?;
+        Ok((DeployHash::from(digest), remainder))
     }
 }

@@ -11,7 +11,17 @@ pub struct Digest(_Digest);
 #[wasm_bindgen]
 impl Digest {
     #[wasm_bindgen(constructor)]
-    pub fn new(bytes: Vec<u8>) -> Result<Digest, JsValue> {
+    pub fn new(digest_hex_str: &str) -> Result<Digest, JsValue> {
+        let bytes =
+            hex::decode(digest_hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+        if bytes.len() != _Digest::LENGTH {
+            return Err(JsValue::from_str("Invalid Digest length"));
+        }
+        Self::from_digest(bytes)
+    }
+
+    #[wasm_bindgen]
+    pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, JsValue> {
         let mut digest_bytes = [0u8; _Digest::LENGTH];
         if bytes.len() != _Digest::LENGTH {
             return Err(JsValue::from_str("Invalid Digest length"));
@@ -49,7 +59,7 @@ impl ToBytes for Digest {
 
 impl FromBytes for Digest {
     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
-        _Digest::from_bytes(bytes).map(|(inner, remainder)| (Digest(inner), remainder))
+        _Digest::from_bytes(bytes).map(|(digest, remainder)| (Digest(digest), remainder))
     }
 }
 

@@ -15,8 +15,8 @@ import init, {
   GlobalStateIdentifier,
   Path,
   Deploy,
-  hexToUint8Array,
   AccessRights,
+  // hexToUint8Array,
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
@@ -84,19 +84,16 @@ function App() {
         'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e';
       console.log(new AccessRights(0o07));
       const uref = new URef(addressHex, AccessRights.READ_ADD_WRITE());
-      const stateRootHashHex = chain_get_state_root_hash.result.state_root_hash;
-      const stateRootHashBytes = hexToUint8Array(stateRootHashHex);
       const state_get_balance = await sdk.state_get_balance(
         host,
         Verbosity.High,
-        new Digest(stateRootHashBytes),
+        new Digest(chain_get_state_root_hash.result.state_root_hash),
         uref
       );
       console.log('js state_get_balance', state_get_balance);
 
       const dict_addressHex =
         '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530'; // event
-      const dict_addressBytes = hexToUint8Array(dict_addressHex);
       const seedURef = new URef(dict_addressHex, AccessRights.READ_ADD_WRITE());
       const dictionary_item_identifier = new DictionaryItemIdentifier(
         seedURef,
@@ -105,19 +102,20 @@ function App() {
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(
         host,
         Verbosity.High,
-        new Digest(stateRootHashBytes),
+        new Digest(chain_get_state_root_hash.result.state_root_hash),
         dictionary_item_identifier
       );
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
 
       const uref_addressHex =
         'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8'; // named key "name" should be "USDC" parsed value
-      const uref_addressBytes = hexToUint8Array(uref_addressHex);
 
       const query_global_state = await sdk.query_global_state(
         host,
         Verbosity.High,
-        GlobalStateIdentifier.fromStateRootHash(new Digest(stateRootHashBytes)),
+        GlobalStateIdentifier.fromStateRootHash(
+          new Digest(chain_get_state_root_hash.result.state_root_hash)
+        ),
         Key.fromURef(new URef(uref_addressHex, new AccessRights(0o01))),
         new Path([])
       );
