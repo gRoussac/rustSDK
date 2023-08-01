@@ -16,6 +16,7 @@ import init, {
   Path,
   Deploy,
   AccessRights,
+  PublicKey,
   // hexToUint8Array,
 } from 'casper-wasm-sdk';
 
@@ -47,8 +48,7 @@ function App() {
     try {
       const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(
         host,
-        Verbosity.High,
-        undefined
+        Verbosity.High
       );
       setHash(chain_get_state_root_hash.result.state_root_hash);
       console.log('js chain_get_state_root_hash', chain_get_state_root_hash);
@@ -60,14 +60,13 @@ function App() {
       );
       console.log('js chain_get_block', chain_get_block);
 
-      let hex_str =
-        '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445';
-      let deploy_hash = new DeployHash(hex_str);
       let finalized_approvals = true;
       const info_get_deploy = await sdk.get_deploy(
         host,
         Verbosity.High,
-        deploy_hash,
+        new DeployHash(
+          '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445'
+        ),
         finalized_approvals
       );
 
@@ -76,27 +75,28 @@ function App() {
         host,
         Verbosity.High,
         BlockIdentifier.fromHeight(block_identifier_height),
-        '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce'
+        new PublicKey(
+          '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce'
+        )
       );
       console.log('js state_get_account_info', state_get_account_info);
 
-      const addressHex =
-        'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e';
-      console.log(new AccessRights(0o07));
-      const uref = new URef(addressHex, AccessRights.READ_ADD_WRITE());
       const state_get_balance = await sdk.state_get_balance(
         host,
         Verbosity.High,
         new Digest(chain_get_state_root_hash.result.state_root_hash),
-        uref
+        new URef(
+          'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
+          AccessRights.READ_ADD_WRITE()
+        )
       );
       console.log('js state_get_balance', state_get_balance);
 
-      const dict_addressHex =
-        '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530'; // event
-      const seedURef = new URef(dict_addressHex, AccessRights.READ_ADD_WRITE());
       const dictionary_item_identifier = new DictionaryItemIdentifier(
-        seedURef,
+        new URef(
+          '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530',
+          AccessRights.READ_ADD_WRITE()
+        ),
         '0' // event key
       );
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(
@@ -107,16 +107,18 @@ function App() {
       );
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
 
-      const uref_addressHex =
-        'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8'; // named key "name" should be "USDC" parsed value
-
       const query_global_state = await sdk.query_global_state(
         host,
         Verbosity.High,
         GlobalStateIdentifier.fromStateRootHash(
           new Digest(chain_get_state_root_hash.result.state_root_hash)
         ),
-        Key.fromURef(new URef(uref_addressHex, new AccessRights(0o01))),
+        Key.fromURef(
+          new URef(
+            'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
+            new AccessRights(0o01)
+          )
+        ),
         new Path([])
       );
       console.log('js query_global_state', query_global_state);

@@ -1,6 +1,5 @@
-use super::{account_hash::AccountHash, uref::URef};
+use super::{account_hash::AccountHash, public_key::PublicKey, uref::URef};
 use casper_client::rpcs::PurseIdentifier as _PurseIdentifier;
-//use casper_types::PublicKey;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -8,11 +7,10 @@ pub struct PurseIdentifier(_PurseIdentifier);
 
 #[wasm_bindgen]
 impl PurseIdentifier {
-    // TODO PublicKey
-    // #[wasm_bindgen(constructor)]
-    // pub fn new_main_purse_under_publicKey(key: PublicKey) -> Self {
-    //     _PurseIdentifier::MainPurseUnderPublicKey(key)
-    // }
+    #[wasm_bindgen(constructor)]
+    pub fn new_main_purse_under_public_key(key: PublicKey) -> Self {
+        PurseIdentifier(_PurseIdentifier::MainPurseUnderPublicKey(key.into()))
+    }
 
     pub fn new_main_purse_under_account_hash(account_hash: AccountHash) -> Self {
         PurseIdentifier(_PurseIdentifier::MainPurseUnderAccountHash(
@@ -25,14 +23,14 @@ impl PurseIdentifier {
     }
 }
 
-// impl From<PurseIdentifier> for PublicKey {
-//     fn from(purse_identifier: PurseIdentifier) -> Self {
-//         match purse_identifier {
-//             PurseIdentifier(_PurseIdentifier::MainPurseUnderPublicKey(key)) => key.into(),
-//             _ => unimplemented!("Conversion not implemented for PurseIdentifier to Key"),
-//         }
-//     }
-// }
+impl From<PurseIdentifier> for PublicKey {
+    fn from(purse_identifier: PurseIdentifier) -> Self {
+        match purse_identifier {
+            PurseIdentifier(_PurseIdentifier::MainPurseUnderPublicKey(key)) => key.into(),
+            _ => unimplemented!("Conversion not implemented for PurseIdentifier to Key"),
+        }
+    }
+}
 
 impl From<PurseIdentifier> for _PurseIdentifier {
     fn from(purse_identifier: PurseIdentifier) -> Self {
@@ -66,11 +64,11 @@ impl From<PurseIdentifier> for URef {
     }
 }
 
-// impl From<PublicKey> for PurseIdentifier {
-//     fn from(key: PublicKey) -> Self {
-//         PurseIdentifier(_PurseIdentifier::MainPurseUnderPublicKey(key.into()))
-//     }
-// }
+impl From<PublicKey> for PurseIdentifier {
+    fn from(key: PublicKey) -> Self {
+        PurseIdentifier(_PurseIdentifier::MainPurseUnderPublicKey(key.into()))
+    }
+}
 
 impl From<AccountHash> for PurseIdentifier {
     fn from(account_hash: AccountHash) -> Self {

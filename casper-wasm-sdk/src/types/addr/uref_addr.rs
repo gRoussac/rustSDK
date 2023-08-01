@@ -15,10 +15,6 @@ impl URefAddr {
         array.copy_from_slice(&bytes);
         Ok(URefAddr(array))
     }
-
-    pub fn to_vec(&self) -> Vec<u8> {
-        self.0.to_vec()
-    }
 }
 
 impl From<URefAddr> for _URefAddr {

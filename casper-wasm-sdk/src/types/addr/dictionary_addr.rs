@@ -15,10 +15,6 @@ impl DictionaryAddr {
         array.copy_from_slice(&bytes);
         Ok(DictionaryAddr(array))
     }
-
-    pub fn to_vec(&self) -> Vec<u8> {
-        self.0.to_vec()
-    }
 }
 
 impl From<DictionaryAddr> for _DictionaryAddr {

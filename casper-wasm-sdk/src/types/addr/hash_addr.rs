@@ -15,10 +15,6 @@ impl HashAddr {
         array.copy_from_slice(&bytes);
         Ok(HashAddr(array))
     }
-
-    pub fn to_vec(&self) -> Vec<u8> {
-        self.0.to_vec()
-    }
 }
 
 impl From<HashAddr> for _HashAddr {

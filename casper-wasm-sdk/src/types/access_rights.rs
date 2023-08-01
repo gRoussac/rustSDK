@@ -71,21 +71,25 @@ impl AccessRights {
         AccessRights(access_rights)
     }
 
+    #[wasm_bindgen]
     // Utility method to check if the READ flag is set.
     pub fn is_readable(&self) -> bool {
         self.0.is_readable()
     }
 
+    #[wasm_bindgen]
     // Utility method to check if the WRITE flag is set.
     pub fn is_writeable(&self) -> bool {
         self.0.is_writeable()
     }
 
+    #[wasm_bindgen]
     // Utility method to check if the ADD flag is set.
     pub fn is_addable(&self) -> bool {
         self.0.is_addable()
     }
 
+    #[wasm_bindgen]
     // Utility method to check if no flags are set.
     pub fn is_none(&self) -> bool {
         self.0.is_none()
