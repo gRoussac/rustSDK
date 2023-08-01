@@ -13,10 +13,6 @@ impl EraId {
         EraId(value.into())
     }
 
-    pub fn to_le_bytes(self) -> Vec<u8> {
-        self.0.to_le_bytes().to_vec()
-    }
-
     pub fn value(&self) -> u64 {
         self.0.into()
     }
