@@ -47,7 +47,7 @@ impl AccessRights {
         _AccessRights::READ_ADD_WRITE.bits()
     }
 
-    // Utility method to create AccessRights with specific flags.
+    // Utility method to create AccessRights with u8
     #[wasm_bindgen(constructor)]
     pub fn new(access_rights: u8) -> Result<AccessRights, JsValue> {
         match _AccessRights::from_bits(access_rights) {

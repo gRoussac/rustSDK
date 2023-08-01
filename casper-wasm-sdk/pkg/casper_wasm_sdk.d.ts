@@ -156,7 +156,7 @@ export class DeployHash {
 * @param {Digest} digest
 * @returns {DeployHash}
 */
-  static from_digest(digest: Digest): DeployHash;
+  static fromDigest(digest: Digest): DeployHash;
 }
 /**
 */
@@ -193,7 +193,7 @@ export class Digest {
 * @param {Uint8Array} bytes
 * @returns {Digest}
 */
-  static from_digest(bytes: Uint8Array): Digest;
+  static fromDigest(bytes: Uint8Array): Digest;
 }
 /**
 */
@@ -598,9 +598,9 @@ export interface InitOutput {
   readonly __wbg_deploy_free: (a: number) => void;
   readonly deploy_new: (a: number) => number;
   readonly deployhash_new: (a: number, b: number, c: number) => void;
-  readonly deployhash_from_digest: (a: number, b: number) => void;
+  readonly deployhash_fromDigest: (a: number, b: number) => void;
   readonly digest_new: (a: number, b: number, c: number) => void;
-  readonly digest_from_digest: (a: number, b: number, c: number) => void;
+  readonly digest_fromDigest: (a: number, b: number, c: number) => void;
   readonly __wbg_purseidentifier_free: (a: number) => void;
   readonly purseidentifier_new_main_purse_under_account_hash: (a: number) => number;
   readonly purseidentifier_new_purse_uref: (a: number) => number;

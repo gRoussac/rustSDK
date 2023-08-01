@@ -693,12 +693,12 @@ export class DeployHash {
     * @param {Digest} digest
     * @returns {DeployHash}
     */
-    static from_digest(digest) {
+    static fromDigest(digest) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             _assertClass(digest, Digest);
             var ptr0 = digest.__destroy_into_raw();
-            wasm.deployhash_from_digest(retptr, ptr0);
+            wasm.deployhash_fromDigest(retptr, ptr0);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -854,12 +854,12 @@ export class Digest {
     * @param {Uint8Array} bytes
     * @returns {Digest}
     */
-    static from_digest(bytes) {
+    static fromDigest(bytes) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
             const len0 = WASM_VECTOR_LEN;
-            wasm.digest_from_digest(retptr, ptr0, len0);
+            wasm.digest_fromDigest(retptr, ptr0, len0);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             var r2 = getInt32Memory0()[retptr / 4 + 2];

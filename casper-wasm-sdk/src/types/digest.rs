@@ -20,7 +20,7 @@ impl Digest {
         Self::from_digest(bytes)
     }
 
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "fromDigest")]
     pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, JsValue> {
         let mut digest_bytes = [0u8; _Digest::LENGTH];
         if bytes.len() != _Digest::LENGTH {
