@@ -1,6 +1,6 @@
-use super::SDK;
 use crate::{
     helpers::serialize_result,
+    sdk::SDK,
     types::{
         global_state_identifier::GlobalStateIdentifier, key::Key, path::Path, verbosity::Verbosity,
     },
@@ -17,10 +17,10 @@ impl SDK {
     pub async fn query_global_state(
         &mut self,
         node_address: &str,
+        verbosity: Verbosity,
         global_state_identifier: GlobalStateIdentifier,
         key: Key,
         path: Path,
-        verbosity: Verbosity,
     ) -> JsValue {
         //log("query_global_state!");
         let result: Result<SuccessResponse<QueryGlobalStateResult>, Error> = query_global_state(

@@ -44,37 +44,38 @@ function App() {
     console.log(sdk);
 
     try {
-      const get_state_root_hash = await sdk.get_state_root_hash(
+      const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(
         host,
-        BlockIdentifier.fromHeight(block_identifier_height),
-        Verbosity.High
+        Verbosity.High,
+        undefined
       );
-      setHash(get_state_root_hash.result.state_root_hash);
-      console.log('js get_state_root_hash', get_state_root_hash);
+      setHash(chain_get_state_root_hash.result.state_root_hash);
+      console.log('js chain_get_state_root_hash', chain_get_state_root_hash);
 
       const chain_get_block = await sdk.chain_get_block(
         host,
-        BlockIdentifier.fromHeight(block_identifier_height),
-        Verbosity.High
+        Verbosity.High,
+        BlockIdentifier.fromHeight(block_identifier_height)
       );
       console.log('js chain_get_block', chain_get_block);
 
       let hex_str =
         '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445';
       let deploy_hash = new DeployHash(hex_str);
-      const info_get_deploy = await sdk.info_get_deploy(
+      let finalized_approvals = true;
+      const info_get_deploy = await sdk.get_deploy(
         host,
+        Verbosity.High,
         deploy_hash,
-        true,
-        Verbosity.High
+        finalized_approvals
       );
 
       console.log('js info_get_deploy', info_get_deploy);
       const state_get_account_info = await sdk.state_get_account_info(
         host,
-        '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce',
+        Verbosity.High,
         BlockIdentifier.fromHeight(block_identifier_height),
-        Verbosity.High
+        '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce'
       );
       console.log('js state_get_account_info', state_get_account_info);
 
@@ -83,13 +84,13 @@ function App() {
       const accessRights = 7; // or 0o07 in octal notation
       const addressBytes = hexToUint8Array(addressHex);
       const uref = new URef(addressBytes, accessRights);
-      const stateRootHashHex = get_state_root_hash.result.state_root_hash;
+      const stateRootHashHex = chain_get_state_root_hash.result.state_root_hash;
       const stateRootHashBytes = hexToUint8Array(stateRootHashHex);
       const state_get_balance = await sdk.state_get_balance(
         host,
+        Verbosity.High,
         new Digest(stateRootHashBytes),
-        uref,
-        Verbosity.High
+        uref
       );
       console.log('js state_get_balance', state_get_balance);
 
@@ -103,9 +104,9 @@ function App() {
       );
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(
         host,
+        Verbosity.High,
         new Digest(stateRootHashBytes),
-        dictionary_item_identifier,
-        Verbosity.High
+        dictionary_item_identifier
       );
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
 
@@ -115,10 +116,10 @@ function App() {
 
       const query_global_state = await sdk.query_global_state(
         host,
+        Verbosity.High,
         GlobalStateIdentifier.fromStateRootHash(new Digest(stateRootHashBytes)),
         Key.fromURef(new URef(uref_addressBytes, 1)),
-        new Path([]),
-        Verbosity.High
+        new Path([])
       );
       console.log('js query_global_state', query_global_state);
 
@@ -129,8 +130,8 @@ function App() {
       console.log(deploy);
       const account_put_deploy = await sdk.account_put_deploy(
         host,
-        deploy,
-        Verbosity.High
+        Verbosity.High,
+        deploy
       );
       console.log('js account_put_deploy', account_put_deploy);
     } catch (error) {

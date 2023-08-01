@@ -1,6 +1,6 @@
-use super::SDK;
 use crate::{
     helpers::serialize_result,
+    sdk::SDK,
     types::{
         dictionary_item_identifier::DictionaryItemIdentifier, digest::Digest, verbosity::Verbosity,
     },
@@ -13,13 +13,12 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub async fn state_get_dictionary_item(
+    pub async fn get_dictionary_item(
         &mut self,
         node_address: &str,
+        verbosity: Verbosity,
         state_root_hash: Digest,
         dictionary_item_identifier: DictionaryItemIdentifier,
-        verbosity: Verbosity,
     ) -> JsValue {
         //log("state_get_dictionary_item!");
         let result: Result<SuccessResponse<GetDictionaryItemResult>, Error> = get_dictionary_item(
@@ -31,5 +30,22 @@ impl SDK {
         )
         .await;
         serialize_result(result)
+    }
+
+    #[wasm_bindgen(js_name = "state_get_dictionary_item")]
+    pub async fn state_get_dictionary_item_js_alias(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        state_root_hash: Digest,
+        dictionary_item_identifier: DictionaryItemIdentifier,
+    ) -> JsValue {
+        self.get_dictionary_item(
+            node_address,
+            verbosity,
+            state_root_hash,
+            dictionary_item_identifier,
+        )
+        .await
     }
 }

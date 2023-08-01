@@ -1,7 +1,7 @@
-use super::SDK;
 use crate::{
     helpers::serialize_result,
     js::externs::{error, log},
+    sdk::SDK,
     types::{block_identifier::BlockIdentifier, verbosity::Verbosity},
 };
 use casper_client::{
@@ -13,15 +13,15 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub async fn state_get_account_info(
+    pub async fn get_account(
         &mut self,
         node_address: &str,
-        account_identifier: String,
-        block_identifier: Option<BlockIdentifier>,
         verbosity: Verbosity,
+        maybe_block_identifier: Option<BlockIdentifier>,
+        // TODO PublicKey
+        account_identifier: String,
     ) -> JsValue {
-        //log("state_get_account_info!");
+        //log("get_account!");
         let account_identifier_bytes: Vec<u8> = match hex::decode(account_identifier) {
             Ok(bytes) => bytes,
             Err(err) => {
@@ -41,10 +41,28 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
-            block_identifier.map(Into::into),
+            maybe_block_identifier.map(Into::into),
             account_identifier,
         )
         .await;
         serialize_result(result)
+    }
+
+    #[wasm_bindgen(js_name = "state_get_account_info")]
+    pub async fn state_get_account_info_js_alias(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        maybe_block_identifier: Option<BlockIdentifier>,
+        // TODO PublicKey
+        account_identifier: String,
+    ) -> JsValue {
+        self.get_account(
+            node_address,
+            verbosity,
+            maybe_block_identifier,
+            account_identifier,
+        )
+        .await
     }
 }

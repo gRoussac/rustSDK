@@ -1,7 +1,7 @@
-use super::SDK;
 use crate::{
     helpers::serialize_result,
     js::externs::log,
+    sdk::SDK,
     types::{deploy_hash::DeployHash, verbosity::Verbosity},
 };
 use casper_client::{
@@ -12,16 +12,14 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub async fn info_get_deploy(
+    pub async fn get_deploy(
         &mut self,
         node_address: &str,
+        verbosity: Verbosity,
         deploy_hash: DeployHash,
         finalized_approvals: bool,
-        verbosity: Verbosity,
     ) -> JsValue {
-        //log("info_get_deploy!");
-        log(&format!("{:?}", verbosity));
+        //log("get_deploy!");
         let result: Result<SuccessResponse<GetDeployResult>, Error> = get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
@@ -31,5 +29,17 @@ impl SDK {
         )
         .await;
         serialize_result(result)
+    }
+
+    #[wasm_bindgen(js_name = "info_get_deploy")]
+    pub async fn info_get_deploy_js_alias(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        deploy_hash: DeployHash,
+        finalized_approvals: bool,
+    ) -> JsValue {
+        self.get_deploy(node_address, verbosity, deploy_hash, finalized_approvals)
+            .await
     }
 }
