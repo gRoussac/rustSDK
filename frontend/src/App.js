@@ -15,6 +15,7 @@ import init, {
   GlobalStateIdentifier,
   Path,
   Deploy,
+  hexToUint8Array,
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
@@ -161,11 +162,3 @@ function App() {
 }
 
 export default App;
-
-function hexToUint8Array(hexString) {
-  const bytes = new Uint8Array(hexString.length / 2);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = parseInt(hexString.substr(i * 2, 2), 16);
-  }
-  return bytes;
-}
