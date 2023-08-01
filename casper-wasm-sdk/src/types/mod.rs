@@ -1,3 +1,4 @@
+pub mod access_rights;
 pub mod account_hash;
 pub mod addr;
 pub mod block_hash;
