@@ -1,11 +1,12 @@
-use casper_types::Digest as _Digest;
+use casper_types::{
+    bytesrepr::{self, FromBytes, ToBytes},
+    Digest as _Digest,
+};
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 #[wasm_bindgen]
-pub struct Digest {
-    bytes: Vec<u8>,
-}
+pub struct Digest(_Digest);
 
 #[wasm_bindgen]
 impl Digest {
@@ -16,22 +17,45 @@ impl Digest {
             return Err(JsValue::from_str("Invalid Digest length"));
         }
         digest_bytes.copy_from_slice(&bytes);
-        Ok(Digest {
-            bytes: digest_bytes.to_vec(),
-        })
-    }
-}
-
-impl From<_Digest> for Digest {
-    fn from(digest: _Digest) -> Self {
-        Digest {
-            bytes: digest.value().to_vec(),
-        }
+        Ok(Digest(_Digest::from(digest_bytes)))
     }
 }
 
 impl From<Digest> for _Digest {
     fn from(digest: Digest) -> Self {
-        _Digest::try_from(digest.bytes.as_slice()).expect("Invalid Digest bytes")
+        digest.0
+    }
+}
+
+impl From<_Digest> for Digest {
+    fn from(digest: _Digest) -> Self {
+        Digest(digest)
+    }
+}
+
+impl ToBytes for Digest {
+    fn to_bytes(&self) -> Result<Vec<u8>, bytesrepr::Error> {
+        self.0.to_bytes()
+    }
+
+    fn serialized_length(&self) -> usize {
+        self.0.serialized_length()
+    }
+
+    fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
+        self.0.write_bytes(bytes)
+    }
+}
+
+impl FromBytes for Digest {
+    fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
+        _Digest::from_bytes(bytes).map(|(inner, remainder)| (Digest(inner), remainder))
+    }
+}
+
+impl From<[u8; _Digest::LENGTH]> for Digest {
+    fn from(bytes: [u8; _Digest::LENGTH]) -> Self {
+        let digest = _Digest::try_from(bytes).unwrap();
+        Digest(digest)
     }
 }

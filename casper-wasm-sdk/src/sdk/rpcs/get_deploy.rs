@@ -1,6 +1,5 @@
 use crate::{
     helpers::serialize_result,
-    js::externs::log,
     sdk::SDK,
     types::{deploy_hash::DeployHash, verbosity::Verbosity},
 };

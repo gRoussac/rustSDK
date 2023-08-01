@@ -8,9 +8,9 @@ pub struct BlockHash(_BlockHash);
 #[wasm_bindgen]
 impl BlockHash {
     #[wasm_bindgen(constructor)]
-    pub fn new(hash: &[u8]) -> Self {
+    pub fn new(hash: Vec<u8>) -> Self {
         let (block_hash, _) =
-            _BlockHash::from_bytes(hash).expect("Failed to create BlockHash from bytes");
+            _BlockHash::from_bytes(&hash).expect("Failed to create BlockHash from bytes");
         BlockHash(block_hash)
     }
 

@@ -16,6 +16,7 @@ import init, {
   Path,
   Deploy,
   hexToUint8Array,
+  AccessRights,
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
@@ -81,9 +82,8 @@ function App() {
 
       const addressHex =
         'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e';
-      const accessRights = 7; // or 0o07 in octal notation
-      const addressBytes = hexToUint8Array(addressHex);
-      const uref = new URef(addressBytes, accessRights);
+      console.log(new AccessRights(0o07));
+      const uref = new URef(addressHex, AccessRights.READ_ADD_WRITE());
       const stateRootHashHex = chain_get_state_root_hash.result.state_root_hash;
       const stateRootHashBytes = hexToUint8Array(stateRootHashHex);
       const state_get_balance = await sdk.state_get_balance(
@@ -97,7 +97,7 @@ function App() {
       const dict_addressHex =
         '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530'; // event
       const dict_addressBytes = hexToUint8Array(dict_addressHex);
-      const seedURef = new URef(dict_addressBytes, accessRights);
+      const seedURef = new URef(dict_addressHex, AccessRights.READ_ADD_WRITE());
       const dictionary_item_identifier = new DictionaryItemIdentifier(
         seedURef,
         '0' // event key
@@ -118,7 +118,7 @@ function App() {
         host,
         Verbosity.High,
         GlobalStateIdentifier.fromStateRootHash(new Digest(stateRootHashBytes)),
-        Key.fromURef(new URef(uref_addressBytes, 1)),
+        Key.fromURef(new URef(uref_addressHex, new AccessRights(0o01))),
         new Path([])
       );
       console.log('js query_global_state', query_global_state);

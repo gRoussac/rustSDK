@@ -11,7 +11,6 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen(js_name = "get_balance")]
     pub async fn get_balance(
         &mut self,
         node_address: &str,
