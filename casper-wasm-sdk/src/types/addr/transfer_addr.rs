@@ -17,10 +17,6 @@ impl TransferAddr {
         array.copy_from_slice(&bytes);
         Ok(TransferAddr(array))
     }
-
-    // pub fn into_transfer_addr(self) -> _TransferAddr {
-    //     _TransferAddr(self.0)
-    // }
 }
 
 impl From<Vec<u8>> for TransferAddr {
