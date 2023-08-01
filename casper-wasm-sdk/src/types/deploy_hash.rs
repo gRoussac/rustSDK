@@ -21,6 +21,7 @@ impl DeployHash {
         Self::from_digest(Digest::from(hash))
     }
 
+    #[wasm_bindgen(js_name = "fromDigest")]
     pub fn from_digest(digest: Digest) -> Result<DeployHash, JsValue> {
         Ok(_DeployHash::new(digest.into()).into())
     }

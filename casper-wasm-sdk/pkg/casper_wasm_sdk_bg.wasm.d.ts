@@ -9,9 +9,9 @@ export function accounthash_fromFormattedStr(a: number, b: number, c: number): v
 export function __wbg_deploy_free(a: number): void;
 export function deploy_new(a: number): number;
 export function deployhash_new(a: number, b: number, c: number): void;
-export function deployhash_from_digest(a: number, b: number): void;
+export function deployhash_fromDigest(a: number, b: number): void;
 export function digest_new(a: number, b: number, c: number): void;
-export function digest_from_digest(a: number, b: number, c: number): void;
+export function digest_fromDigest(a: number, b: number, c: number): void;
 export function __wbg_purseidentifier_free(a: number): void;
 export function purseidentifier_new_main_purse_under_account_hash(a: number): number;
 export function purseidentifier_new_purse_uref(a: number): number;
