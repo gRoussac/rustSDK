@@ -1,10 +1,10 @@
-use super::SDK;
 use crate::{
     helpers::serialize_result,
-    types::{digest::Digest, uref::URef, verbosity::Verbosity},
+    sdk::SDK,
+    types::{block_identifier::BlockIdentifier, verbosity::Verbosity},
 };
 use casper_client::{
-    get_balance, rpcs::results::GetBalanceResult, Error, JsonRpcId, SuccessResponse,
+    get_era_summary, rpcs::results::GetEraSummaryResult, Error, JsonRpcId, SuccessResponse,
 };
 use rand::Rng;
 use wasm_bindgen::prelude::*;
@@ -12,20 +12,18 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen]
-    pub async fn state_get_balance(
+    pub async fn get_era_summary(
         &mut self,
         node_address: &str,
-        state_root_hash: Digest,
-        purse: URef,
         verbosity: Verbosity,
+        maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
-        //log("state_get_balance!");
-        let result: Result<SuccessResponse<GetBalanceResult>, Error> = get_balance(
+        //log("get_era_summary!".to_string());
+        let result: Result<SuccessResponse<GetEraSummaryResult>, Error> = get_era_summary(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
-            state_root_hash.into(),
-            purse.into(),
+            maybe_block_identifier.map(Into::into),
         )
         .await;
         serialize_result(result)

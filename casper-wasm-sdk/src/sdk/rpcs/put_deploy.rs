@@ -1,6 +1,6 @@
-use super::SDK;
 use crate::{
     helpers::serialize_result,
+    sdk::SDK,
     types::{deploy::Deploy, verbosity::Verbosity},
 };
 use casper_client::{
@@ -11,12 +11,11 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub async fn account_put_deploy(
+    pub async fn put_deploy(
         &mut self,
         node_address: &str,
-        deploy: Deploy,
         verbosity: Verbosity,
+        deploy: Deploy,
     ) -> JsValue {
         //log("account_put_deploy!".to_string());
         let result: Result<SuccessResponse<PutDeployResult>, Error> = put_deploy(
@@ -27,5 +26,15 @@ impl SDK {
         )
         .await;
         serialize_result(result)
+    }
+
+    #[wasm_bindgen(js_name = "account_put_deploy")]
+    pub async fn account_put_deploy_js_alias(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        deploy: Deploy,
+    ) -> JsValue {
+        self.put_deploy(node_address, verbosity, deploy).await
     }
 }
