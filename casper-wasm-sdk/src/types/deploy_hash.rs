@@ -46,16 +46,16 @@ impl From<Digest> for DeployHash {
 }
 
 impl ToBytes for DeployHash {
+    fn to_bytes(&self) -> Result<Vec<u8>, bytesrepr::Error> {
+        self.0.to_bytes()
+    }
+
     fn write_bytes(&self, writer: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
         self.0.write_bytes(writer)
     }
 
     fn serialized_length(&self) -> usize {
         self.0.serialized_length()
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>, bytesrepr::Error> {
-        self.0.to_bytes()
     }
 }
 
