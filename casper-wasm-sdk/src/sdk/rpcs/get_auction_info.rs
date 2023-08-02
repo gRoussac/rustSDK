@@ -18,7 +18,7 @@ impl SDK {
         verbosity: Verbosity,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
-        //log("get_auction_info!".to_string());
+        //log("get_auction_info!");
         let result: Result<SuccessResponse<GetAuctionInfoResult>, Error> = get_auction_info(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,

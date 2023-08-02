@@ -9,7 +9,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen]
     pub async fn get_node_status(&mut self, node_address: &str, verbosity: Verbosity) -> JsValue {
-        //log("get_node_status!".to_string());
+        //log("get_node_status!");
         let result: Result<SuccessResponse<GetNodeStatusResult>, Error> = get_node_status(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,

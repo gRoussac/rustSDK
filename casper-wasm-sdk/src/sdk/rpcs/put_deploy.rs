@@ -17,7 +17,7 @@ impl SDK {
         verbosity: Verbosity,
         deploy: Deploy,
     ) -> JsValue {
-        //log("account_put_deploy!".to_string());
+        //log("account_put_deploy!");
         let result: Result<SuccessResponse<PutDeployResult>, Error> = put_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
