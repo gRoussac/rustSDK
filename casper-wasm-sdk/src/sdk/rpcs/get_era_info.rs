@@ -21,7 +21,7 @@ impl SDK {
         verbosity: Verbosity,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
-        //log("get_era_info!".to_string());
+        //log("get_era_info!");
         let result: Result<SuccessResponse<GetEraInfoResult>, Error> = get_era_info(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,

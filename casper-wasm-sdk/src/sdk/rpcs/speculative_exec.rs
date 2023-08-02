@@ -19,7 +19,7 @@ impl SDK {
         verbosity: Verbosity,
         deploy: Deploy,
     ) -> JsValue {
-        //log("speculative_exec!".to_string());
+        //log("speculative_exec!");
         let result: Result<SuccessResponse<SpeculativeExecResult>, Error> = speculative_exec(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,

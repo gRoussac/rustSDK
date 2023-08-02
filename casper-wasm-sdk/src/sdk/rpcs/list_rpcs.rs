@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen]
     pub async fn list_rpcs(&mut self, node_address: &str, verbosity: Verbosity) -> JsValue {
-        //log("list_rpcs!".to_string());
+        //log("list_rpcs!");
         let result: Result<SuccessResponse<ListRpcsResult>, Error> = list_rpcs(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,

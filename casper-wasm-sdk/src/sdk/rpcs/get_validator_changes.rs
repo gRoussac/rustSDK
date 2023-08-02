@@ -14,7 +14,7 @@ impl SDK {
         node_address: &str,
         verbosity: Verbosity,
     ) -> JsValue {
-        //log("get_validator_changes!".to_string());
+        //log("get_validator_changes!");
         let result: Result<SuccessResponse<GetValidatorChangesResult>, Error> =
             get_validator_changes(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),

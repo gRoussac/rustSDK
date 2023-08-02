@@ -18,7 +18,7 @@ impl SDK {
         verbosity: Verbosity,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
-        //log("get_block_transfers!".to_string());
+        //log("get_block_transfers!");
         let result: Result<SuccessResponse<GetBlockTransfersResult>, Error> = get_block_transfers(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
