@@ -1,6 +1,6 @@
 use crate::js::externs::error;
 use casper_client::Error;
-use casper_types::Timestamp;
+use js_sys::Date;
 use serde::Serialize;
 use wasm_bindgen::JsValue;
 
@@ -24,20 +24,27 @@ pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
     let current_timestamp: String = match timestamp {
         Some(ts) if !ts.is_empty() => {
             // Attempt to parse the timestamp as a number
-            if let Ok(parsed_time) = ts.parse::<u64>() {
-                // Create a Timestamp object and use it to format the timestamp
-                let timestamp = Timestamp::from(parsed_time);
-                timestamp.to_string()
+            if let Ok(parsed_time) = ts.parse::<f64>() {
+                // Create a JavaScript Date object and set its time
+                let js_date = Date::new_0();
+                js_date.set_time(parsed_time);
+                // Get the RFC3339-like formatted timestamp
+                js_date.to_iso_string().as_string().unwrap_or_default()
             } else {
                 // If the timestamp couldn't be parsed, use the current time
-                Timestamp::now().to_string()
+                let js_date = Date::new_0();
+                js_date.to_iso_string().as_string().unwrap_or_default()
             }
         }
         _ => {
-            // If no timestamp is provided, use the current time
-            Timestamp::now().to_string()
+            let js_date = Date::new_0();
+            js_date.to_iso_string().as_string().unwrap_or_default()
         }
     };
 
     current_timestamp
+}
+
+pub fn get_str_or_default(opt_str: Option<&String>) -> &str {
+    opt_str.map(String::as_str).unwrap_or_default()
 }
