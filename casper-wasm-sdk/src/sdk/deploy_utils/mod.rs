@@ -1,2 +1,2 @@
 pub mod make_deploy;
-pub mod transfer;
+pub mod make_transfer;

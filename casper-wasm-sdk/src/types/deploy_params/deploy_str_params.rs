@@ -1,8 +1,8 @@
+use crate::helpers::get_current_timestamp;
+use crate::helpers::get_str_or_default;
 use casper_client::cli::DeployStrParams as _DeployStrParams;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
-
-use crate::{helpers::get_current_timestamp, js::externs::log};
 
 #[wasm_bindgen]
 #[derive(Default, Debug, Clone)]
@@ -34,7 +34,7 @@ impl DeployStrParams {
         }
 
         // TODO Fix ttl `humantime::parse_duration` with get_current_ttl(&ttl)
-        log(&format!("_ttl {:?}", _ttl));
+        // log(&format!("_ttl {:?}", _ttl));
 
         DeployStrParams {
             chain_name: OnceCell::from(chain_name),
@@ -104,10 +104,10 @@ impl DeployStrParams {
 // Convert DeployStrParams to casper_client::cli::DeployStrParams
 pub fn deploy_str_params_to_casper_client(deploy_params: &DeployStrParams) -> _DeployStrParams<'_> {
     _DeployStrParams {
-        secret_key: deploy_params.secret_key.get().unwrap().as_str(),
-        timestamp: deploy_params.timestamp.get().unwrap().as_str(),
-        ttl: deploy_params.ttl.get().unwrap().as_str(),
-        chain_name: deploy_params.chain_name.get().unwrap().as_str(),
-        session_account: deploy_params.session_account.get().unwrap().as_str(),
+        secret_key: get_str_or_default(deploy_params.secret_key.get()),
+        timestamp: get_str_or_default(deploy_params.timestamp.get()),
+        ttl: get_str_or_default(deploy_params.ttl.get()),
+        chain_name: get_str_or_default(deploy_params.chain_name.get()),
+        session_account: get_str_or_default(deploy_params.session_account.get()),
     }
 }

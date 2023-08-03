@@ -1,8 +1,8 @@
+use super::args_simple::ArgsSimple;
+use crate::helpers::get_str_or_default;
 use js_sys::Array;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
-
-use super::args_simple::ArgsSimple;
 
 #[wasm_bindgen]
 #[derive(Default, Debug, Clone)]
@@ -151,51 +151,52 @@ pub fn payment_str_params_to_casper_client(
         .map_or_else(Vec::new, |args_simple| {
             args_simple.args().iter().map(String::as_str).collect()
         });
+
     // Use the appropriate `with_` method based on available fields as PaymentStrParams is private
     if let Some(payment_hash) = payment_params.payment_hash.get() {
         return casper_client::cli::PaymentStrParams::with_hash(
             payment_hash.as_str(),
-            payment_params.payment_entry_point.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
-            payment_params.payment_args_json.get().unwrap().as_str(),
-            payment_params.payment_args_complex.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_args_json.get()),
+            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
     if let Some(payment_name) = payment_params.payment_name.get() {
         return casper_client::cli::PaymentStrParams::with_name(
             payment_name.as_str(),
-            payment_params.payment_entry_point.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
-            payment_params.payment_args_json.get().unwrap().as_str(),
-            payment_params.payment_args_complex.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_args_json.get()),
+            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
     if let Some(payment_package_hash) = payment_params.payment_package_hash.get() {
         return casper_client::cli::PaymentStrParams::with_package_hash(
             payment_package_hash.as_str(),
-            payment_params.payment_version.get().unwrap().as_str(),
-            payment_params.payment_entry_point.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_version.get()),
+            get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
-            payment_params.payment_args_json.get().unwrap().as_str(),
-            payment_params.payment_args_complex.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_args_json.get()),
+            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
     if let Some(payment_package_name) = payment_params.payment_package_name.get() {
         return casper_client::cli::PaymentStrParams::with_package_name(
             payment_package_name.as_str(),
-            payment_params.payment_version.get().unwrap().as_str(),
-            payment_params.payment_entry_point.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_version.get()),
+            get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
-            payment_params.payment_args_json.get().unwrap().as_str(),
-            payment_params.payment_args_complex.get().unwrap().as_str(),
+            get_str_or_default(payment_params.payment_args_json.get()),
+            get_str_or_default(payment_params.payment_args_complex.get()),
         );
     }
 
     // Default to the Payment amount
-    casper_client::cli::PaymentStrParams::with_amount(
-        payment_params.payment_amount.get().unwrap().as_str(),
-    )
+    casper_client::cli::PaymentStrParams::with_amount(get_str_or_default(
+        payment_params.payment_amount.get(),
+    ))
 }
