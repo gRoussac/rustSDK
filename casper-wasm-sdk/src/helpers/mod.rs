@@ -1,5 +1,6 @@
 use crate::js::externs::error;
-use casper_client::Error;
+use casper_client::{cli::CliError, Error};
+use casper_types::Deploy;
 use js_sys::Date;
 use serde::Serialize;
 use wasm_bindgen::JsValue;
@@ -13,6 +14,19 @@ pub fn serialize_result<T: Serialize>(result: Result<T, Error>) -> JsValue {
                 JsValue::null()
             }
         },
+        Err(err) => {
+            error(&format!("Error occurred: {:?}", err));
+            JsValue::null()
+        }
+    }
+}
+
+pub fn stringify_deploy(result: Result<Deploy, CliError>) -> JsValue {
+    match result {
+        Ok(deploy) => {
+            let serialized_deploy = format!("{:?}", deploy);
+            JsValue::from_str(&serialized_deploy)
+        }
         Err(err) => {
             error(&format!("Error occurred: {:?}", err));
             JsValue::null()

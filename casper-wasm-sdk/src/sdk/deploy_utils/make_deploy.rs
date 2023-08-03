@@ -3,6 +3,7 @@ use casper_types::Deploy;
 use wasm_bindgen::prelude::*;
 
 use crate::{
+    helpers::stringify_deploy,
     js::externs::log,
     sdk::SDK,
     types::deploy_params::{
@@ -29,8 +30,6 @@ impl SDK {
             payment_str_params_to_casper_client(&(payment_params.clone())),
             false,
         );
-        log(&format!("{:?}", result));
-        JsValue::null()
-        //serialize_result(result)
+        stringify_deploy(result)
     }
 }
