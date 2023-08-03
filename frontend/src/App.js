@@ -169,7 +169,7 @@ function App() {
         payment_params,
         false
       );
-      // console.log(make_transfer);
+      console.log(make_transfer);
 
       deploy_params = new DeployStrParams(
         secret_key,
