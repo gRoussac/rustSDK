@@ -181,6 +181,9 @@ function App() {
       console.log(deploy_params);
 
       session_params = new SessionStrParams();
+      session_params.session_hash =
+        '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
+      session_params.session_entry_point = 'decimals';
       console.log(session_params);
       payment_params = new PaymentStrParams();
       payment_params.payment_amount = '5500000000';
