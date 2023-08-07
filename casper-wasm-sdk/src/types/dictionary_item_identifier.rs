@@ -1,6 +1,7 @@
-use super::uref::URef;
-use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
+use casper_client::{rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier, Error};
 use wasm_bindgen::prelude::*;
+
+use super::{account_hash::AccountHash, addr::hash_addr::HashAddr, key::Key, uref::URef};
 
 #[derive(Debug)]
 #[wasm_bindgen]
@@ -8,14 +9,52 @@ pub struct DictionaryItemIdentifier(_DictionaryItemIdentifier);
 
 #[wasm_bindgen]
 impl DictionaryItemIdentifier {
-    #[wasm_bindgen(constructor)]
-    pub fn new(seed_uref: URef, dictionary_item_key: String) -> Self {
-        let dictionary_item_identifier = _DictionaryItemIdentifier::URef {
+    pub fn new_from_account_info(
+        account_hash: AccountHash,
+        dictionary_name: String,
+        dictionary_item_key: String,
+    ) -> Self {
+        let key = Key::from_account(account_hash).to_formatted_string();
+        DictionaryItemIdentifier(_DictionaryItemIdentifier::AccountNamedKey {
+            key,
+            dictionary_name,
+            dictionary_item_key,
+        })
+    }
+
+    pub fn new_from_contract_info(
+        contract_addr: HashAddr,
+        dictionary_name: String,
+        dictionary_item_key: String,
+    ) -> Self {
+        let key = Key::from_hash(contract_addr).to_formatted_string();
+        DictionaryItemIdentifier(_DictionaryItemIdentifier::ContractNamedKey {
+            key,
+            dictionary_name,
+            dictionary_item_key,
+        })
+    }
+
+    pub fn new_from_seed_uref(seed_uref: URef, dictionary_item_key: String) -> Self {
+        DictionaryItemIdentifier(_DictionaryItemIdentifier::URef {
             seed_uref: seed_uref.into(),
             dictionary_item_key,
-        };
-        DictionaryItemIdentifier(dictionary_item_identifier)
+        })
     }
+
+    // #[wasm_bindgen(js_name = newFromItemKey)]
+    // pub fn new_from_item_key(item_key: Key) -> Result<JsValue, JsValue> {
+    //     if item_key.as_dictionary().is_some() {
+    //         Ok(JsValue::from(DictionaryItemIdentifier(
+    //             _DictionaryItemIdentifier::Dictionary(item_key.to_formatted_string()),
+    //         )))
+    //     } else {
+    //         Err(JsValue::from(Error::InvalidKeyVariant {
+    //             expected_variant: "Key::Dictionary".to_string(),
+    //             actual: JsValue::from(item_key.into()),
+    //         }))
+    //     }
+    // }
 }
 
 impl From<DictionaryItemIdentifier> for _DictionaryItemIdentifier {

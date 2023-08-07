@@ -1,5 +1,5 @@
 /* global BigInt */
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import './App.css';
 
@@ -24,12 +24,34 @@ import init, {
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
-const block_identifier_height = BigInt(1958541);
+const block_identifier_height_default = BigInt(1958541);
+const pubKey_default =
+  '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce';
 
 function App() {
   const [wasm, setWasm] = useState();
   const [ready, setReady] = useState(false);
+  const [block_identifier_height, setBlock_identifier_height] = useState(
+    block_identifier_height_default
+  );
   const [hash, setHash] = useState('');
+  const [pubKey, setPubKey] = useState(pubKey_default);
+  const [block, setBlock] = useState('');
+  const [info_get_account_info_hash, setInfo_get_account_info_hash] =
+    useState('');
+  const [info_get_account_info_purse, setInfo_get_account_info_purse] =
+    useState('');
+  const [info_get_deploy, setInfo_get_deploy] = useState('');
+
+  const [state_get_balance, setState_get_balance] = useState('');
+  const [state_get_dictionary_item, setState_get_dictionary_item] = useState(
+    []
+  );
+  const [query_global_state, setQuery_global_state] = useState('');
+
+  const [account_put_deploy, setAccount_put_deploy] = useState('');
+  const [make_deploy, setMake_deploy] = useState('');
+  const [make_transfer, setMake_transfer] = useState('');
 
   let test = false;
 
@@ -53,60 +75,66 @@ function App() {
         host,
         Verbosity.High
       );
-      setHash(chain_get_state_root_hash.result.state_root_hash);
-      console.log('js chain_get_state_root_hash', chain_get_state_root_hash);
+      setHash(chain_get_state_root_hash?.result.state_root_hash);
+      console.log(
+        'js chain_get_state_root_hash',
+        chain_get_state_root_hash?.result.state_root_hash
+      );
 
       const chain_get_block = await sdk.chain_get_block(
         host,
         Verbosity.High,
         BlockIdentifier.fromHeight(block_identifier_height)
       );
+      setBlock(chain_get_block?.result.block.hash);
       console.log('js chain_get_block', chain_get_block);
 
-      let finalized_approvals = true;
-      const info_get_deploy = await sdk.get_deploy(
-        host,
-        Verbosity.High,
-        new DeployHash(
-          '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445'
-        ),
-        finalized_approvals
-      );
-
-      console.log('js info_get_deploy', info_get_deploy);
+      const public_key = new PublicKey(pubKey);
+      console.log(public_key);
       const state_get_account_info = await sdk.state_get_account_info(
         host,
         Verbosity.High,
         BlockIdentifier.fromHeight(block_identifier_height),
-        new PublicKey(
-          '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce'
-        )
+        public_key
       );
       console.log('js state_get_account_info', state_get_account_info);
+
+      setInfo_get_account_info_hash(
+        state_get_account_info?.result.account.account_hash
+      );
+      setInfo_get_account_info_purse(
+        state_get_account_info?.result.account.main_purse
+      );
 
       const state_get_balance = await sdk.state_get_balance(
         host,
         Verbosity.High,
-        new Digest(chain_get_state_root_hash.result.state_root_hash),
+        new Digest(chain_get_state_root_hash?.result.state_root_hash),
         new URef(
           'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
           AccessRights.READ_ADD_WRITE()
         )
       );
       console.log('js state_get_balance', state_get_balance);
+      setState_get_balance(state_get_balance?.result.balance_value);
 
-      const dictionary_item_identifier = new DictionaryItemIdentifier(
-        new URef(
-          '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530',
-          AccessRights.READ_ADD_WRITE()
-        ),
-        '0' // event key
-      );
+      const dictionary_item_identifier =
+        DictionaryItemIdentifier.new_from_seed_uref(
+          new URef(
+            '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530',
+            AccessRights.READ_ADD_WRITE()
+          ),
+          '0' // event key
+        );
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(
         host,
         Verbosity.High,
-        new Digest(chain_get_state_root_hash.result.state_root_hash),
+        new Digest(chain_get_state_root_hash?.result.state_root_hash),
         dictionary_item_identifier
+      );
+
+      setState_get_dictionary_item(
+        state_get_dictionary_item?.result.stored_value.CLValue.parsed
       );
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
 
@@ -114,7 +142,7 @@ function App() {
         host,
         Verbosity.High,
         GlobalStateIdentifier.fromStateRootHash(
-          new Digest(chain_get_state_root_hash.result.state_root_hash)
+          new Digest(chain_get_state_root_hash?.result.state_root_hash)
         ),
         Key.fromURef(
           new URef(
@@ -122,21 +150,12 @@ function App() {
             new AccessRights(0o01)
           )
         ),
-        new Path([])
+        new Path('')
       );
       console.log('js query_global_state', query_global_state);
-
-      const deployAsString =
-        '{"hash":"1fca183a9760e3925657867c3c17946ffc8c37ae68f55d6a6af529e2e12af043","header":{"account":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","timestamp":"2023-07-31T16:10:04.463Z","ttl":"30m","gas_price":1,"body_hash":"0f7bbc79a5f02f2621347005c62fb440d8d07d5c97e2cd11da090da24989f61f","dependencies":[],"chain_name":"integration-test"},"payment":{"ModuleBytes":{"module_bytes":"","args":[["amount",{"bytes":"058e31a6553a","cl_type":"U512"}]]}},"session":{"StoredContractByHash":{"hash":"9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477","entry_point":"decimals","args":[]}},"approvals":[{"signer":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","signature":"018e64c442f6a4ccae0758bcf43a3f76a36e3d3744332d65ee1cafd0b2f30ffa362ad14c500742ed58c3736a863de34e1266c354f76e5915ac991c834aee3aeb08"}]}';
-
-      let signed_deploy = new Deploy(JSON.parse(deployAsString));
-      console.log(signed_deploy);
-      const account_put_deploy = await sdk.account_put_deploy(
-        host,
-        Verbosity.High,
-        signed_deploy
+      setQuery_global_state(
+        query_global_state?.result.stored_value.CLValue.parsed
       );
-      console.log('js account_put_deploy', account_put_deploy);
 
       const secret_key = `-----BEGIN PRIVATE KEY-----
       MC4CAQAwBQYDK2VwBCIEID9zhnRGadcOP7873Snbak8gI0m3iDoXMTCryPKBlx1D
@@ -169,7 +188,8 @@ function App() {
         payment_params,
         false
       );
-      console.log(make_transfer);
+      console.log(typeof make_transfer);
+      setMake_transfer(make_transfer);
 
       deploy_params = new DeployStrParams(
         secret_key,
@@ -195,7 +215,34 @@ function App() {
         payment_params,
         false
       );
+      setMake_deploy(JSON.stringify(make_deploy));
       console.log(make_deploy);
+
+      const deployAsString =
+        '{"hash":"1fca183a9760e3925657867c3c17946ffc8c37ae68f55d6a6af529e2e12af043","header":{"account":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","timestamp":"2023-07-31T16:10:04.463Z","ttl":"30m","gas_price":1,"body_hash":"0f7bbc79a5f02f2621347005c62fb440d8d07d5c97e2cd11da090da24989f61f","dependencies":[],"chain_name":"integration-test"},"payment":{"ModuleBytes":{"module_bytes":"","args":[["amount",{"bytes":"058e31a6553a","cl_type":"U512"}]]}},"session":{"StoredContractByHash":{"hash":"9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477","entry_point":"decimals","args":[]}},"approvals":[{"signer":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","signature":"018e64c442f6a4ccae0758bcf43a3f76a36e3d3744332d65ee1cafd0b2f30ffa362ad14c500742ed58c3736a863de34e1266c354f76e5915ac991c834aee3aeb08"}]}';
+
+      //  console.log(JSON.parse(make_transfer));
+      let signed_deploy = new Deploy(JSON.parse(deployAsString));
+      console.log(signed_deploy);
+      const account_put_deploy = await sdk.account_put_deploy(
+        host,
+        Verbosity.High,
+        make_transfer
+      );
+      setAccount_put_deploy(account_put_deploy?.result.deploy.hash);
+      console.log('js account_put_deploy', account_put_deploy);
+
+      let finalized_approvals = true;
+      const info_get_deploy = await sdk.get_deploy(
+        host,
+        Verbosity.High,
+        new DeployHash(
+          '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445'
+        ),
+        finalized_approvals
+      );
+      console.log('js info_get_deploy', info_get_deploy);
+      setInfo_get_deploy(info_get_deploy?.result.api_version);
     } catch (error) {
       console.error(error);
     }
@@ -212,12 +259,108 @@ function App() {
   return (
     <div className="App">
       <>
-        <div>
-          <br /> <br />
-          State root hash
-          <br /> <br />
-          {hash}
-          <br />
+        <img src={'./logo.png'} alt="CasperLabs"></img>
+        <div className="text-start my-3 mx-4">
+          <div className="my-2">
+            <label className="fw-bold">State root hash</label>
+            <div className="ms-2 d-inline-flex">{hash}</div>
+          </div>
+
+          <div className="my-2 w-50">
+            <form className="form-inline">
+              <label className="form-control">
+                Block hash for height
+                <input
+                  className="ms-2 form-control-sm text-center"
+                  type="number"
+                  name="height"
+                  placeholder={block_identifier_height_default.toString()}
+                  defaultValue={block_identifier_height.toString()}
+                ></input>
+              </label>
+            </form>
+            <div className="my-2">
+              <label className="fw-bold">Block Info Hash</label>
+              <div className="ms-2 d-inline-flex">{block}</div>
+            </div>
+          </div>
+
+          <div className="w-50">
+            <form className="form-inline">
+              <label className="ms-2fw-bold form-control">
+                <span>Public key</span>
+                <input
+                  className="ms-2 form-control-sm w-75 text-center"
+                  type="text"
+                  name="pubKey"
+                  placeholder={pubKey}
+                  defaultValue={pubKey}
+                ></input>
+              </label>
+            </form>
+          </div>
+
+          <div className="my-2">
+            <label className="fw-bold">Account Info Hash</label>
+            <div className="ms-2 d-inline-flex">
+              {info_get_account_info_hash}
+            </div>
+          </div>
+          <div className="my-2">
+            <label className="fw-bold">Account Info Purse</label>
+            <div className="ms-2 d-inline-flex">
+              {info_get_account_info_purse}
+            </div>
+          </div>
+
+          <div className="my-2 w-50">
+            <form className="form-inline">
+              <label className="form-control">
+                Account main purse uref
+                <input
+                  className="ms-2 form-control-sm w-75 text-center"
+                  type="text"
+                  name="purse"
+                  placeholder="uref-"
+                  defaultValue={info_get_account_info_purse}
+                ></input>
+              </label>
+            </form>
+            <div className="my-2">
+              <label className="fw-bold">State get balance</label>
+              <div className="ms-2 d-inline-flex">{state_get_balance}</div>
+            </div>
+          </div>
+
+          <div className="my-2">
+            <label className="fw-bold">State get dictionary item</label>
+            {state_get_dictionary_item.map((item, index) => (
+              <div key={index}>
+                <span>Key: {item.get('key')}</span>
+                <span className="ms-2">{item.get('value')}</span>
+              </div>
+            ))}
+          </div>
+          <div className="my-2">
+            <label className="fw-bold">Query global state</label>
+            <div className="ms-2 d-inline-flex">{query_global_state}</div>
+          </div>
+          <div className="my-2">
+            <label className="fw-bold">Make Deploy</label>
+            <div>{make_deploy}</div>
+          </div>
+          <div className="my-2">
+            <label className="fw-bold">Make transfer deploy</label>
+            <div>{make_transfer}</div>
+          </div>
+          <div className="my-2">
+            <label className="fw-bold">Put Deploy</label>
+            <div>{account_put_deploy}</div>
+          </div>
+          <div className="my-2">
+            <label className="fw-bold">Deploy info</label>
+            <div>{info_get_deploy}</div>
+          </div>
         </div>
       </>
     </div>
