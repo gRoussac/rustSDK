@@ -25,9 +25,9 @@ impl SDK {
         log("make_deploy!");
         let result: Result<Deploy, CliError> = make_deploy(
             "",
-            deploy_str_params_to_casper_client(&(deploy_params.clone())),
-            session_str_params_to_casper_client(&(session_params.clone())),
-            payment_str_params_to_casper_client(&(payment_params.clone())),
+            deploy_str_params_to_casper_client(&(deploy_params)),
+            session_str_params_to_casper_client(&(session_params)),
+            payment_str_params_to_casper_client(&(payment_params)),
             false,
         );
         stringify_deploy(result)

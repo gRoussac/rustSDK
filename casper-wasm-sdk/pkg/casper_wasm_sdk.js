@@ -223,23 +223,7 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_48(arg0, arg1, arg2) {
-    wasm.wasm_bindgen__convert__closures__invoke1_mut__h85c6c3cba794dad3(arg0, arg1, addHeapObject(arg2));
-}
-
-/**
-* @param {string} s
-*/
-export function log(s) {
-    const ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    wasm.log(ptr0, len0);
-}
-
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-    return instance.ptr;
+    wasm.wasm_bindgen__convert__closures__invoke1_mut__h40c7eb4c2cbb51ab(arg0, arg1, addHeapObject(arg2));
 }
 
 function getArrayU8FromWasm0(ptr, len) {
@@ -266,6 +250,22 @@ export function hexToUint8Array(hex_string) {
     }
 }
 
+/**
+* @param {string} s
+*/
+export function log(s) {
+    const ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    wasm.log(ptr0, len0);
+}
+
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
+    return instance.ptr;
+}
+
 function passArray8ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 1, 1) >>> 0;
     getUint8Memory0().set(arg, ptr / 1);
@@ -290,8 +290,8 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_298(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__h6781a696866739b3(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+function __wbg_adapter_301(arg0, arg1, arg2, arg3) {
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__h161e9520129f1928(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
 /**
@@ -539,6 +539,22 @@ export class AccountHash {
 }
 /**
 */
+export class AccountNamedKey {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_accountnamedkey_free(ptr);
+    }
+}
+/**
+*/
 export class ArgsSimple {
 
     __destroy_into_raw() {
@@ -651,6 +667,22 @@ export class BlockIdentifier {
     static fromHeight(height) {
         const ret = wasm.blockidentifier_fromHeight(height);
         return BlockIdentifier.__wrap(ret);
+    }
+}
+/**
+*/
+export class ContractNamedKey {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_contractnamedkey_free(ptr);
     }
 }
 /**
@@ -997,16 +1029,81 @@ export class DictionaryItemIdentifier {
         wasm.__wbg_dictionaryitemidentifier_free(ptr);
     }
     /**
+    * @param {AccountHash} account_hash
+    * @param {string} dictionary_name
+    * @param {string} dictionary_item_key
+    * @returns {DictionaryItemIdentifier}
+    */
+    static new_from_account_info(account_hash, dictionary_name, dictionary_item_key) {
+        _assertClass(account_hash, AccountHash);
+        var ptr0 = account_hash.__destroy_into_raw();
+        const ptr1 = passStringToWasm0(dictionary_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(dictionary_item_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.dictionaryitemidentifier_new_from_account_info(ptr0, ptr1, len1, ptr2, len2);
+        return DictionaryItemIdentifier.__wrap(ret);
+    }
+    /**
+    * @param {HashAddr} contract_addr
+    * @param {string} dictionary_name
+    * @param {string} dictionary_item_key
+    * @returns {DictionaryItemIdentifier}
+    */
+    static new_from_contract_info(contract_addr, dictionary_name, dictionary_item_key) {
+        _assertClass(contract_addr, HashAddr);
+        var ptr0 = contract_addr.__destroy_into_raw();
+        const ptr1 = passStringToWasm0(dictionary_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(dictionary_item_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.dictionaryitemidentifier_new_from_contract_info(ptr0, ptr1, len1, ptr2, len2);
+        return DictionaryItemIdentifier.__wrap(ret);
+    }
+    /**
     * @param {URef} seed_uref
     * @param {string} dictionary_item_key
+    * @returns {DictionaryItemIdentifier}
     */
-    constructor(seed_uref, dictionary_item_key) {
+    static new_from_seed_uref(seed_uref, dictionary_item_key) {
         _assertClass(seed_uref, URef);
         var ptr0 = seed_uref.__destroy_into_raw();
         const ptr1 = passStringToWasm0(dictionary_item_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.dictionaryitemidentifier_new(ptr0, ptr1, len1);
+        const ret = wasm.dictionaryitemidentifier_new_from_seed_uref(ptr0, ptr1, len1);
         return DictionaryItemIdentifier.__wrap(ret);
+    }
+}
+/**
+*/
+export class DictionaryItemStrParams {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_dictionaryitemstrparams_free(ptr);
+    }
+}
+/**
+*/
+export class DictionaryVariant {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_dictionaryvariant_free(ptr);
     }
 }
 /**
@@ -1307,7 +1404,7 @@ export class Key {
     static fromTransfer(key) {
         const ptr0 = passArray8ToWasm0(key, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.key_fromTransfer(ptr0, len0);
+        const ret = wasm.fromTransfer(ptr0, len0);
         return TransferAddr.__wrap(ret);
     }
     /**
@@ -1397,6 +1494,25 @@ export class Key {
     static fromChecksumRegistry() {
         const ret = wasm.key_fromChecksumRegistry();
         return Key.__wrap(ret);
+    }
+    /**
+    * @returns {string}
+    */
+    toFormattedString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.key_toFormattedString(retptr, this.__wbg_ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            deferred1_0 = r0;
+            deferred1_1 = r1;
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
     }
 }
 /**
@@ -1874,22 +1990,6 @@ export class SDK {
         wasm.__wbg_sdk_free(ptr);
     }
     /**
-    * @param {DeployStrParams} deploy_params
-    * @param {SessionStrParams} session_params
-    * @param {PaymentStrParams} payment_params
-    * @returns {any}
-    */
-    make_deploy(deploy_params, session_params, payment_params) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
     * @param {string} amount
     * @param {string} target_account
     * @param {string | undefined} transfer_id
@@ -1917,7 +2017,7 @@ export class SDK {
     * @param {BlockIdentifier | undefined} maybe_block_identifier
     * @returns {Promise<any>}
     */
-    get_block_transfers(node_address, verbosity, maybe_block_identifier) {
+    get_era_summary(node_address, verbosity, maybe_block_identifier) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         let ptr1 = 0;
@@ -1925,7 +2025,18 @@ export class SDK {
             _assertClass(maybe_block_identifier, BlockIdentifier);
             ptr1 = maybe_block_identifier.__destroy_into_raw();
         }
-        const ret = wasm.sdk_get_block_transfers(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
+        const ret = wasm.sdk_get_era_summary(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @returns {Promise<any>}
+    */
+    get_peers(node_address, verbosity) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_peers(this.__wbg_ptr, ptr0, len0, verbosity);
         return takeObject(ret);
     }
     /**
@@ -1974,6 +2085,187 @@ export class SDK {
         _assertClass(deploy, Deploy);
         var ptr2 = deploy.__destroy_into_raw();
         const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0, len0, ptr1, verbosity, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {BlockIdentifier | undefined} maybe_block_identifier
+    * @returns {Promise<any>}
+    */
+    get_block_transfers(node_address, verbosity, maybe_block_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        let ptr1 = 0;
+        if (!isLikeNone(maybe_block_identifier)) {
+            _assertClass(maybe_block_identifier, BlockIdentifier);
+            ptr1 = maybe_block_identifier.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_block_transfers(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {Digest} state_root_hash
+    * @param {DictionaryItemIdentifier} dictionary_item_identifier
+    * @returns {Promise<any>}
+    */
+    get_dictionary_item(node_address, verbosity, state_root_hash, dictionary_item_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(state_root_hash, Digest);
+        var ptr1 = state_root_hash.__destroy_into_raw();
+        _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
+        var ptr2 = dictionary_item_identifier.__destroy_into_raw();
+        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {Digest} state_root_hash
+    * @param {DictionaryItemIdentifier} dictionary_item_identifier
+    * @returns {Promise<any>}
+    */
+    state_get_dictionary_item(node_address, verbosity, state_root_hash, dictionary_item_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(state_root_hash, Digest);
+        var ptr1 = state_root_hash.__destroy_into_raw();
+        _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
+        var ptr2 = dictionary_item_identifier.__destroy_into_raw();
+        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {GlobalStateIdentifier | undefined} maybe_global_state_identifier
+    * @param {PurseIdentifier} purse_identifier
+    * @returns {Promise<any>}
+    */
+    query_balance(node_address, verbosity, maybe_global_state_identifier, purse_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        let ptr1 = 0;
+        if (!isLikeNone(maybe_global_state_identifier)) {
+            _assertClass(maybe_global_state_identifier, GlobalStateIdentifier);
+            ptr1 = maybe_global_state_identifier.__destroy_into_raw();
+        }
+        _assertClass(purse_identifier, PurseIdentifier);
+        var ptr2 = purse_identifier.__destroy_into_raw();
+        const ret = wasm.sdk_query_balance(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {Digest} state_root_hash
+    * @param {URef} purse
+    * @returns {Promise<any>}
+    */
+    get_balance(node_address, verbosity, state_root_hash, purse) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(state_root_hash, Digest);
+        var ptr1 = state_root_hash.__destroy_into_raw();
+        _assertClass(purse, URef);
+        var ptr2 = purse.__destroy_into_raw();
+        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {Digest} state_root_hash
+    * @param {URef} purse
+    * @returns {Promise<any>}
+    */
+    state_get_balance(node_address, verbosity, state_root_hash, purse) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(state_root_hash, Digest);
+        var ptr1 = state_root_hash.__destroy_into_raw();
+        _assertClass(purse, URef);
+        var ptr2 = purse.__destroy_into_raw();
+        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @returns {Promise<any>}
+    */
+    get_node_status(node_address, verbosity) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_node_status(this.__wbg_ptr, ptr0, len0, verbosity);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @returns {Promise<any>}
+    */
+    get_validator_changes(node_address, verbosity) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_validator_changes(this.__wbg_ptr, ptr0, len0, verbosity);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {BlockIdentifier | undefined} maybe_block_identifier
+    * @returns {Promise<any>}
+    */
+    get_state_root_hash(node_address, verbosity, maybe_block_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        let ptr1 = 0;
+        if (!isLikeNone(maybe_block_identifier)) {
+            _assertClass(maybe_block_identifier, BlockIdentifier);
+            ptr1 = maybe_block_identifier.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_state_root_hash(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {BlockIdentifier | undefined} maybe_block_identifier
+    * @returns {Promise<any>}
+    */
+    chain_get_state_root_hash(node_address, verbosity, maybe_block_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        let ptr1 = 0;
+        if (!isLikeNone(maybe_block_identifier)) {
+            _assertClass(maybe_block_identifier, BlockIdentifier);
+            ptr1 = maybe_block_identifier.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_state_root_hash(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number} verbosity
+    * @param {GlobalStateIdentifier} global_state_identifier
+    * @param {Key} key
+    * @param {Path} path
+    * @returns {Promise<any>}
+    */
+    query_global_state(node_address, verbosity, global_state_identifier, key, path) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(global_state_identifier, GlobalStateIdentifier);
+        var ptr1 = global_state_identifier.__destroy_into_raw();
+        _assertClass(key, Key);
+        var ptr2 = key.__destroy_into_raw();
+        _assertClass(path, Path);
+        var ptr3 = path.__destroy_into_raw();
+        const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2, ptr3);
         return takeObject(ret);
     }
     /**
@@ -2036,51 +2328,6 @@ export class SDK {
     /**
     * @param {string} node_address
     * @param {number} verbosity
-    * @param {Digest} state_root_hash
-    * @param {URef} purse
-    * @returns {Promise<any>}
-    */
-    get_balance(node_address, verbosity, state_root_hash, purse) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        _assertClass(purse, URef);
-        var ptr2 = purse.__destroy_into_raw();
-        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {Digest} state_root_hash
-    * @param {URef} purse
-    * @returns {Promise<any>}
-    */
-    state_get_balance(node_address, verbosity, state_root_hash, purse) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        _assertClass(purse, URef);
-        var ptr2 = purse.__destroy_into_raw();
-        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @returns {Promise<any>}
-    */
-    get_peers(node_address, verbosity) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_peers(this.__wbg_ptr, ptr0, len0, verbosity);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
     * @param {BlockIdentifier | undefined} maybe_block_identifier
     * @returns {Promise<any>}
     */
@@ -2115,63 +2362,58 @@ export class SDK {
     /**
     * @param {string} node_address
     * @param {number} verbosity
-    * @param {BlockIdentifier | undefined} maybe_block_identifier
     * @returns {Promise<any>}
     */
-    get_era_summary(node_address, verbosity, maybe_block_identifier) {
+    get_chainspec(node_address, verbosity) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr1 = maybe_block_identifier.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_era_summary(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
+        const ret = wasm.sdk_get_chainspec(this.__wbg_ptr, ptr0, len0, verbosity);
+        return takeObject(ret);
+    }
+    /**
+    * @param {DeployStrParams} deploy_params
+    * @param {SessionStrParams} session_params
+    * @param {PaymentStrParams} payment_params
+    * @returns {any}
+    */
+    make_deploy(deploy_params, session_params, payment_params) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
         return takeObject(ret);
     }
     /**
     * @param {string} node_address
     * @param {number} verbosity
+    * @param {DeployHash} deploy_hash
+    * @param {boolean} finalized_approvals
     * @returns {Promise<any>}
     */
-    get_node_status(node_address, verbosity) {
+    get_deploy(node_address, verbosity, deploy_hash, finalized_approvals) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_node_status(this.__wbg_ptr, ptr0, len0, verbosity);
+        _assertClass(deploy_hash, DeployHash);
+        var ptr1 = deploy_hash.__destroy_into_raw();
+        const ret = wasm.sdk_get_deploy(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, finalized_approvals);
         return takeObject(ret);
     }
     /**
     * @param {string} node_address
     * @param {number} verbosity
-    * @param {Digest} state_root_hash
-    * @param {DictionaryItemIdentifier} dictionary_item_identifier
+    * @param {DeployHash} deploy_hash
+    * @param {boolean} finalized_approvals
     * @returns {Promise<any>}
     */
-    get_dictionary_item(node_address, verbosity, state_root_hash, dictionary_item_identifier) {
+    info_get_deploy(node_address, verbosity, deploy_hash, finalized_approvals) {
         const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
-        var ptr2 = dictionary_item_identifier.__destroy_into_raw();
-        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {Digest} state_root_hash
-    * @param {DictionaryItemIdentifier} dictionary_item_identifier
-    * @returns {Promise<any>}
-    */
-    state_get_dictionary_item(node_address, verbosity, state_root_hash, dictionary_item_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
-        var ptr2 = dictionary_item_identifier.__destroy_into_raw();
-        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
+        _assertClass(deploy_hash, DeployHash);
+        var ptr1 = deploy_hash.__destroy_into_raw();
+        const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, finalized_approvals);
         return takeObject(ret);
     }
     /**
@@ -2208,132 +2450,6 @@ export class SDK {
     static new() {
         const ret = wasm.sdk_new();
         return SDK.__wrap(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @returns {Promise<any>}
-    */
-    get_chainspec(node_address, verbosity) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_chainspec(this.__wbg_ptr, ptr0, len0, verbosity);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {DeployHash} deploy_hash
-    * @param {boolean} finalized_approvals
-    * @returns {Promise<any>}
-    */
-    get_deploy(node_address, verbosity, deploy_hash, finalized_approvals) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(deploy_hash, DeployHash);
-        var ptr1 = deploy_hash.__destroy_into_raw();
-        const ret = wasm.sdk_get_deploy(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, finalized_approvals);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {DeployHash} deploy_hash
-    * @param {boolean} finalized_approvals
-    * @returns {Promise<any>}
-    */
-    info_get_deploy(node_address, verbosity, deploy_hash, finalized_approvals) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(deploy_hash, DeployHash);
-        var ptr1 = deploy_hash.__destroy_into_raw();
-        const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, finalized_approvals);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {GlobalStateIdentifier | undefined} maybe_global_state_identifier
-    * @param {PurseIdentifier} purse_identifier
-    * @returns {Promise<any>}
-    */
-    query_balance(node_address, verbosity, maybe_global_state_identifier, purse_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_global_state_identifier)) {
-            _assertClass(maybe_global_state_identifier, GlobalStateIdentifier);
-            ptr1 = maybe_global_state_identifier.__destroy_into_raw();
-        }
-        _assertClass(purse_identifier, PurseIdentifier);
-        var ptr2 = purse_identifier.__destroy_into_raw();
-        const ret = wasm.sdk_query_balance(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {BlockIdentifier | undefined} maybe_block_identifier
-    * @returns {Promise<any>}
-    */
-    get_state_root_hash(node_address, verbosity, maybe_block_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr1 = maybe_block_identifier.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_state_root_hash(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {BlockIdentifier | undefined} maybe_block_identifier
-    * @returns {Promise<any>}
-    */
-    chain_get_state_root_hash(node_address, verbosity, maybe_block_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr1 = maybe_block_identifier.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_state_root_hash(this.__wbg_ptr, ptr0, len0, verbosity, ptr1);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @returns {Promise<any>}
-    */
-    get_validator_changes(node_address, verbosity) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_validator_changes(this.__wbg_ptr, ptr0, len0, verbosity);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number} verbosity
-    * @param {GlobalStateIdentifier} global_state_identifier
-    * @param {Key} key
-    * @param {Path} path
-    * @returns {Promise<any>}
-    */
-    query_global_state(node_address, verbosity, global_state_identifier, key, path) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(global_state_identifier, GlobalStateIdentifier);
-        var ptr1 = global_state_identifier.__destroy_into_raw();
-        _assertClass(key, Key);
-        var ptr2 = key.__destroy_into_raw();
-        _assertClass(path, Path);
-        var ptr3 = path.__destroy_into_raw();
-        const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0, len0, verbosity, ptr1, ptr2, ptr3);
-        return takeObject(ret);
     }
 }
 /**
@@ -2779,6 +2895,22 @@ export class URefAddr {
         }
     }
 }
+/**
+*/
+export class URefVariant {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_urefvariant_free(ptr);
+    }
+}
 
 async function __wbg_load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
@@ -3128,7 +3260,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_298(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_301(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -3220,8 +3352,8 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3062 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 621, __wbg_adapter_48);
+    imports.wbg.__wbindgen_closure_wrapper3078 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 619, __wbg_adapter_48);
         return addHeapObject(ret);
     };
 
