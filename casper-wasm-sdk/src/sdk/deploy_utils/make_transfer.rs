@@ -1,17 +1,19 @@
-//pub fn new_transfer(
 use crate::{
-    helpers::stringify_deploy,
+    helpers::serialize_result,
     js::externs::log,
     sdk::SDK,
-    types::deploy_params::{
-        deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
-        payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
+    types::{
+        deploy::Deploy,
+        deploy_params::{
+            deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
+            payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
+        },
     },
 };
 use casper_client::cli::{make_transfer, CliError};
-use casper_types::Deploy;
+use casper_types::Deploy as _Deploy;
 use rand::Rng;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{describe::U64, prelude::*};
 
 #[wasm_bindgen]
 impl SDK {
@@ -30,15 +32,31 @@ impl SDK {
         } else {
             rand::thread_rng().gen::<u64>().to_string()
         };
-        let result: Result<Deploy, CliError> = make_transfer(
+        log(&format!("transfer_id {:?}", transfer_id));
+        let result: Result<_Deploy, CliError> = make_transfer(
             "",
             amount,
             target_account,
             &transfer_id,
-            deploy_str_params_to_casper_client(&(deploy_params.clone())),
-            payment_str_params_to_casper_client(&(payment_params.clone())),
+            deploy_str_params_to_casper_client(&deploy_params),
+            payment_str_params_to_casper_client(&payment_params),
             false,
         );
-        stringify_deploy(result)
+
+        // Map the result to our custom Deploy type to Serialize Transfer "id" into string
+        let mapped_result: Result<Deploy, CliError> = result.map(Deploy::from);
+
+        log(&format!(
+            "test {:?}",
+            serde_wasm_bindgen::to_value(&rand::thread_rng().gen::<f64>())
+        ));
+
+        let value = serialize_result(mapped_result);
+        log(&format!("{:?}", value));
+        // let test = Deploy::new(value.clone());
+        // log(&format!("testtesttest{:?}", test));
+
+        value
+        //JsValue::null()
     }
 }

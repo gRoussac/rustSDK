@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::types::{access_rights::AccessRights, addr::uref_addr::URefAddr};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[wasm_bindgen]
 
 pub struct URef(_URef);
