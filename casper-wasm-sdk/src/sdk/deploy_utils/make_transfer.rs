@@ -45,12 +45,6 @@ impl SDK {
 
         // Map the result to our custom Deploy type to Serialize Transfer "id" into string
         let mapped_result: Result<Deploy, CliError> = result.map(Deploy::from);
-
-        log(&format!(
-            "test {:?}",
-            serde_wasm_bindgen::to_value(&rand::thread_rng().gen::<f64>())
-        ));
-
         let value = serialize_result(mapped_result);
         log(&format!("{:?}", value));
         // let test = Deploy::new(value.clone());
