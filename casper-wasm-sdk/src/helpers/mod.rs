@@ -1,11 +1,14 @@
-use crate::js::externs::error;
-use casper_client::{cli::CliError, Error};
+use crate::js::externs::{error, log};
+use casper_client::cli::CliError;
 use casper_types::Deploy;
 use js_sys::Date;
-use serde::Serialize;
 use wasm_bindgen::JsValue;
 
-pub fn serialize_result<T: Serialize>(result: Result<T, Error>) -> JsValue {
+pub fn serialize_result<T, E>(result: Result<T, E>) -> JsValue
+where
+    T: serde::Serialize + std::fmt::Debug,
+    E: std::error::Error,
+{
     match result {
         Ok(data) => match serde_wasm_bindgen::to_value(&data) {
             Ok(json) => json,

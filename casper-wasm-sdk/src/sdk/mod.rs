@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+pub mod deploy;
 pub mod deploy_utils;
 pub mod rpcs;
 
