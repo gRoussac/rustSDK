@@ -1,34 +1,25 @@
-use crate::js::externs::{error, log};
-use casper_client::cli::CliError;
-use casper_types::Deploy;
+use crate::js::externs::error;
 use js_sys::Date;
+use serde::Serialize;
+use serde_wasm_bindgen::Serializer;
 use wasm_bindgen::JsValue;
 
 pub fn serialize_result<T, E>(result: Result<T, E>) -> JsValue
 where
-    T: serde::Serialize + std::fmt::Debug,
+    T: Serialize,
     E: std::error::Error,
 {
     match result {
-        Ok(data) => match serde_wasm_bindgen::to_value(&data) {
-            Ok(json) => json,
-            Err(err) => {
-                error(&format!("Error serializing data to JSON: {:?}", err));
-                JsValue::null()
+        Ok(data) => {
+            let serializer =
+                Serializer::json_compatible().serialize_large_number_types_as_bigints(true);
+            match data.serialize(&serializer) {
+                Ok(json) => json,
+                Err(err) => {
+                    error(&format!("Error serializing data to JSON: {:?}", err));
+                    JsValue::null()
+                }
             }
-        },
-        Err(err) => {
-            error(&format!("Error occurred: {:?}", err));
-            JsValue::null()
-        }
-    }
-}
-
-pub fn stringify_deploy(result: Result<Deploy, CliError>) -> JsValue {
-    match result {
-        Ok(deploy) => {
-            let serialized_deploy = format!("{:?}", deploy);
-            JsValue::from_str(&serialized_deploy)
         }
         Err(err) => {
             error(&format!("Error occurred: {:?}", err));

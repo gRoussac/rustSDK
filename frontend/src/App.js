@@ -1,4 +1,3 @@
-/* global BigInt */
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import './App.css';
@@ -23,6 +22,12 @@ import init, {
   // hexToUint8Array,
 } from 'casper-wasm-sdk';
 
+/* global BigInt */
+// eslint-disable-next-line no-extend-native
+BigInt.prototype.toJSON = (number_as_bigint) => {
+  number_as_bigint.toString();
+};
+
 const host = 'http://localhost:3000';
 const block_identifier_height_default = BigInt(1958541);
 const pubKey_default =
@@ -35,7 +40,7 @@ function App() {
     block_identifier_height_default
   );
   const [hash, setHash] = useState('');
-  const [pubKey, setPubKey] = useState(pubKey_default);
+  const [pubKey] = useState(pubKey_default);
   const [block, setBlock] = useState('');
   const [info_get_account_info_hash, setInfo_get_account_info_hash] =
     useState('');
@@ -54,6 +59,13 @@ function App() {
   const [make_transfer, setMake_transfer] = useState('');
 
   let test = false;
+  useEffect(() => {
+    if (!test) {
+      // FIX ME please
+      test = true;
+      initApp();
+    }
+  }, [test]);
 
   const fetchWasm = async () => {
     // console.log('fetchWasm');
@@ -179,6 +191,7 @@ function App() {
       payment_params.payment_amount = '5500000000';
       console.log(payment_params);
 
+      // Transfer minimum amount of tokens to recipient
       const make_transfer = await sdk.make_transfer(
         '2500000000',
         '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
@@ -189,7 +202,6 @@ function App() {
       );
       setMake_transfer(JSON.stringify(make_transfer));
       console.log(make_transfer);
-      console.log(JSON.stringify(make_transfer));
 
       deploy_params = new DeployStrParams(
         secret_key,
@@ -201,6 +213,7 @@ function App() {
       console.log(deploy_params);
 
       let session_params = new SessionStrParams();
+      // Call an erc 20 token in the wild
       session_params.session_hash =
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
@@ -218,7 +231,6 @@ function App() {
       );
       setMake_deploy(JSON.stringify(make_deploy));
       console.log(make_deploy);
-      console.log(JSON.stringify(make_deploy));
 
       // Update hash && timestamp if you need to deploy this already signed deploy
       // const deployAsString =
@@ -226,7 +238,7 @@ function App() {
 
       // let signed_deploy = new Deploy(JSON.parse(deployAsString));
 
-      let signed_deploy = new Deploy(make_transfer);
+      let signed_deploy = new Deploy(make_transfer); // make_deploy
       console.log(signed_deploy);
       const account_put_deploy = await sdk.account_put_deploy(
         host,
@@ -246,7 +258,7 @@ function App() {
         host,
         Verbosity.High,
         new DeployHash(
-          // '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445'
+          // '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
           account_put_deploy?.result.deploy_hash
         ),
         finalized_approvals
@@ -258,13 +270,6 @@ function App() {
     }
     setReady(true);
   };
-
-  useEffect(() => {
-    if (!test) {
-      test = true;
-      initApp();
-    }
-  }, [test]);
 
   return (
     <div className="App">
@@ -346,8 +351,8 @@ function App() {
             <label className="fw-bold">State get dictionary item</label>
             {state_get_dictionary_item.map((item, index) => (
               <div key={index}>
-                <span>Key: {item.get('key')}</span>
-                <span className="ms-2">{item.get('value')}</span>
+                <span>Key: {item.key}</span>
+                <span className="ms-2">{item.value}</span>
               </div>
             ))}
           </div>
