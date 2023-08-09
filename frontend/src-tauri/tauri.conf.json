@@ -3,7 +3,7 @@
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run start",
     "devPath": "http://localhost:3000/",
-    "distDir": "../.."
+    "distDir": "../build"
   },
   "package": {
     "productName": "casper",

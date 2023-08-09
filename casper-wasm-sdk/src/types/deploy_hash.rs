@@ -4,6 +4,7 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     DeployHash as _DeployHash,
 };
+use hex::decode;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
@@ -14,8 +15,8 @@ pub struct DeployHash(_DeployHash);
 impl DeployHash {
     #[wasm_bindgen(constructor)]
     pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, JsValue> {
-        let bytes = hex::decode(deploy_hash_hex_str)
-            .map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+        let bytes =
+            decode(deploy_hash_hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
         let mut hash = [0u8; _Digest::LENGTH];
         hash.copy_from_slice(&bytes);
         Self::from_digest(Digest::from(hash))

@@ -23,14 +23,6 @@ import init, {
   // hexToUint8Array,
 } from 'casper-wasm-sdk';
 
-
-declare global {
-  interface BigInt {
-    toJSON(): string;
-  }
-}
-BigInt.prototype.toJSON = function (): string { return this.toString(); };
-
 const host = 'http://localhost:3000';
 const block_identifier_height_default = BigInt(1958541);
 const pubKey_default =
@@ -95,6 +87,7 @@ function App() {
         'js chain_get_state_root_hash',
         chain_get_state_root_hash?.result.state_root_hash
       );
+      console.log(chain_get_state_root_hash);
 
       const chain_get_block = await sdk.chain_get_block(
         host,
@@ -185,7 +178,7 @@ function App() {
         secret_key,
         chain_name,
         session_account,
-        undefined,
+        timestamp,
         ttl
       );
       console.log(deploy_params);
@@ -195,7 +188,7 @@ function App() {
       console.log(payment_params);
 
       // Transfer minimum amount of tokens to recipient
-      const make_transfer = await sdk.make_transfer(
+      const make_transfer = sdk.make_transfer(
         '2500000000',
         '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
         undefined, // transfer_id
@@ -225,7 +218,7 @@ function App() {
       payment_params.payment_amount = '5500000000';
       console.log(payment_params);
 
-      const make_deploy = await sdk.make_deploy(
+      const make_deploy = sdk.make_deploy(
         deploy_params,
         session_params,
         payment_params,
@@ -239,7 +232,7 @@ function App() {
 
       // let signed_deploy = new Deploy(JSON.parse(deployAsString));
 
-      let signed_deploy = new Deploy(make_transfer); // make_deploy
+      let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);
       const account_put_deploy = await sdk.account_put_deploy(
         host,
@@ -247,7 +240,6 @@ function App() {
         signed_deploy
       );
       console.log('js account_put_deploy', account_put_deploy);
-      console.log('js deploy hash ', account_put_deploy?.result?.deploy_hash);
       setAccount_put_deploy(account_put_deploy?.result?.deploy_hash);
 
       if (!account_put_deploy?.result.deploy_hash) {
@@ -266,6 +258,7 @@ function App() {
       );
       console.log('js info_get_deploy', info_get_deploy);
       setInfo_get_deploy(info_get_deploy?.result?.api_version);
+
     } catch (error) {
       console.error(error);
     }
