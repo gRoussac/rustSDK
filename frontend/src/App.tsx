@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react';
 import { useEffect, useState } from 'react';
 import './App.css';
 
@@ -22,11 +23,13 @@ import init, {
   // hexToUint8Array,
 } from 'casper-wasm-sdk';
 
-/* global BigInt */
-// eslint-disable-next-line no-extend-native
-BigInt.prototype.toJSON = (number_as_bigint) => {
-  number_as_bigint.toString();
-};
+
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+BigInt.prototype.toJSON = function (): string { return this.toString(); };
 
 const host = 'http://localhost:3000';
 const block_identifier_height_default = BigInt(1958541);
@@ -34,12 +37,11 @@ const pubKey_default =
   '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce';
 
 function App() {
-  const [wasm, setWasm] = useState();
-  const [ready, setReady] = useState(false);
+  const [wasm, setWasm] = useState(false);
   const [block_identifier_height, setBlock_identifier_height] = useState(
     block_identifier_height_default
   );
-  const [hash, setHash] = useState('');
+  const [hash, setHash] = useState(false);
   const [pubKey] = useState(pubKey_default);
   const [block, setBlock] = useState('');
   const [info_get_account_info_hash, setInfo_get_account_info_hash] =
@@ -65,27 +67,28 @@ function App() {
       test = true;
       initApp();
     }
-  }, [test]);
+  }, []);
 
   const fetchWasm = async () => {
     // console.log('fetchWasm');
-    const wasm = await init();
+    await init();
     //console.log(wasm);
-    setWasm(wasm);
+    setWasm(true);
   };
 
   const initApp = async () => {
-    setReady(false);
     if (!wasm) {
       await fetchWasm();
-    }
-    const sdk = SDK.new();
+    };
+    // console.log(wasm);
+    const sdk: SDK = new SDK();
     console.log(sdk);
 
     try {
       const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(
         host,
-        Verbosity.High
+        2,
+        undefined
       );
       setHash(chain_get_state_root_hash?.result.state_root_hash);
       console.log(
@@ -159,7 +162,7 @@ function App() {
         Key.fromURef(
           new URef(
             'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
-            new AccessRights(0o01)
+            AccessRights.READ_ADD_WRITE()
           )
         ),
         new Path('')
@@ -198,7 +201,6 @@ function App() {
         undefined, // transfer_id
         deploy_params,
         payment_params,
-        false
       );
       setMake_transfer(JSON.stringify(make_transfer));
       console.log(make_transfer);
@@ -227,7 +229,6 @@ function App() {
         deploy_params,
         session_params,
         payment_params,
-        false
       );
       setMake_deploy(JSON.stringify(make_deploy));
       console.log(make_deploy);
@@ -268,7 +269,6 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-    setReady(true);
   };
 
   return (
@@ -351,8 +351,8 @@ function App() {
             <label className="fw-bold">State get dictionary item</label>
             {state_get_dictionary_item.map((item, index) => (
               <div key={index}>
-                <span>Key: {item.key}</span>
-                <span className="ms-2">{item.value}</span>
+                <span>Key: {item['key']}</span>
+                <span className="ms-2">{item['value']}</span>
               </div>
             ))}
           </div>
