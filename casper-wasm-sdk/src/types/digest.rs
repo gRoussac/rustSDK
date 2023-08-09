@@ -2,6 +2,7 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     Digest as _Digest,
 };
+use hex::decode;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
@@ -13,7 +14,7 @@ impl Digest {
     #[wasm_bindgen(constructor)]
     pub fn new(digest_hex_str: &str) -> Result<Digest, JsValue> {
         let bytes =
-            hex::decode(digest_hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+            decode(digest_hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
         if bytes.len() != _Digest::LENGTH {
             return Err(JsValue::from_str("Invalid Digest length"));
         }

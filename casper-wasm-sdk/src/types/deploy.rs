@@ -1,4 +1,5 @@
 use casper_types::Deploy as _Deploy;
+use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone)]
@@ -9,7 +10,8 @@ pub struct Deploy(_Deploy);
 impl Deploy {
     #[wasm_bindgen(constructor)]
     pub fn new(deploy: JsValue) -> Deploy {
-        let deploy: _Deploy = serde_wasm_bindgen::from_value(deploy)
+        let deploy: _Deploy = deploy
+            .into_serde()
             .map_err(|err| JsValue::from_str(&format!("Failed to deserialize Deploy: {:?}", err)))
             .unwrap();
         Deploy(deploy)
