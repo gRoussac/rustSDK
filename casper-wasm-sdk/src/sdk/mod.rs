@@ -14,6 +14,7 @@ impl Default for SDK {
 
 #[wasm_bindgen]
 impl SDK {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         SDK {}
     }
