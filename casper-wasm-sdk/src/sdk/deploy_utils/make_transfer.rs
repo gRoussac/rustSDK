@@ -1,6 +1,5 @@
 use crate::{
     helpers::serialize_result,
-    js::externs::log,
     sdk::SDK,
     types::deploy_params::{
         deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -23,13 +22,12 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
-        log("make_transfer!");
+        // log("make_transfer");
         let transfer_id = if let Some(transfer_id) = transfer_id {
             transfer_id
         } else {
             rand::thread_rng().gen::<u64>().to_string()
         };
-        log(&format!("transfer_id {:?}", transfer_id));
         let result: Result<Deploy, CliError> = make_transfer(
             "",
             amount,

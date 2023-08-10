@@ -1,7 +1,6 @@
-use casper_client::{rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier, Error};
-use wasm_bindgen::prelude::*;
-
 use super::{account_hash::AccountHash, addr::hash_addr::HashAddr, key::Key, uref::URef};
+use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 #[wasm_bindgen]

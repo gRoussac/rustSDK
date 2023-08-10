@@ -4,7 +4,6 @@ use wasm_bindgen::prelude::*;
 
 use crate::{
     helpers::serialize_result,
-    js::externs::log,
     sdk::SDK,
     types::deploy_params::{
         deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -22,8 +21,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
-        log("make_deploy!");
-        log(&format!("{:?}", deploy_params));
+        // log("make_deploy");
         let result: Result<Deploy, CliError> = make_deploy(
             "",
             deploy_str_params_to_casper_client(&deploy_params),

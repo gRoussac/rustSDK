@@ -2,6 +2,7 @@ use crate::{
     js::externs::{error, log},
     sdk::SDK,
     types::{
+        block_identifier::BlockIdentifier,
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -15,9 +16,11 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SDK {
+    #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen]
-    pub async fn transfer(
+    pub async fn speculative_transfer(
         &mut self,
+        maybe_block_id: Option<BlockIdentifier>,
         node_address: &str,
         verbosity: Verbosity,
         amount: &str,
@@ -25,7 +28,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
-        log("transfer!");
+        log("speculative_transfer!");
         match make_transfer(
             "",
             amount,
@@ -36,12 +39,12 @@ impl SDK {
             false,
         ) {
             Ok(deploy) => {
-                self.put_deploy(node_address, verbosity, deploy.into())
+                self.speculative_exec(node_address, maybe_block_id, verbosity, deploy.into())
                     .await
             }
             Err(err) => {
                 // Handle the error, log it, and return an error JsValue if desired
-                error(&format!("Error during transfer: {}", err));
+                error(&format!("Error during speculative_transfer: {}", err));
                 // For example, return an error JsValue:
                 JsValue::from_str(&format!("Error: {}", err))
             }

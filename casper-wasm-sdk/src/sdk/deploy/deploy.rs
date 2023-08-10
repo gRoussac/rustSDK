@@ -1,5 +1,5 @@
 use crate::{
-    js::externs::log,
+    js::externs::{error, log},
     sdk::SDK,
     types::{
         deploy_params::{
@@ -36,11 +36,11 @@ impl SDK {
                 self.put_deploy(node_address, verbosity, deploy.into())
                     .await
             }
-            Err(error) => {
+            Err(err) => {
                 // Handle the error, log it, and return an error JsValue if desired
-                log(&format!("Error during deploy: {}", error));
+                error(&format!("Error during deploy: {}", err));
                 // For example, return an error JsValue:
-                JsValue::from_str(&format!("Error: {}", error))
+                JsValue::from_str(&format!("Error: {}", err))
             }
         }
     }
