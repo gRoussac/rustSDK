@@ -1,4 +1,4 @@
-use crate::js::externs::{error, log};
+use crate::js::externs::error;
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use serde::Serialize;
@@ -36,12 +36,10 @@ pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
         .map(|parsed_time| {
             NaiveDateTime::from_timestamp_opt(parsed_time / 1000, 0)
                 .map(|naive_time| DateTime::<Utc>::from_utc(naive_time, Utc))
-                .unwrap_or_else(|| Utc::now())
+                .unwrap_or_else(Utc::now)
         })
-        .unwrap_or_else(|| Utc::now());
-
-    let formatted_timestamp = current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true);
-    formatted_timestamp
+        .unwrap_or_else(Utc::now);
+    current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true)
 }
 
 pub fn get_str_or_default(opt_str: Option<&String>) -> &str {

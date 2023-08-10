@@ -9,6 +9,16 @@ pub enum Verbosity {
     High = 2,
 }
 
+impl From<Verbosity> for u64 {
+    fn from(verbosity: Verbosity) -> Self {
+        match verbosity {
+            Verbosity::Low => 0,
+            Verbosity::Medium => 1,
+            Verbosity::High => 2,
+        }
+    }
+}
+
 impl From<Verbosity> for _Verbosity {
     fn from(verbosity: Verbosity) -> Self {
         match verbosity {
