@@ -1,4 +1,5 @@
 use crate::js::externs::error;
+use casper_types::SecretKey;
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use serde::Serialize;
@@ -44,4 +45,13 @@ pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
 
 pub fn get_str_or_default(opt_str: Option<&String>) -> &str {
     opt_str.map(String::as_str).unwrap_or_default()
+}
+
+pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, JsValue> {
+    let secret_key_result = SecretKey::from_pem(secret_key);
+    if let Err(err) = secret_key_result {
+        error(&format!("Error loading secret key: {:?}", err));
+        return Err(JsValue::null());
+    }
+    Ok(secret_key_result.unwrap())
 }

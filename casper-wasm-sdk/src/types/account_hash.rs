@@ -1,4 +1,5 @@
 use super::public_key::PublicKey;
+use crate::js::externs::error;
 use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
@@ -14,7 +15,8 @@ impl AccountHash {
     #[wasm_bindgen(constructor)]
     pub fn new(account_hash_hex_str: &str) -> Result<AccountHash, JsValue> {
         let account_hash = _AccountHash::from_formatted_str(account_hash_hex_str)
-            .map_err(|err| JsValue::from_str(&format!("Failed to parse AccountHash: {:?}", err)))?;
+            .map_err(|err| error(&format!("Failed to parse AccountHash: {:?}", err)))
+            .unwrap();
         Ok(AccountHash(account_hash))
     }
 
@@ -26,12 +28,14 @@ impl AccountHash {
 
     #[wasm_bindgen(js_name = fromFormattedStr)]
     pub fn from_formatted_str(input: &str) -> Result<AccountHash, JsValue> {
-        let account_hash = _AccountHash::from_formatted_str(input).map_err(|err| {
-            JsValue::from_str(&format!(
-                "Failed to parse AccountHash from formatted string: {:?}",
-                err
-            ))
-        })?;
+        let account_hash = _AccountHash::from_formatted_str(input)
+            .map_err(|err| {
+                error(&format!(
+                    "Failed to parse AccountHash from formatted string: {:?}",
+                    err
+                ))
+            })
+            .unwrap();
         Ok(AccountHash(account_hash))
     }
 

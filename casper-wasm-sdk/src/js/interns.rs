@@ -1,9 +1,11 @@
-use crate::{helpers::get_current_timestamp, js::externs::error, types::verbosity::Verbosity};
-use casper_types::{PublicKey, SecretKey};
+use crate::{
+    helpers::{get_current_timestamp, secret_key_from_pem},
+    js::externs::error,
+    types::verbosity::Verbosity,
+};
+use casper_types::PublicKey;
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
-
-use super::externs::log;
 
 #[wasm_bindgen(js_name = "hexToUint8Array")]
 pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {
@@ -46,15 +48,9 @@ pub fn json_pretty_print(value: JsValue, verbosity: Option<Verbosity>) -> JsValu
 
 #[wasm_bindgen(js_name = "privateToPublicKey")]
 pub fn secret_to_public_key(secret_key: &str) -> JsValue {
-    let secret_key_result = SecretKey::from_pem(secret_key);
-    if let Err(error) = secret_key_result {
-        log(&format!("Error loading secret key: {:?}", error));
-        return JsValue::null();
-    }
-    let public_key = PublicKey::from(&secret_key_result.unwrap());
-
+    let public_key = PublicKey::from(&secret_key_from_pem(secret_key).unwrap());
     JsValue::from_serde(&public_key).unwrap_or_else(|err| {
-        log(&format!("Error serializing public key: {:?}", err));
+        error(&format!("Error serializing public key: {:?}", err));
         JsValue::null()
     })
 }

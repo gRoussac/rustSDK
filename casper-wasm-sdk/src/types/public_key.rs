@@ -1,3 +1,4 @@
+use crate::js::externs::error;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey,
@@ -13,9 +14,11 @@ impl PublicKey {
     #[wasm_bindgen(constructor)]
     pub fn new(public_key_hex_str: &str) -> Result<PublicKey, JsValue> {
         let bytes = hex::decode(public_key_hex_str)
-            .map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+            .map_err(|err| error(&format!("{:?}", err)))
+            .unwrap();
         let (public_key, _) = _PublicKey::from_bytes(&bytes)
-            .map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+            .map_err(|err| error(&format!("{:?}", err)))
+            .unwrap();
         Ok(PublicKey(public_key))
     }
 
