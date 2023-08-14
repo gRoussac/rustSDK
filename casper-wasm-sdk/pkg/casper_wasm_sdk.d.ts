@@ -22,6 +22,10 @@ export function jsonPrettyPrint(value: any, verbosity?: number): any;
 */
 export function privateToPublicKey(secret_key: string): any;
 /**
+* @returns {any}
+*/
+export function getTimestamp(): any;
+/**
 * @param {string} s
 */
 export function log(s: string): void;
@@ -834,6 +838,10 @@ export interface InitOutput {
   readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly transferaddr_new: (a: number, b: number, c: number) => void;
   readonly fromTransfer: (a: number, b: number) => number;
+  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
+  readonly jsonPrettyPrint: (a: number, b: number) => number;
+  readonly privateToPublicKey: (a: number, b: number) => number;
+  readonly getTimestamp: () => number;
   readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly eraid_new: (a: number) => number;
   readonly eraid_value: (a: number) => number;
@@ -853,9 +861,6 @@ export interface InitOutput {
   readonly key_fromChainspecRegistry: () => number;
   readonly key_fromChecksumRegistry: () => number;
   readonly key_toFormattedString: (a: number, b: number) => void;
-  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
-  readonly jsonPrettyPrint: (a: number, b: number) => number;
-  readonly privateToPublicKey: (a: number, b: number) => number;
   readonly sdk_get_account: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_get_auction_info: (a: number, b: number, c: number, d: number, e: number) => number;
