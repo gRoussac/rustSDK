@@ -22,7 +22,8 @@ import init, {
   PaymentStrParams,
   // hexToUint8Array,
   jsonPrettyPrint,
-  privateToPublicKey
+  privateToPublicKey,
+  getTimestamp
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
@@ -173,7 +174,7 @@ function App() {
       const chain_name = 'integration-test';
       const session_account =
         privateToPublicKey(secret_key);
-      const timestamp = Date.now().toString(); // or undefined
+      const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
       const ttl = '1h';
 
       console.log("privateToPublicKey result", privateToPublicKey(secret_key));

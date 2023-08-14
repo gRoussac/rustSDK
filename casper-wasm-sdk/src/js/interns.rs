@@ -1,4 +1,4 @@
-use crate::{js::externs::error, types::verbosity::Verbosity};
+use crate::{helpers::get_current_timestamp, js::externs::error, types::verbosity::Verbosity};
 use casper_types::{PublicKey, SecretKey};
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
@@ -57,4 +57,9 @@ pub fn secret_to_public_key(secret_key: &str) -> JsValue {
         log(&format!("Error serializing public key: {:?}", err));
         JsValue::null()
     })
+}
+
+#[wasm_bindgen(js_name = "getTimestamp")]
+pub fn get_timestamp() -> JsValue {
+    get_current_timestamp(&None).into()
 }
