@@ -82,7 +82,7 @@ function App() {
     try {
       const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(
         host,
-        2,
+        Verbosity.High,
         undefined
       );
       setHash(chain_get_state_root_hash?.result.state_root_hash);
