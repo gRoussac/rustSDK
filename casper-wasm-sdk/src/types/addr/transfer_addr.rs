@@ -1,4 +1,5 @@
 //use casper_types::TransferAddr as _TransferAddr;
+use crate::js::externs::error;
 use casper_types::TRANSFER_ADDR_LENGTH;
 use wasm_bindgen::prelude::*;
 
@@ -11,7 +12,8 @@ impl TransferAddr {
     #[wasm_bindgen(constructor)]
     pub fn new(bytes: Vec<u8>) -> Result<TransferAddr, JsValue> {
         if bytes.len() != TRANSFER_ADDR_LENGTH {
-            return Err(JsValue::from_str("Invalid TransferAddr length"));
+            error("Invalid TransferAddr length");
+            return Err(JsValue::null());
         }
         let mut array = [0u8; TRANSFER_ADDR_LENGTH];
         array.copy_from_slice(&bytes);

@@ -1,4 +1,5 @@
 use super::digest::Digest;
+use crate::js::externs::error;
 use casper_types::Digest as _Digest;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
@@ -15,8 +16,9 @@ pub struct DeployHash(_DeployHash);
 impl DeployHash {
     #[wasm_bindgen(constructor)]
     pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, JsValue> {
-        let bytes =
-            decode(deploy_hash_hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
+        let bytes = decode(deploy_hash_hex_str)
+            .map_err(|err| error(&format!("{:?}", err)))
+            .unwrap();
         let mut hash = [0u8; _Digest::LENGTH];
         hash.copy_from_slice(&bytes);
         Self::from_digest(Digest::from(hash))

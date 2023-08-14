@@ -37,10 +37,8 @@ impl SDK {
                     .await
             }
             Err(err) => {
-                // Handle the error, log it, and return an error JsValue if desired
                 error(&format!("Error during deploy: {}", err));
-                // For example, return an error JsValue:
-                JsValue::from_str(&format!("Error: {}", err))
+                JsValue::null()
             }
         }
     }

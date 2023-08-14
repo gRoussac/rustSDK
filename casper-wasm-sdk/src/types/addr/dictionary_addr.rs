@@ -1,3 +1,4 @@
+use crate::js::externs::error;
 use casper_types::{DictionaryAddr as _DictionaryAddr, KEY_DICTIONARY_LENGTH};
 use wasm_bindgen::prelude::*;
 
@@ -9,7 +10,8 @@ impl DictionaryAddr {
     #[wasm_bindgen(constructor)]
     pub fn new(bytes: Vec<u8>) -> Result<DictionaryAddr, JsValue> {
         if bytes.len() != KEY_DICTIONARY_LENGTH {
-            return Err(JsValue::from_str("Invalid DictionaryAddr length"));
+            error("Invalid DictionaryAddr length");
+            return Err(JsValue::null());
         }
         let mut array = [0u8; KEY_DICTIONARY_LENGTH];
         array.copy_from_slice(&bytes);

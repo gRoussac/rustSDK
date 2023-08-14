@@ -1,3 +1,4 @@
+use crate::js::externs::error;
 use casper_types::AccessRights as _AccessRights;
 use wasm_bindgen::prelude::*;
 
@@ -52,7 +53,10 @@ impl AccessRights {
     pub fn new(access_rights: u8) -> Result<AccessRights, JsValue> {
         match _AccessRights::from_bits(access_rights) {
             Some(rights) => Ok(AccessRights(rights)),
-            None => Err(JsValue::from_str("Invalid URef access rights")),
+            None => {
+                error("Invalid URef access rights");
+                Err(JsValue::null())
+            }
         }
     }
 

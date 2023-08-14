@@ -1,7 +1,9 @@
+use crate::{
+    js::externs::error,
+    types::{access_rights::AccessRights, addr::uref_addr::URefAddr},
+};
 use casper_types::URef as _URef;
 use wasm_bindgen::prelude::*;
-
-use crate::types::{access_rights::AccessRights, addr::uref_addr::URefAddr};
 
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
@@ -15,7 +17,10 @@ impl URef {
         // Convert the input hexadecimal string to bytes
         let bytes = match hex::decode(uref_hex_str) {
             Ok(bytes) => bytes,
-            Err(error) => return Err(JsValue::from_str(&format!("Invalid hex string: {}", error))),
+            Err(err) => {
+                error(&format!("Invalid hex string: {}", err));
+                return Err(JsValue::null());
+            }
         };
 
         let uref = _URef::new(

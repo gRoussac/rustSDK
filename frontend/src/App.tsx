@@ -25,6 +25,7 @@ import init, {
   privateToPublicKey,
   getTimestamp
 } from 'casper-wasm-sdk';
+import { assert } from 'console';
 
 const host = 'http://localhost:3000';
 const block_identifier_height_default = BigInt(1958541);
@@ -236,13 +237,31 @@ function App() {
         '{"hash":"20f0ead3d5e93706598716ec4c1cd8afe987d80a7dffb444dd7f9c6bb9d40937","header":{"account":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","timestamp":"2023-08-07T23:30:30.785Z","ttl":"30m","gas_price":1,"body_hash":"0f7bbc79a5f02f2621347005c62fb440d8d07d5c97e2cd11da090da24989f61f","dependencies":[],"chain_name":"integration-test"},"payment":{"ModuleBytes":{"module_bytes":"","args":[["amount",{"bytes":"058e31a6553a","cl_type":"U512"}]]}},"session":{"StoredContractByHash":{"hash":"9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477","entry_point":"decimals","args":[]}},"approvals":[{"signer":"01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9","signature":"018e64c442f6a4ccae0758bcf43a3f76a36e3d3744332d65ee1cafd0b2f30ffa362ad14c500742ed58c3736a863de34e1266c354f76e5915ac991c834aee3aeb08"}]}';
 
       let deploy_to_sign = new Deploy(JSON.parse(deployAsString));
+      console.log(deploy_to_sign.ToJson());
 
-      const deploy_signed = await sdk.sign_deploy(
+      let deploy_signed = await sdk.sign_deploy(
         deploy_to_sign,
         secret_key
       );
-      console.log('js deploy_signed', deploy_signed.approvals);
+      console.log('js deploy_signed two parties', deploy_signed.approvals); // Deploy has two approvals
+      console.assert(deploy_signed.approvals.length === 2);
 
+      deploy_to_sign = new Deploy(JSON.parse(deployAsString));
+      deploy_to_sign = deploy_to_sign.addArg('test', 'arg'); // Deploy was modified has no approvals anymore
+      console.assert(deploy_to_sign.ToJson().approvals.length === 0);
+
+
+      deploy_signed = await sdk.sign_deploy(
+        deploy_to_sign,
+        secret_key
+      );
+      console.log('js deploy + arg + sign_deploy', deploy_signed.approvals); // Deploy has one approval
+      console.assert(deploy_signed.approvals.length === 1);
+
+      deploy_to_sign = new Deploy(JSON.parse(deployAsString));
+      deploy_signed = deploy_to_sign.addArg('test', 'arg', secret_key); // Deploy was modified has one approval
+      console.log('js deploy + arg + secret_key ', deploy_signed.ToJson().approvals); // Deploy should have one approval
+      console.assert(deploy_signed.ToJson().approvals.length === 1);
 
       let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);

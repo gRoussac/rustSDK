@@ -1,3 +1,4 @@
+use crate::js::externs::error;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     Digest as _Digest,
@@ -13,11 +14,9 @@ pub struct Digest(_Digest);
 impl Digest {
     #[wasm_bindgen(constructor)]
     pub fn new(digest_hex_str: &str) -> Result<Digest, JsValue> {
-        let bytes =
-            decode(digest_hex_str).map_err(|err| JsValue::from_str(&format!("{:?}", err)))?;
-        if bytes.len() != _Digest::LENGTH {
-            return Err(JsValue::from_str("Invalid Digest length"));
-        }
+        let bytes = decode(digest_hex_str)
+            .map_err(|err| error(&format!("{:?}", err)))
+            .unwrap();
         Self::from_digest(bytes)
     }
 
@@ -25,7 +24,8 @@ impl Digest {
     pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, JsValue> {
         let mut digest_bytes = [0u8; _Digest::LENGTH];
         if bytes.len() != _Digest::LENGTH {
-            return Err(JsValue::from_str("Invalid Digest length"));
+            error("Invalid Digest length");
+            return Err(JsValue::null());
         }
         digest_bytes.copy_from_slice(&bytes);
         Ok(Digest(_Digest::from(digest_bytes)))
