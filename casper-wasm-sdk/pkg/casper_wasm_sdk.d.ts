@@ -6,10 +6,6 @@
 */
 export function fromTransfer(key: Uint8Array): TransferAddr;
 /**
-* @param {string} s
-*/
-export function log(s: string): void;
-/**
 * @param {string} hex_string
 * @returns {Uint8Array}
 */
@@ -20,6 +16,15 @@ export function hexToUint8Array(hex_string: string): Uint8Array;
 * @returns {any}
 */
 export function jsonPrettyPrint(value: any, verbosity?: number): any;
+/**
+* @param {string} secret_key
+* @returns {any}
+*/
+export function privateToPublicKey(secret_key: string): any;
+/**
+* @param {string} s
+*/
+export function log(s: string): void;
 /**
 */
 export enum Verbosity {
@@ -579,9 +584,6 @@ export class SDK {
 */
   speculative_exec(node_address: string, block_identifier: BlockIdentifier | undefined, verbosity: number, deploy: Deploy): Promise<any>;
 /**
-*/
-  constructor();
-/**
 * @param {string} node_address
 * @param {number} verbosity
 * @param {DeployStrParams} deploy_params
@@ -604,12 +606,6 @@ export class SDK {
 * @returns {Promise<any>}
 */
   chain_get_block(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  get_peers(node_address: string, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
 * @param {number} verbosity
@@ -704,6 +700,12 @@ export class SDK {
 * @param {number} verbosity
 * @returns {Promise<any>}
 */
+  get_peers(node_address: string, verbosity: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number} verbosity
+* @returns {Promise<any>}
+*/
   get_validator_changes(node_address: string, verbosity: number): Promise<any>;
 /**
 * @param {string} node_address
@@ -734,6 +736,9 @@ export class SDK {
 * @returns {any}
 */
   make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): any;
+/**
+*/
+  constructor();
 /**
 * @param {BlockIdentifier | undefined} maybe_block_id
 * @param {string} node_address
@@ -830,6 +835,8 @@ export interface InitOutput {
   readonly transferaddr_new: (a: number, b: number, c: number) => void;
   readonly fromTransfer: (a: number, b: number) => number;
   readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
+  readonly eraid_new: (a: number) => number;
+  readonly eraid_value: (a: number) => number;
   readonly key_new: (a: number, b: number) => void;
   readonly key_fromURef: (a: number) => number;
   readonly key_fromDeployInfo: (a: number) => number;
@@ -846,8 +853,9 @@ export interface InitOutput {
   readonly key_fromChainspecRegistry: () => number;
   readonly key_fromChecksumRegistry: () => number;
   readonly key_toFormattedString: (a: number, b: number) => void;
-  readonly eraid_new: (a: number) => number;
-  readonly eraid_value: (a: number) => number;
+  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
+  readonly jsonPrettyPrint: (a: number, b: number) => number;
+  readonly privateToPublicKey: (a: number, b: number) => number;
   readonly sdk_get_account: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_get_auction_info: (a: number, b: number, c: number, d: number, e: number) => number;
@@ -856,17 +864,12 @@ export interface InitOutput {
   readonly sdk_get_era_summary: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_query_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_speculative_exec: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly __wbg_sdk_free: (a: number) => void;
-  readonly sdk_new: () => number;
   readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly sdk_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_chain_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly __wbg_deploy_free: (a: number) => void;
-  readonly deploy_new: (a: number) => number;
   readonly deployhash_new: (a: number, b: number, c: number) => void;
   readonly deployhash_fromDigest: (a: number, b: number) => void;
   readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
@@ -878,6 +881,7 @@ export interface InitOutput {
   readonly sdk_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_get_validator_changes: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
@@ -899,6 +903,8 @@ export interface InitOutput {
   readonly accessrights_is_none: (a: number) => number;
   readonly blockhash_new: (a: number, b: number) => number;
   readonly blockhash_toBytes: (a: number, b: number) => void;
+  readonly __wbg_deploy_free: (a: number) => void;
+  readonly deploy_new: (a: number) => number;
   readonly __wbg_deploystrparams_free: (a: number) => void;
   readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly deploystrparams_secret_key: (a: number, b: number) => void;
@@ -923,7 +929,6 @@ export interface InitOutput {
   readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
   readonly hashaddr_new: (a: number, b: number, c: number) => void;
   readonly urefaddr_new: (a: number, b: number, c: number) => void;
-  readonly log: (a: number, b: number) => void;
   readonly __wbg_paymentstrparams_free: (a: number) => void;
   readonly paymentstrparams_new: () => number;
   readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
@@ -959,8 +964,9 @@ export interface InitOutput {
   readonly sessionstrparams_set_session_entry_point: (a: number, b: number, c: number) => void;
   readonly sessionstrparams_is_session_transfer: (a: number) => number;
   readonly sessionstrparams_set_is_session_transfer: (a: number, b: number) => void;
-  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
-  readonly jsonPrettyPrint: (a: number, b: number) => number;
+  readonly log: (a: number, b: number) => void;
+  readonly __wbg_sdk_free: (a: number) => void;
+  readonly sdk_new: () => number;
   readonly __wbg_blockidentifier_free: (a: number) => void;
   readonly blockidentifier_new: (a: number) => number;
   readonly blockidentifier_from_hash: (a: number) => number;
