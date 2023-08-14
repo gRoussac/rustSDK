@@ -250,17 +250,16 @@ function App() {
       deploy_to_sign = deploy_to_sign.addArg('test', 'arg'); // Deploy was modified has no approvals anymore
       console.assert(deploy_to_sign.ToJson().approvals.length === 0);
 
-
       deploy_signed = await sdk.sign_deploy(
         deploy_to_sign,
         secret_key
       );
-      console.log('js deploy + arg + sign_deploy', deploy_signed.approvals); // Deploy has one approval
+      console.log('js deploy + addArg > sign_deploy', deploy_signed.approvals); // Deploy has one approval
       console.assert(deploy_signed.approvals.length === 1);
 
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
-      deploy_signed = deploy_to_sign.addArg('test', 'arg', secret_key); // Deploy was modified has one approval
-      console.log('js deploy + arg + secret_key ', deploy_signed.ToJson().approvals); // Deploy should have one approval
+      deploy_signed = deploy_to_sign.addArg('test', 'addArg', secret_key); // Deploy was modified has one approval
+      console.log('js deploy + addArg + secret_key ', deploy_signed.ToJson().approvals); // Deploy should have one approval
       console.assert(deploy_signed.ToJson().approvals.length === 1);
 
       let signed_deploy = new Deploy(make_transfer); // or make_deploy

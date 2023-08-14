@@ -1,7 +1,10 @@
 use crate::{helpers::secret_key_from_pem, js::externs::error};
+use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
     CLValue, ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, SecretKey,
+    Timestamp,
 };
+use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
@@ -17,6 +20,14 @@ impl Deploy {
             .into_serde()
             .map_err(|err| error(&format!("Failed to deserialize Deploy: {:?}", err)))
             .unwrap();
+        let deploy = match deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
+            Ok(()) => deploy,
+            Err(err) => {
+                error(&format!("Deploy has not a valid size: {:?}", err));
+                deploy
+            }
+        };
+
         deploy.into()
     }
 
@@ -34,6 +45,66 @@ impl Deploy {
                 JsValue::null()
             }
         }
+    }
+
+    #[wasm_bindgen(js_name = "validateDeploySize")]
+    pub fn validate_deploy_size(&self) -> bool {
+        let deploy: _Deploy = self.0.clone();
+        match deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
+            Ok(()) => true,
+            Err(err) => {
+                error(&format!("Deploy has not a valid size: {:?}", err));
+                false
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "isValid")]
+    pub fn is_valid(&self) -> bool {
+        let deploy: _Deploy = self.0.clone();
+        match deploy.is_valid() {
+            Ok(()) => true,
+            Err(err) => {
+                error(&format!("Deploy is not valid: {:?}", err));
+                false
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "hasValidHash")]
+    pub fn has_valid_hash(&self) -> bool {
+        let deploy: _Deploy = self.0.clone();
+        match deploy.has_valid_hash() {
+            Ok(()) => true,
+            Err(err) => {
+                error(&format!("Deploy has not a valid hash: {:?}", err));
+                false
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "isExpired")]
+    pub fn expired(&self) -> bool {
+        let deploy: _Deploy = self.0.clone();
+        let now: DateTime<Utc> = Utc::now();
+
+        match deploy.expired(Timestamp::from(now.timestamp() as u64)) {
+            true => true,
+            false => {
+                error("Deploy has expired");
+                false
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "sign")]
+    pub fn sign(&mut self, secret_key: &str) -> Deploy {
+        let mut deploy: _Deploy = self.0.clone();
+        deploy.sign(&secret_key_from_pem(secret_key).unwrap());
+        if let Err(err) = deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
+            error(&format!("Deploy has not a valid size: {:?}", err));
+        }
+        deploy.into()
     }
 
     #[wasm_bindgen(js_name = "addArg")]
@@ -138,7 +209,7 @@ impl Deploy {
             .with_ttl(deploy.ttl())
             .with_timestamp(deploy.timestamp());
 
-        // TODO Fix me, you will have to resign a deploy adding args to it
+        // TODO Fix me, you will have to sign again a deploy if adding args to it
         let secret_key_result = secret_key
             .clone()
             .map(|key| secret_key_from_pem(&key).unwrap())
@@ -152,11 +223,14 @@ impl Deploy {
             deploy_builder = deploy_builder.with_secret_key(&secret_key_result);
         }
 
-        deploy_builder
+        let deploy = deploy_builder
             .build()
             .map_err(|err| error(&format!("Failed to build deploy: {:?}", err)))
-            .unwrap()
-            .into()
+            .unwrap();
+
+        let deploy: Deploy = deploy.into();
+        let _ = deploy.validate_deploy_size();
+        deploy
     }
 }
 
