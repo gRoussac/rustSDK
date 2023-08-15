@@ -188,7 +188,6 @@ impl Deploy {
             .with_ttl(deploy.ttl())
             .with_timestamp(deploy.timestamp());
 
-        // TODO Fix me, you will have to sign again a deploy if adding args to it
         let secret_key_result = secret_key
             .clone()
             .map(|key| secret_key_from_pem(&key).unwrap())
@@ -196,7 +195,8 @@ impl Deploy {
                 if secret_key.is_some() {
                     error("Error loading secret key");
                 }
-                SecretKey::generate_ed25519().unwrap() // Default will not be used
+                // Default will never be used in next if secret_key.is_some()
+                SecretKey::generate_ed25519().unwrap()
             });
         if secret_key.is_some() {
             deploy_builder = deploy_builder.with_secret_key(&secret_key_result);
