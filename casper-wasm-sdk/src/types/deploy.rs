@@ -1,7 +1,7 @@
 use crate::{helpers::secret_key_from_pem, js::externs::error};
-use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
+use casper_client::{cli::insert_arg as insert_simple_arg, MAX_SERIALIZED_SIZE_OF_DEPLOY};
 use casper_types::{
-    CLValue, ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, SecretKey,
+    ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, SecretKey,
     Timestamp,
 };
 use chrono::{DateTime, Utc};
@@ -108,36 +108,15 @@ impl Deploy {
     }
 
     #[wasm_bindgen(js_name = "addArg")]
-    pub fn add_arg(&mut self, key: &str, js_value: JsValue, secret_key: Option<String>) -> Deploy {
+    pub fn add_arg(&mut self, simple_arg: JsValue, secret_key: Option<String>) -> Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
 
-        let deserialized: Result<serde_json::Value, _> = JsValue::into_serde(&js_value)
-            .map_err(|err| error(&format!("Failed to deserialize JsValue: {:?}", err)));
-
-        if let Err(err) = deserialized {
-            error(&format!("Error deserializing: {:?}", err));
-            return deploy.into();
-        }
-
-        let serialized = serde_json::to_string(&deserialized.unwrap())
-            .map_err(|err| error(&format!("Failed to serialize JSON: {:?}", err)));
-
-        if let Err(err) = serialized {
-            error(&format!("Error serializing JSON: {:?}", err));
-            return deploy.into();
-        }
-
-        let cl_value = CLValue::from_t(serialized.unwrap())
-            .map_err(|err| error(&format!("Failed to create CLValue: {:?}", err)));
-
-        if let Err(err) = cl_value {
-            error(&format!("Error creating CLValue: {:?}", err));
-            return deploy.into();
-        }
+        let simple_arg = simple_arg.as_string().unwrap_or_default();
 
         let mut new_args = session.args().clone();
-        new_args.insert_cl_value(key, cl_value.unwrap());
+        //new_args.insert_cl_value(key, cl_value);
+        let _ = insert_simple_arg(&simple_arg, &mut new_args);
 
         let new_session = match session.contract_identifier() {
             Some(ContractIdentifier::Hash(hash)) => ExecutableDeployItem::StoredContractByHash {

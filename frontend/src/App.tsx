@@ -20,10 +20,13 @@ import init, {
   DeployStrParams,
   SessionStrParams,
   PaymentStrParams,
-  // hexToUint8Array,
+  hexToUint8Array,
   jsonPrettyPrint,
   privateToPublicKey,
-  getTimestamp
+  getTimestamp,
+  CLValue,
+  CLType,
+  Bytes
 } from 'casper-wasm-sdk';
 import { assert } from 'console';
 
@@ -247,9 +250,13 @@ function App() {
       console.assert(deploy_signed.approvals.length === 2);
 
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
-      deploy_to_sign = deploy_to_sign.addArg('test', 'arg'); // Deploy was modified has no approvals anymore
-      console.assert(deploy_to_sign.ToJson().approvals.length === 0);
 
+      // let cl_value_ = CLValue.bool(true);
+      // console.log(CLType.Bool(), cl_value_);
+
+      deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
+      console.assert(deploy_to_sign.ToJson().approvals.length === 0);
+      console.log('deploy_to_sign ', deploy_to_sign.ToJson());
       deploy_signed = await sdk.sign_deploy(
         deploy_to_sign,
         secret_key
@@ -258,7 +265,8 @@ function App() {
       console.assert(deploy_signed.approvals.length === 1);
 
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
-      deploy_signed = deploy_to_sign.addArg('test', 'addArg', secret_key); // Deploy was modified has one approval
+      deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval
+      console.log('deploy_signed', deploy_signed.ToJson());
       console.log('js deploy + addArg + secret_key ', deploy_signed.ToJson().approvals); // Deploy should have one approval
       console.assert(deploy_signed.ToJson().approvals.length === 1);
 

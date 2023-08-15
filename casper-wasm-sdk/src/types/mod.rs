@@ -3,6 +3,7 @@ pub mod account_hash;
 pub mod addr;
 pub mod block_hash;
 pub mod block_identifier;
+pub mod cl;
 pub mod deploy;
 pub mod deploy_hash;
 pub mod deploy_params;
