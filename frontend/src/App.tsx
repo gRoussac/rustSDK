@@ -28,7 +28,6 @@ import init, {
   CLType,
   Bytes
 } from 'casper-wasm-sdk';
-import { assert } from 'console';
 
 const host = 'http://localhost:3000';
 const block_identifier_height_default = BigInt(1958541);
@@ -181,12 +180,12 @@ function App() {
       const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
       const ttl = '1h';
 
-      console.log("privateToPublicKey result", privateToPublicKey(secret_key));
+      console.log("privateToPublicKey result", session_account);
 
       let deploy_params = new DeployStrParams(
-        secret_key,
         chain_name,
         session_account,
+        secret_key,
         timestamp,
         ttl
       );
@@ -208,11 +207,8 @@ function App() {
       console.log(jsonPrettyPrint(make_transfer, Verbosity.Medium));
 
       deploy_params = new DeployStrParams(
-        secret_key,
         chain_name,
-        session_account,
-        undefined,
-        ttl
+        session_account
       );
       console.log(deploy_params);
 
@@ -246,8 +242,8 @@ function App() {
         deploy_to_sign,
         secret_key
       );
-      console.log('js deploy_signed two parties', deploy_signed.approvals); // Deploy has two approvals
-      console.assert(deploy_signed.approvals.length === 2);
+      console.log('js deploy_signed two parties', deploy_signed.approvals);
+      console.assert(deploy_signed.approvals.length === 2); // Deploy has two approvals
 
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
 
@@ -261,14 +257,15 @@ function App() {
         deploy_to_sign,
         secret_key
       );
-      console.log('js deploy + addArg > sign_deploy', deploy_signed.approvals); // Deploy has one approval
-      console.assert(deploy_signed.approvals.length === 1);
+      console.log('js deploy + addArg > sign_deploy', deploy_signed.approvals);
+      console.assert(deploy_signed.approvals.length === 1); // Deploy should have one approval
 
-      deploy_to_sign = new Deploy(JSON.parse(deployAsString));
+      deploy_to_sign = new Deploy(make_deploy);
+      console.assert(deploy_to_sign.ToJson().approvals.length === 0); // Deploy has no approval
       deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval
       console.log('deploy_signed', deploy_signed.ToJson());
-      console.log('js deploy + addArg + secret_key ', deploy_signed.ToJson().approvals); // Deploy should have one approval
-      console.assert(deploy_signed.ToJson().approvals.length === 1);
+      console.log('js deploy + addArg + secret_key ', deploy_signed.ToJson().approvals);
+      console.assert(deploy_signed.ToJson().approvals.length === 1); // Deploy should have one approval
 
       let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);

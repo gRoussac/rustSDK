@@ -2,7 +2,6 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export function sdk_transfer(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number): number;
-export function sdk_make_deploy(a: number, b: number, c: number, d: number): number;
 export function publickey_new(a: number, b: number, c: number): void;
 export function publickey_fromUint8Array(a: number, b: number): number;
 export function transferaddr_new(a: number, b: number, c: number): void;
@@ -196,6 +195,7 @@ export function dictionaryitemstrparams_set_contract_named_key(a: number, b: num
 export function dictionaryitemstrparams_set_uref(a: number, b: number, c: number, d: number): void;
 export function dictionaryitemstrparams_set_dictionary(a: number, b: number, c: number): void;
 export function sdk_speculative_transfer(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number): number;
+export function sdk_make_deploy(a: number, b: number, c: number, d: number): number;
 export function __wbg_deploy_free(a: number): void;
 export function deploy_new(a: number): number;
 export function deploy_FromJson(a: number, b: number): number;

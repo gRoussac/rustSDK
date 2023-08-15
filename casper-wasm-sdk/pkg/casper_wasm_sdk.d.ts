@@ -403,13 +403,13 @@ export class DeployHash {
 export class DeployStrParams {
   free(): void;
 /**
-* @param {string} secret_key
 * @param {string} chain_name
 * @param {string} session_account
+* @param {string | undefined} secret_key
 * @param {string | undefined} timestamp
 * @param {string | undefined} ttl
 */
-  constructor(secret_key: string, chain_name: string, session_account: string, timestamp?: string, ttl?: string);
+  constructor(chain_name: string, session_account: string, secret_key?: string, timestamp?: string, ttl?: string);
 /**
 */
   chain_name: string;
@@ -731,13 +731,6 @@ export class SDK {
 */
   transfer(node_address: string, verbosity: number, amount: string, target_account: string, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Promise<any>;
 /**
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @returns {any}
-*/
-  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): any;
-/**
 * @param {string} node_address
 * @param {number} verbosity
 * @param {GlobalStateIdentifier | undefined} maybe_global_state_identifier
@@ -964,6 +957,13 @@ export class SDK {
 * @returns {Promise<any>}
 */
   speculative_transfer(maybe_block_id: BlockIdentifier | undefined, node_address: string, verbosity: number, amount: string, target_account: string, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Promise<any>;
+/**
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @returns {any}
+*/
+  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): any;
 }
 /**
 */
@@ -1046,7 +1046,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
-  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly publickey_new: (a: number, b: number, c: number) => void;
   readonly publickey_fromUint8Array: (a: number, b: number) => number;
   readonly transferaddr_new: (a: number, b: number, c: number) => void;
@@ -1240,6 +1239,7 @@ export interface InitOutput {
   readonly dictionaryitemstrparams_set_uref: (a: number, b: number, c: number, d: number) => void;
   readonly dictionaryitemstrparams_set_dictionary: (a: number, b: number, c: number) => void;
   readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => number;
+  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly __wbg_deploy_free: (a: number) => void;
   readonly deploy_new: (a: number) => number;
   readonly deploy_FromJson: (a: number, b: number) => number;

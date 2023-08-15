@@ -18,9 +18,9 @@ pub struct DeployStrParams {
 impl DeployStrParams {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        secret_key: String,
         chain_name: String,
         session_account: String,
+        secret_key: Option<String>,
         timestamp: Option<String>,
         ttl: Option<String>,
     ) -> Self {
@@ -37,11 +37,11 @@ impl DeployStrParams {
         // log(&format!("_ttl {:?}", _ttl));
 
         DeployStrParams {
-            chain_name: OnceCell::from(chain_name),
-            secret_key: OnceCell::from(secret_key),
-            session_account: OnceCell::from(session_account),
+            secret_key: OnceCell::from(secret_key.unwrap_or_default()),
             timestamp: OnceCell::from(current_timestamp),
             ttl: _ttl,
+            chain_name: OnceCell::from(chain_name),
+            session_account: OnceCell::from(session_account),
         }
     }
 
