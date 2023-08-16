@@ -1,6 +1,7 @@
 use crate::{
     helpers::{insert_arg, secret_key_from_pem},
     js::externs::error,
+    sdk::deploy_utils::{make_deploy::make_deploy, make_transfer::make_transfer},
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
@@ -10,6 +11,11 @@ use casper_types::{
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
+
+use super::deploy_params::{
+    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+    session_str_params::SessionStrParams,
+};
 
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
@@ -34,12 +40,12 @@ impl Deploy {
         deploy.into()
     }
 
-    #[wasm_bindgen(js_name = "FromJson")]
+    #[wasm_bindgen(js_name = "fromJson")]
     pub fn from_json(&self, deploy: JsValue) -> Deploy {
         Self::new(deploy)
     }
 
-    #[wasm_bindgen(js_name = "ToJson")]
+    #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         match JsValue::from_serde(&self.0) {
             Ok(json) => json,
@@ -48,6 +54,38 @@ impl Deploy {
                 JsValue::null()
             }
         }
+    }
+
+    // static context
+    #[wasm_bindgen(js_name = "withSession")]
+    pub fn with_payment_and_session(
+        deploy_params: DeployStrParams,
+        session_params: SessionStrParams,
+        payment_params: PaymentStrParams,
+    ) -> Option<Deploy> {
+        make_deploy(deploy_params, session_params, payment_params)
+            .map(Into::into)
+            .ok()
+    }
+
+    // static context
+    #[wasm_bindgen(js_name = "withTransfer")]
+    pub fn new_transfer(
+        amount: &str,
+        target_account: &str,
+        transfer_id: Option<String>,
+        deploy_params: DeployStrParams,
+        payment_params: PaymentStrParams,
+    ) -> Option<Deploy> {
+        make_transfer(
+            amount,
+            target_account,
+            transfer_id,
+            deploy_params,
+            payment_params,
+        )
+        .map(Into::into)
+        .ok()
     }
 
     #[wasm_bindgen(js_name = "validateDeploySize")]

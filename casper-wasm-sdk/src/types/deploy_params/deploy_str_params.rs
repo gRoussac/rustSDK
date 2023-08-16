@@ -1,5 +1,6 @@
 use crate::helpers::get_current_timestamp;
 use crate::helpers::get_str_or_default;
+use crate::helpers::get_ttl;
 use casper_client::cli::DeployStrParams as _DeployStrParams;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
@@ -25,21 +26,11 @@ impl DeployStrParams {
         ttl: Option<String>,
     ) -> Self {
         let current_timestamp = get_current_timestamp(&timestamp);
-
-        let _ttl = OnceCell::new();
-        if let Some(ttl_value) = ttl {
-            _ttl.set(ttl_value).unwrap();
-        } else {
-            _ttl.set("30m".to_string()).unwrap();
-        }
-
-        // TODO Fix ttl `humantime::parse_duration` with get_current_ttl(&ttl)
-        // log(&format!("_ttl {:?}", _ttl));
-
+        let ttl = get_ttl(ttl);
         DeployStrParams {
             secret_key: OnceCell::from(secret_key.unwrap_or_default()),
             timestamp: OnceCell::from(current_timestamp),
-            ttl: _ttl,
+            ttl: OnceCell::from(ttl),
             chain_name: OnceCell::from(chain_name),
             session_account: OnceCell::from(session_account),
         }

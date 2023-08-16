@@ -1,4 +1,4 @@
-use casper_client::cli::{make_deploy, CliError};
+use casper_client::cli::{make_deploy as client_make_deploy, CliError};
 use casper_types::Deploy;
 use wasm_bindgen::prelude::*;
 
@@ -21,14 +21,22 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
-        // log("make_deploy");
-        let result: Result<Deploy, CliError> = make_deploy(
-            "",
-            deploy_str_params_to_casper_client(&deploy_params),
-            session_str_params_to_casper_client(&session_params),
-            payment_str_params_to_casper_client(&payment_params),
-            false,
-        );
-        serialize_result(result)
+        let deploy = make_deploy(deploy_params, session_params, payment_params);
+        serialize_result(deploy)
     }
+}
+
+pub fn make_deploy(
+    deploy_params: DeployStrParams,
+    session_params: SessionStrParams,
+    payment_params: PaymentStrParams,
+) -> Result<Deploy, CliError> {
+    // log("make_deploy");
+    client_make_deploy(
+        "",
+        deploy_str_params_to_casper_client(&deploy_params),
+        session_str_params_to_casper_client(&session_params),
+        payment_str_params_to_casper_client(&payment_params),
+        false,
+    )
 }

@@ -1,8 +1,9 @@
 use crate::js::externs::error;
 use casper_client::cli::JsonArg;
-use casper_types::{NamedArg, RuntimeArgs, SecretKey};
+use casper_types::{DeployBuilder, NamedArg, RuntimeArgs, SecretKey};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
+use once_cell::sync::OnceCell;
 use serde::Serialize;
 use wasm_bindgen::{JsCast, JsValue};
 
@@ -42,6 +43,20 @@ pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
         })
         .unwrap_or_else(Utc::now);
     current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true)
+}
+
+pub fn get_ttl(ttl: Option<String>) -> String {
+    // TODO Fix ttl `humantime::parse_duration` with get_current_ttl(&ttl)
+    // log(&format!("ttl {:?}", ttl));
+    if let Some(ttl) = ttl {
+        ttl
+    } else {
+        DeployBuilder::DEFAULT_TTL.to_string()
+    }
+}
+
+pub fn get_gas_price(gas_price: Option<u64>) -> u64 {
+    gas_price.unwrap_or(DeployBuilder::DEFAULT_GAS_PRICE)
 }
 
 pub fn get_str_or_default(opt_str: Option<&String>) -> &str {
