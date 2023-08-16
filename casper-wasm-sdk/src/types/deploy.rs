@@ -1,8 +1,11 @@
-use crate::{helpers::secret_key_from_pem, js::externs::error};
-use casper_client::{cli::insert_arg as insert_simple_arg, MAX_SERIALIZED_SIZE_OF_DEPLOY};
+use crate::{
+    helpers::{insert_arg, secret_key_from_pem},
+    js::externs::error,
+};
+use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
-    ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, SecretKey,
-    Timestamp,
+    ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, RuntimeArgs,
+    SecretKey, Timestamp,
 };
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -108,79 +111,13 @@ impl Deploy {
     }
 
     #[wasm_bindgen(js_name = "addArg")]
-    pub fn add_arg(&mut self, simple_arg: JsValue, secret_key: Option<String>) -> Deploy {
+    pub fn add_arg(&mut self, js_value_arg: JsValue, secret_key: Option<String>) -> Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
 
-        let simple_arg = simple_arg.as_string().unwrap_or_default();
-
-        let mut new_args = session.args().clone();
-        //new_args.insert_cl_value(key, cl_value);
-        let _ = insert_simple_arg(&simple_arg, &mut new_args);
-
-        let new_session = match session.contract_identifier() {
-            Some(ContractIdentifier::Hash(hash)) => ExecutableDeployItem::StoredContractByHash {
-                hash,
-                entry_point: session.entry_point_name().to_string(),
-                args: new_args,
-            },
-            Some(ContractIdentifier::Name(name)) => ExecutableDeployItem::StoredContractByName {
-                name: name.clone(),
-                entry_point: session.entry_point_name().to_string(),
-                args: new_args,
-            },
-            None => match session {
-                ExecutableDeployItem::ModuleBytes { module_bytes, .. } => {
-                    ExecutableDeployItem::ModuleBytes {
-                        module_bytes: module_bytes.clone(),
-                        args: new_args,
-                    }
-                }
-                ExecutableDeployItem::StoredContractByHash {
-                    hash,
-                    entry_point,
-                    args: _,
-                } => ExecutableDeployItem::StoredContractByHash {
-                    hash: *hash,
-                    entry_point: entry_point.clone(),
-                    args: new_args,
-                },
-                ExecutableDeployItem::StoredContractByName {
-                    name,
-                    entry_point,
-                    args: _,
-                } => ExecutableDeployItem::StoredContractByName {
-                    name: name.clone(),
-                    entry_point: entry_point.clone(),
-                    args: new_args,
-                },
-                ExecutableDeployItem::StoredVersionedContractByHash {
-                    hash,
-                    version,
-                    entry_point,
-                    args: _,
-                } => ExecutableDeployItem::StoredVersionedContractByHash {
-                    hash: *hash,
-                    version: *version,
-                    entry_point: entry_point.clone(),
-                    args: new_args,
-                },
-                ExecutableDeployItem::StoredVersionedContractByName {
-                    name,
-                    version,
-                    entry_point,
-                    args: _,
-                } => ExecutableDeployItem::StoredVersionedContractByName {
-                    name: name.clone(),
-                    version: *version,
-                    entry_point: entry_point.clone(),
-                    args: new_args,
-                },
-                ExecutableDeployItem::Transfer { .. } => {
-                    ExecutableDeployItem::Transfer { args: new_args }
-                }
-            },
-        };
+        let mut args = session.args().clone();
+        let new_args = insert_arg(&mut args, js_value_arg);
+        let new_session = create_new_session(new_args, session);
 
         let mut deploy_builder = DeployBuilder::new(deploy.chain_name(), new_session)
             .with_account(deploy.account().clone())
@@ -210,6 +147,75 @@ impl Deploy {
         let deploy: Deploy = deploy.into();
         let _ = deploy.validate_deploy_size();
         deploy
+    }
+}
+
+fn create_new_session(
+    new_args: &RuntimeArgs,
+    session: &ExecutableDeployItem,
+) -> ExecutableDeployItem {
+    match session.contract_identifier() {
+        Some(ContractIdentifier::Hash(hash)) => ExecutableDeployItem::StoredContractByHash {
+            hash,
+            entry_point: session.entry_point_name().to_string(),
+            args: new_args.clone(),
+        },
+        Some(ContractIdentifier::Name(name)) => ExecutableDeployItem::StoredContractByName {
+            name: name.clone(),
+            entry_point: session.entry_point_name().to_string(),
+            args: new_args.clone(),
+        },
+        None => match session {
+            ExecutableDeployItem::ModuleBytes { module_bytes, .. } => {
+                ExecutableDeployItem::ModuleBytes {
+                    module_bytes: module_bytes.clone(),
+                    args: new_args.clone(),
+                }
+            }
+            ExecutableDeployItem::StoredContractByHash {
+                hash,
+                entry_point,
+                args: _,
+            } => ExecutableDeployItem::StoredContractByHash {
+                hash: *hash,
+                entry_point: entry_point.clone(),
+                args: new_args.clone(),
+            },
+            ExecutableDeployItem::StoredContractByName {
+                name,
+                entry_point,
+                args: _,
+            } => ExecutableDeployItem::StoredContractByName {
+                name: name.clone(),
+                entry_point: entry_point.clone(),
+                args: new_args.clone(),
+            },
+            ExecutableDeployItem::StoredVersionedContractByHash {
+                hash,
+                version,
+                entry_point,
+                args: _,
+            } => ExecutableDeployItem::StoredVersionedContractByHash {
+                hash: *hash,
+                version: *version,
+                entry_point: entry_point.clone(),
+                args: new_args.clone(),
+            },
+            ExecutableDeployItem::StoredVersionedContractByName {
+                name,
+                version,
+                entry_point,
+                args: _,
+            } => ExecutableDeployItem::StoredVersionedContractByName {
+                name: name.clone(),
+                version: *version,
+                entry_point: entry_point.clone(),
+                args: new_args.clone(),
+            },
+            ExecutableDeployItem::Transfer { .. } => ExecutableDeployItem::Transfer {
+                args: new_args.clone(),
+            },
+        },
     }
 }
 
@@ -257,7 +263,7 @@ impl From<_Deploy> for Deploy {
 //             //                         .map(|u64_inner| u64_inner.to_string())
 //             //                         .unwrap_or_else(|| {
 //             //                             "Serialize error on named arg \"id\" u64 to String"
-//             //                                 .to_owned()
+//             //                                 .clone()
 //             //                         })
 //             //                 })
 //             //                 .unwrap_or_else(|err| {
@@ -265,7 +271,7 @@ impl From<_Deploy> for Deploy {
 //             //                         "Error converting named arg \"id\" value to String: {:?}",
 //             //                         err
 //             //                     ));
-//             //                     "Serialize error on named arg \"id\"".to_owned()
+//             //                     "Serialize error on named arg \"id\"".clone()
 //             //                 });
 
 //             //             args_array.insert(key, id_value).expect("Insertion failed");

@@ -1,9 +1,10 @@
 use crate::js::externs::error;
-use casper_types::SecretKey;
+use casper_client::cli::JsonArg;
+use casper_types::{NamedArg, RuntimeArgs, SecretKey};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use serde::Serialize;
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsCast, JsValue};
 
 pub fn serialize_result<T, E>(result: Result<T, E>) -> JsValue
 where
@@ -54,4 +55,36 @@ pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, JsValue> {
         return Err(JsValue::null());
     }
     Ok(secret_key_result.unwrap())
+}
+
+pub fn insert_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
+    if js_sys::Object::instanceof(&js_value_arg) {
+        let json_arg: Result<JsonArg, serde_json::Error> = js_value_arg.into_serde();
+        let json_arg: Option<JsonArg> = match json_arg {
+            Ok(arg) => Some(arg),
+            Err(err) => {
+                error(&format!("Error converting to JsonArg: {:?}", err));
+                None
+            }
+        };
+        if let Some(json_arg) = json_arg {
+            let named_arg = NamedArg::try_from(json_arg);
+            let named_arg: Option<NamedArg> = match named_arg {
+                Ok(arg) => Some(arg),
+                Err(err) => {
+                    error(&format!("Error converting to NamedArg: {:?}", err));
+                    None
+                }
+            };
+            if let Some(named_arg) = named_arg {
+                args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
+            }
+        }
+    } else if let Some(string_arg) = js_value_arg.as_string() {
+        let simple_arg = string_arg;
+        let _ = casper_client::cli::insert_arg(&simple_arg, args);
+    } else {
+        error("Error converting to JsonArg or Simple Arg");
+    }
+    args
 }
