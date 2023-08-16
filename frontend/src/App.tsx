@@ -251,6 +251,7 @@ function App() {
       // console.log(CLType.Bool(), cl_value_);
 
       deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
+      deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 });
       console.assert(deploy_to_sign.ToJson().approvals.length === 0);
       console.log('deploy_to_sign ', deploy_to_sign.ToJson());
       deploy_signed = await sdk.sign_deploy(
@@ -263,7 +264,7 @@ function App() {
       deploy_to_sign = new Deploy(make_deploy);
       console.assert(deploy_to_sign.ToJson().approvals.length === 0); // Deploy has no approval
       deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval
-      console.log('deploy_signed', deploy_signed.ToJson());
+      console.log('make_deploy signed', deploy_signed.ToJson());
       console.log('js deploy + addArg + secret_key ', deploy_signed.ToJson().approvals);
       console.assert(deploy_signed.ToJson().approvals.length === 1); // Deploy should have one approval
 
