@@ -217,6 +217,8 @@ function App() {
       session_params.session_hash =
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
+      // session_params.session_args_simple = ["joe:bool='true"]; // session_args_simple or session_args_json but not both
+      session_params.session_args_json = JSON.stringify([{ "name": "joe", "type": "U256", "value": 1 }]); // Arrary of objects as multiple args
       console.log(session_params);
 
       payment_params = new PaymentStrParams();
@@ -251,7 +253,7 @@ function App() {
       // console.log(CLType.Bool(), cl_value_);
 
       deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
-      deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 });
+      deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 }); // No arrary as one arg
       console.assert(deploy_to_sign.ToJson().approvals.length === 0);
       console.log('deploy_to_sign ', deploy_to_sign.ToJson());
       deploy_signed = await sdk.sign_deploy(
@@ -262,11 +264,14 @@ function App() {
       console.assert(deploy_signed.approvals.length === 1); // Deploy should have one approval
 
       deploy_to_sign = new Deploy(make_deploy);
+      console.log('make_deploy footprint', deploy_to_sign.footprint());
       console.assert(deploy_to_sign.ToJson().approvals.length === 0); // Deploy has no approval
+      console.log('make_deploy ApprovalsHash before', deploy_to_sign.approvalsHash());
       deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval
       console.log('make_deploy signed', deploy_signed.ToJson());
       console.log('js deploy + addArg + secret_key ', deploy_signed.ToJson().approvals);
       console.assert(deploy_signed.ToJson().approvals.length === 1); // Deploy should have one approval
+      console.log('make_deploy ApprovalsHash after', deploy_signed.approvalsHash());
 
       let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);

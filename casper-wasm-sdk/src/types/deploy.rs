@@ -110,6 +110,49 @@ impl Deploy {
         deploy.into()
     }
 
+    #[wasm_bindgen(js_name = "footprint")]
+    pub fn footprint(&self) -> JsValue {
+        let deploy: _Deploy = self.0.clone();
+        let footprint = match deploy.footprint() {
+            Ok(footprint) => footprint,
+            Err(err) => {
+                error(&format!("Error getting footprint: {:?}", err));
+                return JsValue::null();
+            }
+        };
+
+        match JsValue::from_serde(&footprint) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!("Error serializing footprint to JSON: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "approvalsHash")]
+    pub fn compute_approvals_hash(&self) -> JsValue {
+        let deploy: _Deploy = self.0.clone();
+        let compute_approvals_hash = match deploy.compute_approvals_hash() {
+            Ok(approvals_hash) => approvals_hash,
+            Err(err) => {
+                error(&format!("Error computing approvals hash: {:?}", err));
+                return JsValue::null();
+            }
+        };
+
+        match JsValue::from_serde(&compute_approvals_hash) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!(
+                    "Error serializing compute_approvals_hash to JSON: {:?}",
+                    err
+                ));
+                JsValue::null()
+            }
+        }
+    }
+
     #[wasm_bindgen(js_name = "addArg")]
     pub fn add_arg(&mut self, js_value_arg: JsValue, secret_key: Option<String>) -> Deploy {
         let deploy = self.0.clone();
