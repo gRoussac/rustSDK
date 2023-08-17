@@ -1,37 +1,11 @@
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_client::cli::JsonArg;
-use casper_types::{DeployBuilder, NamedArg, RuntimeArgs, SecretKey};
+use casper_types::{DeployBuilder, ErrorExt, SecretKey};
+use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
-use once_cell::sync::OnceCell;
 use serde::Serialize;
 use wasm_bindgen::{JsCast, JsValue};
-
-pub fn serialize_result<T, E>(result: Result<T, E>) -> JsValue
-where
-    T: Serialize,
-    E: std::error::Error,
-{
-    match result {
-        Ok(data) => {
-            // Let's not use serde-wasm-bindgen for now but from_serde as per https://rustwasm.github.io/wasm-bindgen/reference/arbitrary-data-with-serde.html
-            // use serde_wasm_bindgen::Serializer;
-            // let serializer =
-            //     Serializer::json_compatible().serialize_large_number_types_as_bigints(true);
-            match JsValue::from_serde(&data) {
-                Ok(json) => json,
-                Err(err) => {
-                    error(&format!("Error serializing data to JSON: {:?}", err));
-                    JsValue::null()
-                }
-            }
-        }
-        Err(err) => {
-            error(&format!("Error occurred: {:?}", err));
-            JsValue::null()
-        }
-    }
-}
 
 pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
     let parsed_timestamp = timestamp.as_ref().and_then(|ts| ts.parse::<i64>().ok());
@@ -63,13 +37,48 @@ pub fn get_str_or_default(opt_str: Option<&String>) -> &str {
     opt_str.map(String::as_str).unwrap_or_default()
 }
 
-pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, JsValue> {
-    let secret_key_result = SecretKey::from_pem(secret_key);
-    if let Err(err) = secret_key_result {
-        error(&format!("Error loading secret key: {:?}", err));
-        return Err(JsValue::null());
+pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
+    SecretKey::from_pem(secret_key)
+}
+
+pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {
+    let mut bytes = Vec::with_capacity(hex_string.len() / 2);
+    let mut hex_chars = hex_string.chars();
+    while let (Some(a), Some(b)) = (hex_chars.next(), hex_chars.next()) {
+        if let Ok(byte) = u8::from_str_radix(&format!("{}{}", a, b), 16) {
+            bytes.push(byte);
+        } else {
+            // If an invalid hex pair is encountered, return an empty vector.
+            return Vec::new();
+        }
     }
-    Ok(secret_key_result.unwrap())
+    bytes
+}
+
+pub fn serialize_result<T, E>(result: Result<T, E>) -> JsValue
+where
+    T: Serialize,
+    E: std::error::Error,
+{
+    match result {
+        Ok(data) => {
+            // Let's not use serde-wasm-bindgen for now but from_serde as per https://rustwasm.github.io/wasm-bindgen/reference/arbitrary-data-with-serde.html
+            // use serde_wasm_bindgen::Serializer;
+            // let serializer =
+            //     Serializer::json_compatible().serialize_large_number_types_as_bigints(true);
+            match JsValue::from_serde(&data) {
+                Ok(json) => json,
+                Err(err) => {
+                    error(&format!("Error serializing data to JSON: {:?}", err));
+                    JsValue::null()
+                }
+            }
+        }
+        Err(err) => {
+            error(&format!("Error occurred: {:?}", err));
+            JsValue::null()
+        }
+    }
 }
 
 pub fn insert_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {

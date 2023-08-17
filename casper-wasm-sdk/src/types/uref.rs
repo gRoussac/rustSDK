@@ -1,5 +1,5 @@
 use crate::{
-    js::externs::error,
+    debug::error,
     types::{access_rights::AccessRights, addr::uref_addr::URefAddr},
 };
 use casper_types::URef as _URef;

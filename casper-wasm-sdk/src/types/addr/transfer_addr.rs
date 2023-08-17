@@ -1,5 +1,5 @@
 //use casper_types::TransferAddr as _TransferAddr;
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::TRANSFER_ADDR_LENGTH;
 use wasm_bindgen::prelude::*;
 

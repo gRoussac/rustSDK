@@ -1,4 +1,4 @@
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::{DictionaryAddr as _DictionaryAddr, KEY_DICTIONARY_LENGTH};
 use wasm_bindgen::prelude::*;
 

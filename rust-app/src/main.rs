@@ -1,11 +1,23 @@
-use casper_wasm_sdk::{sdk::SDK, types::verbosity::Verbosity};
+use casper_wasm_sdk::{
+    debug::{error, log},
+    helpers::hex_to_uint8_vec,
+    sdk::{deploy_utils::make_deploy::make_deploy, SDK},
+    types::verbosity::Verbosity,
+};
 
 #[tokio::main]
 async fn main() {
     println!("Bye world!");
-    let mut sdk = SDK::new();
+    let sdk = SDK::new();
     let peers = sdk
-        .get_peers("https://rpc.integration.casperlabs.io", Verbosity::High)
+        .get_peers("https://rpc.integration.casperlabs.io", Verbosity::Low)
         .await;
-    dbg!(&format!("{:?}", peers));
+    dbg!(peers.unwrap());
+
+    let test =
+        hex_to_uint8_vec("0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54");
+    dbg!(test);
+    // log("bound log to std");
+    // error("bound error to std");
+    //  make_deploy(deploy_params, session_params, payment_params);
 }

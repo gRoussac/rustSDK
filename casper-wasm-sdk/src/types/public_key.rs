@@ -1,4 +1,4 @@
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey,

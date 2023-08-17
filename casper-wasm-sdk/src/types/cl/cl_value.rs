@@ -2,7 +2,7 @@ use super::{
     bytes::{self, Bytes},
     cl_type::CLType,
 };
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::{
     bytesrepr::{FromBytes, ToBytes},
     CLTyped, CLValue as _CLValue, U128,

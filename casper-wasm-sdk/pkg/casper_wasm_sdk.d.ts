@@ -6,6 +6,14 @@
 */
 export function fromTransfer(key: Uint8Array): TransferAddr;
 /**
+* @param {string} s
+*/
+export function log(s: string): void;
+/**
+* @param {string} s
+*/
+export function error(s: string): void;
+/**
 * @param {string} hex_string
 * @returns {Uint8Array}
 */
@@ -25,10 +33,6 @@ export function privateToPublicKey(secret_key: string): any;
 * @returns {any}
 */
 export function getTimestamp(): any;
-/**
-* @param {string} s
-*/
-export function log(s: string): void;
 /**
 */
 export enum CLTypeEnum {
@@ -779,12 +783,6 @@ export class SDK {
 */
   deploy(node_address: string, verbosity: number, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Promise<any>;
 /**
-* @param {Deploy} deploy
-* @param {string} secret_key
-* @returns {any}
-*/
-  sign_deploy(deploy: Deploy, secret_key: string): any;
-/**
 * @param {string} node_address
 * @param {number} verbosity
 * @param {BlockIdentifier | undefined} maybe_block_identifier
@@ -881,6 +879,12 @@ export class SDK {
 * @returns {Promise<any>}
 */
   speculative_exec(node_address: string, block_identifier: BlockIdentifier | undefined, verbosity: number, deploy: Deploy): Promise<any>;
+/**
+* @param {Deploy} deploy
+* @param {string} secret_key
+* @returns {any}
+*/
+  sign_deploy(deploy: Deploy, secret_key: string): any;
 /**
 * @param {string} node_address
 * @param {number} verbosity
@@ -1121,8 +1125,9 @@ export interface InitOutput {
   readonly key_toFormattedString: (a: number, b: number) => void;
   readonly __wbg_path_free: (a: number) => void;
   readonly path_new: (a: number) => number;
+  readonly log: (a: number, b: number) => void;
+  readonly error: (a: number, b: number) => void;
   readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_get_account: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_get_auction_info: (a: number, b: number, c: number, d: number, e: number) => number;
@@ -1168,9 +1173,7 @@ export interface InitOutput {
   readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
   readonly __wbg_dictionaryaddr_free: (a: number) => void;
   readonly __wbg_blockhash_free: (a: number) => void;
-  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
-  readonly jsonPrettyPrint: (a: number, b: number) => number;
-  readonly privateToPublicKey: (a: number, b: number) => number;
+  readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly sdk_get_chainspec: (a: number, b: number, c: number, d: number) => number;
@@ -1204,7 +1207,6 @@ export interface InitOutput {
   readonly purseidentifier_new_main_purse_under_public_key: (a: number) => number;
   readonly purseidentifier_new_main_purse_under_account_hash: (a: number) => number;
   readonly purseidentifier_new_purse_uref: (a: number) => number;
-  readonly getTimestamp: () => number;
   readonly __wbg_urefaddr_free: (a: number) => void;
   readonly __wbg_blockidentifier_free: (a: number) => void;
   readonly blockidentifier_new: (a: number) => number;
@@ -1294,7 +1296,6 @@ export interface InitOutput {
   readonly sessionstrparams_session_args_complex: (a: number, b: number) => void;
   readonly sessionstrparams_session_version: (a: number, b: number) => void;
   readonly sessionstrparams_session_entry_point: (a: number, b: number) => void;
-  readonly log: (a: number, b: number) => void;
   readonly __wbg_argssimple_free: (a: number) => void;
   readonly __wbg_digest_free: (a: number) => void;
   readonly digest_new: (a: number, b: number, c: number) => void;
@@ -1302,6 +1303,10 @@ export interface InitOutput {
   readonly __wbg_publickey_free: (a: number) => void;
   readonly publickey_new: (a: number, b: number, c: number) => void;
   readonly publickey_fromUint8Array: (a: number, b: number) => number;
+  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
+  readonly jsonPrettyPrint: (a: number, b: number) => number;
+  readonly privateToPublicKey: (a: number, b: number) => number;
+  readonly getTimestamp: () => number;
   readonly sdk_new: () => number;
   readonly __wbg_sdk_free: (a: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;

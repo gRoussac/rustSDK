@@ -1,4 +1,4 @@
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::{URefAddr as _URefAddr, UREF_ADDR_LENGTH};
 use wasm_bindgen::prelude::*;
 

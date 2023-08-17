@@ -1,5 +1,5 @@
 use crate::{
-    js::externs::{error, log},
+    debug::{error, log},
     sdk::SDK,
     types::{
         deploy_params::{
