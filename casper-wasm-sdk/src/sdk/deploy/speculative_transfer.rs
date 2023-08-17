@@ -1,6 +1,5 @@
 use crate::{
     debug::{error, log},
-    sdk::SDK,
     types::{
         block_identifier::BlockIdentifier,
         deploy_params::{
@@ -9,6 +8,7 @@ use crate::{
         },
         verbosity::Verbosity,
     },
+    SDK,
 };
 use casper_client::cli::make_transfer;
 use rand::Rng;

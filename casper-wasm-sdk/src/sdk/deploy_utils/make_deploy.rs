@@ -4,12 +4,12 @@ use wasm_bindgen::prelude::*;
 
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::deploy_params::{
         deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
         payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
         session_str_params::{session_str_params_to_casper_client, SessionStrParams},
     },
+    SDK,
 };
 
 #[wasm_bindgen]
@@ -26,7 +26,7 @@ impl SDK {
     }
 }
 
-pub fn make_deploy(
+pub(crate) fn make_deploy(
     deploy_params: DeployStrParams,
     session_params: SessionStrParams,
     payment_params: PaymentStrParams,

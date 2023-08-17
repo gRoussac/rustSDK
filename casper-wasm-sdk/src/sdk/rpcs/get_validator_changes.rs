@@ -1,4 +1,4 @@
-use crate::{helpers::serialize_result, sdk::SDK, types::verbosity::Verbosity};
+use crate::{helpers::serialize_result, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult, Error, JsonRpcId,
     SuccessResponse,

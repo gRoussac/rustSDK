@@ -1,6 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
-use crate::{debug::log, sdk::SDK, types::verbosity::Verbosity};
+use crate::{debug::log, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_peers as client_get_peers, rpcs::results::GetPeersResult, Error, JsonRpcId, SuccessResponse,
 };

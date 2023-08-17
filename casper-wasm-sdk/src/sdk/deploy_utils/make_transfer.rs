@@ -1,10 +1,10 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::deploy_params::{
         deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
         payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
     },
+    SDK,
 };
 use casper_client::cli::{make_transfer as client_make_transfer, CliError};
 use casper_types::Deploy;
@@ -34,7 +34,7 @@ impl SDK {
     }
 }
 
-pub fn make_transfer(
+pub(crate) fn make_transfer(
     amount: &str,
     target_account: &str,
     transfer_id: Option<String>,

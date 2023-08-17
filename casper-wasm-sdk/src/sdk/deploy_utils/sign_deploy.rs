@@ -1,4 +1,4 @@
-use crate::{helpers::serialize_result, sdk::SDK, types::deploy::Deploy};
+use crate::{helpers::serialize_result, types::deploy::Deploy, SDK};
 use casper_types::Deploy as _Deploy;
 use wasm_bindgen::prelude::*;
 

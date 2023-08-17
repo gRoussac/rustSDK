@@ -1,7 +1,7 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{digest::Digest, uref::URef, verbosity::Verbosity},
+    SDK,
 };
 use casper_client::{
     get_balance, rpcs::results::GetBalanceResult, Error, JsonRpcId, SuccessResponse,

@@ -1,9 +1,9 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{
         dictionary_item_identifier::DictionaryItemIdentifier, digest::Digest, verbosity::Verbosity,
     },
+    SDK,
 };
 use casper_client::{
     get_dictionary_item, rpcs::results::GetDictionaryItemResult, Error, JsonRpcId, SuccessResponse,
