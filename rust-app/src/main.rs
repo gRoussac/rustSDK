@@ -1,8 +1,8 @@
 use casper_wasm_sdk::{
     debug::{error, log},
     helpers::hex_to_uint8_vec,
-    sdk::{deploy_utils::make_deploy::make_deploy, SDK},
     types::verbosity::Verbosity,
+    SDK,
 };
 
 #[tokio::main]
@@ -19,5 +19,5 @@ async fn main() {
     dbg!(test);
     // log("bound log to std");
     // error("bound error to std");
-    //  make_deploy(deploy_params, session_params, payment_params);
+    // sdk.make_deploy(deploy_params, session_params, payment_params);
 }

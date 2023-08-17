@@ -1,9 +1,9 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{
         global_state_identifier::GlobalStateIdentifier, key::Key, path::Path, verbosity::Verbosity,
     },
+    SDK,
 };
 use casper_client::{
     query_global_state, rpcs::results::QueryGlobalStateResult, Error, JsonRpcId, SuccessResponse,

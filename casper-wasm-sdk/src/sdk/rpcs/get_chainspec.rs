@@ -1,4 +1,4 @@
-use crate::{helpers::serialize_result, sdk::SDK, types::verbosity::Verbosity};
+use crate::{helpers::serialize_result, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_chainspec, rpcs::results::GetChainspecResult, Error, JsonRpcId, SuccessResponse,
 };

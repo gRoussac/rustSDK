@@ -1,7 +1,7 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{block_identifier::BlockIdentifier, public_key::PublicKey, verbosity::Verbosity},
+    SDK,
 };
 use casper_client::{
     get_account, rpcs::results::GetAccountResult, Error, JsonRpcId, SuccessResponse,

@@ -1,7 +1,7 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{block_identifier::BlockIdentifier, deploy::Deploy, verbosity::Verbosity},
+    SDK,
 };
 use casper_client::{
     rpcs::results::SpeculativeExecResult, speculative_exec, Error, JsonRpcId, SuccessResponse,

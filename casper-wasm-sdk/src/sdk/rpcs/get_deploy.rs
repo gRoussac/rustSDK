@@ -1,7 +1,7 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{deploy_hash::DeployHash, verbosity::Verbosity},
+    SDK,
 };
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult, Error, JsonRpcId, SuccessResponse,

@@ -1,6 +1,6 @@
 use crate::{
     debug::{error, log},
-    sdk::SDK,
+    SDK,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},

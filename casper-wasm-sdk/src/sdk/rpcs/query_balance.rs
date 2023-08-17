@@ -1,10 +1,10 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{
         global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
         verbosity::Verbosity,
     },
+    SDK,
 };
 use casper_client::{
     query_balance, rpcs::results::QueryBalanceResult, Error, JsonRpcId, SuccessResponse,

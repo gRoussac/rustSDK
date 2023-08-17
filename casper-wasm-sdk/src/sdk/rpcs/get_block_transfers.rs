@@ -1,7 +1,7 @@
 use crate::{
     helpers::serialize_result,
-    sdk::SDK,
     types::{block_identifier::BlockIdentifier, verbosity::Verbosity},
+    SDK,
 };
 use casper_client::{
     get_block_transfers, rpcs::results::GetBlockTransfersResult, Error, JsonRpcId, SuccessResponse,
