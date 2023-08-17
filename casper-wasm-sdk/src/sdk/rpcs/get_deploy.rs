@@ -30,6 +30,7 @@ impl SDK {
         serialize_result(result)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "info_get_deploy")]
     pub async fn info_get_deploy_js_alias(
         &mut self,

@@ -3,7 +3,6 @@ pub mod deploy;
 pub mod deploy_utils;
 pub mod rpcs;
 
-#[derive(Debug)]
 #[wasm_bindgen]
 pub struct SDK {}
 

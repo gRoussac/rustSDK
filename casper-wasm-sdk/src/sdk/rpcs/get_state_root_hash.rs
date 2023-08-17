@@ -28,6 +28,7 @@ impl SDK {
         serialize_result(result)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "chain_get_state_root_hash")]
     pub async fn chain_get_state_root_hash_js_alias(
         &mut self,

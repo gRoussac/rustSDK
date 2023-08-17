@@ -27,6 +27,7 @@ impl SDK {
         serialize_result(result)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "chain_get_block")]
     pub async fn chain_get_block_js_alias(
         &mut self,
