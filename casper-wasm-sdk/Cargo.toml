@@ -31,9 +31,14 @@ gloo-utils = { version = "0.1", default-features = false, features = ["serde"] }
 chrono = "0.4"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 name = "casper_wasm_sdk"
 path = "src/lib.rs"
+
+[[bin]]
+name = "casper_wasm_sdk"
+path = "src/main.rs"
+doc = false
 
 [profile.release]
 lto = true

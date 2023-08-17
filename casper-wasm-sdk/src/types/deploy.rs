@@ -40,8 +40,8 @@ impl Deploy {
         deploy.into()
     }
 
-    #[wasm_bindgen(js_name = "fromJson")]
-    pub fn from_json(&self, deploy: JsValue) -> Deploy {
+    // #[wasm_bindgen(js_name = "fromJson")] // Do not expose that for now, use new
+    fn from_json(&self, deploy: JsValue) -> Deploy {
         Self::new(deploy)
     }
 
