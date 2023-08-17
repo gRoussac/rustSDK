@@ -1,6 +1,9 @@
+#[cfg(target_arch = "wasm32")]
+use crate::types::block_identifier::BlockIdentifier;
+#[cfg(target_arch = "wasm32")]
 use crate::{
     debug::{error, log},
-    SDK,
+    helpers::serialize_result,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -9,13 +12,16 @@ use crate::{
         },
         verbosity::Verbosity,
     },
+    SDK,
 };
+#[cfg(target_arch = "wasm32")]
 use casper_client::cli::make_deploy;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
     pub async fn speculative_deploy(
         &mut self,
         maybe_block_id: Option<BlockIdentifier>,
@@ -33,10 +39,10 @@ impl SDK {
             payment_str_params_to_casper_client(&payment_params),
             false,
         ) {
-            Ok(deploy) => {
+            Ok(deploy) => serialize_result(
                 self.speculative_exec(node_address, maybe_block_id, verbosity, deploy.into())
-                    .await
-            }
+                    .await,
+            ),
             Err(err) => {
                 error(&format!("Error during speculative_deploy: {}", err));
                 JsValue::null()

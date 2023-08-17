@@ -1,5 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+use crate::helpers::serialize_result;
 use crate::{
-    helpers::serialize_result,
     types::{block_identifier::BlockIdentifier, public_key::PublicKey, verbosity::Verbosity},
     SDK,
 };
@@ -7,30 +8,31 @@ use casper_client::{
     get_account, rpcs::results::GetAccountResult, Error, JsonRpcId, SuccessResponse,
 };
 use rand::Rng;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    pub async fn get_account(
+    #[wasm_bindgen(js_name = "get_account")]
+    pub async fn get_account_js_alias(
         &mut self,
         node_address: &str,
         verbosity: Verbosity,
         maybe_block_identifier: Option<BlockIdentifier>,
         account_identifier: PublicKey,
     ) -> JsValue {
-        //log("get_account!");
-        let result: Result<SuccessResponse<GetAccountResult>, Error> = get_account(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
-            verbosity.into(),
-            maybe_block_identifier.map(Into::into),
-            account_identifier.into(),
+        serialize_result(
+            self.get_account(
+                node_address,
+                verbosity,
+                maybe_block_identifier,
+                account_identifier,
+            )
+            .await,
         )
-        .await;
-        serialize_result(result)
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "state_get_account_info")]
     pub async fn state_get_account_info_js_alias(
         &mut self,
@@ -39,11 +41,31 @@ impl SDK {
         maybe_block_identifier: Option<BlockIdentifier>,
         account_identifier: PublicKey,
     ) -> JsValue {
-        self.get_account(
+        self.get_account_js_alias(
             node_address,
             verbosity,
             maybe_block_identifier,
             account_identifier,
+        )
+        .await
+    }
+}
+
+impl SDK {
+    pub async fn get_account(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        maybe_block_identifier: Option<BlockIdentifier>,
+        account_identifier: PublicKey,
+    ) -> Result<SuccessResponse<GetAccountResult>, Error> {
+        //log("get_account!");
+        get_account(
+            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+            node_address,
+            verbosity.into(),
+            maybe_block_identifier.map(Into::into),
+            account_identifier.into(),
         )
         .await
     }

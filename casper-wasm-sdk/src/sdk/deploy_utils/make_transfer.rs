@@ -1,20 +1,20 @@
-use crate::{
-    helpers::serialize_result,
-    types::deploy_params::{
-        deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
-        payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
-    },
-    SDK,
+use crate::types::deploy_params::{
+    deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
+    payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
 };
+#[cfg(target_arch = "wasm32")]
+use crate::{helpers::serialize_result, SDK};
 use casper_client::cli::{make_transfer as client_make_transfer, CliError};
 use casper_types::Deploy;
 use rand::Rng;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub fn make_transfer(
+    #[wasm_bindgen(js_name = "make_transfer")]
+    pub fn make_transfer_js_alias(
         &mut self,
         amount: &str,
         target_account: &str,

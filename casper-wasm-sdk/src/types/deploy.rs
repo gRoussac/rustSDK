@@ -41,9 +41,9 @@ impl Deploy {
     }
 
     // #[wasm_bindgen(js_name = "fromJson")] // Do not expose that for now, use new
-    fn from_json(&self, deploy: JsValue) -> Deploy {
-        Self::new(deploy)
-    }
+    // fn from_json(&self, deploy: JsValue) -> Deploy {
+    //     Self::new(deploy)
+    // }
 
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
