@@ -1,6 +1,6 @@
 use crate::{
+    debug::error,
     helpers::{insert_arg, secret_key_from_pem},
-    js::externs::error,
     sdk::deploy_utils::{make_deploy::make_deploy, make_transfer::make_transfer},
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
@@ -141,7 +141,12 @@ impl Deploy {
     #[wasm_bindgen(js_name = "sign")]
     pub fn sign(&mut self, secret_key: &str) -> Deploy {
         let mut deploy: _Deploy = self.0.clone();
-        deploy.sign(&secret_key_from_pem(secret_key).unwrap());
+        let secret_key_from_pem = secret_key_from_pem(secret_key);
+        if let Err(err) = secret_key_from_pem {
+            error(&format!("Error loading secret key: {:?}", err));
+            return deploy.into();
+        }
+        deploy.sign(&secret_key_from_pem.unwrap());
         if let Err(err) = deploy.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
             error(&format!("Deploy has not a valid size: {:?}", err));
         }

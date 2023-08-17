@@ -1,5 +1,5 @@
 use super::digest::Digest;
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::Digest as _Digest;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},

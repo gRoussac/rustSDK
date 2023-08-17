@@ -1,4 +1,4 @@
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::{HashAddr as _HashAddr, KEY_HASH_LENGTH};
 use wasm_bindgen::prelude::*;
 

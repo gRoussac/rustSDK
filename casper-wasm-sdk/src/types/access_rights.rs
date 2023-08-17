@@ -1,4 +1,4 @@
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::AccessRights as _AccessRights;
 use wasm_bindgen::prelude::*;
 

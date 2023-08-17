@@ -1,25 +1,13 @@
-use crate::{
-    helpers::{get_current_timestamp, secret_key_from_pem},
-    js::externs::error,
-    types::verbosity::Verbosity,
-};
+use crate::helpers::get_current_timestamp;
+use crate::helpers::hex_to_uint8_vec;
+use crate::{debug::error, helpers::secret_key_from_pem, types::verbosity::Verbosity};
 use casper_types::PublicKey;
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(js_name = "hexToUint8Array")]
-pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {
-    let mut bytes = Vec::with_capacity(hex_string.len() / 2);
-    let mut hex_chars = hex_string.chars();
-    while let (Some(a), Some(b)) = (hex_chars.next(), hex_chars.next()) {
-        if let Ok(byte) = u8::from_str_radix(&format!("{}{}", a, b), 16) {
-            bytes.push(byte);
-        } else {
-            // If an invalid hex pair is encountered, return an empty vector.
-            return Vec::new();
-        }
-    }
-    bytes
+pub fn hex_to_uint8_vec_js_alias(hex_string: &str) -> Vec<u8> {
+    hex_to_uint8_vec(hex_string)
 }
 
 #[wasm_bindgen(js_name = "jsonPrettyPrint")]
@@ -48,7 +36,12 @@ pub fn json_pretty_print(value: JsValue, verbosity: Option<Verbosity>) -> JsValu
 
 #[wasm_bindgen(js_name = "privateToPublicKey")]
 pub fn secret_to_public_key(secret_key: &str) -> JsValue {
-    let public_key = PublicKey::from(&secret_key_from_pem(secret_key).unwrap());
+    let secret_key_from_pem = secret_key_from_pem(secret_key);
+    if let Err(err) = secret_key_from_pem {
+        error(&format!("Error loading secret key: {:?}", err));
+        return JsValue::null();
+    }
+    let public_key = PublicKey::from(&secret_key_from_pem.unwrap());
     JsValue::from_serde(&public_key).unwrap_or_else(|err| {
         error(&format!("Error serializing public key: {:?}", err));
         JsValue::null()

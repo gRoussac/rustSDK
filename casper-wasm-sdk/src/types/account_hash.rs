@@ -1,5 +1,5 @@
 use super::public_key::PublicKey;
-use crate::js::externs::error;
+use crate::debug::error;
 use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
