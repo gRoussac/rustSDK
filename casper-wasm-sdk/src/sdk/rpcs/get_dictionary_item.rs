@@ -32,6 +32,7 @@ impl SDK {
         serialize_result(result)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
         &mut self,

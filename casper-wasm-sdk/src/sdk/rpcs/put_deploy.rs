@@ -28,6 +28,7 @@ impl SDK {
         serialize_result(result)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "account_put_deploy")]
     pub async fn account_put_deploy_js_alias(
         &mut self,
