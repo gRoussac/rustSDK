@@ -1,5 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+use crate::helpers::serialize_result;
 use crate::{
-    helpers::serialize_result,
     types::{
         global_state_identifier::GlobalStateIdentifier, key::Key, path::Path, verbosity::Verbosity,
     },
@@ -9,12 +10,14 @@ use casper_client::{
     query_global_state, rpcs::results::QueryGlobalStateResult, Error, JsonRpcId, SuccessResponse,
 };
 use rand::Rng;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub async fn query_global_state(
+    #[wasm_bindgen(js_name = "query_global_state")]
+    pub async fn query_global_state_js_alias(
         &mut self,
         node_address: &str,
         verbosity: Verbosity,
@@ -22,8 +25,24 @@ impl SDK {
         key: Key,
         path: Path,
     ) -> JsValue {
+        serialize_result(
+            self.query_global_state(node_address, verbosity, global_state_identifier, key, path)
+                .await,
+        )
+    }
+}
+
+impl SDK {
+    pub async fn query_global_state(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        global_state_identifier: GlobalStateIdentifier,
+        key: Key,
+        path: Path,
+    ) -> Result<SuccessResponse<QueryGlobalStateResult>, Error> {
         //log("query_global_state!");
-        let result: Result<SuccessResponse<QueryGlobalStateResult>, Error> = query_global_state(
+        query_global_state(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
@@ -31,7 +50,6 @@ impl SDK {
             key.into(),
             path.into(),
         )
-        .await;
-        serialize_result(result)
+        .await
     }
 }

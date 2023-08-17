@@ -1,5 +1,7 @@
+#[cfg(target_arch = "wasm32")]
 use crate::{
     debug::{error, log},
+    helpers::serialize_result,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -10,9 +12,12 @@ use crate::{
     },
     SDK,
 };
+#[cfg(target_arch = "wasm32")]
 use casper_client::cli::make_deploy;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen]
@@ -32,10 +37,10 @@ impl SDK {
             payment_str_params_to_casper_client(&payment_params),
             false,
         ) {
-            Ok(deploy) => {
+            Ok(deploy) => serialize_result(
                 self.put_deploy(node_address, verbosity, deploy.into())
-                    .await
-            }
+                    .await,
+            ),
             Err(err) => {
                 error(&format!("Error during deploy: {}", err));
                 JsValue::null()

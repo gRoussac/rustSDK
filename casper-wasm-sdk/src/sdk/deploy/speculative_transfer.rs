@@ -1,5 +1,8 @@
+#[cfg(target_arch = "wasm32")]
+#[cfg(target_arch = "wasm32")]
 use crate::{
     debug::{error, log},
+    helpers::serialize_result,
     types::{
         block_identifier::BlockIdentifier,
         deploy_params::{
@@ -10,10 +13,14 @@ use crate::{
     },
     SDK,
 };
+#[cfg(target_arch = "wasm32")]
 use casper_client::cli::make_transfer;
+#[cfg(target_arch = "wasm32")]
 use rand::Rng;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     #[allow(clippy::too_many_arguments)]
@@ -38,10 +45,10 @@ impl SDK {
             payment_str_params_to_casper_client(&payment_params),
             false,
         ) {
-            Ok(deploy) => {
+            Ok(deploy) => serialize_result(
                 self.speculative_exec(node_address, maybe_block_id, verbosity, deploy.into())
-                    .await
-            }
+                    .await,
+            ),
             Err(err) => {
                 error(&format!("Error during speculative_transfer: {}", err));
                 JsValue::null()

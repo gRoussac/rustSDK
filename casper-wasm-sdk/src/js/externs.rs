@@ -17,7 +17,7 @@ pub fn log(s: &str) {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
+    #[wasm_bindgen(js_namespace = console, js_name = error)]
     pub fn error_with_prefix(s: &str);
 }
 

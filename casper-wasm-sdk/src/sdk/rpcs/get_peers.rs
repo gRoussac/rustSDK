@@ -1,9 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{debug::log, types::verbosity::Verbosity, SDK};
-use casper_client::{
-    get_peers as client_get_peers, rpcs::results::GetPeersResult, Error, JsonRpcId, SuccessResponse,
-};
+use casper_client::{get_peers, rpcs::results::GetPeersResult, Error, JsonRpcId, SuccessResponse};
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -28,7 +26,7 @@ impl SDK {
         verbosity: Verbosity,
     ) -> Result<SuccessResponse<GetPeersResult>, Error> {
         log("get_peers!");
-        client_get_peers(
+        get_peers(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             verbosity.into(),
