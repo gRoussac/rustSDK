@@ -310,7 +310,7 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_328(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_331(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h70dd628200031030(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -1122,6 +1122,19 @@ export class Deploy {
         return Deploy.__wrap(ret);
     }
     /**
+    * @param {Bytes} module_bytes
+    * @param {string | undefined} secret_key
+    * @returns {Deploy}
+    */
+    withModuleBytes(module_bytes, secret_key) {
+        _assertClass(module_bytes, Bytes);
+        var ptr0 = module_bytes.__destroy_into_raw();
+        var ptr1 = isLikeNone(secret_key) ? 0 : passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.deploy_withModuleBytes(this.__wbg_ptr, ptr0, ptr1, len1);
+        return Deploy.__wrap(ret);
+    }
+    /**
     * @param {string | undefined} secret_key
     * @returns {Deploy}
     */
@@ -1142,6 +1155,28 @@ export class Deploy {
         var ptr1 = isLikeNone(secret_key) ? 0 : passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len1 = WASM_VECTOR_LEN;
         const ret = wasm.deploy_withStandardPayment(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+        return Deploy.__wrap(ret);
+    }
+    /**
+    * @param {any} payment
+    * @param {string | undefined} secret_key
+    * @returns {Deploy}
+    */
+    withPayment(payment, secret_key) {
+        var ptr0 = isLikeNone(secret_key) ? 0 : passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.deploy_withPayment(this.__wbg_ptr, addHeapObject(payment), ptr0, len0);
+        return Deploy.__wrap(ret);
+    }
+    /**
+    * @param {any} session
+    * @param {string | undefined} secret_key
+    * @returns {Deploy}
+    */
+    withSession(session, secret_key) {
+        var ptr0 = isLikeNone(secret_key) ? 0 : passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.deploy_withSession(this.__wbg_ptr, addHeapObject(session), ptr0, len0);
         return Deploy.__wrap(ret);
     }
     /**
@@ -3878,7 +3913,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_328(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_331(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -3958,7 +3993,7 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3544 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper3536 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 725, __wbg_adapter_28);
         return addHeapObject(ret);
     };

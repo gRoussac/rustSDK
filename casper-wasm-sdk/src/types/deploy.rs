@@ -1,4 +1,5 @@
 use super::{
+    cl::bytes::Bytes,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -14,8 +15,9 @@ use crate::{
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
-    bytesrepr::Bytes, ContractHash, ContractPackageHash, Deploy as _Deploy, DeployBuilder,
-    ExecutableDeployItem, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
+    bytesrepr::{Bytes as _Bytes, FromBytes, ToBytes},
+    ContractHash, ContractPackageHash, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem,
+    RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -229,17 +231,73 @@ impl Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
 
-        let new_session = modify_session(
-            session,
-            NewSessionParams {
-                new_entry_point: Some(entrypoint.to_string()),
-                ..Default::default()
-            },
-        );
+        self.build(BuildParams {
+            secret_key,
+            session: Some(modify_session(
+                session,
+                NewSessionParams {
+                    new_entry_point: Some(entrypoint.to_string()),
+                    ..Default::default()
+                },
+            )),
+            ..Default::default()
+        })
+    }
+
+    // #[wasm_bindgen(js_name = "withHash")]
+    // pub fn with_hash(&self, hash: ContractHash, secret_key: Option<String>) -> Deploy {
+    //     let deploy = self.0.clone();
+    //     let session = deploy.session();
+
+    //     self.build(BuildParams {
+    //         secret_key,
+    //         session: Some(modify_session(
+    //             session,
+    //             NewSessionParams {
+    //                 new_hash: Some(hash.to_string()),
+    //                 ..Default::default()
+    //             },
+    //         )),
+    //         ..Default::default()
+    //     })
+    // }
+
+    // #[wasm_bindgen(js_name = "withPackageHash")]
+    // pub fn with_package_hash(
+    //     &self,
+    //     package_hash: ContractHash,
+    //     secret_key: Option<String>,
+    // ) -> Deploy {
+    //     let deploy = self.0.clone();
+    //     let session = deploy.session();
+
+    //     self.build(BuildParams {
+    //         secret_key,
+    //         session: Some(modify_session(
+    //             session,
+    //             NewSessionParams {
+    //                 new_package_hash: Some(package_hash.to_string()),
+    //                 ..Default::default()
+    //             },
+    //         )),
+    //         ..Default::default()
+    //     })
+    // }
+
+    #[wasm_bindgen(js_name = "withModuleBytes")]
+    pub fn with_module_bytes(&self, module_bytes: Bytes, secret_key: Option<String>) -> Deploy {
+        let deploy = self.0.clone();
+        let session = deploy.session();
 
         self.build(BuildParams {
             secret_key,
-            session: Some(new_session),
+            session: Some(modify_session(
+                session,
+                NewSessionParams {
+                    new_module_bytes: Some(&module_bytes),
+                    ..Default::default()
+                },
+            )),
             ..Default::default()
         })
     }
@@ -254,12 +312,11 @@ impl Deploy {
 
     #[wasm_bindgen(js_name = "withStandardPayment")]
     pub fn with_standard_payment(&self, amount: &str, secret_key: Option<String>) -> Deploy {
-        let deploy: _Deploy = self.0.clone();
         let cloned_amount = amount.to_string();
         let amount = U512::from_dec_str(&cloned_amount);
         if let Err(err) = amount {
             error(&format!("Error converting amount: {:?}", err));
-            return deploy.into();
+            return self.0.clone().into();
         }
         self.build(BuildParams {
             secret_key,
@@ -268,31 +325,39 @@ impl Deploy {
         })
     }
 
-    // #[wasm_bindgen(js_name = "withPayment")]
-    // pub fn with_payment(
-    //     &self,
-    //     payment: ExecutableDeployItem,
-    //     secret_key: Option<String>,
-    // ) -> Deploy {
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         payment: Some(payment),
-    //         ..Default::default()
-    //     })
-    // }
+    #[wasm_bindgen(js_name = "withPayment")]
+    pub fn with_payment(&self, payment: JsValue, secret_key: Option<String>) -> Deploy {
+        let payment_item_result = payment.into_serde();
 
-    // #[wasm_bindgen(js_name = "withSession")]
-    // pub fn with_session(
-    //     &self,
-    //     session: ExecutableDeployItem,
-    //     secret_key: Option<String>,
-    // ) -> Deploy {
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         session: Some(session),
-    //         ..Default::default()
-    //     })
-    // }
+        match payment_item_result {
+            Ok(payment_item) => self.build(BuildParams {
+                secret_key,
+                payment: Some(payment_item),
+                ..Default::default()
+            }),
+            Err(err) => {
+                error(&format!("Error parsing payment: {}", err));
+                self.0.clone().into()
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "withSession")]
+    pub fn with_session(&self, session: JsValue, secret_key: Option<String>) -> Deploy {
+        let session_item_result = session.into_serde();
+
+        match session_item_result {
+            Ok(session_item) => self.build(BuildParams {
+                secret_key,
+                session: Some(session_item),
+                ..Default::default()
+            }),
+            Err(err) => {
+                error(&format!("Error parsing session: {}", err));
+                self.0.clone().into()
+            }
+        }
+    }
 
     #[wasm_bindgen(js_name = "validateDeploySize")]
     pub fn validate_deploy_size(&self) -> bool {
@@ -447,8 +512,20 @@ fn modify_session(
 ) -> ExecutableDeployItem {
     match session {
         ExecutableDeployItem::ModuleBytes { module_bytes, args } => {
+            let default: _Bytes = module_bytes.clone();
+            let new_bytes = new_module_bytes.unwrap();
+            let new: &Bytes = &new_bytes;
+            let new_module_bytes: _Bytes = {
+                let new_bytes: _Bytes = _Bytes::from(new.to_vec());
+                if new_bytes.len() > 0 {
+                    new_bytes
+                } else {
+                    default
+                }
+            };
+
             ExecutableDeployItem::ModuleBytes {
-                module_bytes: new_module_bytes.cloned().unwrap_or(module_bytes.clone()),
+                module_bytes: new_module_bytes,
                 args: new_args.cloned().unwrap_or_else(|| args.clone()),
             }
         }

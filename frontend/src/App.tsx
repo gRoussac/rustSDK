@@ -225,7 +225,7 @@ function App() {
       payment_params.payment_amount = '5500000000';
       console.log(payment_params);
 
-      // let test_deploy = Deploy.withSession(
+      // let test_deploy = Deploy.withPaymentAndSession(
       //   deploy_params,
       //   session_params,
       //   payment_params,
@@ -233,6 +233,7 @@ function App() {
 
       // test_deploy = test_deploy.sign(secret_key);
       // test_deploy = test_deploy.withTTL('60m', secret_key);
+      // test_deploy = test_deploy.withSession(JSON.parse('{ "StoredContractByHash": { "hash": "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477", "entry_point": "decimals", "args": []}}'));
       // console.log(test_deploy.toJson());
 
       // let test_transfer = Deploy.withTransfer(
