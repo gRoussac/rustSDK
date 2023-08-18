@@ -22,9 +22,57 @@ pub struct PaymentStrParams {
 
 #[wasm_bindgen]
 impl PaymentStrParams {
+    #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(constructor)]
-    pub fn new() -> PaymentStrParams {
-        PaymentStrParams::default()
+    pub fn new(
+        payment_amount: Option<String>,
+        payment_hash: Option<String>,
+        payment_name: Option<String>,
+        payment_package_hash: Option<String>,
+        payment_package_name: Option<String>,
+        payment_path: Option<String>,
+        payment_args_simple: Option<Array>,
+        payment_args_json: Option<String>,
+        payment_args_complex: Option<String>,
+        payment_version: Option<String>,
+        payment_entry_point: Option<String>,
+    ) -> Self {
+        let mut payment_params = PaymentStrParams::default();
+        if let Some(payment_amount) = payment_amount {
+            payment_params.set_payment_amount(payment_amount);
+        };
+        if let Some(payment_hash) = payment_hash {
+            payment_params.set_payment_hash(payment_hash);
+        };
+        if let Some(payment_name) = payment_name {
+            payment_params.set_payment_name(payment_name);
+        };
+        if let Some(payment_package_hash) = payment_package_hash {
+            payment_params.set_payment_package_hash(payment_package_hash);
+        };
+        if let Some(payment_package_name) = payment_package_name {
+            payment_params.set_payment_package_name(payment_package_name);
+        };
+        if let Some(payment_path) = payment_path {
+            payment_params.set_payment_path(payment_path);
+        };
+        if let Some(payment_args_simple) = payment_args_simple {
+            payment_params.set_payment_args_simple(payment_args_simple);
+        };
+        if let Some(payment_args_json) = payment_args_json {
+            payment_params.set_payment_args_json(payment_args_json);
+        };
+        if let Some(payment_args_complex) = payment_args_complex {
+            payment_params.set_payment_args_complex(payment_args_complex);
+        };
+        if let Some(payment_version) = payment_version {
+            payment_params.set_payment_version(payment_version);
+        };
+        if let Some(payment_entry_point) = payment_entry_point {
+            payment_params.set_payment_entry_point(payment_entry_point);
+        };
+
+        payment_params
     }
 
     #[wasm_bindgen(getter)]

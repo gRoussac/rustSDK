@@ -1,28 +1,109 @@
+use super::deploy_params::{
+    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+    session_str_params::SessionStrParams,
+};
 use crate::{
     debug::error,
-    helpers::{insert_arg, secret_key_from_pem},
+    helpers::{
+        get_current_timestamp, get_ttl, insert_arg, parse_timestamp, parse_ttl, secret_key_from_pem,
+    },
     make_deploy, make_transfer,
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
-    ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, RuntimeArgs,
-    SecretKey, Timestamp,
+    ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, PublicKey,
+    RuntimeArgs, SecretKey, TimeDiff, Timestamp,
 };
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
-use super::deploy_params::{
-    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-    session_str_params::SessionStrParams,
-};
-
 #[derive(Debug, Clone)]
 #[wasm_bindgen]
 pub struct Deploy(_Deploy);
 
+struct BuildParams {
+    secret_key: Option<String>,
+    chain_name: Option<String>,
+    ttl: Option<TimeDiff>,
+    timestamp: Option<Timestamp>,
+    session: Option<ExecutableDeployItem>,
+    payment: Option<ExecutableDeployItem>,
+    account: Option<PublicKey>,
+}
+
 #[wasm_bindgen]
 impl Deploy {
+    fn build(&self, deploy_params: BuildParams) -> Deploy {
+        let BuildParams {
+            secret_key,
+            chain_name,
+            ttl,
+            timestamp,
+            session,
+            payment,
+            account,
+        } = deploy_params;
+        let deploy: _Deploy = self.0.clone();
+        let chain_name = if let Some(chain_name) = chain_name {
+            chain_name
+        } else {
+            deploy.chain_name().into()
+        };
+        let ttl = if let Some(ttl) = ttl {
+            ttl
+        } else {
+            deploy.ttl()
+        };
+        let timestamp = if let Some(timestamp) = timestamp {
+            timestamp
+        } else {
+            deploy.timestamp()
+        };
+        let session = if let Some(session) = session {
+            session
+        } else {
+            deploy.session().clone()
+        };
+        let payment = if let Some(payment) = payment {
+            payment
+        } else {
+            deploy.payment().clone()
+        };
+        let account = if let Some(account) = account {
+            account
+        } else {
+            deploy.account().clone()
+        };
+        let mut deploy_builder = DeployBuilder::new(chain_name, session)
+            .with_account(account)
+            .with_payment(payment)
+            .with_ttl(ttl)
+            .with_timestamp(timestamp);
+
+        let secret_key_result = secret_key
+            .clone()
+            .map(|key| secret_key_from_pem(&key).unwrap())
+            .unwrap_or_else(|| {
+                if secret_key.is_some() {
+                    error("Error loading secret key");
+                }
+                // Default will never be used in next if secret_key.is_some()
+                SecretKey::generate_ed25519().unwrap()
+            });
+        if secret_key.is_some() {
+            deploy_builder = deploy_builder.with_secret_key(&secret_key_result);
+        }
+        let deploy = deploy_builder
+            .build()
+            .map_err(|err| error(&format!("Failed to build deploy: {:?}", err)))
+            .unwrap();
+
+        let deploy: Deploy = deploy.into();
+        let _ = deploy.validate_deploy_size();
+        deploy
+    }
+
     #[wasm_bindgen(constructor)]
     pub fn new(deploy: JsValue) -> Deploy {
         let deploy: _Deploy = deploy
@@ -36,7 +117,6 @@ impl Deploy {
                 deploy
             }
         };
-
         deploy.into()
     }
 
@@ -62,10 +142,13 @@ impl Deploy {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> Option<Deploy> {
+    ) -> Deploy {
         make_deploy(deploy_params, session_params, payment_params)
             .map(Into::into)
-            .ok()
+            .unwrap_or_else(|err| {
+                error(&format!("Error creating session deploy: {}", err));
+                Deploy::new(JsValue::null())
+            })
     }
 
     // static context
@@ -76,7 +159,7 @@ impl Deploy {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Option<Deploy> {
+    ) -> Deploy {
         make_transfer(
             amount,
             target_account,
@@ -85,7 +168,59 @@ impl Deploy {
             payment_params,
         )
         .map(Into::into)
-        .ok()
+        .unwrap_or_else(|err| {
+            error(&format!("Error creating transfer deploy: {}", err));
+            Deploy::new(JsValue::null())
+        })
+    }
+
+    #[wasm_bindgen(js_name = "withTTL")]
+    pub fn with_ttl(&self, ttl: &str, secret_key: Option<String>) -> Deploy {
+        let mut ttl = parse_ttl(ttl);
+        if let Err(err) = &ttl {
+            error(&format!("Error parsing TTL: {}", err));
+            ttl = parse_ttl(&get_ttl(None));
+        }
+        self.build(BuildParams {
+            secret_key,
+            chain_name: None,
+            ttl: Some(ttl.unwrap()),
+            timestamp: None,
+            session: None,
+            payment: None,
+            account: None,
+        })
+    }
+
+    #[wasm_bindgen(js_name = "withTimestamp")]
+    pub fn with_timestamp(&self, timestamp: &str, secret_key: Option<String>) -> Deploy {
+        let mut timestamp = parse_timestamp(timestamp);
+        if let Err(err) = &timestamp {
+            error(&format!("Error parsing Timestamp: {}", err));
+            timestamp = parse_timestamp(&get_current_timestamp(&None));
+        }
+        self.build(BuildParams {
+            secret_key,
+            chain_name: None,
+            ttl: None,
+            timestamp: Some(timestamp.unwrap()),
+            session: None,
+            payment: None,
+            account: None,
+        })
+    }
+
+    #[wasm_bindgen(js_name = "withChainName")]
+    pub fn with_chain_name(&self, chain_name: String, secret_key: Option<String>) -> Deploy {
+        self.build(BuildParams {
+            secret_key,
+            chain_name: Some(chain_name),
+            ttl: None,
+            timestamp: None,
+            session: None,
+            payment: None,
+            account: None,
+        })
     }
 
     #[wasm_bindgen(js_name = "validateDeploySize")]
@@ -128,7 +263,6 @@ impl Deploy {
     pub fn expired(&self) -> bool {
         let deploy: _Deploy = self.0.clone();
         let now: DateTime<Utc> = Utc::now();
-
         match deploy.expired(Timestamp::from(now.timestamp() as u64)) {
             true => true,
             false => {
@@ -163,7 +297,6 @@ impl Deploy {
                 return JsValue::null();
             }
         };
-
         match JsValue::from_serde(&footprint) {
             Ok(json) => json,
             Err(err) => {
@@ -183,7 +316,6 @@ impl Deploy {
                 return JsValue::null();
             }
         };
-
         match JsValue::from_serde(&compute_approvals_hash) {
             Ok(json) => json,
             Err(err) => {
@@ -205,34 +337,15 @@ impl Deploy {
         let new_args = insert_arg(&mut args, js_value_arg);
         let new_session = create_new_session(new_args, session);
 
-        let mut deploy_builder = DeployBuilder::new(deploy.chain_name(), new_session)
-            .with_account(deploy.account().clone())
-            .with_payment(deploy.payment().clone())
-            .with_ttl(deploy.ttl())
-            .with_timestamp(deploy.timestamp());
-
-        let secret_key_result = secret_key
-            .clone()
-            .map(|key| secret_key_from_pem(&key).unwrap())
-            .unwrap_or_else(|| {
-                if secret_key.is_some() {
-                    error("Error loading secret key");
-                }
-                // Default will never be used in next if secret_key.is_some()
-                SecretKey::generate_ed25519().unwrap()
-            });
-        if secret_key.is_some() {
-            deploy_builder = deploy_builder.with_secret_key(&secret_key_result);
-        }
-
-        let deploy = deploy_builder
-            .build()
-            .map_err(|err| error(&format!("Failed to build deploy: {:?}", err)))
-            .unwrap();
-
-        let deploy: Deploy = deploy.into();
-        let _ = deploy.validate_deploy_size();
-        deploy
+        self.build(BuildParams {
+            secret_key,
+            chain_name: None,
+            ttl: None,
+            timestamp: None,
+            session: Some(new_session),
+            payment: None,
+            account: None,
+        })
     }
 }
 

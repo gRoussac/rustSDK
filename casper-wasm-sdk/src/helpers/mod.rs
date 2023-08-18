@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::debug::error;
-use casper_client::cli::JsonArg;
-use casper_types::{DeployBuilder, ErrorExt, SecretKey};
+use casper_client::cli::{CliError, JsonArg};
+use casper_types::{DeployBuilder, ErrorExt, SecretKey, TimeDiff, Timestamp};
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -27,6 +29,23 @@ pub fn get_ttl(ttl: Option<String>) -> String {
     } else {
         DeployBuilder::DEFAULT_TTL.to_string()
     }
+}
+
+pub fn parse_timestamp(value: &str) -> Result<Timestamp, CliError> {
+    if value.is_empty() {
+        return Ok(Timestamp::now());
+    }
+    Timestamp::from_str(value).map_err(|error| CliError::FailedToParseTimestamp {
+        context: "timestamp",
+        error,
+    })
+}
+
+pub fn parse_ttl(value: &str) -> Result<TimeDiff, CliError> {
+    TimeDiff::from_str(value).map_err(|error| CliError::FailedToParseTimeDiff {
+        context: "ttl",
+        error,
+    })
 }
 
 pub fn get_gas_price(gas_price: Option<u64>) -> u64 {
