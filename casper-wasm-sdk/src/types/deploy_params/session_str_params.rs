@@ -23,8 +23,56 @@ pub struct SessionStrParams {
 #[wasm_bindgen]
 impl SessionStrParams {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> SessionStrParams {
-        SessionStrParams::default()
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        session_hash: Option<String>,
+        session_name: Option<String>,
+        session_package_hash: Option<String>,
+        session_package_name: Option<String>,
+        session_path: Option<String>,
+        session_args_simple: Option<Array>,
+        session_args_json: Option<String>,
+        session_args_complex: Option<String>,
+        session_version: Option<String>,
+        session_entry_point: Option<String>,
+        is_session_transfer: Option<bool>,
+    ) -> Self {
+        let mut session_params = SessionStrParams::default();
+        if let Some(session_hash) = session_hash {
+            session_params.set_session_hash(session_hash);
+        };
+        if let Some(session_name) = session_name {
+            session_params.set_session_name(session_name);
+        };
+        if let Some(session_package_hash) = session_package_hash {
+            session_params.set_session_package_hash(session_package_hash);
+        };
+        if let Some(session_package_name) = session_package_name {
+            session_params.set_session_package_name(session_package_name);
+        };
+        if let Some(session_path) = session_path {
+            session_params.set_session_path(session_path);
+        };
+        if let Some(session_args_simple) = session_args_simple {
+            session_params.set_session_args_simple(session_args_simple);
+        };
+        if let Some(session_args_json) = session_args_json {
+            session_params.set_session_args_json(session_args_json);
+        };
+        if let Some(session_args_complex) = session_args_complex {
+            session_params.set_session_args_complex(session_args_complex);
+        };
+        if let Some(session_version) = session_version {
+            session_params.set_session_version(session_version);
+        };
+        if let Some(session_entry_point) = session_entry_point {
+            session_params.set_session_entry_point(session_entry_point);
+        };
+        if let Some(is_session_transfer) = is_session_transfer {
+            session_params.set_is_session_transfer(is_session_transfer);
+        };
+
+        session_params
     }
 
     // Getter and setter for session_hash field
@@ -84,15 +132,17 @@ impl SessionStrParams {
 
     // Getter and setter for session_args_simple field
     #[wasm_bindgen(getter)]
-    pub fn session_args_simple(&self) -> Option<Array> {
-        let args_simple = self.session_args_simple.get()?;
-        let array: Array = args_simple.args().iter().map(JsValue::from).collect();
-        Some(array)
+    pub fn session_args_simple(&self) -> Option<ArgsSimple> {
+        self.session_args_simple.get().cloned()
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_args_simple(&self, session_args_simple: Array) {
-        let args_simple: ArgsSimple = session_args_simple.into_iter().collect();
+    pub fn set_session_args_simple(&mut self, session_args_simple: Array) {
+        let args: Vec<String> = session_args_simple
+            .iter()
+            .map(|value| value.as_string().unwrap_or_default())
+            .collect();
+        let args_simple = ArgsSimple::from(args);
         self.session_args_simple.set(args_simple).unwrap();
     }
 

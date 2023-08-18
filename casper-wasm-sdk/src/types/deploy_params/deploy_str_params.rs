@@ -27,13 +27,15 @@ impl DeployStrParams {
     ) -> Self {
         let current_timestamp = get_current_timestamp(&timestamp);
         let ttl = get_ttl(ttl);
-        DeployStrParams {
-            secret_key: OnceCell::from(secret_key.unwrap_or_default()),
-            timestamp: OnceCell::from(current_timestamp),
-            ttl: OnceCell::from(ttl),
-            chain_name: OnceCell::from(chain_name),
-            session_account: OnceCell::from(session_account),
-        }
+        let deploy_params = DeployStrParams::default();
+        deploy_params.set_chain_name(chain_name);
+        deploy_params.set_session_account(session_account);
+        if let Some(secret_key) = secret_key {
+            deploy_params.set_secret_key(secret_key);
+        };
+        deploy_params.set_timestamp(current_timestamp);
+        deploy_params.set_ttl(ttl);
+        deploy_params
     }
 
     // Getter and setter for secret_key field
