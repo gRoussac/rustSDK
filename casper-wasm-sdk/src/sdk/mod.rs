@@ -1,11 +1,12 @@
-use wasm_bindgen::prelude::*;
 pub mod rpcs;
 
 pub(crate) mod deploy;
 pub use deploy::*;
 
 pub(crate) mod deploy_utils;
-pub use deploy_utils::*;
+pub(crate) use deploy_utils::*;
+
+pub use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct SDK {}
