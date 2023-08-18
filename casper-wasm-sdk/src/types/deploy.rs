@@ -1,6 +1,9 @@
-use super::deploy_params::{
-    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-    session_str_params::SessionStrParams,
+use super::{
+    deploy_params::{
+        deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+        session_str_params::SessionStrParams,
+    },
+    public_key::PublicKey,
 };
 use crate::{
     debug::error,
@@ -11,8 +14,8 @@ use crate::{
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
-    ContractIdentifier, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, PublicKey,
-    RuntimeArgs, SecretKey, TimeDiff, Timestamp,
+    bytesrepr::Bytes, ContractHash, ContractPackageHash, Deploy as _Deploy, DeployBuilder,
+    ExecutableDeployItem, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -22,6 +25,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct Deploy(_Deploy);
 
+#[derive(Default)]
 struct BuildParams {
     secret_key: Option<String>,
     chain_name: Option<String>,
@@ -73,10 +77,10 @@ impl Deploy {
         let account = if let Some(account) = account {
             account
         } else {
-            deploy.account().clone()
+            deploy.account().clone().into()
         };
         let mut deploy_builder = DeployBuilder::new(chain_name, session)
-            .with_account(account)
+            .with_account(account.into())
             .with_payment(payment)
             .with_ttl(ttl)
             .with_timestamp(timestamp);
@@ -137,7 +141,7 @@ impl Deploy {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "withSession")]
+    #[wasm_bindgen(js_name = "withPaymentAndSession")]
     pub fn with_payment_and_session(
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -183,12 +187,8 @@ impl Deploy {
         }
         self.build(BuildParams {
             secret_key,
-            chain_name: None,
             ttl: Some(ttl.unwrap()),
-            timestamp: None,
-            session: None,
-            payment: None,
-            account: None,
+            ..Default::default()
         })
     }
 
@@ -201,27 +201,98 @@ impl Deploy {
         }
         self.build(BuildParams {
             secret_key,
-            chain_name: None,
-            ttl: None,
             timestamp: Some(timestamp.unwrap()),
-            session: None,
-            payment: None,
-            account: None,
+            ..Default::default()
         })
     }
 
     #[wasm_bindgen(js_name = "withChainName")]
-    pub fn with_chain_name(&self, chain_name: String, secret_key: Option<String>) -> Deploy {
+    pub fn with_chain_name(&self, chain_name: &str, secret_key: Option<String>) -> Deploy {
         self.build(BuildParams {
             secret_key,
-            chain_name: Some(chain_name),
-            ttl: None,
-            timestamp: None,
-            session: None,
-            payment: None,
-            account: None,
+            chain_name: Some(chain_name.to_string()),
+            ..Default::default()
         })
     }
+
+    #[wasm_bindgen(js_name = "withAccount")]
+    pub fn with_account(&self, account: PublicKey, secret_key: Option<String>) -> Deploy {
+        self.build(BuildParams {
+            secret_key,
+            account: account.into(),
+            ..Default::default()
+        })
+    }
+
+    #[wasm_bindgen(js_name = "withEntryPoint")]
+    pub fn with_entrypoint(&self, entrypoint: &str, secret_key: Option<String>) -> Deploy {
+        let deploy = self.0.clone();
+        let session = deploy.session();
+
+        let new_session = modify_session(
+            session,
+            NewSessionParams {
+                new_entry_point: Some(entrypoint.to_string()),
+                ..Default::default()
+            },
+        );
+
+        self.build(BuildParams {
+            secret_key,
+            session: Some(new_session),
+            ..Default::default()
+        })
+    }
+
+    #[wasm_bindgen(js_name = "withSecretKey")]
+    pub fn with_secret_key(&self, secret_key: Option<String>) -> Deploy {
+        self.build(BuildParams {
+            secret_key,
+            ..Default::default()
+        })
+    }
+
+    #[wasm_bindgen(js_name = "withStandardPayment")]
+    pub fn with_standard_payment(&self, amount: &str, secret_key: Option<String>) -> Deploy {
+        let deploy: _Deploy = self.0.clone();
+        let cloned_amount = amount.to_string();
+        let amount = U512::from_dec_str(&cloned_amount);
+        if let Err(err) = amount {
+            error(&format!("Error converting amount: {:?}", err));
+            return deploy.into();
+        }
+        self.build(BuildParams {
+            secret_key,
+            payment: Some(ExecutableDeployItem::new_standard_payment(amount.unwrap())),
+            ..Default::default()
+        })
+    }
+
+    // #[wasm_bindgen(js_name = "withPayment")]
+    // pub fn with_payment(
+    //     &self,
+    //     payment: ExecutableDeployItem,
+    //     secret_key: Option<String>,
+    // ) -> Deploy {
+    //     self.build(BuildParams {
+    //         secret_key,
+    //         payment: Some(payment),
+    //         ..Default::default()
+    //     })
+    // }
+
+    // #[wasm_bindgen(js_name = "withSession")]
+    // pub fn with_session(
+    //     &self,
+    //     session: ExecutableDeployItem,
+    //     secret_key: Option<String>,
+    // ) -> Deploy {
+    //     self.build(BuildParams {
+    //         secret_key,
+    //         session: Some(session),
+    //         ..Default::default()
+    //     })
+    // }
 
     #[wasm_bindgen(js_name = "validateDeploySize")]
     pub fn validate_deploy_size(&self) -> bool {
@@ -335,85 +406,94 @@ impl Deploy {
 
         let mut args = session.args().clone();
         let new_args = insert_arg(&mut args, js_value_arg);
-        let new_session = create_new_session(new_args, session);
+        let new_session = modify_session(
+            session,
+            NewSessionParams {
+                new_args: Some(new_args),
+                ..Default::default()
+            },
+        );
 
         self.build(BuildParams {
             secret_key,
-            chain_name: None,
-            ttl: None,
-            timestamp: None,
             session: Some(new_session),
-            payment: None,
-            account: None,
+            ..Default::default()
         })
     }
 }
 
-fn create_new_session(
-    new_args: &RuntimeArgs,
+#[derive(Default)]
+struct NewSessionParams<'a> {
+    new_args: Option<&'a RuntimeArgs>,
+    new_hash: Option<ContractHash>,
+    new_package_hash: Option<ContractPackageHash>,
+    new_entry_point: Option<String>,
+    new_name: Option<String>,
+    new_version: Option<u32>,
+    new_module_bytes: Option<&'a Bytes>,
+}
+
+fn modify_session(
     session: &ExecutableDeployItem,
+    NewSessionParams {
+        new_args,
+        new_hash,
+        new_package_hash,
+        new_entry_point,
+        new_name,
+        new_version,
+        new_module_bytes,
+    }: NewSessionParams,
 ) -> ExecutableDeployItem {
-    match session.contract_identifier() {
-        Some(ContractIdentifier::Hash(hash)) => ExecutableDeployItem::StoredContractByHash {
-            hash,
-            entry_point: session.entry_point_name().to_string(),
-            args: new_args.clone(),
-        },
-        Some(ContractIdentifier::Name(name)) => ExecutableDeployItem::StoredContractByName {
-            name: name.clone(),
-            entry_point: session.entry_point_name().to_string(),
-            args: new_args.clone(),
-        },
-        None => match session {
-            ExecutableDeployItem::ModuleBytes { module_bytes, .. } => {
-                ExecutableDeployItem::ModuleBytes {
-                    module_bytes: module_bytes.clone(),
-                    args: new_args.clone(),
-                }
+    match session {
+        ExecutableDeployItem::ModuleBytes { module_bytes, args } => {
+            ExecutableDeployItem::ModuleBytes {
+                module_bytes: new_module_bytes.cloned().unwrap_or(module_bytes.clone()),
+                args: new_args.cloned().unwrap_or_else(|| args.clone()),
             }
-            ExecutableDeployItem::StoredContractByHash {
-                hash,
-                entry_point,
-                args: _,
-            } => ExecutableDeployItem::StoredContractByHash {
-                hash: *hash,
-                entry_point: entry_point.clone(),
-                args: new_args.clone(),
-            },
-            ExecutableDeployItem::StoredContractByName {
-                name,
-                entry_point,
-                args: _,
-            } => ExecutableDeployItem::StoredContractByName {
-                name: name.clone(),
-                entry_point: entry_point.clone(),
-                args: new_args.clone(),
-            },
-            ExecutableDeployItem::StoredVersionedContractByHash {
-                hash,
-                version,
-                entry_point,
-                args: _,
-            } => ExecutableDeployItem::StoredVersionedContractByHash {
-                hash: *hash,
-                version: *version,
-                entry_point: entry_point.clone(),
-                args: new_args.clone(),
-            },
-            ExecutableDeployItem::StoredVersionedContractByName {
-                name,
-                version,
-                entry_point,
-                args: _,
-            } => ExecutableDeployItem::StoredVersionedContractByName {
-                name: name.clone(),
-                version: *version,
-                entry_point: entry_point.clone(),
-                args: new_args.clone(),
-            },
-            ExecutableDeployItem::Transfer { .. } => ExecutableDeployItem::Transfer {
-                args: new_args.clone(),
-            },
+        }
+        ExecutableDeployItem::StoredContractByHash {
+            hash,
+            entry_point,
+            args,
+        } => ExecutableDeployItem::StoredContractByHash {
+            hash: new_hash.unwrap_or(*hash),
+            entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
+            args: new_args.cloned().unwrap_or_else(|| args.clone()),
+        },
+        ExecutableDeployItem::StoredContractByName {
+            name,
+            entry_point,
+            args,
+        } => ExecutableDeployItem::StoredContractByName {
+            name: new_name.unwrap_or_else(|| name.clone()),
+            entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
+            args: new_args.cloned().unwrap_or_else(|| args.clone()),
+        },
+        ExecutableDeployItem::StoredVersionedContractByHash {
+            hash,
+            version,
+            entry_point,
+            args,
+        } => ExecutableDeployItem::StoredVersionedContractByHash {
+            hash: new_package_hash.unwrap_or(*hash),
+            version: Some(new_version.unwrap_or(version.unwrap())),
+            entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
+            args: new_args.cloned().unwrap_or_else(|| args.clone()),
+        },
+        ExecutableDeployItem::StoredVersionedContractByName {
+            name,
+            version,
+            entry_point,
+            args,
+        } => ExecutableDeployItem::StoredVersionedContractByName {
+            name: new_name.unwrap_or_else(|| name.clone()),
+            version: Some(new_version.unwrap_or(version.unwrap())),
+            entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
+            args: new_args.cloned().unwrap_or_else(|| args.clone()),
+        },
+        ExecutableDeployItem::Transfer { args } => ExecutableDeployItem::Transfer {
+            args: new_args.cloned().unwrap_or_else(|| args.clone()),
         },
     }
 }
