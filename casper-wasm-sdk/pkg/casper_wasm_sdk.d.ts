@@ -361,7 +361,7 @@ export class Deploy {
 * @param {PaymentStrParams} payment_params
 * @returns {Deploy}
 */
-  static withSession(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
+  static withPaymentAndSession(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
 /**
 * @param {string} amount
 * @param {string} target_account
@@ -389,6 +389,29 @@ export class Deploy {
 * @returns {Deploy}
 */
   withChainName(chain_name: string, secret_key?: string): Deploy;
+/**
+* @param {PublicKey} account
+* @param {string | undefined} secret_key
+* @returns {Deploy}
+*/
+  withAccount(account: PublicKey, secret_key?: string): Deploy;
+/**
+* @param {string} entrypoint
+* @param {string | undefined} secret_key
+* @returns {Deploy}
+*/
+  withEntryPoint(entrypoint: string, secret_key?: string): Deploy;
+/**
+* @param {string | undefined} secret_key
+* @returns {Deploy}
+*/
+  withSecretKey(secret_key?: string): Deploy;
+/**
+* @param {string} amount
+* @param {string | undefined} secret_key
+* @returns {Deploy}
+*/
+  withStandardPayment(amount: string, secret_key?: string): Deploy;
 /**
 * @returns {boolean}
 */
@@ -1017,15 +1040,15 @@ export class SDK {
 */
   account_put_deploy(node_address: string, verbosity: number, deploy: Deploy): Promise<any>;
 /**
+*/
+  constructor();
+/**
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
 * @returns {any}
 */
   make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): any;
-/**
-*/
-  constructor();
 }
 /**
 */
@@ -1147,22 +1170,6 @@ export interface InitOutput {
   readonly cltype_Tuple3: () => number;
   readonly cltype_Any: () => number;
   readonly cltype_new: (a: number) => number;
-  readonly __wbg_deploy_free: (a: number) => void;
-  readonly deploy_new: (a: number) => number;
-  readonly deploy_toJson: (a: number) => number;
-  readonly deploy_withSession: (a: number, b: number, c: number) => number;
-  readonly deploy_withTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
-  readonly deploy_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_withChainName: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly deploy_validateDeploySize: (a: number) => number;
-  readonly deploy_isValid: (a: number) => number;
-  readonly deploy_hasValidHash: (a: number) => number;
-  readonly deploy_isExpired: (a: number) => number;
-  readonly deploy_sign: (a: number, b: number, c: number) => number;
-  readonly deploy_footprint: (a: number) => number;
-  readonly deploy_approvalsHash: (a: number) => number;
-  readonly deploy_addArg: (a: number, b: number, c: number, d: number) => number;
   readonly __wbg_eraid_free: (a: number) => void;
   readonly eraid_new: (a: number) => number;
   readonly eraid_value: (a: number) => number;
@@ -1262,6 +1269,10 @@ export interface InitOutput {
   readonly __wbg_hashaddr_free: (a: number) => void;
   readonly __wbg_urefaddr_free: (a: number) => void;
   readonly urefaddr_new: (a: number, b: number, c: number) => void;
+  readonly __wbg_blockidentifier_free: (a: number) => void;
+  readonly blockidentifier_new: (a: number) => number;
+  readonly blockidentifier_from_hash: (a: number) => number;
+  readonly blockidentifier_fromHeight: (a: number) => number;
   readonly __wbg_paymentstrparams_free: (a: number) => void;
   readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number, t: number, u: number) => number;
   readonly paymentstrparams_payment_amount: (a: number, b: number) => void;
@@ -1310,10 +1321,6 @@ export interface InitOutput {
   readonly sessionstrparams_session_args_complex: (a: number, b: number) => void;
   readonly sessionstrparams_session_version: (a: number, b: number) => void;
   readonly sessionstrparams_session_entry_point: (a: number, b: number) => void;
-  readonly __wbg_blockidentifier_free: (a: number) => void;
-  readonly blockidentifier_new: (a: number) => number;
-  readonly blockidentifier_from_hash: (a: number) => number;
-  readonly blockidentifier_fromHeight: (a: number) => number;
   readonly __wbg_bytes_free: (a: number) => void;
   readonly bytes_new: () => number;
   readonly bytes_len: (a: number) => number;
@@ -1323,6 +1330,26 @@ export interface InitOutput {
   readonly bytes_asSlice: (a: number) => number;
   readonly bytes_fromSlice: (a: number, b: number) => number;
   readonly bytes_iter: (a: number) => number;
+  readonly __wbg_deploy_free: (a: number) => void;
+  readonly deploy_new: (a: number) => number;
+  readonly deploy_toJson: (a: number) => number;
+  readonly deploy_withPaymentAndSession: (a: number, b: number, c: number) => number;
+  readonly deploy_withTransfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
+  readonly deploy_withTTL: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withTimestamp: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withChainName: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withAccount: (a: number, b: number, c: number, d: number) => number;
+  readonly deploy_withEntryPoint: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_withSecretKey: (a: number, b: number, c: number) => number;
+  readonly deploy_withStandardPayment: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly deploy_validateDeploySize: (a: number) => number;
+  readonly deploy_isValid: (a: number) => number;
+  readonly deploy_hasValidHash: (a: number) => number;
+  readonly deploy_isExpired: (a: number) => number;
+  readonly deploy_sign: (a: number, b: number, c: number) => number;
+  readonly deploy_footprint: (a: number) => number;
+  readonly deploy_approvalsHash: (a: number) => number;
+  readonly deploy_addArg: (a: number, b: number, c: number, d: number) => number;
   readonly __wbg_deploystrparams_free: (a: number) => void;
   readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly deploystrparams_secret_key: (a: number, b: number) => void;
@@ -1341,24 +1368,24 @@ export interface InitOutput {
   readonly dictionaryitemstrparams_set_contract_named_key: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly dictionaryitemstrparams_set_uref: (a: number, b: number, c: number, d: number) => void;
   readonly dictionaryitemstrparams_set_dictionary: (a: number, b: number, c: number) => void;
-  readonly __wbg_dictionaryitemidentifier_free: (a: number) => void;
-  readonly dictionaryitemidentifier_new_from_account_info: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly dictionaryitemidentifier_new_from_contract_info: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly dictionaryitemidentifier_new_from_seed_uref: (a: number, b: number, c: number) => number;
   readonly __wbg_uref_free: (a: number) => void;
   readonly uref_new: (a: number, b: number, c: number, d: number) => void;
   readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
-  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_new: () => number;
   readonly __wbg_sdk_free: (a: number) => void;
   readonly bytes_innerBytes: (a: number) => number;
   readonly __wbg_argssimple_free: (a: number) => void;
+  readonly __wbg_dictionaryitemidentifier_free: (a: number) => void;
+  readonly dictionaryitemidentifier_new_from_account_info: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly dictionaryitemidentifier_new_from_contract_info: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly dictionaryitemidentifier_new_from_seed_uref: (a: number, b: number, c: number) => number;
   readonly __wbg_digest_free: (a: number) => void;
   readonly digest_new: (a: number, b: number, c: number) => void;
   readonly digest_fromDigest: (a: number, b: number, c: number) => void;
   readonly __wbg_publickey_free: (a: number) => void;
   readonly publickey_new: (a: number, b: number, c: number) => void;
   readonly publickey_fromUint8Array: (a: number, b: number) => number;
+  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly hexToUint8Array: (a: number, b: number, c: number) => void;
   readonly jsonPrettyPrint: (a: number, b: number) => number;
   readonly privateToPublicKey: (a: number, b: number) => number;
