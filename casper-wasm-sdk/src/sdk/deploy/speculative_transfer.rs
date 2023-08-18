@@ -1,8 +1,7 @@
 #[cfg(target_arch = "wasm32")]
-#[cfg(target_arch = "wasm32")]
+use crate::helpers::serialize_result;
 use crate::{
     debug::{error, log},
-    helpers::serialize_result,
     types::{
         block_identifier::BlockIdentifier,
         deploy_params::{
@@ -13,9 +12,11 @@ use crate::{
     },
     SDK,
 };
-#[cfg(target_arch = "wasm32")]
-use casper_client::cli::make_transfer;
-#[cfg(target_arch = "wasm32")]
+use casper_client::{
+    cli::{make_transfer, CliError},
+    rpcs::results::SpeculativeExecResult,
+    SuccessResponse,
+};
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -24,8 +25,8 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 impl SDK {
     #[allow(clippy::too_many_arguments)]
-    #[wasm_bindgen]
-    pub async fn speculative_transfer(
+    #[wasm_bindgen(js_name = "speculative_transfer")]
+    pub async fn speculative_transfer_js_alias(
         &mut self,
         maybe_block_id: Option<BlockIdentifier>,
         node_address: &str,
@@ -35,8 +36,35 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
+        serialize_result(
+            self.speculative_transfer(
+                maybe_block_id,
+                node_address,
+                verbosity,
+                amount,
+                target_account,
+                deploy_params,
+                payment_params,
+            )
+            .await,
+        )
+    }
+}
+
+impl SDK {
+    #[allow(clippy::too_many_arguments)]
+    pub async fn speculative_transfer(
+        &mut self,
+        maybe_block_id: Option<BlockIdentifier>,
+        node_address: &str,
+        verbosity: Verbosity,
+        amount: &str,
+        target_account: &str,
+        deploy_params: DeployStrParams,
+        payment_params: PaymentStrParams,
+    ) -> Result<SuccessResponse<SpeculativeExecResult>, CliError> {
         log("speculative_transfer!");
-        match make_transfer(
+        let deploy = make_transfer(
             "",
             amount,
             target_account,
@@ -44,15 +72,21 @@ impl SDK {
             deploy_str_params_to_casper_client(&deploy_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        ) {
-            Ok(deploy) => serialize_result(
-                self.speculative_exec(node_address, maybe_block_id, verbosity, deploy.into())
-                    .await,
-            ),
-            Err(err) => {
-                error(&format!("Error during speculative_transfer: {}", err));
-                JsValue::null()
-            }
+        );
+
+        if let Err(err) = deploy {
+            let err_msg = format!("Error during speculative_transfer: {}", err);
+            error(&err_msg);
+            return Err(err);
         }
+
+        self.speculative_exec(
+            node_address,
+            maybe_block_id,
+            verbosity,
+            deploy.unwrap().into(),
+        )
+        .await
+        .map_err(CliError::Core)
     }
 }

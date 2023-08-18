@@ -1,7 +1,7 @@
 #[cfg(target_arch = "wasm32")]
+use crate::helpers::serialize_result;
 use crate::{
     debug::{error, log},
-    helpers::serialize_result,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -12,16 +12,19 @@ use crate::{
     },
     SDK,
 };
-#[cfg(target_arch = "wasm32")]
-use casper_client::cli::make_deploy;
+use casper_client::{
+    cli::{make_deploy, CliError},
+    rpcs::results::PutDeployResult,
+    SuccessResponse,
+};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen]
-    pub async fn deploy(
+    #[wasm_bindgen(js_name = "deploy")]
+    pub async fn deploy_js_alias(
         &mut self,
         node_address: &str,
         verbosity: Verbosity,
@@ -29,22 +32,45 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
+        serialize_result(
+            self.deploy(
+                node_address,
+                verbosity,
+                deploy_params,
+                session_params,
+                payment_params,
+            )
+            .await,
+        )
+    }
+}
+
+impl SDK {
+    pub async fn deploy(
+        &mut self,
+        node_address: &str,
+        verbosity: Verbosity,
+        deploy_params: DeployStrParams,
+        session_params: SessionStrParams,
+        payment_params: PaymentStrParams,
+    ) -> Result<SuccessResponse<PutDeployResult>, CliError> {
         log("deploy!");
-        match make_deploy(
+        let deploy = make_deploy(
             "",
             deploy_str_params_to_casper_client(&deploy_params),
             session_str_params_to_casper_client(&session_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        ) {
-            Ok(deploy) => serialize_result(
-                self.put_deploy(node_address, verbosity, deploy.into())
-                    .await,
-            ),
-            Err(err) => {
-                error(&format!("Error during deploy: {}", err));
-                JsValue::null()
-            }
+        );
+
+        if let Err(err) = deploy {
+            let err_msg = format!("Error during deploy: {}", err);
+            error(&err_msg);
+            return Err(err);
         }
+
+        self.put_deploy(node_address, verbosity, deploy.unwrap().into())
+            .await
+            .map_err(CliError::Core)
     }
 }

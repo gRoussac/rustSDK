@@ -8,7 +8,7 @@ use casper_wasm_sdk::{
 #[tokio::main]
 async fn main() {
     println!("Bye world!");
-    let sdk = SDK::new();
+    let mut sdk = SDK::new();
     let peers = sdk
         .get_peers("https://rpc.integration.casperlabs.io", Verbosity::Low)
         .await;
