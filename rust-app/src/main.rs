@@ -55,10 +55,4 @@ async fn main() {
 
     // let test_deploy: Result<Deploy, SdkError> =
     //     sdk.make_deploy(deploy_params, session_params, payment_params);
-    let test = sdk
-        .get_dictionary_item_test(
-            "386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530",
-        )
-        .await;
-    dbg!(test);
 }
