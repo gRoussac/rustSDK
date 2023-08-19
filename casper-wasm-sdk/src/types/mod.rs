@@ -17,5 +17,6 @@ pub mod key;
 pub mod path;
 pub mod public_key;
 pub mod purse_identifier;
+pub mod sdk_error;
 pub mod uref;
 pub mod verbosity;

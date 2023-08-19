@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use crate::debug::error;
+use crate::types::sdk_error::SdkError;
 use casper_client::cli::{CliError, JsonArg};
 use casper_types::{DeployBuilder, ErrorExt, SecretKey, TimeDiff, Timestamp};
 use casper_types::{NamedArg, RuntimeArgs};
@@ -31,18 +32,18 @@ pub fn get_ttl(ttl: Option<String>) -> String {
     }
 }
 
-pub fn parse_timestamp(value: &str) -> Result<Timestamp, CliError> {
+pub fn parse_timestamp(value: &str) -> Result<Timestamp, SdkError> {
     if value.is_empty() {
         return Ok(Timestamp::now());
     }
-    Timestamp::from_str(value).map_err(|error| CliError::FailedToParseTimestamp {
+    Timestamp::from_str(value).map_err(|error| SdkError::FailedToParseTimestamp {
         context: "timestamp",
         error,
     })
 }
 
-pub fn parse_ttl(value: &str) -> Result<TimeDiff, CliError> {
-    TimeDiff::from_str(value).map_err(|error| CliError::FailedToParseTimeDiff {
+pub fn parse_ttl(value: &str) -> Result<TimeDiff, SdkError> {
+    TimeDiff::from_str(value).map_err(|error| SdkError::FailedToParseTimeDiff {
         context: "ttl",
         error,
     })

@@ -7,6 +7,7 @@ use casper_wasm_sdk::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
         },
+        sdk_error::SdkError,
         verbosity::Verbosity,
     },
     SDK,
@@ -50,8 +51,7 @@ async fn main() {
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount("5500000000");
 
-    let test_deploy: Deploy = sdk
-        .make_deploy(deploy_params, session_params, payment_params)
-        .unwrap();
+    let test_deploy: Result<Deploy, SdkError> =
+        sdk.make_deploy(deploy_params, session_params, payment_params);
     dbg!(test_deploy);
 }
