@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_arch = "wasm32-unknown-unknown")]
 use crate::helpers::serialize_result;
 use crate::{
     types::deploy_params::{
@@ -10,10 +10,10 @@ use crate::{
 };
 use casper_client::cli::{make_deploy as client_make_deploy, CliError};
 use casper_types::Deploy;
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_arch = "wasm32-unknown-unknown")]
 use wasm_bindgen::prelude::*;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_arch = "wasm32-unknown-unknown")]
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(js_name = "make_deploy")]

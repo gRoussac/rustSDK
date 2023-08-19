@@ -37,39 +37,39 @@ impl PaymentStrParams {
         payment_version: Option<String>,
         payment_entry_point: Option<String>,
     ) -> Self {
-        let mut payment_params = PaymentStrParams::default();
+        let payment_params = PaymentStrParams::default();
         if let Some(payment_amount) = payment_amount {
-            payment_params.set_payment_amount(payment_amount);
+            payment_params.set_payment_amount(&payment_amount);
         };
         if let Some(payment_hash) = payment_hash {
-            payment_params.set_payment_hash(payment_hash);
+            payment_params.set_payment_hash(&payment_hash);
         };
         if let Some(payment_name) = payment_name {
-            payment_params.set_payment_name(payment_name);
+            payment_params.set_payment_name(&payment_name);
         };
         if let Some(payment_package_hash) = payment_package_hash {
-            payment_params.set_payment_package_hash(payment_package_hash);
+            payment_params.set_payment_package_hash(&payment_package_hash);
         };
         if let Some(payment_package_name) = payment_package_name {
-            payment_params.set_payment_package_name(payment_package_name);
+            payment_params.set_payment_package_name(&payment_package_name);
         };
         if let Some(payment_path) = payment_path {
-            payment_params.set_payment_path(payment_path);
+            payment_params.set_payment_path(&payment_path);
         };
         if let Some(payment_args_simple) = payment_args_simple {
             payment_params.set_payment_args_simple(payment_args_simple);
         };
         if let Some(payment_args_json) = payment_args_json {
-            payment_params.set_payment_args_json(payment_args_json);
+            payment_params.set_payment_args_json(&payment_args_json);
         };
         if let Some(payment_args_complex) = payment_args_complex {
-            payment_params.set_payment_args_complex(payment_args_complex);
+            payment_params.set_payment_args_complex(&payment_args_complex);
         };
         if let Some(payment_version) = payment_version {
-            payment_params.set_payment_version(payment_version);
+            payment_params.set_payment_version(&payment_version);
         };
         if let Some(payment_entry_point) = payment_entry_point {
-            payment_params.set_payment_entry_point(payment_entry_point);
+            payment_params.set_payment_entry_point(&payment_entry_point);
         };
 
         payment_params
@@ -81,8 +81,8 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_amount(&self, payment_amount: String) {
-        self.payment_amount.set(payment_amount).unwrap();
+    pub fn set_payment_amount(&self, payment_amount: &str) {
+        self.payment_amount.set(payment_amount.to_string()).unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -91,8 +91,8 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_hash(&self, payment_hash: String) {
-        self.payment_hash.set(payment_hash).unwrap();
+    pub fn set_payment_hash(&self, payment_hash: &str) {
+        self.payment_hash.set(payment_hash.to_string()).unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -101,8 +101,8 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_name(&self, payment_name: String) {
-        self.payment_name.set(payment_name).unwrap();
+    pub fn set_payment_name(&self, payment_name: &str) {
+        self.payment_name.set(payment_name.to_string()).unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -111,8 +111,10 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_package_hash(&self, payment_package_hash: String) {
-        self.payment_package_hash.set(payment_package_hash).unwrap();
+    pub fn set_payment_package_hash(&self, payment_package_hash: &str) {
+        self.payment_package_hash
+            .set(payment_package_hash.to_string())
+            .unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -121,8 +123,10 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_package_name(&self, payment_package_name: String) {
-        self.payment_package_name.set(payment_package_name).unwrap();
+    pub fn set_payment_package_name(&self, payment_package_name: &str) {
+        self.payment_package_name
+            .set(payment_package_name.to_string())
+            .unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -131,8 +135,8 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_path(&self, payment_path: String) {
-        self.payment_path.set(payment_path).unwrap();
+    pub fn set_payment_path(&self, payment_path: &str) {
+        self.payment_path.set(payment_path.to_string()).unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -154,8 +158,10 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_args_json(&self, payment_args_json: String) {
-        self.payment_args_json.set(payment_args_json).unwrap();
+    pub fn set_payment_args_json(&self, payment_args_json: &str) {
+        self.payment_args_json
+            .set(payment_args_json.to_string())
+            .unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -164,8 +170,10 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_args_complex(&self, payment_args_complex: String) {
-        self.payment_args_complex.set(payment_args_complex).unwrap();
+    pub fn set_payment_args_complex(&self, payment_args_complex: &str) {
+        self.payment_args_complex
+            .set(payment_args_complex.to_string())
+            .unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -174,8 +182,10 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_version(&self, payment_version: String) {
-        self.payment_version.set(payment_version).unwrap();
+    pub fn set_payment_version(&self, payment_version: &str) {
+        self.payment_version
+            .set(payment_version.to_string())
+            .unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -184,8 +194,10 @@ impl PaymentStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_payment_entry_point(&self, payment_entry_point: String) {
-        self.payment_entry_point.set(payment_entry_point).unwrap();
+    pub fn set_payment_entry_point(&self, payment_entry_point: &str) {
+        self.payment_entry_point
+            .set(payment_entry_point.to_string())
+            .unwrap();
     }
 }
 
