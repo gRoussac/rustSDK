@@ -887,6 +887,26 @@ export class PurseIdentifier {
 export class SDK {
   free(): void;
 /**
+* @param {string} node_address
+* @param {string | undefined} state_root_hash
+* @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
+* @param {DictionaryItemStrParams | undefined} dictionary_item_params
+* @param {number | undefined} verbosity
+* @param {Digest | undefined} state_root_hash_digest
+* @returns {Promise<any>}
+*/
+  get_dictionary_item(node_address: string, state_root_hash?: string, dictionary_item_identifier?: DictionaryItemIdentifier, dictionary_item_params?: DictionaryItemStrParams, verbosity?: number, state_root_hash_digest?: Digest): Promise<any>;
+/**
+* @param {string} node_address
+* @param {string | undefined} state_root_hash
+* @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
+* @param {DictionaryItemStrParams | undefined} dictionary_item_params
+* @param {number | undefined} verbosity
+* @param {Digest | undefined} state_root_hash_digest
+* @returns {Promise<any>}
+*/
+  state_get_dictionary_item(node_address: string, state_root_hash?: string, dictionary_item_identifier?: DictionaryItemIdentifier, dictionary_item_params?: DictionaryItemStrParams, verbosity?: number, state_root_hash_digest?: Digest): Promise<any>;
+/**
 * @param {BlockIdentifier | undefined} maybe_block_id
 * @param {string} node_address
 * @param {number} verbosity
@@ -906,24 +926,6 @@ export class SDK {
 * @returns {any}
 */
   make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): any;
-/**
-* @param {string} node_address
-* @param {Digest} state_root_hash
-* @param {number | undefined} verbosity
-* @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
-* @param {DictionaryItemStrParams | undefined} dictionary_item_params
-* @returns {Promise<any>}
-*/
-  get_dictionary_item(node_address: string, state_root_hash: Digest, verbosity?: number, dictionary_item_identifier?: DictionaryItemIdentifier, dictionary_item_params?: DictionaryItemStrParams): Promise<any>;
-/**
-* @param {string} node_address
-* @param {Digest} state_root_hash
-* @param {number | undefined} verbosity
-* @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
-* @param {DictionaryItemStrParams | undefined} dictionary_item_params
-* @returns {Promise<any>}
-*/
-  state_get_dictionary_item(node_address: string, state_root_hash: Digest, verbosity?: number, dictionary_item_identifier?: DictionaryItemIdentifier, dictionary_item_params?: DictionaryItemStrParams): Promise<any>;
 /**
 * @param {string} node_address
 * @param {number} verbosity
@@ -1236,6 +1238,8 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_bytes_free: (a: number) => void;
   readonly bytes_new: () => number;
+  readonly sdk_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
+  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
   readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => number;
   readonly transferaddr_new: (a: number, b: number, c: number) => void;
   readonly fromTransfer: (a: number, b: number) => number;
@@ -1332,8 +1336,6 @@ export interface InitOutput {
   readonly dictionaryitemidentifier_newFromSeedUref: (a: number, b: number, c: number) => number;
   readonly __wbg_path_free: (a: number) => void;
   readonly path_new: (a: number) => number;
-  readonly sdk_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly log: (a: number, b: number) => void;
   readonly error: (a: number, b: number) => void;

@@ -22,6 +22,10 @@ use casper_client::{
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::{
+    convert::{FromWasmAbi, IntoWasmAbi},
+    describe::WasmDescribe,
+};
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
@@ -30,10 +34,11 @@ impl SDK {
     pub async fn get_dictionary_item_js_alias(
         &mut self,
         node_address: &str,
-        state_root_hash: Digest,
-        verbosity: Option<Verbosity>,
+        state_root_hash: Option<String>,
         dictionary_item_identifier: Option<DictionaryItemIdentifier>,
         dictionary_item_params: Option<DictionaryItemStrParams>,
+        verbosity: Option<Verbosity>,
+        state_root_hash_digest: Option<Digest>,
     ) -> JsValue {
         let dictionary_item = if let Some(identifier) = dictionary_item_identifier {
             DictionaryItemInput::Identifier(identifier)
@@ -44,10 +49,19 @@ impl SDK {
             return JsValue::null();
         };
 
+        let selected_state_root_hash: Digest = if let Some(hash) = state_root_hash_digest {
+            hash
+        } else if let Some(hash_string) = state_root_hash {
+            Digest::from(hash_string.as_str())
+        } else {
+            error("Error: Missing state_root_hash");
+            return JsValue::null();
+        };
+
         serialize_result(
             self.get_dictionary_item(
                 node_address,
-                state_root_hash,
+                selected_state_root_hash,
                 verbosity,
                 Some(dictionary_item),
             )
@@ -59,17 +73,19 @@ impl SDK {
     pub async fn state_get_dictionary_item_js_alias(
         &mut self,
         node_address: &str,
-        state_root_hash: Digest,
-        verbosity: Option<Verbosity>,
+        state_root_hash: Option<String>,
         dictionary_item_identifier: Option<DictionaryItemIdentifier>,
         dictionary_item_params: Option<DictionaryItemStrParams>,
+        verbosity: Option<Verbosity>,
+        state_root_hash_digest: Option<Digest>,
     ) -> JsValue {
         self.get_dictionary_item_js_alias(
             node_address,
             state_root_hash,
-            verbosity,
             dictionary_item_identifier,
             dictionary_item_params,
+            verbosity,
+            state_root_hash_digest,
         )
         .await
     }
@@ -117,11 +133,4 @@ impl SDK {
             })
         }
     }
-
-    // pub async fn get_dictionary_item_test(&mut self, state_root_hash: impl ToDigest) {
-    //     let _digest = state_root_hash.to_digest();
-    //     log(&format!("{:?}", _digest.to_digest()));
-    //     let stringi: String = state_root_hash.to_digest().into();
-    //     log(&format!("{:?}", stringi));
-    // }
 }

@@ -3,6 +3,8 @@
 export const memory: WebAssembly.Memory;
 export function __wbg_bytes_free(a: number): void;
 export function bytes_new(): number;
+export function sdk_get_dictionary_item(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): number;
+export function sdk_state_get_dictionary_item(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): number;
 export function sdk_speculative_transfer(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number): number;
 export function transferaddr_new(a: number, b: number, c: number): void;
 export function fromTransfer(a: number, b: number): number;
@@ -99,8 +101,6 @@ export function dictionaryitemidentifier_newFromContractInfo(a: number, b: numbe
 export function dictionaryitemidentifier_newFromSeedUref(a: number, b: number, c: number): number;
 export function __wbg_path_free(a: number): void;
 export function path_new(a: number): number;
-export function sdk_get_dictionary_item(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
-export function sdk_state_get_dictionary_item(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function sdk_transfer(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number): number;
 export function log(a: number, b: number): void;
 export function error(a: number, b: number): void;

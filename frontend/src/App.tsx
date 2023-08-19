@@ -142,9 +142,11 @@ function App() {
         );
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(
         host,
-        new Digest(chain_get_state_root_hash?.result.state_root_hash),
-        Verbosity.High,
-        dictionary_item_identifier
+        undefined,
+        dictionary_item_identifier,
+        undefined,
+        undefined,
+        new Digest(chain_get_state_root_hash?.result.state_root_hash)
       );
 
       setState_get_dictionary_item(

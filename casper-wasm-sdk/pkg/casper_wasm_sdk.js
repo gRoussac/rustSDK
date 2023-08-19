@@ -2854,6 +2854,70 @@ export class SDK {
         wasm.__wbg_sdk_free(ptr);
     }
     /**
+    * @param {string} node_address
+    * @param {string | undefined} state_root_hash
+    * @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
+    * @param {DictionaryItemStrParams | undefined} dictionary_item_params
+    * @param {number | undefined} verbosity
+    * @param {Digest | undefined} state_root_hash_digest
+    * @returns {Promise<any>}
+    */
+    get_dictionary_item(node_address, state_root_hash, dictionary_item_identifier, dictionary_item_params, verbosity, state_root_hash_digest) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        var ptr1 = isLikeNone(state_root_hash) ? 0 : passStringToWasm0(state_root_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        let ptr2 = 0;
+        if (!isLikeNone(dictionary_item_identifier)) {
+            _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
+            ptr2 = dictionary_item_identifier.__destroy_into_raw();
+        }
+        let ptr3 = 0;
+        if (!isLikeNone(dictionary_item_params)) {
+            _assertClass(dictionary_item_params, DictionaryItemStrParams);
+            ptr3 = dictionary_item_params.__destroy_into_raw();
+        }
+        let ptr4 = 0;
+        if (!isLikeNone(state_root_hash_digest)) {
+            _assertClass(state_root_hash_digest, Digest);
+            ptr4 = state_root_hash_digest.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, ptr3, isLikeNone(verbosity) ? 3 : verbosity, ptr4);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {string | undefined} state_root_hash
+    * @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
+    * @param {DictionaryItemStrParams | undefined} dictionary_item_params
+    * @param {number | undefined} verbosity
+    * @param {Digest | undefined} state_root_hash_digest
+    * @returns {Promise<any>}
+    */
+    state_get_dictionary_item(node_address, state_root_hash, dictionary_item_identifier, dictionary_item_params, verbosity, state_root_hash_digest) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        var ptr1 = isLikeNone(state_root_hash) ? 0 : passStringToWasm0(state_root_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        let ptr2 = 0;
+        if (!isLikeNone(dictionary_item_identifier)) {
+            _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
+            ptr2 = dictionary_item_identifier.__destroy_into_raw();
+        }
+        let ptr3 = 0;
+        if (!isLikeNone(dictionary_item_params)) {
+            _assertClass(dictionary_item_params, DictionaryItemStrParams);
+            ptr3 = dictionary_item_params.__destroy_into_raw();
+        }
+        let ptr4 = 0;
+        if (!isLikeNone(state_root_hash_digest)) {
+            _assertClass(state_root_hash_digest, Digest);
+            ptr4 = state_root_hash_digest.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, ptr3, isLikeNone(verbosity) ? 3 : verbosity, ptr4);
+        return takeObject(ret);
+    }
+    /**
     * @param {BlockIdentifier | undefined} maybe_block_id
     * @param {string} node_address
     * @param {number} verbosity
@@ -2902,58 +2966,6 @@ export class SDK {
         _assertClass(payment_params, PaymentStrParams);
         var ptr4 = payment_params.__destroy_into_raw();
         const ret = wasm.sdk_make_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {Digest} state_root_hash
-    * @param {number | undefined} verbosity
-    * @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
-    * @param {DictionaryItemStrParams | undefined} dictionary_item_params
-    * @returns {Promise<any>}
-    */
-    get_dictionary_item(node_address, state_root_hash, verbosity, dictionary_item_identifier, dictionary_item_params) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        let ptr2 = 0;
-        if (!isLikeNone(dictionary_item_identifier)) {
-            _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
-            ptr2 = dictionary_item_identifier.__destroy_into_raw();
-        }
-        let ptr3 = 0;
-        if (!isLikeNone(dictionary_item_params)) {
-            _assertClass(dictionary_item_params, DictionaryItemStrParams);
-            ptr3 = dictionary_item_params.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0, len0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {Digest} state_root_hash
-    * @param {number | undefined} verbosity
-    * @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
-    * @param {DictionaryItemStrParams | undefined} dictionary_item_params
-    * @returns {Promise<any>}
-    */
-    state_get_dictionary_item(node_address, state_root_hash, verbosity, dictionary_item_identifier, dictionary_item_params) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        let ptr2 = 0;
-        if (!isLikeNone(dictionary_item_identifier)) {
-            _assertClass(dictionary_item_identifier, DictionaryItemIdentifier);
-            ptr2 = dictionary_item_identifier.__destroy_into_raw();
-        }
-        let ptr3 = 0;
-        if (!isLikeNone(dictionary_item_params)) {
-            _assertClass(dictionary_item_params, DictionaryItemStrParams);
-            ptr3 = dictionary_item_params.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0, len0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3);
         return takeObject(ret);
     }
     /**
