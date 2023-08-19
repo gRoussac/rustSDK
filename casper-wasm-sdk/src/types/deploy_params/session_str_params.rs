@@ -39,34 +39,34 @@ impl SessionStrParams {
     ) -> Self {
         let mut session_params = SessionStrParams::default();
         if let Some(session_hash) = session_hash {
-            session_params.set_session_hash(session_hash);
+            session_params.set_session_hash(&session_hash);
         };
         if let Some(session_name) = session_name {
-            session_params.set_session_name(session_name);
+            session_params.set_session_name(&session_name);
         };
         if let Some(session_package_hash) = session_package_hash {
-            session_params.set_session_package_hash(session_package_hash);
+            session_params.set_session_package_hash(&session_package_hash);
         };
         if let Some(session_package_name) = session_package_name {
-            session_params.set_session_package_name(session_package_name);
+            session_params.set_session_package_name(&session_package_name);
         };
         if let Some(session_path) = session_path {
-            session_params.set_session_path(session_path);
+            session_params.set_session_path(&session_path);
         };
         if let Some(session_args_simple) = session_args_simple {
             session_params.set_session_args_simple(session_args_simple);
         };
         if let Some(session_args_json) = session_args_json {
-            session_params.set_session_args_json(session_args_json);
+            session_params.set_session_args_json(&session_args_json);
         };
         if let Some(session_args_complex) = session_args_complex {
-            session_params.set_session_args_complex(session_args_complex);
+            session_params.set_session_args_complex(&session_args_complex);
         };
         if let Some(session_version) = session_version {
-            session_params.set_session_version(session_version);
+            session_params.set_session_version(&session_version);
         };
         if let Some(session_entry_point) = session_entry_point {
-            session_params.set_session_entry_point(session_entry_point);
+            session_params.set_session_entry_point(&session_entry_point);
         };
         if let Some(is_session_transfer) = is_session_transfer {
             session_params.set_is_session_transfer(is_session_transfer);
@@ -82,8 +82,8 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_hash(&self, session_hash: String) {
-        self.session_hash.set(session_hash).unwrap();
+    pub fn set_session_hash(&self, session_hash: &str) {
+        self.session_hash.set(session_hash.to_string()).unwrap();
     }
 
     // Getter and setter for session_name field
@@ -93,8 +93,8 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_name(&self, session_name: String) {
-        self.session_name.set(session_name).unwrap();
+    pub fn set_session_name(&self, session_name: &str) {
+        self.session_name.set(session_name.to_string()).unwrap();
     }
 
     // Getter and setter for session_package_hash field
@@ -104,8 +104,10 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_package_hash(&self, session_package_hash: String) {
-        self.session_package_hash.set(session_package_hash).unwrap();
+    pub fn set_session_package_hash(&self, session_package_hash: &str) {
+        self.session_package_hash
+            .set(session_package_hash.to_string())
+            .unwrap();
     }
 
     // Getter and setter for session_package_name field
@@ -115,8 +117,10 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_package_name(&self, session_package_name: String) {
-        self.session_package_name.set(session_package_name).unwrap();
+    pub fn set_session_package_name(&self, session_package_name: &str) {
+        self.session_package_name
+            .set(session_package_name.to_string())
+            .unwrap();
     }
 
     // Getter and setter for session_path field
@@ -126,8 +130,8 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_path(&self, session_path: String) {
-        self.session_path.set(session_path).unwrap();
+    pub fn set_session_path(&self, session_path: &str) {
+        self.session_path.set(session_path.to_string()).unwrap();
     }
 
     // Getter and setter for session_args_simple field
@@ -153,8 +157,10 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_args_json(&self, session_args_json: String) {
-        self.session_args_json.set(session_args_json).unwrap();
+    pub fn set_session_args_json(&self, session_args_json: &str) {
+        self.session_args_json
+            .set(session_args_json.to_string())
+            .unwrap();
     }
 
     // Getter and setter for session_args_complex field
@@ -164,8 +170,10 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_args_complex(&self, session_args_complex: String) {
-        self.session_args_complex.set(session_args_complex).unwrap();
+    pub fn set_session_args_complex(&self, session_args_complex: &str) {
+        self.session_args_complex
+            .set(session_args_complex.to_string())
+            .unwrap();
     }
 
     // Getter and setter for session_version field
@@ -175,8 +183,10 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_version(&self, session_version: String) {
-        self.session_version.set(session_version).unwrap();
+    pub fn set_session_version(&self, session_version: &str) {
+        self.session_version
+            .set(session_version.to_string())
+            .unwrap();
     }
 
     // Getter and setter for session_entry_point field
@@ -186,8 +196,10 @@ impl SessionStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_entry_point(&self, session_entry_point: String) {
-        self.session_entry_point.set(session_entry_point).unwrap();
+    pub fn set_session_entry_point(&self, session_entry_point: &str) {
+        self.session_entry_point
+            .set(session_entry_point.to_string())
+            .unwrap();
     }
 
     // Getter and setter for is_session_transfer field

@@ -6,13 +6,25 @@ use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct DeployStrParams {
     secret_key: OnceCell<String>,
     timestamp: OnceCell<String>,
     ttl: OnceCell<String>,
     chain_name: OnceCell<String>,
     session_account: OnceCell<String>,
+}
+
+impl Default for DeployStrParams {
+    fn default() -> Self {
+        DeployStrParams {
+            secret_key: OnceCell::new(),
+            timestamp: OnceCell::new(),
+            ttl: OnceCell::new(),
+            chain_name: OnceCell::new(),
+            session_account: OnceCell::new(),
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -25,16 +37,16 @@ impl DeployStrParams {
         timestamp: Option<String>,
         ttl: Option<String>,
     ) -> Self {
+        let deploy_params = DeployStrParams::default();
+        deploy_params.set_chain_name(&chain_name);
+        deploy_params.set_session_account(&session_account);
+        if let Some(secret_key) = secret_key {
+            deploy_params.set_secret_key(&secret_key);
+        };
         let current_timestamp = get_current_timestamp(&timestamp);
         let ttl = get_ttl(ttl);
-        let deploy_params = DeployStrParams::default();
-        deploy_params.set_chain_name(chain_name);
-        deploy_params.set_session_account(session_account);
-        if let Some(secret_key) = secret_key {
-            deploy_params.set_secret_key(secret_key);
-        };
-        deploy_params.set_timestamp(current_timestamp);
-        deploy_params.set_ttl(ttl);
+        deploy_params.set_timestamp(Some(current_timestamp));
+        deploy_params.set_ttl(Some(ttl));
         deploy_params
     }
 
@@ -45,8 +57,8 @@ impl DeployStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_secret_key(&self, secret_key: String) {
-        self.secret_key.set(secret_key).unwrap();
+    pub fn set_secret_key(&self, secret_key: &str) {
+        self.secret_key.set(secret_key.to_string()).unwrap();
     }
 
     // Getter and setter for timestamp field
@@ -56,8 +68,19 @@ impl DeployStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_timestamp(&self, timestamp: String) {
-        self.timestamp.set(timestamp).unwrap();
+    pub fn set_timestamp(&self, timestamp: Option<String>) {
+        if let Some(timestamp) = timestamp {
+            self.timestamp.set(timestamp.to_string()).unwrap();
+        } else {
+            let current_timestamp = get_current_timestamp(&timestamp);
+            self.timestamp.set(current_timestamp).unwrap();
+        };
+    }
+
+    #[wasm_bindgen(js_name = "setDefaultTimestamp")]
+    pub fn set_default_timestamp(&self) {
+        let current_timestamp = get_current_timestamp(&None);
+        self.timestamp.set(current_timestamp).unwrap();
     }
 
     // Getter and setter for ttl field
@@ -67,7 +90,18 @@ impl DeployStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_ttl(&self, ttl: String) {
+    pub fn set_ttl(&self, ttl: Option<String>) {
+        if let Some(ttl) = ttl {
+            self.timestamp.set(ttl.to_string()).unwrap();
+        } else {
+            let ttl = get_ttl(ttl);
+            self.ttl.set(ttl).unwrap();
+        };
+    }
+
+    #[wasm_bindgen(js_name = "setDefaultTTL")]
+    pub fn set_default_ttl(&self) {
+        let ttl = get_ttl(None);
         self.ttl.set(ttl).unwrap();
     }
 
@@ -78,8 +112,8 @@ impl DeployStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_chain_name(&self, chain_name: String) {
-        self.chain_name.set(chain_name).unwrap();
+    pub fn set_chain_name(&self, chain_name: &str) {
+        self.chain_name.set(chain_name.to_string()).unwrap();
     }
 
     // Getter and setter for session_account field
@@ -89,8 +123,10 @@ impl DeployStrParams {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_session_account(&self, session_account: String) {
-        self.session_account.set(session_account).unwrap();
+    pub fn set_session_account(&self, session_account: &str) {
+        self.session_account
+            .set(session_account.to_string())
+            .unwrap();
     }
 }
 
