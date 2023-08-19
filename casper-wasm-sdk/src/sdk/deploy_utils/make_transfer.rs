@@ -1,9 +1,12 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
-    types::deploy_params::{
-        deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
-        payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
+    types::{
+        deploy_params::{
+            deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
+            payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
+        },
+        sdk_error::SdkError,
     },
     SDK,
 };
@@ -45,7 +48,7 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<Deploy, CliError> {
+    ) -> Result<Deploy, SdkError> {
         // log("make_transfer");
         make_transfer(
             amount,
@@ -54,6 +57,7 @@ impl SDK {
             deploy_params,
             payment_params,
         )
+        .map_err(SdkError::from)
     }
 }
 
@@ -63,7 +67,7 @@ pub(crate) fn make_transfer(
     transfer_id: Option<String>,
     deploy_params: DeployStrParams,
     payment_params: PaymentStrParams,
-) -> Result<Deploy, CliError> {
+) -> Result<Deploy, SdkError> {
     let transfer_id = if let Some(transfer_id) = transfer_id {
         transfer_id
     } else {
@@ -78,4 +82,5 @@ pub(crate) fn make_transfer(
         payment_str_params_to_casper_client(&payment_params),
         false,
     )
+    .map_err(SdkError::from)
 }

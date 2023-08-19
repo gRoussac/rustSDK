@@ -8,6 +8,7 @@ use crate::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
         },
+        sdk_error::SdkError,
         verbosity::Verbosity,
     },
     SDK,
@@ -62,7 +63,7 @@ impl SDK {
         target_account: &str,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<SuccessResponse<SpeculativeExecResult>, CliError> {
+    ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
         log("speculative_transfer!");
         let deploy = make_transfer(
             "",
@@ -77,7 +78,7 @@ impl SDK {
         if let Err(err) = deploy {
             let err_msg = format!("Error during speculative_transfer: {}", err);
             error(&err_msg);
-            return Err(err);
+            return Err(SdkError::from(err));
         }
 
         self.speculative_exec(
@@ -87,6 +88,6 @@ impl SDK {
             deploy.unwrap().into(),
         )
         .await
-        .map_err(CliError::Core)
+        .map_err(SdkError::from)
     }
 }

@@ -8,6 +8,7 @@ use crate::{
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
             session_str_params::{session_str_params_to_casper_client, SessionStrParams},
         },
+        sdk_error::SdkError,
         verbosity::Verbosity,
     },
     SDK,
@@ -53,7 +54,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<SuccessResponse<PutDeployResult>, CliError> {
+    ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
         log("deploy!");
         let deploy = make_deploy(
             "",
@@ -66,11 +67,11 @@ impl SDK {
         if let Err(err) = deploy {
             let err_msg = format!("Error during deploy: {}", err);
             error(&err_msg);
-            return Err(err);
+            return Err(SdkError::from(err));
         }
 
         self.put_deploy(node_address, verbosity, deploy.unwrap().into())
             .await
-            .map_err(CliError::Core)
+            .map_err(SdkError::from)
     }
 }
