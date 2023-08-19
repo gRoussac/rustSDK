@@ -1,5 +1,6 @@
 use super::args_simple::ArgsSimple;
 use crate::helpers::get_str_or_default;
+use casper_client::cli::SessionStrParams as _SessionStrParams;
 use js_sys::Array;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
@@ -214,10 +215,10 @@ impl SessionStrParams {
     }
 }
 
-// Convert SessionStrParams to casper_client::cli::SessionStrParams
+// Convert SessionStrParams to casper_client::cli::SessionStrParam
 pub fn session_str_params_to_casper_client(
     session_params: &SessionStrParams,
-) -> casper_client::cli::SessionStrParams<'_> {
+) -> _SessionStrParams<'_> {
     let session_args_simple: Vec<&str> = session_params
         .session_args_simple
         .get()
@@ -227,7 +228,7 @@ pub fn session_str_params_to_casper_client(
 
     // Use the appropriate `with_` method based on available fields as SessionStrParams is private
     if let Some(session_hash) = session_params.session_hash.get() {
-        return casper_client::cli::SessionStrParams::with_hash(
+        return _SessionStrParams::with_hash(
             session_hash.as_str(),
             get_str_or_default(session_params.session_entry_point.get()),
             session_args_simple,
@@ -237,7 +238,7 @@ pub fn session_str_params_to_casper_client(
     }
 
     if let Some(session_name) = session_params.session_name.get() {
-        return casper_client::cli::SessionStrParams::with_name(
+        return _SessionStrParams::with_name(
             session_name.as_str(),
             get_str_or_default(session_params.session_entry_point.get()),
             session_args_simple,
@@ -247,7 +248,7 @@ pub fn session_str_params_to_casper_client(
     }
 
     if let Some(session_package_hash) = session_params.session_package_hash.get() {
-        return casper_client::cli::SessionStrParams::with_package_hash(
+        return _SessionStrParams::with_package_hash(
             session_package_hash.as_str(),
             get_str_or_default(session_params.session_version.get()),
             get_str_or_default(session_params.session_entry_point.get()),
@@ -258,7 +259,7 @@ pub fn session_str_params_to_casper_client(
     }
 
     if let Some(session_package_name) = session_params.session_package_name.get() {
-        return casper_client::cli::SessionStrParams::with_package_name(
+        return _SessionStrParams::with_package_name(
             session_package_name.as_str(),
             get_str_or_default(session_params.session_version.get()),
             get_str_or_default(session_params.session_entry_point.get()),
@@ -269,7 +270,7 @@ pub fn session_str_params_to_casper_client(
     }
 
     // Default to Transfer type of Deploy
-    casper_client::cli::SessionStrParams::with_transfer(
+    _SessionStrParams::with_transfer(
         session_args_simple,
         get_str_or_default(session_params.session_args_json.get()),
         get_str_or_default(session_params.session_args_complex.get()),

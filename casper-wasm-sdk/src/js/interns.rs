@@ -11,26 +11,19 @@ pub fn hex_to_uint8_vec_js_alias(hex_string: &str) -> Vec<u8> {
 }
 
 #[wasm_bindgen(js_name = "jsonPrettyPrint")]
-pub fn json_pretty_print(value: JsValue, verbosity: Option<Verbosity>) -> JsValue {
-    //log("json_pretty_print");
-    if let Ok(deserialized) = value.into_serde::<serde_json::Value>() {
-        let result = match verbosity {
-            Some(Verbosity::Low) | None => Ok(deserialized.to_string()),
-            Some(Verbosity::Medium) => casper_types::json_pretty_print(&deserialized),
-            Some(Verbosity::High) => serde_json::to_string_pretty(&deserialized),
-        }
-        .map_err(|err| error(&format!("Error in json_pretty_print: {}", err)));
+pub fn json_pretty_print_js_alias(value: JsValue, verbosity: Option<Verbosity>) -> JsValue {
+    use crate::helpers::json_pretty_print;
 
-        match result {
-            Ok(result) => result.into(),
-            Err(err) => {
-                error(&format!("Error in json_pretty_print: {:?}", err));
-                JsValue::null()
-            }
+    let deserialized: Result<serde_json::Value, _> = value.into_serde();
+    match deserialized {
+        Ok(result) => {
+            let pretty_printed = json_pretty_print(result, verbosity);
+            JsValue::from_str(&pretty_printed)
         }
-    } else {
-        error("Deserialization error into_serde of json_pretty_print");
-        JsValue::null()
+        Err(err) => {
+            error(&format!("Error in json_pretty_print: {:?}", err));
+            value
+        }
     }
 }
 

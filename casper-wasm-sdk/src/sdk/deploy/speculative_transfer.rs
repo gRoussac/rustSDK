@@ -13,11 +13,7 @@ use crate::{
     },
     SDK,
 };
-use casper_client::{
-    cli::{make_transfer, CliError},
-    rpcs::results::SpeculativeExecResult,
-    SuccessResponse,
-};
+use casper_client::{cli::make_transfer, rpcs::results::SpeculativeExecResult, SuccessResponse};
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;

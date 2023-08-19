@@ -14,11 +14,7 @@ use crate::{
     },
     SDK,
 };
-use casper_client::{
-    cli::{make_deploy, CliError},
-    rpcs::results::SpeculativeExecResult,
-    SuccessResponse,
-};
+use casper_client::{cli::make_deploy, rpcs::results::SpeculativeExecResult, SuccessResponse};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 

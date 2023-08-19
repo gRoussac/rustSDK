@@ -1,5 +1,6 @@
 use super::args_simple::ArgsSimple;
 use crate::helpers::get_str_or_default;
+use casper_client::cli::PaymentStrParams as _PaymentStrParams;
 use js_sys::Array;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
@@ -204,7 +205,7 @@ impl PaymentStrParams {
 // Convert PaymentStrParams to casper_client::cli::PaymentStrParams
 pub fn payment_str_params_to_casper_client(
     payment_params: &PaymentStrParams,
-) -> casper_client::cli::PaymentStrParams<'_> {
+) -> _PaymentStrParams<'_> {
     let payment_args_simple: Vec<&str> = payment_params
         .payment_args_simple
         .get()
@@ -214,7 +215,7 @@ pub fn payment_str_params_to_casper_client(
 
     // Use the appropriate `with_` method based on available fields as PaymentStrParams is private
     if let Some(payment_hash) = payment_params.payment_hash.get() {
-        return casper_client::cli::PaymentStrParams::with_hash(
+        return _PaymentStrParams::with_hash(
             payment_hash.as_str(),
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
@@ -224,7 +225,7 @@ pub fn payment_str_params_to_casper_client(
     }
 
     if let Some(payment_name) = payment_params.payment_name.get() {
-        return casper_client::cli::PaymentStrParams::with_name(
+        return _PaymentStrParams::with_name(
             payment_name.as_str(),
             get_str_or_default(payment_params.payment_entry_point.get()),
             payment_args_simple,
@@ -234,7 +235,7 @@ pub fn payment_str_params_to_casper_client(
     }
 
     if let Some(payment_package_hash) = payment_params.payment_package_hash.get() {
-        return casper_client::cli::PaymentStrParams::with_package_hash(
+        return _PaymentStrParams::with_package_hash(
             payment_package_hash.as_str(),
             get_str_or_default(payment_params.payment_version.get()),
             get_str_or_default(payment_params.payment_entry_point.get()),
@@ -245,7 +246,7 @@ pub fn payment_str_params_to_casper_client(
     }
 
     if let Some(payment_package_name) = payment_params.payment_package_name.get() {
-        return casper_client::cli::PaymentStrParams::with_package_name(
+        return _PaymentStrParams::with_package_name(
             payment_package_name.as_str(),
             get_str_or_default(payment_params.payment_version.get()),
             get_str_or_default(payment_params.payment_entry_point.get()),
@@ -256,7 +257,5 @@ pub fn payment_str_params_to_casper_client(
     }
 
     // Default to the Payment amount
-    casper_client::cli::PaymentStrParams::with_amount(get_str_or_default(
-        payment_params.payment_amount.get(),
-    ))
+    _PaymentStrParams::with_amount(get_str_or_default(payment_params.payment_amount.get()))
 }
