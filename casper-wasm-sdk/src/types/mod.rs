@@ -4,6 +4,8 @@ pub mod addr;
 pub mod block_hash;
 pub mod block_identifier;
 pub mod cl;
+pub mod contract_hash;
+pub mod contract_package_hash;
 pub mod deploy;
 pub mod deploy_hash;
 pub mod deploy_params;

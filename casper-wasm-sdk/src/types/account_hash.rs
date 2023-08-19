@@ -20,13 +20,13 @@ impl AccountHash {
         Ok(AccountHash(account_hash))
     }
 
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "fromPublicKey")]
     pub fn from_public_key(public_key: PublicKey) -> AccountHash {
         let account_hash = _AccountHash::from_public_key(&(public_key.into()), crypto::blake2b);
         AccountHash(account_hash)
     }
 
-    #[wasm_bindgen(js_name = fromFormattedStr)]
+    #[wasm_bindgen(js_name = "fromFormattedStr")]
     pub fn from_formatted_str(input: &str) -> Result<AccountHash, JsValue> {
         let account_hash = _AccountHash::from_formatted_str(input)
             .map_err(|err| {
@@ -39,7 +39,7 @@ impl AccountHash {
         Ok(AccountHash(account_hash))
     }
 
-    #[wasm_bindgen(js_name = toFormattedString)]
+    #[wasm_bindgen(js_name = "toFormattedString")]
     pub fn to_formatted_string(&self) -> String {
         self.0.to_formatted_string()
     }
