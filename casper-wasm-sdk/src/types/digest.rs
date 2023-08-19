@@ -70,3 +70,43 @@ impl From<[u8; _Digest::LENGTH]> for Digest {
         Digest(digest)
     }
 }
+
+impl From<&str> for Digest {
+    fn from(s: &str) -> Self {
+        let bytes = hex::decode(s)
+            .map_err(|err| error(&format!("{:?}", err)))
+            .expect("Failed to decode hex string");
+        let mut digest_bytes = [0u8; _Digest::LENGTH];
+
+        if bytes.len() != _Digest::LENGTH {
+            error("Invalid Digest length");
+            panic!("Invalid Digest length");
+        }
+
+        digest_bytes.copy_from_slice(&bytes);
+        Digest(_Digest::from(digest_bytes))
+    }
+}
+
+impl From<Digest> for String {
+    fn from(digest: Digest) -> Self {
+        let digest: _Digest = digest.into();
+        digest.to_string()
+    }
+}
+
+pub trait ToDigest {
+    fn to_digest(&self) -> Digest;
+}
+
+impl ToDigest for Digest {
+    fn to_digest(&self) -> Digest {
+        self.0.into()
+    }
+}
+
+impl ToDigest for &str {
+    fn to_digest(&self) -> Digest {
+        Digest::from(*self)
+    }
+}

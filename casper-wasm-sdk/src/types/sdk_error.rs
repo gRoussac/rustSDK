@@ -6,76 +6,76 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SdkError {
-    #[error("failed to parse {context} as a key: {error}")]
+    #[error("Failed to parse {context} as a key: {error}")]
     FailedToParseKey {
         context: &'static str,
         error: KeyFromStrError,
     },
 
-    #[error("failed to parse {context} as a public key: {error}")]
+    #[error("Failed to parse {context} as a public key: {error}")]
     FailedToParsePublicKey {
         context: String,
         error: casper_types::crypto::Error,
     },
 
-    #[error("failed to parse {context} as an account hash: {error}")]
+    #[error("Failed to parse {context} as an account hash: {error}")]
     FailedToParseAccountHash {
         context: &'static str,
         error: casper_types::addressable_entity::FromStrError,
     },
 
-    #[error("failed to parse '{context}' as a uref: {error}")]
+    #[error("Failed to parse '{context}' as a uref: {error}")]
     FailedToParseURef {
         context: &'static str,
         error: URefFromStrError,
     },
 
-    #[error("failed to parse '{context}' as an integer: {error}")]
+    #[error("Failed to parse '{context}' as an integer: {error}")]
     FailedToParseInt {
         context: &'static str,
         error: ParseIntError,
     },
 
-    #[error("failed to parse '{context}' as a time diff: {error}")]
+    #[error("Failed to parse '{context}' as a time diff: {error}")]
     FailedToParseTimeDiff {
         context: &'static str,
         error: DurationError,
     },
 
-    #[error("failed to parse '{context}' as a timestamp: {error}")]
+    #[error("Failed to parse '{context}' as a timestamp: {error}")]
     FailedToParseTimestamp {
         context: &'static str,
         error: TimestampError,
     },
 
-    #[error("failed to parse '{context}' as u128, u256, or u512: {error:?}")]
+    #[error("Failed to parse '{context}' as u128, u256, or u512: {error:?}")]
     FailedToParseUint {
         context: &'static str,
         error: UIntParseError,
     },
 
-    #[error("failed to parse '{context}' as a hash digest: {error:?}")]
+    #[error("Failed to parse '{context}' as a hash digest: {error:?}")]
     FailedToParseDigest {
         context: &'static str,
         error: casper_types::DigestError,
     },
 
-    #[error("failed to parse state identifier")]
+    #[error("Failed to parse state identifier")]
     FailedToParseStateIdentifier,
 
-    #[error("conflicting arguments passed '{context}' {args:?}")]
+    #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 
-    #[error("invalid CLValue error: {0}")]
+    #[error("Invalid CLValue error: {0}")]
     InvalidCLValue(String),
 
-    #[error("invalid argument '{context}': {error}")]
+    #[error("Invalid argument '{context}': {error}")]
     InvalidArgument {
         context: &'static str,
         error: String,
     },
 
-    #[error("failed to parse json-args to JSON: {0}. They should be a JSON Array of Objects, each of the form {{\"name\":<String>,\"type\":<VALUE>,\"value\":<VALUE>}}")]
+    #[error("Failed to parse json-args to JSON: {0}. They should be a JSON Array of Objects, each of the form {{\"name\":<String>,\"type\":<VALUE>,\"value\":<VALUE>}}")]
     FailedToParseJsonArgs(#[from] serde_json::Error),
 
     #[error(transparent)]

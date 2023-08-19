@@ -10,7 +10,7 @@ use crate::{
     },
     SDK,
 };
-use casper_client::cli::{make_transfer as client_make_transfer, CliError};
+use casper_client::cli::make_transfer as client_make_transfer;
 use casper_types::Deploy;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]

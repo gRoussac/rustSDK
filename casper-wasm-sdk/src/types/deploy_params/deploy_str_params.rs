@@ -1,6 +1,6 @@
 use crate::helpers::get_current_timestamp;
 use crate::helpers::get_str_or_default;
-use crate::helpers::get_ttl;
+use crate::helpers::get_ttl_or_default;
 use casper_client::cli::DeployStrParams as _DeployStrParams;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
@@ -31,20 +31,20 @@ impl Default for DeployStrParams {
 impl DeployStrParams {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        chain_name: String,
-        session_account: String,
+        chain_name: &str,
+        session_account: &str,
         secret_key: Option<String>,
         timestamp: Option<String>,
         ttl: Option<String>,
     ) -> Self {
         let deploy_params = DeployStrParams::default();
-        deploy_params.set_chain_name(&chain_name);
-        deploy_params.set_session_account(&session_account);
+        deploy_params.set_chain_name(chain_name);
+        deploy_params.set_session_account(session_account);
         if let Some(secret_key) = secret_key {
             deploy_params.set_secret_key(&secret_key);
         };
         let current_timestamp = get_current_timestamp(&timestamp);
-        let ttl = get_ttl(ttl);
+        let ttl = get_ttl_or_default(ttl);
         deploy_params.set_timestamp(Some(current_timestamp));
         deploy_params.set_ttl(Some(ttl));
         deploy_params
@@ -92,16 +92,16 @@ impl DeployStrParams {
     #[wasm_bindgen(setter)]
     pub fn set_ttl(&self, ttl: Option<String>) {
         if let Some(ttl) = ttl {
-            self.timestamp.set(ttl.to_string()).unwrap();
+            self.ttl.set(ttl.to_string()).unwrap();
         } else {
-            let ttl = get_ttl(ttl);
+            let ttl = get_ttl_or_default(ttl);
             self.ttl.set(ttl).unwrap();
         };
     }
 
     #[wasm_bindgen(js_name = "setDefaultTTL")]
     pub fn set_default_ttl(&self) {
-        let ttl = get_ttl(None);
+        let ttl = get_ttl_or_default(None);
         self.ttl.set(ttl).unwrap();
     }
 

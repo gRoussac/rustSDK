@@ -1,8 +1,8 @@
-use casper_types::Deploy;
 use casper_wasm_sdk::{
     debug::{error, log},
     helpers::hex_to_uint8_vec,
     types::{
+        deploy::Deploy,
         deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
@@ -26,22 +26,24 @@ async fn main() {
     //  dbg!(test);
     // log("bound log to std");
     // error("bound error to std");
-    // let deploy_params = DeployStrParams::new(
-    //     "integration-test".to_string(),
-    //     "01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9".to_string(),
-    //     None,
-    //     None,
-    //     None,
-    // );
-    let deploy_params = DeployStrParams::default();
-    deploy_params.set_chain_name("integration-test");
-    deploy_params
-        .set_session_account("01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9");
+    let deploy_params = DeployStrParams::new(
+        "integration-test".to_string(),
+        "01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9".to_string(),
+        None,
+        None,
+        Some("1h".to_string()),
+    );
+    // let deploy_params = DeployStrParams::default();
+    // deploy_params.set_chain_name("integration-test");
+    // deploy_params
+    //     .set_session_account("01d589b1ff893657417d180148829e2e0c509182f0f4678c2af7d1ddd58012ccd9");
     // deploy_params.set_ttl(None);
     // deploy_params.set_timestamp(None);
 
-    deploy_params.set_default_ttl();
-    deploy_params.set_default_timestamp();
+    // deploy_params.set_default_ttl();
+    // deploy_params.set_default_timestamp();
+
+    dbg!(deploy_params);
 
     let session_params = SessionStrParams::default();
     session_params
@@ -51,7 +53,12 @@ async fn main() {
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount("5500000000");
 
-    let test_deploy: Result<Deploy, SdkError> =
-        sdk.make_deploy(deploy_params, session_params, payment_params);
-    dbg!(test_deploy);
+    // let test_deploy: Result<Deploy, SdkError> =
+    //     sdk.make_deploy(deploy_params, session_params, payment_params);
+    let test = sdk
+        .get_dictionary_item_test(
+            "386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530",
+        )
+        .await;
+    dbg!(test);
 }

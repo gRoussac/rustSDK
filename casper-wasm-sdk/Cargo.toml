@@ -30,6 +30,8 @@ once_cell = { version = "1.18.0", default-features = false }
 gloo-utils = { version = "0.2", default-features = false, features = ["serde"] }
 chrono = "0.4"
 num-traits = "0.2"
+humantime = "2"
+thiserror = "=1.0.34"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

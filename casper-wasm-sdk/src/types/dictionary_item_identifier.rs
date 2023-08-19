@@ -8,32 +8,38 @@ pub struct DictionaryItemIdentifier(_DictionaryItemIdentifier);
 
 #[wasm_bindgen]
 impl DictionaryItemIdentifier {
+    // static context
+    #[wasm_bindgen(js_name = "newFromAccountInfo")]
     pub fn new_from_account_info(
         account_hash: AccountHash,
-        dictionary_name: String,
-        dictionary_item_key: String,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
     ) -> Self {
         let key = Key::from_account(account_hash).to_formatted_string();
         DictionaryItemIdentifier(_DictionaryItemIdentifier::AccountNamedKey {
             key,
-            dictionary_name,
-            dictionary_item_key,
+            dictionary_name: dictionary_name.to_string(),
+            dictionary_item_key: dictionary_item_key.to_string(),
         })
     }
 
+    // static context
+    #[wasm_bindgen(js_name = "newFromContractInfo")]
     pub fn new_from_contract_info(
         contract_addr: HashAddr,
-        dictionary_name: String,
-        dictionary_item_key: String,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
     ) -> Self {
         let key = Key::from_hash(contract_addr).to_formatted_string();
         DictionaryItemIdentifier(_DictionaryItemIdentifier::ContractNamedKey {
             key,
-            dictionary_name,
-            dictionary_item_key,
+            dictionary_name: dictionary_name.to_string(),
+            dictionary_item_key: dictionary_item_key.to_string(),
         })
     }
 
+    // static context
+    #[wasm_bindgen(js_name = "newFromSeedUref")]
     pub fn new_from_seed_uref(seed_uref: URef, dictionary_item_key: String) -> Self {
         DictionaryItemIdentifier(_DictionaryItemIdentifier::URef {
             seed_uref: seed_uref.into(),

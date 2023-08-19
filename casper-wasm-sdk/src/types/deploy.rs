@@ -11,7 +11,8 @@ use super::{
 use crate::{
     debug::error,
     helpers::{
-        get_current_timestamp, get_ttl, insert_arg, parse_timestamp, parse_ttl, secret_key_from_pem,
+        get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
+        secret_key_from_pem,
     },
     make_deploy, make_transfer,
 };
@@ -187,7 +188,7 @@ impl Deploy {
         let mut ttl = parse_ttl(ttl);
         if let Err(err) = &ttl {
             error(&format!("Error parsing TTL: {}", err));
-            ttl = parse_ttl(&get_ttl(None));
+            ttl = parse_ttl(&get_ttl_or_default(None));
         }
         self.build(BuildParams {
             secret_key,
@@ -425,6 +426,7 @@ impl Deploy {
         deploy.into()
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "footprint")]
     pub fn footprint(&self) -> JsValue {
         let deploy: _Deploy = self.0.clone();
@@ -444,6 +446,7 @@ impl Deploy {
         }
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "approvalsHash")]
     pub fn compute_approvals_hash(&self) -> JsValue {
         let deploy: _Deploy = self.0.clone();
@@ -510,6 +513,7 @@ impl Deploy {
         self.0.clone().session().entry_point_name().to_string()
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "paymentAmount")]
     pub fn payment_amount(&self, conv_rate: u64) -> JsValue {
         match JsValue::from_serde(&self.0.clone().session().payment_amount(conv_rate)) {
@@ -524,6 +528,7 @@ impl Deploy {
         }
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "args")]
     pub fn args(&self) -> JsValue {
         match JsValue::from_serde(self.0.clone().session().args()) {

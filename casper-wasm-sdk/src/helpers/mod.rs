@@ -2,7 +2,8 @@ use std::str::FromStr;
 
 use crate::debug::error;
 use crate::types::sdk_error::SdkError;
-use casper_client::cli::{CliError, JsonArg};
+use crate::types::verbosity::Verbosity;
+use casper_client::cli::JsonArg;
 use casper_types::{DeployBuilder, ErrorExt, SecretKey, TimeDiff, Timestamp};
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
@@ -22,7 +23,7 @@ pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
     current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true)
 }
 
-pub fn get_ttl(ttl: Option<String>) -> String {
+pub fn get_ttl_or_default(ttl: Option<String>) -> String {
     // TODO Fix ttl `humantime::parse_duration` with get_current_ttl(&ttl)
     // log(&format!("ttl {:?}", ttl));
     if let Some(ttl) = ttl {
@@ -49,12 +50,16 @@ pub fn parse_ttl(value: &str) -> Result<TimeDiff, SdkError> {
     })
 }
 
-pub fn get_gas_price(gas_price: Option<u64>) -> u64 {
+pub fn get_gas_price_or_default(gas_price: Option<u64>) -> u64 {
     gas_price.unwrap_or(DeployBuilder::DEFAULT_GAS_PRICE)
 }
 
 pub fn get_str_or_default(opt_str: Option<&String>) -> &str {
     opt_str.map(String::as_str).unwrap_or_default()
+}
+
+pub fn get_verbosity_or_default(verbosity: Option<Verbosity>) -> Verbosity {
+    verbosity.unwrap_or(Verbosity::Low)
 }
 
 pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
@@ -98,6 +103,32 @@ where
             error(&format!("Error occurred: {:?}", err));
             JsValue::null()
         }
+    }
+}
+
+pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> String
+where
+    T: Serialize,
+{
+    // log("json_pretty_print");
+    if let Ok(deserialized) = serde_json::to_value(&value) {
+        let result = match verbosity {
+            Some(Verbosity::Low) | None => Ok(deserialized.to_string()),
+            Some(Verbosity::Medium) => casper_types::json_pretty_print(&deserialized),
+            Some(Verbosity::High) => serde_json::to_string_pretty(&deserialized),
+        }
+        .map_err(|err| error(&format!("Error in json_pretty_print: {}", err)));
+
+        match result {
+            Ok(result) => result,
+            Err(err) => {
+                error(&format!("Error in json_pretty_print: {:?}", err));
+                String::from("")
+            }
+        }
+    } else {
+        error("Deserialization error into_serde of json_pretty_print");
+        String::from("")
     }
 }
 
