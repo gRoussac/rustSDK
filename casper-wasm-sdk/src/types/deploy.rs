@@ -1,5 +1,7 @@
 use super::{
     cl::bytes::Bytes,
+    contract_hash::ContractHash,
+    contract_package_hash::ContractPackageHash,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -15,12 +17,12 @@ use crate::{
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
-    bytesrepr::{Bytes as _Bytes, FromBytes, ToBytes},
-    ContractHash, ContractPackageHash, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem,
+    bytesrepr::Bytes as _Bytes, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, Phase,
     RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
+use num_traits::cast::FromPrimitive;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone)]
@@ -244,45 +246,45 @@ impl Deploy {
         })
     }
 
-    // #[wasm_bindgen(js_name = "withHash")]
-    // pub fn with_hash(&self, hash: ContractHash, secret_key: Option<String>) -> Deploy {
-    //     let deploy = self.0.clone();
-    //     let session = deploy.session();
+    #[wasm_bindgen(js_name = "withHash")]
+    pub fn with_hash(&self, hash: ContractHash, secret_key: Option<String>) -> Deploy {
+        let deploy = self.0.clone();
+        let session = deploy.session();
 
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         session: Some(modify_session(
-    //             session,
-    //             NewSessionParams {
-    //                 new_hash: Some(hash.to_string()),
-    //                 ..Default::default()
-    //             },
-    //         )),
-    //         ..Default::default()
-    //     })
-    // }
+        self.build(BuildParams {
+            secret_key,
+            session: Some(modify_session(
+                session,
+                NewSessionParams {
+                    new_hash: Some(hash),
+                    ..Default::default()
+                },
+            )),
+            ..Default::default()
+        })
+    }
 
-    // #[wasm_bindgen(js_name = "withPackageHash")]
-    // pub fn with_package_hash(
-    //     &self,
-    //     package_hash: ContractHash,
-    //     secret_key: Option<String>,
-    // ) -> Deploy {
-    //     let deploy = self.0.clone();
-    //     let session = deploy.session();
+    #[wasm_bindgen(js_name = "withPackageHash")]
+    pub fn with_package_hash(
+        &self,
+        package_hash: ContractPackageHash,
+        secret_key: Option<String>,
+    ) -> Deploy {
+        let deploy = self.0.clone();
+        let session = deploy.session();
 
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         session: Some(modify_session(
-    //             session,
-    //             NewSessionParams {
-    //                 new_package_hash: Some(package_hash.to_string()),
-    //                 ..Default::default()
-    //             },
-    //         )),
-    //         ..Default::default()
-    //     })
-    // }
+        self.build(BuildParams {
+            secret_key,
+            session: Some(modify_session(
+                session,
+                NewSessionParams {
+                    new_package_hash: Some(package_hash),
+                    ..Default::default()
+                },
+            )),
+            ..Default::default()
+        })
+    }
 
     #[wasm_bindgen(js_name = "withModuleBytes")]
     pub fn with_module_bytes(&self, module_bytes: Bytes, secret_key: Option<String>) -> Deploy {
@@ -464,6 +466,75 @@ impl Deploy {
         }
     }
 
+    #[wasm_bindgen(js_name = "isTransfer")]
+    pub fn is_transfer(&self) -> bool {
+        self.0.clone().session().is_transfer()
+    }
+
+    #[wasm_bindgen(js_name = "isStandardPayment")]
+    pub fn is_standard_payment(&self, phase: u8) -> bool {
+        if let Some(phase_enum) = Phase::from_u8(phase) {
+            self.0.clone().session().is_standard_payment(phase_enum)
+        } else {
+            false
+        }
+    }
+
+    #[wasm_bindgen(js_name = "isStoredContract")]
+    pub fn is_stored_contract(&self) -> bool {
+        self.0.clone().session().is_stored_contract()
+    }
+
+    #[wasm_bindgen(js_name = "isStoredContractPackage")]
+    pub fn is_stored_contract_package(&self) -> bool {
+        self.0.clone().session().is_stored_contract_package()
+    }
+
+    #[wasm_bindgen(js_name = "isModuleBytes")]
+    pub fn is_module_bytes(&self) -> bool {
+        self.0.clone().session().is_module_bytes()
+    }
+
+    #[wasm_bindgen(js_name = "isByName")]
+    pub fn is_by_name(&self) -> bool {
+        self.0.clone().session().is_by_name()
+    }
+
+    #[wasm_bindgen(js_name = "byName")]
+    pub fn by_name(&self) -> Option<String> {
+        self.0.clone().session().by_name()
+    }
+
+    #[wasm_bindgen(js_name = "entryPointName")]
+    pub fn entry_point_name(&self) -> String {
+        self.0.clone().session().entry_point_name().to_string()
+    }
+
+    #[wasm_bindgen(js_name = "paymentAmount")]
+    pub fn payment_amount(&self, conv_rate: u64) -> JsValue {
+        match JsValue::from_serde(&self.0.clone().session().payment_amount(conv_rate)) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!(
+                    "Error serializing payment_amount to JSON: {:?}",
+                    err
+                ));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "args")]
+    pub fn args(&self) -> JsValue {
+        match JsValue::from_serde(self.0.clone().session().args()) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!("Error serializing args to JSON: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
     #[wasm_bindgen(js_name = "addArg")]
     pub fn add_arg(&mut self, js_value_arg: JsValue, secret_key: Option<String>) -> Deploy {
         let deploy = self.0.clone();
@@ -514,9 +585,9 @@ fn modify_session(
         ExecutableDeployItem::ModuleBytes { module_bytes, args } => {
             let default: _Bytes = module_bytes.clone();
             let new_bytes = new_module_bytes.unwrap();
-            let new: &Bytes = &new_bytes;
+            let new: &Bytes = new_bytes;
             let new_module_bytes: _Bytes = {
-                let new_bytes: _Bytes = _Bytes::from(new.to_vec());
+                let new_bytes: _Bytes = _Bytes::from((*new).to_vec());
                 if new_bytes.len() > 0 {
                     new_bytes
                 } else {
@@ -534,7 +605,7 @@ fn modify_session(
             entry_point,
             args,
         } => ExecutableDeployItem::StoredContractByHash {
-            hash: new_hash.unwrap_or(*hash),
+            hash: new_hash.unwrap_or((*hash).into()).into(),
             entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
             args: new_args.cloned().unwrap_or_else(|| args.clone()),
         },
@@ -553,7 +624,7 @@ fn modify_session(
             entry_point,
             args,
         } => ExecutableDeployItem::StoredVersionedContractByHash {
-            hash: new_package_hash.unwrap_or(*hash),
+            hash: new_package_hash.unwrap_or((*hash).into()).into(),
             version: Some(new_version.unwrap_or(version.unwrap())),
             entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
             args: new_args.cloned().unwrap_or_else(|| args.clone()),
