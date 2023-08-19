@@ -133,7 +133,7 @@ function App() {
       setState_get_balance(state_get_balance?.result.balance_value);
 
       const dictionary_item_identifier =
-        DictionaryItemIdentifier.new_from_seed_uref(
+        DictionaryItemIdentifier.newFromSeedUref(
           new URef(
             '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530',
             AccessRights.READ_ADD_WRITE()
@@ -142,8 +142,8 @@ function App() {
         );
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(
         host,
-        Verbosity.High,
         new Digest(chain_get_state_root_hash?.result.state_root_hash),
+        Verbosity.High,
         dictionary_item_identifier
       );
 
