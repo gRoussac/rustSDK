@@ -1,19 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {Uint8Array} key
-* @returns {TransferAddr}
-*/
-export function fromTransfer(key: Uint8Array): TransferAddr;
-/**
-* @param {string} s
-*/
-export function log(s: string): void;
-/**
-* @param {string} s
-*/
-export function error(s: string): void;
-/**
 * @param {string} hex_string
 * @returns {Uint8Array}
 */
@@ -33,6 +20,26 @@ export function privateToPublicKey(secret_key: string): any;
 * @returns {any}
 */
 export function getTimestamp(): any;
+/**
+* @param {Uint8Array} key
+* @returns {TransferAddr}
+*/
+export function fromTransfer(key: Uint8Array): TransferAddr;
+/**
+* @param {string} s
+*/
+export function log(s: string): void;
+/**
+* @param {string} s
+*/
+export function error(s: string): void;
+/**
+*/
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
+}
 /**
 */
 export enum CLTypeEnum {
@@ -59,13 +66,6 @@ export enum CLTypeEnum {
   Tuple2 = 20,
   Tuple3 = 21,
   Any = 22,
-}
-/**
-*/
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
 }
 /**
 */
@@ -614,6 +614,10 @@ export class DictionaryItemIdentifier {
 * @returns {DictionaryItemIdentifier}
 */
   static newFromSeedUref(seed_uref: URef, dictionary_item_key: string): DictionaryItemIdentifier;
+/**
+* @returns {any}
+*/
+  toJson(): any;
 }
 /**
 */
@@ -643,6 +647,10 @@ export class DictionaryItemStrParams {
 * @param {string} value
 */
   setDictionary(value: string): void;
+/**
+* @returns {any}
+*/
+  toJson(): any;
 }
 /**
 */
@@ -657,6 +665,10 @@ export class Digest {
 * @returns {Digest}
 */
   static fromDigest(bytes: Uint8Array): Digest;
+/**
+* @returns {any}
+*/
+  toJson(): any;
 }
 /**
 */
@@ -887,36 +899,51 @@ export class PurseIdentifier {
 export class SDK {
   free(): void;
 /**
-* @param {string} node_address
-* @param {string | undefined} state_root_hash
-* @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
-* @param {DictionaryItemStrParams | undefined} dictionary_item_params
-* @param {number | undefined} verbosity
-* @param {Digest | undefined} state_root_hash_digest
-* @returns {Promise<any>}
+* @param {any} options
+* @returns {getDictionaryItemOptions}
 */
-  get_dictionary_item(node_address: string, state_root_hash?: string, dictionary_item_identifier?: DictionaryItemIdentifier, dictionary_item_params?: DictionaryItemStrParams, verbosity?: number, state_root_hash_digest?: Digest): Promise<any>;
+  get_dictionary_item_options(options: any): getDictionaryItemOptions;
 /**
-* @param {string} node_address
-* @param {string | undefined} state_root_hash
-* @param {DictionaryItemIdentifier | undefined} dictionary_item_identifier
-* @param {DictionaryItemStrParams | undefined} dictionary_item_params
-* @param {number | undefined} verbosity
-* @param {Digest | undefined} state_root_hash_digest
+* @param {getDictionaryItemOptions} options
 * @returns {Promise<any>}
 */
-  state_get_dictionary_item(node_address: string, state_root_hash?: string, dictionary_item_identifier?: DictionaryItemIdentifier, dictionary_item_params?: DictionaryItemStrParams, verbosity?: number, state_root_hash_digest?: Digest): Promise<any>;
+  get_dictionary_item(options: getDictionaryItemOptions): Promise<any>;
+/**
+* @param {getDictionaryItemOptions} options
+* @returns {Promise<any>}
+*/
+  state_get_dictionary_item(options: getDictionaryItemOptions): Promise<any>;
 /**
 * @param {BlockIdentifier | undefined} maybe_block_id
 * @param {string} node_address
-* @param {number} verbosity
+* @param {number | undefined} verbosity
 * @param {string} amount
 * @param {string} target_account
 * @param {DeployStrParams} deploy_params
 * @param {PaymentStrParams} payment_params
 * @returns {Promise<any>}
 */
-  speculative_transfer(maybe_block_id: BlockIdentifier | undefined, node_address: string, verbosity: number, amount: string, target_account: string, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Promise<any>;
+  speculative_transfer(maybe_block_id: BlockIdentifier | undefined, node_address: string, verbosity: number | undefined, amount: string, target_account: string, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Promise<any>;
+/**
+* @param {BlockIdentifier | undefined} maybe_block_id
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @returns {Promise<any>}
+*/
+  speculative_deploy(maybe_block_id: BlockIdentifier | undefined, node_address: string, verbosity: number | undefined, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {string} amount
+* @param {string} target_account
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @returns {Promise<any>}
+*/
+  transfer(node_address: string, verbosity: number | undefined, amount: string, target_account: string, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Promise<any>;
 /**
 * @param {string} amount
 * @param {string} target_account
@@ -927,207 +954,190 @@ export class SDK {
 */
   make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): any;
 /**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {string} amount
-* @param {string} target_account
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @returns {Promise<any>}
 */
-  transfer(node_address: string, verbosity: number, amount: string, target_account: string, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Promise<any>;
+  constructor();
 /**
 * @param {string} node_address
-* @param {number} verbosity
+* @param {Deploy} deploy
+* @param {BlockIdentifier | undefined} block_identifier
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  speculative_exec(node_address: string, deploy: Deploy, block_identifier?: BlockIdentifier, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @param {PublicKey} account_identifier
+* @returns {Promise<any>}
+*/
+  get_account(node_address: string, verbosity: number | undefined, maybe_block_identifier: BlockIdentifier | undefined, account_identifier: PublicKey): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @param {PublicKey} account_identifier
+* @returns {Promise<any>}
+*/
+  state_get_account_info(node_address: string, verbosity: number | undefined, maybe_block_identifier: BlockIdentifier | undefined, account_identifier: PublicKey): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
 * @param {BlockIdentifier | undefined} maybe_block_identifier
 * @returns {Promise<any>}
 */
-  get_auction_info(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+  get_auction_info(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
 /**
 * @param {string} node_address
-* @param {number} verbosity
+* @param {number | undefined} verbosity
 * @param {BlockIdentifier | undefined} maybe_block_identifier
 * @returns {Promise<any>}
 */
-  get_block_transfers(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+  get_block(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
 /**
 * @param {string} node_address
-* @param {number} verbosity
+* @param {number | undefined} verbosity
 * @param {BlockIdentifier | undefined} maybe_block_identifier
 * @returns {Promise<any>}
 */
-  get_era_info(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+  chain_get_block(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
 /**
 * @param {string} node_address
-* @param {number} verbosity
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @returns {Promise<any>}
+*/
+  get_block_transfers(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @returns {Promise<any>}
+*/
+  get_era_info(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @returns {Promise<any>}
+*/
+  get_era_summary(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @returns {Promise<any>}
+*/
+  get_state_root_hash(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @returns {Promise<any>}
+*/
+  chain_get_state_root_hash(node_address: string, verbosity?: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
 * @param {GlobalStateIdentifier | undefined} maybe_global_state_identifier
 * @param {PurseIdentifier} purse_identifier
 * @returns {Promise<any>}
 */
-  query_balance(node_address: string, verbosity: number, maybe_global_state_identifier: GlobalStateIdentifier | undefined, purse_identifier: PurseIdentifier): Promise<any>;
+  query_balance(node_address: string, verbosity: number | undefined, maybe_global_state_identifier: GlobalStateIdentifier | undefined, purse_identifier: PurseIdentifier): Promise<any>;
 /**
 * @param {string} node_address
-* @param {BlockIdentifier | undefined} block_identifier
-* @param {number} verbosity
-* @param {Deploy} deploy
-* @returns {Promise<any>}
-*/
-  speculative_exec(node_address: string, block_identifier: BlockIdentifier | undefined, verbosity: number, deploy: Deploy): Promise<any>;
-/**
-* @param {BlockIdentifier | undefined} maybe_block_id
-* @param {string} node_address
-* @param {number} verbosity
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @returns {Promise<any>}
-*/
-  speculative_deploy(maybe_block_id: BlockIdentifier | undefined, node_address: string, verbosity: number, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @returns {Promise<any>}
-*/
-  get_era_summary(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @param {PublicKey} account_identifier
-* @returns {Promise<any>}
-*/
-  get_account(node_address: string, verbosity: number, maybe_block_identifier: BlockIdentifier | undefined, account_identifier: PublicKey): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @param {PublicKey} account_identifier
-* @returns {Promise<any>}
-*/
-  state_get_account_info(node_address: string, verbosity: number, maybe_block_identifier: BlockIdentifier | undefined, account_identifier: PublicKey): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {Digest} state_root_hash
-* @param {URef} purse
-* @returns {Promise<any>}
-*/
-  get_balance(node_address: string, verbosity: number, state_root_hash: Digest, purse: URef): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {Digest} state_root_hash
-* @param {URef} purse
-* @returns {Promise<any>}
-*/
-  state_get_balance(node_address: string, verbosity: number, state_root_hash: Digest, purse: URef): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @returns {Promise<any>}
-*/
-  get_block(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @returns {Promise<any>}
-*/
-  chain_get_block(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  get_chainspec(node_address: string, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {DeployHash} deploy_hash
-* @param {boolean} finalized_approvals
-* @returns {Promise<any>}
-*/
-  get_deploy(node_address: string, verbosity: number, deploy_hash: DeployHash, finalized_approvals: boolean): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {DeployHash} deploy_hash
-* @param {boolean} finalized_approvals
-* @returns {Promise<any>}
-*/
-  info_get_deploy(node_address: string, verbosity: number, deploy_hash: DeployHash, finalized_approvals: boolean): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  get_node_status(node_address: string, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  get_peers(node_address: string, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @returns {Promise<any>}
-*/
-  get_state_root_hash(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @returns {Promise<any>}
-*/
-  chain_get_state_root_hash(node_address: string, verbosity: number, maybe_block_identifier?: BlockIdentifier): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  get_validator_changes(node_address: string, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @returns {Promise<any>}
-*/
-  list_rpcs(node_address: string, verbosity: number): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {Deploy} deploy
-* @returns {Promise<any>}
-*/
-  put_deploy(node_address: string, verbosity: number, deploy: Deploy): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
-* @param {Deploy} deploy
-* @returns {Promise<any>}
-*/
-  account_put_deploy(node_address: string, verbosity: number, deploy: Deploy): Promise<any>;
-/**
-* @param {string} node_address
-* @param {number} verbosity
 * @param {GlobalStateIdentifier} global_state_identifier
 * @param {Key} key
 * @param {Path} path
+* @param {number | undefined} verbosity
 * @returns {Promise<any>}
 */
-  query_global_state(node_address: string, verbosity: number, global_state_identifier: GlobalStateIdentifier, key: Key, path: Path): Promise<any>;
+  query_global_state(node_address: string, global_state_identifier: GlobalStateIdentifier, key: Key, path: Path, verbosity?: number): Promise<any>;
 /**
 * @param {string} node_address
-* @param {number} verbosity
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
+* @param {number | undefined} verbosity
 * @returns {Promise<any>}
 */
-  deploy(node_address: string, verbosity: number, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Promise<any>;
+  deploy(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  get_chainspec(node_address: string, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {Digest} state_root_hash
+* @param {URef} purse
+* @returns {Promise<any>}
+*/
+  get_balance(node_address: string, verbosity: number | undefined, state_root_hash: Digest, purse: URef): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @param {Digest} state_root_hash
+* @param {URef} purse
+* @returns {Promise<any>}
+*/
+  state_get_balance(node_address: string, verbosity: number | undefined, state_root_hash: Digest, purse: URef): Promise<any>;
+/**
+* @param {string} node_address
+* @param {DeployHash} deploy_hash
+* @param {boolean} finalized_approvals
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {DeployHash} deploy_hash
+* @param {boolean} finalized_approvals
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  info_get_deploy(node_address: string, deploy_hash: DeployHash, finalized_approvals: boolean, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  get_node_status(node_address: string, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  get_peers(node_address: string, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  get_validator_changes(node_address: string, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  list_rpcs(node_address: string, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {Deploy} deploy
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  put_deploy(node_address: string, deploy: Deploy, verbosity?: number): Promise<any>;
+/**
+* @param {string} node_address
+* @param {Deploy} deploy
+* @param {number | undefined} verbosity
+* @returns {Promise<any>}
+*/
+  account_put_deploy(node_address: string, deploy: Deploy, verbosity?: number): Promise<any>;
 /**
 * @param {Deploy} deploy
 * @param {string} secret_key
@@ -1141,9 +1151,6 @@ export class SDK {
 * @returns {any}
 */
   make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): any;
-/**
-*/
-  constructor();
 }
 /**
 */
@@ -1231,6 +1238,11 @@ export class URefAddr {
 */
   constructor(bytes: Uint8Array);
 }
+/**
+*/
+export class getDictionaryItemOptions {
+  free(): void;
+}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -1238,9 +1250,42 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_bytes_free: (a: number) => void;
   readonly bytes_new: () => number;
-  readonly sdk_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
-  readonly sdk_state_get_dictionary_item: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
+  readonly __wbg_getdictionaryitemoptions_free: (a: number) => void;
+  readonly sdk_get_dictionary_item_options: (a: number, b: number) => number;
+  readonly sdk_get_dictionary_item: (a: number, b: number) => number;
+  readonly sdk_state_get_dictionary_item: (a: number, b: number) => number;
   readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => number;
+  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
+  readonly jsonPrettyPrint: (a: number, b: number) => number;
+  readonly privateToPublicKey: (a: number, b: number) => number;
+  readonly getTimestamp: () => number;
+  readonly __wbg_paymentstrparams_free: (a: number) => void;
+  readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number, t: number, u: number) => number;
+  readonly paymentstrparams_payment_amount: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_hash: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_hash: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_name: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_name: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_package_hash: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_package_hash: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_package_name: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_package_name: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_path: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_path: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_args_simple: (a: number) => number;
+  readonly paymentstrparams_set_payment_args_simple: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_args_json: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_args_json: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_args_complex: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_args_complex: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_version: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_entry_point: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
+  readonly __wbg_eraid_free: (a: number) => void;
+  readonly eraid_new: (a: number) => number;
+  readonly eraid_value: (a: number) => number;
   readonly transferaddr_new: (a: number, b: number, c: number) => void;
   readonly fromTransfer: (a: number, b: number) => number;
   readonly __wbg_cltype_free: (a: number) => void;
@@ -1271,34 +1316,16 @@ export interface InitOutput {
   readonly __wbg_deployhash_free: (a: number) => void;
   readonly deployhash_new: (a: number, b: number, c: number) => void;
   readonly deployhash_fromDigest: (a: number, b: number) => void;
-  readonly __wbg_paymentstrparams_free: (a: number) => void;
-  readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number, t: number, u: number) => number;
-  readonly paymentstrparams_payment_amount: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_hash: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_hash: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_name: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_name: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_package_hash: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_package_hash: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_package_name: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_package_name: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_path: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_path: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_args_simple: (a: number) => number;
-  readonly paymentstrparams_set_payment_args_simple: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_args_json: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_args_json: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_args_complex: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_args_complex: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_version: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_entry_point: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
-  readonly __wbg_eraid_free: (a: number) => void;
-  readonly eraid_new: (a: number) => number;
-  readonly eraid_value: (a: number) => number;
+  readonly __wbg_dictionaryitemidentifier_free: (a: number) => void;
+  readonly dictionaryitemidentifier_newFromAccountInfo: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly dictionaryitemidentifier_newFromContractInfo: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly dictionaryitemidentifier_newFromSeedUref: (a: number, b: number, c: number) => number;
+  readonly dictionaryitemidentifier_toJson: (a: number) => number;
+  readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
+  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly sdk_make_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
+  readonly sdk_new: () => number;
+  readonly __wbg_sdk_free: (a: number) => void;
   readonly __wbg_transferaddr_free: (a: number) => void;
   readonly __wbg_sessionstrparams_free: (a: number) => void;
   readonly sessionstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number, t: number) => number;
@@ -1324,35 +1351,11 @@ export interface InitOutput {
   readonly sessionstrparams_set_session_entry_point: (a: number, b: number, c: number) => void;
   readonly sessionstrparams_is_session_transfer: (a: number) => number;
   readonly sessionstrparams_set_is_session_transfer: (a: number, b: number) => void;
-  readonly __wbg_dictionaryitemstrparams_free: (a: number) => void;
-  readonly dictionaryitemstrparams_new: () => number;
-  readonly dictionaryitemstrparams_setAccountNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setContractNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setUref: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly dictionaryitemstrparams_setDictionary: (a: number, b: number, c: number) => void;
-  readonly __wbg_dictionaryitemidentifier_free: (a: number) => void;
-  readonly dictionaryitemidentifier_newFromAccountInfo: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly dictionaryitemidentifier_newFromContractInfo: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly dictionaryitemidentifier_newFromSeedUref: (a: number, b: number, c: number) => number;
   readonly __wbg_path_free: (a: number) => void;
   readonly path_new: (a: number) => number;
-  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
+  readonly sdk_speculative_exec: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly log: (a: number, b: number) => void;
   readonly error: (a: number, b: number) => void;
-  readonly __wbg_deploystrparams_free: (a: number) => void;
-  readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
-  readonly deploystrparams_secret_key: (a: number, b: number) => void;
-  readonly deploystrparams_set_secret_key: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_timestamp: (a: number, b: number) => void;
-  readonly deploystrparams_set_timestamp: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_setDefaultTimestamp: (a: number) => void;
-  readonly deploystrparams_ttl: (a: number, b: number) => void;
-  readonly deploystrparams_set_ttl: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_setDefaultTTL: (a: number) => void;
-  readonly deploystrparams_chain_name: (a: number, b: number) => void;
-  readonly deploystrparams_set_chain_name: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_session_account: (a: number, b: number) => void;
-  readonly deploystrparams_set_session_account: (a: number, b: number, c: number) => void;
   readonly __wbg_key_free: (a: number) => void;
   readonly key_new: (a: number, b: number) => void;
   readonly key_fromURef: (a: number) => number;
@@ -1371,12 +1374,6 @@ export interface InitOutput {
   readonly key_fromChainspecRegistry: () => number;
   readonly key_fromChecksumRegistry: () => number;
   readonly key_toFormattedString: (a: number, b: number) => void;
-  readonly sdk_get_auction_info: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_get_block_transfers: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_get_era_info: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_query_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_speculative_exec: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
   readonly __wbg_deploy_free: (a: number) => void;
   readonly deploy_new: (a: number) => number;
   readonly deploy_toJson: (a: number) => number;
@@ -1412,7 +1409,78 @@ export interface InitOutput {
   readonly deploy_paymentAmount: (a: number, b: number) => number;
   readonly deploy_args: (a: number) => number;
   readonly deploy_addArg: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_deploystrparams_free: (a: number) => void;
+  readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
+  readonly deploystrparams_secret_key: (a: number, b: number) => void;
+  readonly deploystrparams_set_secret_key: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_timestamp: (a: number, b: number) => void;
+  readonly deploystrparams_set_timestamp: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_setDefaultTimestamp: (a: number) => void;
+  readonly deploystrparams_ttl: (a: number, b: number) => void;
+  readonly deploystrparams_set_ttl: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_setDefaultTTL: (a: number) => void;
+  readonly deploystrparams_chain_name: (a: number, b: number) => void;
+  readonly deploystrparams_set_chain_name: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_session_account: (a: number, b: number) => void;
+  readonly deploystrparams_set_session_account: (a: number, b: number, c: number) => void;
+  readonly sdk_get_account: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_get_auction_info: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_get_block_transfers: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_get_era_info: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_get_era_summary: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_chain_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_query_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_get_chainspec: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_accounthash_free: (a: number) => void;
+  readonly accounthash_new: (a: number, b: number, c: number) => void;
+  readonly accounthash_fromPublicKey: (a: number) => number;
+  readonly accounthash_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly accounthash_toFormattedString: (a: number, b: number) => void;
+  readonly accounthash_fromUint8Array: (a: number, b: number) => number;
+  readonly blockhash_new: (a: number, b: number) => number;
+  readonly blockhash_toBytes: (a: number, b: number) => void;
+  readonly __wbg_clvalue_free: (a: number) => void;
+  readonly __wbg_dictionaryitemstrparams_free: (a: number) => void;
+  readonly dictionaryitemstrparams_new: () => number;
+  readonly dictionaryitemstrparams_setAccountNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setContractNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setUref: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly dictionaryitemstrparams_setDictionary: (a: number, b: number, c: number) => void;
+  readonly dictionaryitemstrparams_toJson: (a: number) => number;
+  readonly __wbg_globalstateidentifier_free: (a: number) => void;
+  readonly globalstateidentifier_new: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
+  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
+  readonly sdk_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_get_validator_changes: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_blockhash_free: (a: number) => void;
+  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
+  readonly __wbg_contractpackagehash_free: (a: number) => void;
+  readonly contractpackagehash_new: (a: number, b: number, c: number) => void;
+  readonly contractpackagehash_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly contractpackagehash_toFormattedString: (a: number, b: number) => void;
+  readonly contractpackagehash_fromUint8Array: (a: number, b: number) => number;
+  readonly digest_new: (a: number, b: number, c: number) => void;
+  readonly digest_fromDigest: (a: number, b: number, c: number) => void;
+  readonly digest_toJson: (a: number) => number;
+  readonly __wbg_dictionaryaddr_free: (a: number) => void;
+  readonly __wbg_digest_free: (a: number) => void;
   readonly __wbg_accessrights_free: (a: number) => void;
   readonly accessrights_NONE: () => number;
   readonly accessrights_READ: () => number;
@@ -1428,48 +1496,12 @@ export interface InitOutput {
   readonly accessrights_is_writeable: (a: number) => number;
   readonly accessrights_is_addable: (a: number) => number;
   readonly accessrights_is_none: (a: number) => number;
-  readonly __wbg_accounthash_free: (a: number) => void;
-  readonly accounthash_new: (a: number, b: number, c: number) => void;
-  readonly accounthash_fromPublicKey: (a: number) => number;
-  readonly accounthash_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly accounthash_toFormattedString: (a: number, b: number) => void;
-  readonly accounthash_fromUint8Array: (a: number, b: number) => number;
-  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
-  readonly blockhash_new: (a: number, b: number) => number;
-  readonly blockhash_toBytes: (a: number, b: number) => void;
-  readonly __wbg_clvalue_free: (a: number) => void;
-  readonly contractpackagehash_new: (a: number, b: number, c: number) => void;
-  readonly contractpackagehash_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly contractpackagehash_toFormattedString: (a: number, b: number) => void;
-  readonly contractpackagehash_fromUint8Array: (a: number, b: number) => number;
-  readonly __wbg_globalstateidentifier_free: (a: number) => void;
-  readonly globalstateidentifier_new: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
-  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
-  readonly sdk_get_account: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_state_get_account_info: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_state_get_balance: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_chain_get_block: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_get_chainspec: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_info_get_deploy: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_chain_get_state_root_hash: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_get_validator_changes: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_query_global_state: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbg_dictionaryaddr_free: (a: number) => void;
-  readonly __wbg_blockhash_free: (a: number) => void;
-  readonly __wbg_contractpackagehash_free: (a: number) => void;
+  readonly hashaddr_new: (a: number, b: number, c: number) => void;
+  readonly urefaddr_new: (a: number, b: number, c: number) => void;
+  readonly __wbg_blockidentifier_free: (a: number) => void;
+  readonly blockidentifier_new: (a: number) => number;
+  readonly blockidentifier_from_hash: (a: number) => number;
+  readonly blockidentifier_fromHeight: (a: number) => number;
   readonly __wbg_contracthash_free: (a: number) => void;
   readonly contracthash_new: (a: number, b: number, c: number) => void;
   readonly contracthash_fromFormattedStr: (a: number, b: number, c: number) => void;
@@ -1479,18 +1511,6 @@ export interface InitOutput {
   readonly purseidentifier_new_main_purse_under_public_key: (a: number) => number;
   readonly purseidentifier_new_main_purse_under_account_hash: (a: number) => number;
   readonly purseidentifier_new_purse_uref: (a: number) => number;
-  readonly hashaddr_new: (a: number, b: number, c: number) => void;
-  readonly urefaddr_new: (a: number, b: number, c: number) => void;
-  readonly __wbg_blockidentifier_free: (a: number) => void;
-  readonly blockidentifier_new: (a: number) => number;
-  readonly blockidentifier_from_hash: (a: number) => number;
-  readonly blockidentifier_fromHeight: (a: number) => number;
-  readonly __wbg_digest_free: (a: number) => void;
-  readonly digest_new: (a: number, b: number, c: number) => void;
-  readonly digest_fromDigest: (a: number, b: number, c: number) => void;
-  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_new: () => number;
-  readonly __wbg_sdk_free: (a: number) => void;
   readonly __wbg_urefaddr_free: (a: number) => void;
   readonly __wbg_hashaddr_free: (a: number) => void;
   readonly __wbg_argssimple_free: (a: number) => void;
@@ -1500,10 +1520,7 @@ export interface InitOutput {
   readonly __wbg_uref_free: (a: number) => void;
   readonly uref_new: (a: number, b: number, c: number, d: number) => void;
   readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
-  readonly hexToUint8Array: (a: number, b: number, c: number) => void;
-  readonly jsonPrettyPrint: (a: number, b: number) => number;
-  readonly privateToPublicKey: (a: number, b: number) => number;
-  readonly getTimestamp: () => number;
+  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;

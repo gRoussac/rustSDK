@@ -95,42 +95,42 @@ function App() {
       );
       console.log(chain_get_state_root_hash);
 
-      const chain_get_block = await sdk.chain_get_block(
-        host,
-        Verbosity.High,
-        BlockIdentifier.fromHeight(block_identifier_height)
-      );
-      setBlock(chain_get_block?.result.block.hash);
-      console.log('js chain_get_block', chain_get_block);
+      // const chain_get_block = await sdk.chain_get_block(
+      //   host,
+      //   Verbosity.High,
+      //   BlockIdentifier.fromHeight(block_identifier_height)
+      // );
+      // setBlock(chain_get_block?.result.block.hash);
+      // console.log('js chain_get_block', chain_get_block);
 
-      const public_key = new PublicKey(pubKey);
+      // const public_key = new PublicKey(pubKey);
 
-      const state_get_account_info = await sdk.state_get_account_info(
-        host,
-        Verbosity.High,
-        BlockIdentifier.fromHeight(block_identifier_height),
-        public_key
-      );
-      console.log('js state_get_account_info', state_get_account_info);
+      // const state_get_account_info = await sdk.state_get_account_info(
+      //   host,
+      //   Verbosity.High,
+      //   BlockIdentifier.fromHeight(block_identifier_height),
+      //   public_key
+      // );
+      // console.log('js state_get_account_info', state_get_account_info);
 
-      setInfo_get_account_info_hash(
-        state_get_account_info?.result.account.account_hash
-      );
-      setInfo_get_account_info_purse(
-        state_get_account_info?.result.account.main_purse
-      );
+      // setInfo_get_account_info_hash(
+      //   state_get_account_info?.result.account.account_hash
+      // );
+      // setInfo_get_account_info_purse(
+      //   state_get_account_info?.result.account.main_purse
+      // );
 
-      const state_get_balance = await sdk.state_get_balance(
-        host,
-        Verbosity.High,
-        new Digest(chain_get_state_root_hash?.result.state_root_hash),
-        new URef(
-          'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
-          AccessRights.READ_ADD_WRITE()
-        )
-      );
-      console.log('js state_get_balance', state_get_balance);
-      setState_get_balance(state_get_balance?.result.balance_value);
+      // const state_get_balance = await sdk.state_get_balance(
+      //   host,
+      //   new Digest(chain_get_state_root_hash?.result.state_root_hash),
+      //   new URef(
+      //     'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
+      //     AccessRights.READ_ADD_WRITE()
+      //   ),
+      //   Verbosity.High,
+      // );
+      // console.log('js state_get_balance', state_get_balance);
+      // setState_get_balance(state_get_balance?.result.balance_value);
 
       const dictionary_item_identifier =
         DictionaryItemIdentifier.newFromSeedUref(
@@ -140,14 +140,17 @@ function App() {
           ),
           '0' // event key
         );
-      const state_get_dictionary_item = await sdk.state_get_dictionary_item(
-        host,
-        undefined,
-        dictionary_item_identifier,
-        undefined,
-        undefined,
-        new Digest(chain_get_state_root_hash?.result.state_root_hash)
-      );
+
+      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
+      console.log(stateRootHashDigest.toJson());
+      let get_dictionary_item_options = sdk.get_dictionary_item_options({
+        node_address: host,
+        // state_root_hash: chain_get_state_root_hash?.result.state_root_hash,
+        state_root_hash_digest: stateRootHashDigest.toJson(),
+        dictionary_item_identifier: dictionary_item_identifier.toJson()
+      });
+      console.log(get_dictionary_item_options);
+      const state_get_dictionary_item = await sdk.state_get_dictionary_item(get_dictionary_item_options);
 
       setState_get_dictionary_item(
         state_get_dictionary_item?.result.stored_value.CLValue.parsed
@@ -156,7 +159,6 @@ function App() {
 
       const query_global_state = await sdk.query_global_state(
         host,
-        Verbosity.High,
         GlobalStateIdentifier.fromStateRootHash(
           new Digest(chain_get_state_root_hash?.result.state_root_hash)
         ),
@@ -166,7 +168,8 @@ function App() {
             AccessRights.READ_ADD_WRITE()
           )
         ),
-        new Path('')
+        new Path(''),
+        Verbosity.High,
       );
       console.log('js query_global_state', query_global_state);
       setQuery_global_state(
@@ -299,8 +302,8 @@ function App() {
       console.log(signed_deploy);
       const account_put_deploy = await sdk.account_put_deploy(
         host,
+        signed_deploy,
         Verbosity.High,
-        signed_deploy
       );
       console.log('js account_put_deploy', account_put_deploy);
       setAccount_put_deploy(account_put_deploy?.result?.deploy_hash);
@@ -312,12 +315,12 @@ function App() {
       let finalized_approvals = true;
       const info_get_deploy = await sdk.get_deploy(
         host,
-        Verbosity.High,
         new DeployHash(
           // '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
           account_put_deploy?.result.deploy_hash
         ),
-        finalized_approvals
+        finalized_approvals,
+        Verbosity.High,
       );
       console.log('js info_get_deploy', info_get_deploy);
       setInfo_get_deploy(info_get_deploy?.result?.api_version);

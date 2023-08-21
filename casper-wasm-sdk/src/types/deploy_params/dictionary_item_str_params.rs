@@ -1,36 +1,75 @@
 use crate::{debug::error, helpers::get_str_or_default, types::sdk_error::SdkError};
 use casper_client::cli::DictionaryItemStrParams as _DictionaryItemStrParams;
 use casper_types::URef;
+use gloo_utils::format::JsValueSerdeExt;
 use once_cell::sync::OnceCell;
+use serde::{de::Error as SerdeError, Deserialize, Serialize, Serializer};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AccountNamedKey {
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     key: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     dictionary_name: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     dictionary_item_key: OnceCell<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ContractNamedKey {
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     key: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     dictionary_name: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     dictionary_item_key: OnceCell<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct URefVariant {
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     seed_uref: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     dictionary_item_key: OnceCell<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DictionaryVariant {
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
     value: OnceCell<String>,
 }
 
+fn deserialize_once_cell<'de, D>(deserializer: D) -> Result<OnceCell<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let value: String = Deserialize::deserialize(deserializer)?;
+    let cell = OnceCell::new();
+    cell.set(value)
+        .map(|_| cell)
+        .map_err(|_| SerdeError::custom("Could not deser DictionaryItemStrParams"))
+}
+
+fn serialize_once_cell<S>(value: &OnceCell<String>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let value_str = value.get().map(|s| s.as_str()).unwrap_or_default();
+    serializer.serialize_str(value_str)
+}
+
 #[wasm_bindgen]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DictionaryItemStrParams {
     account_named_key: Option<AccountNamedKey>,
     contract_named_key: Option<ContractNamedKey>,
@@ -126,6 +165,11 @@ impl DictionaryItemStrParams {
         if let Some(dictionary) = &mut self.dictionary {
             let _ = dictionary.value.set(value);
         }
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 }
 

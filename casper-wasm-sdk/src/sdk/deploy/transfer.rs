@@ -25,7 +25,7 @@ impl SDK {
     pub async fn transfer_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         amount: &str,
         target_account: &str,
         deploy_params: DeployStrParams,
@@ -34,11 +34,11 @@ impl SDK {
         serialize_result(
             self.transfer(
                 node_address,
-                verbosity,
                 amount,
                 target_account,
                 deploy_params,
                 payment_params,
+                verbosity,
             )
             .await,
         )
@@ -49,11 +49,11 @@ impl SDK {
     pub async fn transfer(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
         amount: &str,
         target_account: &str,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
         log("transfer!");
         let deploy = make_transfer(
@@ -72,7 +72,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(node_address, verbosity, deploy.unwrap().into())
+        self.put_deploy(node_address, deploy.unwrap().into(), verbosity)
             .await
             .map_err(SdkError::from)
     }

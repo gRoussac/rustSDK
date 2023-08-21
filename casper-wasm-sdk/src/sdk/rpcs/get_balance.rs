@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{digest::Digest, uref::URef, verbosity::Verbosity},
     SDK,
 };
@@ -18,7 +19,7 @@ impl SDK {
     pub async fn get_balance_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         state_root_hash: Digest,
         purse: URef,
     ) -> JsValue {
@@ -32,7 +33,7 @@ impl SDK {
     pub async fn state_get_balance_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         state_root_hash: Digest,
         purse: URef,
     ) -> JsValue {
@@ -45,7 +46,7 @@ impl SDK {
     pub async fn get_balance(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         state_root_hash: Digest,
         purse: URef,
     ) -> Result<SuccessResponse<GetBalanceResult>, Error> {
@@ -53,7 +54,7 @@ impl SDK {
         get_balance(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             state_root_hash.into(),
             purse.into(),
         )

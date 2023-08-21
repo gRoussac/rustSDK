@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{
         global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
         verbosity::Verbosity,
@@ -21,7 +22,7 @@ impl SDK {
     pub async fn query_balance_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
         purse_identifier: PurseIdentifier,
     ) -> JsValue {
@@ -41,7 +42,7 @@ impl SDK {
     pub async fn query_balance(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
         purse_identifier: PurseIdentifier,
     ) -> Result<SuccessResponse<QueryBalanceResult>, Error> {
@@ -49,7 +50,7 @@ impl SDK {
         query_balance(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             maybe_global_state_identifier.map(Into::into),
             purse_identifier.into(),
         )

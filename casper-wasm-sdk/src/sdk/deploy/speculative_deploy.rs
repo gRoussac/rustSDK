@@ -26,19 +26,19 @@ impl SDK {
         &mut self,
         maybe_block_id: Option<BlockIdentifier>,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
         serialize_result(
             self.speculative_deploy(
-                maybe_block_id,
                 node_address,
-                verbosity,
                 deploy_params,
                 session_params,
                 payment_params,
+                maybe_block_id,
+                verbosity,
             )
             .await,
         )
@@ -48,12 +48,12 @@ impl SDK {
 impl SDK {
     pub async fn speculative_deploy(
         &mut self,
-        maybe_block_id: Option<BlockIdentifier>,
         node_address: &str,
-        verbosity: Verbosity,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        maybe_block_id: Option<BlockIdentifier>,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
         log("speculative_deploy!");
         let deploy = make_deploy(
@@ -72,9 +72,9 @@ impl SDK {
 
         self.speculative_exec(
             node_address,
+            deploy.unwrap().into(),
             maybe_block_id,
             verbosity,
-            deploy.unwrap().into(),
         )
         .await
         .map_err(SdkError::from)

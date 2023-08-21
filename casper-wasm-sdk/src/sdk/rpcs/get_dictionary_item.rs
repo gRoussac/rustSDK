@@ -19,27 +19,55 @@ use casper_client::{
     get_dictionary_item as get_dictionary_item_lib, rpcs::results::GetDictionaryItemResult,
     JsonRpcId, SuccessResponse,
 };
+use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
+use serde::Deserialize;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::{
-    convert::{FromWasmAbi, IntoWasmAbi},
-    describe::WasmDescribe,
-};
+
+#[derive(Default, Debug, Deserialize, Clone)]
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(js_name = "getDictionaryItemOptions")]
+pub struct GetDictionaryItemOptions {
+    node_address: String,
+    state_root_hash: Option<String>,
+    state_root_hash_digest: Option<Digest>,
+    dictionary_item_params: Option<DictionaryItemStrParams>,
+    dictionary_item_identifier: Option<DictionaryItemIdentifier>,
+    verbosity: Option<Verbosity>,
+}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    #[wasm_bindgen(js_name = "get_dictionary_item_options")]
+    pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
+        let options_result: Result<GetDictionaryItemOptions, _> = options.into_serde();
+        if let Err(err) = options_result {
+            log(&format!("Deserialization error: {:?}", err));
+            return GetDictionaryItemOptions::default();
+        }
+        let options: GetDictionaryItemOptions = options_result.unwrap();
+        options
+    }
+
     #[wasm_bindgen(js_name = "get_dictionary_item")]
     pub async fn get_dictionary_item_js_alias(
         &mut self,
-        node_address: &str,
-        state_root_hash: Option<String>,
-        dictionary_item_identifier: Option<DictionaryItemIdentifier>,
-        dictionary_item_params: Option<DictionaryItemStrParams>,
-        verbosity: Option<Verbosity>,
-        state_root_hash_digest: Option<Digest>,
+        options: GetDictionaryItemOptions,
     ) -> JsValue {
+        let cloned_options = options.clone();
+        let GetDictionaryItemOptions {
+            node_address,
+            state_root_hash,
+            state_root_hash_digest,
+            dictionary_item_params,
+            dictionary_item_identifier,
+            verbosity,
+        } = options;
+
+        log(&format!("get_dictionary_item {:?}", cloned_options));
+
         let dictionary_item = if let Some(identifier) = dictionary_item_identifier {
             DictionaryItemInput::Identifier(identifier)
         } else if let Some(params) = dictionary_item_params {
@@ -49,45 +77,30 @@ impl SDK {
             return JsValue::null();
         };
 
-        let selected_state_root_hash: Digest = if let Some(hash) = state_root_hash_digest {
-            hash
-        } else if let Some(hash_string) = state_root_hash {
-            Digest::from(hash_string.as_str())
+        let result = if let Some(hash) = state_root_hash_digest {
+            self.get_dictionary_item(&node_address, hash, verbosity, Some(dictionary_item))
+                .await
+        } else if let Some(hash) = state_root_hash {
+            self.get_dictionary_item(
+                &node_address,
+                hash.as_str(),
+                verbosity,
+                Some(dictionary_item),
+            )
+            .await
         } else {
             error("Error: Missing state_root_hash");
             return JsValue::null();
         };
-
-        serialize_result(
-            self.get_dictionary_item(
-                node_address,
-                selected_state_root_hash,
-                verbosity,
-                Some(dictionary_item),
-            )
-            .await,
-        )
+        serialize_result(result)
     }
 
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
         &mut self,
-        node_address: &str,
-        state_root_hash: Option<String>,
-        dictionary_item_identifier: Option<DictionaryItemIdentifier>,
-        dictionary_item_params: Option<DictionaryItemStrParams>,
-        verbosity: Option<Verbosity>,
-        state_root_hash_digest: Option<Digest>,
+        options: GetDictionaryItemOptions,
     ) -> JsValue {
-        self.get_dictionary_item_js_alias(
-            node_address,
-            state_root_hash,
-            dictionary_item_identifier,
-            dictionary_item_params,
-            verbosity,
-            state_root_hash_digest,
-        )
-        .await
+        self.get_dictionary_item_js_alias(options).await
     }
 }
 
