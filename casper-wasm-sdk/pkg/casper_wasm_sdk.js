@@ -310,7 +310,7 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_347(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_351(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h70dd628200031030(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -559,6 +559,13 @@ export class AccountHash {
         const ret = wasm.accounthash_fromUint8Array(ptr0, len0);
         return AccountHash.__wrap(ret);
     }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.accounthash_toJson(this.__wbg_ptr);
+        return takeObject(ret);
+    }
 }
 /**
 */
@@ -682,6 +689,13 @@ export class BlockIdentifier {
     static fromHeight(height) {
         const ret = wasm.blockidentifier_fromHeight(height);
         return BlockIdentifier.__wrap(ret);
+    }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.blockidentifier_toJson(this.__wbg_ptr);
+        return takeObject(ret);
     }
 }
 /**
@@ -2065,6 +2079,30 @@ export class EraId {
 }
 /**
 */
+export class GetAccountOptions {
+
+    static __wrap(ptr) {
+        ptr = ptr >>> 0;
+        const obj = Object.create(GetAccountOptions.prototype);
+        obj.__wbg_ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_getaccountoptions_free(ptr);
+    }
+}
+/**
+*/
 export class GlobalStateIdentifier {
 
     static __wrap(ptr) {
@@ -2797,6 +2835,13 @@ export class PublicKey {
         const ret = wasm.publickey_fromUint8Array(ptr0, len0);
         return PublicKey.__wrap(ret);
     }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.publickey_toJson(this.__wbg_ptr);
+        return takeObject(ret);
+    }
 }
 /**
 */
@@ -2876,6 +2921,34 @@ export class SDK {
     }
     /**
     * @param {any} options
+    * @returns {GetAccountOptions}
+    */
+    get_account_options(options) {
+        const ret = wasm.sdk_get_account_options(this.__wbg_ptr, addHeapObject(options));
+        return GetAccountOptions.__wrap(ret);
+    }
+    /**
+    * @param {GetAccountOptions} options
+    * @returns {Promise<any>}
+    */
+    get_account(options) {
+        _assertClass(options, GetAccountOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_get_account(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {GetAccountOptions} options
+    * @returns {Promise<any>}
+    */
+    state_get_account_info(options) {
+        _assertClass(options, GetAccountOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_state_get_account_info(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {any} options
     * @returns {getDictionaryItemOptions}
     */
     get_dictionary_item_options(options) {
@@ -2932,30 +3005,10 @@ export class SDK {
         return takeObject(ret);
     }
     /**
-    * @param {BlockIdentifier | undefined} maybe_block_id
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
-    * @param {DeployStrParams} deploy_params
-    * @param {SessionStrParams} session_params
-    * @param {PaymentStrParams} payment_params
-    * @returns {Promise<any>}
     */
-    speculative_deploy(maybe_block_id, node_address, verbosity, deploy_params, session_params, payment_params) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_block_id)) {
-            _assertClass(maybe_block_id, BlockIdentifier);
-            ptr0 = maybe_block_id.__destroy_into_raw();
-        }
-        const ptr1 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr2 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr3 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr4 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3, ptr4);
-        return takeObject(ret);
+    constructor() {
+        const ret = wasm.sdk_new();
+        return SDK.__wrap(ret);
     }
     /**
     * @param {string} node_address
@@ -3003,12 +3056,6 @@ export class SDK {
         return takeObject(ret);
     }
     /**
-    */
-    constructor() {
-        const ret = wasm.sdk_new();
-        return SDK.__wrap(ret);
-    }
-    /**
     * @param {string} node_address
     * @param {Deploy} deploy
     * @param {BlockIdentifier | undefined} block_identifier
@@ -3029,43 +3076,29 @@ export class SDK {
         return takeObject(ret);
     }
     /**
+    * @param {BlockIdentifier | undefined} maybe_block_id
     * @param {string} node_address
     * @param {number | undefined} verbosity
-    * @param {BlockIdentifier | undefined} maybe_block_identifier
-    * @param {PublicKey} account_identifier
+    * @param {DeployStrParams} deploy_params
+    * @param {SessionStrParams} session_params
+    * @param {PaymentStrParams} payment_params
     * @returns {Promise<any>}
     */
-    get_account(node_address, verbosity, maybe_block_identifier, account_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr1 = maybe_block_identifier.__destroy_into_raw();
+    speculative_deploy(maybe_block_id, node_address, verbosity, deploy_params, session_params, payment_params) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_block_id)) {
+            _assertClass(maybe_block_id, BlockIdentifier);
+            ptr0 = maybe_block_id.__destroy_into_raw();
         }
-        _assertClass(account_identifier, PublicKey);
-        var ptr2 = account_identifier.__destroy_into_raw();
-        const ret = wasm.sdk_get_account(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
-    * @param {BlockIdentifier | undefined} maybe_block_identifier
-    * @param {PublicKey} account_identifier
-    * @returns {Promise<any>}
-    */
-    state_get_account_info(node_address, verbosity, maybe_block_identifier, account_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr1 = maybe_block_identifier.__destroy_into_raw();
-        }
-        _assertClass(account_identifier, PublicKey);
-        var ptr2 = account_identifier.__destroy_into_raw();
-        const ret = wasm.sdk_state_get_account_info(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
+        const ptr1 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr2 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr3 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr4 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3, ptr4);
         return takeObject(ret);
     }
     /**
@@ -3267,17 +3300,6 @@ export class SDK {
     /**
     * @param {string} node_address
     * @param {number | undefined} verbosity
-    * @returns {Promise<any>}
-    */
-    get_chainspec(node_address, verbosity) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_chainspec(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
     * @param {Digest} state_root_hash
     * @param {URef} purse
     * @returns {Promise<any>}
@@ -3307,6 +3329,17 @@ export class SDK {
         _assertClass(purse, URef);
         var ptr2 = purse.__destroy_into_raw();
         const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number | undefined} verbosity
+    * @returns {Promise<any>}
+    */
+    get_chainspec(node_address, verbosity) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_chainspec(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity);
         return takeObject(ret);
     }
     /**
@@ -4209,7 +4242,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_347(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_351(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -4289,8 +4322,8 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3715 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 797, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper3726 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 771, __wbg_adapter_26);
         return addHeapObject(ret);
     };
 
