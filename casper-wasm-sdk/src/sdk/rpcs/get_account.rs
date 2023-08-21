@@ -2,12 +2,12 @@
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+#[cfg(target_arch = "wasm32")]
+use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
     types::{
-        block_identifier::{BlockIdentifier, BlockIdentifierInput},
-        public_key::PublicKey,
-        sdk_error::SdkError,
+        block_identifier::BlockIdentifierInput, public_key::PublicKey, sdk_error::SdkError,
         verbosity::Verbosity,
     },
     SDK,
@@ -26,13 +26,13 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = "getAccountOptions")]
 pub struct GetAccountOptions {
     node_address: String,
     account_identifier: Option<String>,
     public_key: Option<PublicKey>,
     // account_hash: Option<AccountHash>, PR #99 Account identifier
-    maybe_block_id: Option<String>,
+    maybe_block_id_as_string: Option<String>,
     maybe_block_identifier: Option<BlockIdentifier>,
     verbosity: Option<Verbosity>,
 }
@@ -52,7 +52,7 @@ impl SDK {
             account_identifier,
             public_key,
             // account_hash,
-            maybe_block_id,
+            maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
         } = options;
@@ -71,7 +71,7 @@ impl SDK {
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id.map(BlockIdentifierInput::Id)
+            maybe_block_id_as_string.map(BlockIdentifierInput::Id)
         };
 
         serialize_result(

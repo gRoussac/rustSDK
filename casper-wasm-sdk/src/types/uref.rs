@@ -3,9 +3,10 @@ use crate::{
     types::{access_rights::AccessRights, addr::uref_addr::URefAddr},
 };
 use casper_types::URef as _URef;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[wasm_bindgen]
 
 pub struct URef(_URef);
