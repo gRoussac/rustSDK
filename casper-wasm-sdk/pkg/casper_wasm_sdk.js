@@ -2079,54 +2079,6 @@ export class EraId {
 }
 /**
 */
-export class GetAccountOptions {
-
-    static __wrap(ptr) {
-        ptr = ptr >>> 0;
-        const obj = Object.create(GetAccountOptions.prototype);
-        obj.__wbg_ptr = ptr;
-
-        return obj;
-    }
-
-    __destroy_into_raw() {
-        const ptr = this.__wbg_ptr;
-        this.__wbg_ptr = 0;
-
-        return ptr;
-    }
-
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_getaccountoptions_free(ptr);
-    }
-}
-/**
-*/
-export class GetAuctionInfoOptions {
-
-    static __wrap(ptr) {
-        ptr = ptr >>> 0;
-        const obj = Object.create(GetAuctionInfoOptions.prototype);
-        obj.__wbg_ptr = ptr;
-
-        return obj;
-    }
-
-    __destroy_into_raw() {
-        const ptr = this.__wbg_ptr;
-        this.__wbg_ptr = 0;
-
-        return ptr;
-    }
-
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_getauctioninfooptions_free(ptr);
-    }
-}
-/**
-*/
 export class GlobalStateIdentifier {
 
     static __wrap(ptr) {
@@ -2945,30 +2897,48 @@ export class SDK {
     }
     /**
     * @param {any} options
-    * @returns {GetAccountOptions}
+    * @returns {getAccountOptions}
     */
     get_account_options(options) {
         const ret = wasm.sdk_get_account_options(this.__wbg_ptr, addHeapObject(options));
-        return GetAccountOptions.__wrap(ret);
+        return getAccountOptions.__wrap(ret);
     }
     /**
-    * @param {GetAccountOptions} options
+    * @param {getAccountOptions} options
     * @returns {Promise<any>}
     */
     get_account(options) {
-        _assertClass(options, GetAccountOptions);
+        _assertClass(options, getAccountOptions);
         var ptr0 = options.__destroy_into_raw();
         const ret = wasm.sdk_get_account(this.__wbg_ptr, ptr0);
         return takeObject(ret);
     }
     /**
-    * @param {GetAccountOptions} options
+    * @param {getAccountOptions} options
     * @returns {Promise<any>}
     */
     state_get_account_info(options) {
-        _assertClass(options, GetAccountOptions);
+        _assertClass(options, getAccountOptions);
         var ptr0 = options.__destroy_into_raw();
         const ret = wasm.sdk_state_get_account_info(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {any} options
+    * @returns {getBalanceOptions}
+    */
+    get_balance_options(options) {
+        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, addHeapObject(options));
+        return getBalanceOptions.__wrap(ret);
+    }
+    /**
+    * @param {getBalanceOptions} options
+    * @returns {Promise<any>}
+    */
+    get_balance(options) {
+        _assertClass(options, getBalanceOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
         return takeObject(ret);
     }
     /**
@@ -3029,12 +2999,6 @@ export class SDK {
         return takeObject(ret);
     }
     /**
-    */
-    constructor() {
-        const ret = wasm.sdk_new();
-        return SDK.__wrap(ret);
-    }
-    /**
     * @param {string} node_address
     * @param {number | undefined} verbosity
     * @param {string} amount
@@ -3080,6 +3044,64 @@ export class SDK {
         return takeObject(ret);
     }
     /**
+    * @param {any} options
+    * @returns {getAuctionInfoOptions}
+    */
+    get_auction_info_options(options) {
+        const ret = wasm.sdk_get_auction_info_options(this.__wbg_ptr, addHeapObject(options));
+        return getAuctionInfoOptions.__wrap(ret);
+    }
+    /**
+    * @param {getAuctionInfoOptions} options
+    * @returns {Promise<any>}
+    */
+    get_auction_info(options) {
+        _assertClass(options, getAuctionInfoOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_get_auction_info(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {number | undefined} verbosity
+    * @param {GlobalStateIdentifier | undefined} maybe_global_state_identifier
+    * @param {PurseIdentifier} purse_identifier
+    * @returns {Promise<any>}
+    */
+    query_balance(node_address, verbosity, maybe_global_state_identifier, purse_identifier) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        let ptr1 = 0;
+        if (!isLikeNone(maybe_global_state_identifier)) {
+            _assertClass(maybe_global_state_identifier, GlobalStateIdentifier);
+            ptr1 = maybe_global_state_identifier.__destroy_into_raw();
+        }
+        _assertClass(purse_identifier, PurseIdentifier);
+        var ptr2 = purse_identifier.__destroy_into_raw();
+        const ret = wasm.sdk_query_balance(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {Deploy} deploy
+    * @param {BlockIdentifier | undefined} block_identifier
+    * @param {number | undefined} verbosity
+    * @returns {Promise<any>}
+    */
+    speculative_exec(node_address, deploy, block_identifier, verbosity) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(deploy, Deploy);
+        var ptr1 = deploy.__destroy_into_raw();
+        let ptr2 = 0;
+        if (!isLikeNone(block_identifier)) {
+            _assertClass(block_identifier, BlockIdentifier);
+            ptr2 = block_identifier.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0, len0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity);
+        return takeObject(ret);
+    }
+    /**
     * @param {BlockIdentifier | undefined} maybe_block_id
     * @param {string} node_address
     * @param {number | undefined} verbosity
@@ -3103,24 +3125,6 @@ export class SDK {
         _assertClass(payment_params, PaymentStrParams);
         var ptr4 = payment_params.__destroy_into_raw();
         const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3, ptr4);
-        return takeObject(ret);
-    }
-    /**
-    * @param {any} options
-    * @returns {GetAuctionInfoOptions}
-    */
-    get_auction_info_options(options) {
-        const ret = wasm.sdk_get_auction_info_options(this.__wbg_ptr, addHeapObject(options));
-        return GetAuctionInfoOptions.__wrap(ret);
-    }
-    /**
-    * @param {GetAuctionInfoOptions} options
-    * @returns {Promise<any>}
-    */
-    get_auction_info(options) {
-        _assertClass(options, GetAuctionInfoOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.sdk_get_auction_info(this.__wbg_ptr, ptr0);
         return takeObject(ret);
     }
     /**
@@ -3211,46 +3215,6 @@ export class SDK {
     /**
     * @param {string} node_address
     * @param {number | undefined} verbosity
-    * @param {GlobalStateIdentifier | undefined} maybe_global_state_identifier
-    * @param {PurseIdentifier} purse_identifier
-    * @returns {Promise<any>}
-    */
-    query_balance(node_address, verbosity, maybe_global_state_identifier, purse_identifier) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        let ptr1 = 0;
-        if (!isLikeNone(maybe_global_state_identifier)) {
-            _assertClass(maybe_global_state_identifier, GlobalStateIdentifier);
-            ptr1 = maybe_global_state_identifier.__destroy_into_raw();
-        }
-        _assertClass(purse_identifier, PurseIdentifier);
-        var ptr2 = purse_identifier.__destroy_into_raw();
-        const ret = wasm.sdk_query_balance(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {Deploy} deploy
-    * @param {BlockIdentifier | undefined} block_identifier
-    * @param {number | undefined} verbosity
-    * @returns {Promise<any>}
-    */
-    speculative_exec(node_address, deploy, block_identifier, verbosity) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(deploy, Deploy);
-        var ptr1 = deploy.__destroy_into_raw();
-        let ptr2 = 0;
-        if (!isLikeNone(block_identifier)) {
-            _assertClass(block_identifier, BlockIdentifier);
-            ptr2 = block_identifier.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0, len0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
     * @param {BlockIdentifier | undefined} maybe_block_identifier
     * @returns {Promise<any>}
     */
@@ -3320,40 +3284,6 @@ export class SDK {
         _assertClass(payment_params, PaymentStrParams);
         var ptr3 = payment_params.__destroy_into_raw();
         const ret = wasm.sdk_deploy(this.__wbg_ptr, ptr0, len0, ptr1, ptr2, ptr3, isLikeNone(verbosity) ? 3 : verbosity);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
-    * @param {Digest} state_root_hash
-    * @param {URef} purse
-    * @returns {Promise<any>}
-    */
-    get_balance(node_address, verbosity, state_root_hash, purse) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        _assertClass(purse, URef);
-        var ptr2 = purse.__destroy_into_raw();
-        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
-        return takeObject(ret);
-    }
-    /**
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
-    * @param {Digest} state_root_hash
-    * @param {URef} purse
-    * @returns {Promise<any>}
-    */
-    state_get_balance(node_address, verbosity, state_root_hash, purse) {
-        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        _assertClass(state_root_hash, Digest);
-        var ptr1 = state_root_hash.__destroy_into_raw();
-        _assertClass(purse, URef);
-        var ptr2 = purse.__destroy_into_raw();
-        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, ptr2);
         return takeObject(ret);
     }
     /**
@@ -3497,6 +3427,12 @@ export class SDK {
         var ptr2 = payment_params.__destroy_into_raw();
         const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
         return takeObject(ret);
+    }
+    /**
+    */
+    constructor() {
+        const ret = wasm.sdk_new();
+        return SDK.__wrap(ret);
     }
 }
 /**
@@ -3973,6 +3909,78 @@ export class URefAddr {
 }
 /**
 */
+export class getAccountOptions {
+
+    static __wrap(ptr) {
+        ptr = ptr >>> 0;
+        const obj = Object.create(getAccountOptions.prototype);
+        obj.__wbg_ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_getaccountoptions_free(ptr);
+    }
+}
+/**
+*/
+export class getAuctionInfoOptions {
+
+    static __wrap(ptr) {
+        ptr = ptr >>> 0;
+        const obj = Object.create(getAuctionInfoOptions.prototype);
+        obj.__wbg_ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_getauctioninfooptions_free(ptr);
+    }
+}
+/**
+*/
+export class getBalanceOptions {
+
+    static __wrap(ptr) {
+        ptr = ptr >>> 0;
+        const obj = Object.create(getBalanceOptions.prototype);
+        obj.__wbg_ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_getbalanceoptions_free(ptr);
+    }
+}
+/**
+*/
 export class getDictionaryItemOptions {
 
     static __wrap(ptr) {
@@ -4347,8 +4355,8 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3743 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 770, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper3765 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 767, __wbg_adapter_26);
         return addHeapObject(ret);
     };
 
