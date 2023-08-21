@@ -5,8 +5,11 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
     crypto,
 };
+use gloo_utils::format::JsValueSerdeExt;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct AccountHash(_AccountHash);
 
@@ -49,6 +52,11 @@ impl AccountHash {
         let account_hash =
             _AccountHash::try_from(&bytes).expect("Failed to convert bytes to AccountHash");
         AccountHash(account_hash)
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 }
 

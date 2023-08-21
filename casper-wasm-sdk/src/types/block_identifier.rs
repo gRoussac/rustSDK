@@ -1,9 +1,10 @@
+use super::block_hash::BlockHash;
 use casper_client::rpcs::common::BlockIdentifier as _BlockIdentifier;
+use gloo_utils::format::JsValueSerdeExt;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-use super::block_hash::BlockHash;
-
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct BlockIdentifier(_BlockIdentifier);
 
@@ -18,9 +19,14 @@ impl BlockIdentifier {
         BlockIdentifier(_BlockIdentifier::Hash(hash.into()))
     }
 
-    #[wasm_bindgen(js_name = fromHeight)]
+    #[wasm_bindgen(js_name = "fromHeight")]
     pub fn from_height(height: u64) -> Self {
         BlockIdentifier(_BlockIdentifier::Height(height))
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 }
 
