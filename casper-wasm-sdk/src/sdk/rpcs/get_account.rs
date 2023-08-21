@@ -17,10 +17,8 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-
 #[cfg(target_arch = "wasm32")]
 use serde::Deserialize;
-
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
@@ -67,9 +65,11 @@ impl SDK {
         };
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
-            Some(GetAccountInput::BlockIdentifier(maybe_block_identifier))
+            Some(BlockIdentifierInput::BlockIdentifier(
+                maybe_block_identifier,
+            ))
         } else {
-            maybe_block_id.map(GetAccountInput::Id)
+            maybe_block_id.map(BlockIdentifierInput::Id)
         };
 
         serialize_result(
@@ -85,7 +85,7 @@ impl SDK {
 }
 
 #[derive(Debug, Clone)]
-pub enum GetAccountInput {
+pub enum BlockIdentifierInput {
     BlockIdentifier(BlockIdentifier),
     Id(String),
 }
@@ -95,12 +95,12 @@ impl SDK {
         &mut self,
         node_address: &str,
         verbosity: Option<Verbosity>,
-        maybe_block_identifier: Option<GetAccountInput>,
+        maybe_block_identifier: Option<BlockIdentifierInput>,
         public_key: PublicKey,
     ) -> Result<SuccessResponse<GetAccountResult>, SdkError> {
         //log("get_account!");
 
-        if let Some(GetAccountInput::Id(maybe_block_id)) = maybe_block_identifier {
+        if let Some(BlockIdentifierInput::Id(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 node_address,
@@ -112,7 +112,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else {
             let maybe_block_identifier =
-                if let Some(GetAccountInput::BlockIdentifier(maybe_block_identifier)) =
+                if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
                     maybe_block_identifier
                 {
                     Some(maybe_block_identifier)
