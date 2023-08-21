@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{
         global_state_identifier::GlobalStateIdentifier, key::Key, path::Path, verbosity::Verbosity,
     },
@@ -20,10 +21,10 @@ impl SDK {
     pub async fn query_global_state_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
         global_state_identifier: GlobalStateIdentifier,
         key: Key,
         path: Path,
+        verbosity: Option<Verbosity>,
     ) -> JsValue {
         serialize_result(
             self.query_global_state(node_address, verbosity, global_state_identifier, key, path)
@@ -36,7 +37,7 @@ impl SDK {
     pub async fn query_global_state(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         global_state_identifier: GlobalStateIdentifier,
         key: Key,
         path: Path,
@@ -45,7 +46,7 @@ impl SDK {
         query_global_state(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             global_state_identifier.into(),
             key.into(),
             path.into(),

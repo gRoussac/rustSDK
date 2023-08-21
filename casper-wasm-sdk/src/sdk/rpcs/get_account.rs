@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifier, public_key::PublicKey, verbosity::Verbosity},
     SDK,
 };
@@ -18,7 +19,7 @@ impl SDK {
     pub async fn get_account_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
         account_identifier: PublicKey,
     ) -> JsValue {
@@ -37,7 +38,7 @@ impl SDK {
     pub async fn state_get_account_info_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
         account_identifier: PublicKey,
     ) -> JsValue {
@@ -55,7 +56,7 @@ impl SDK {
     pub async fn get_account(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
         account_identifier: PublicKey,
     ) -> Result<SuccessResponse<GetAccountResult>, Error> {
@@ -63,7 +64,7 @@ impl SDK {
         get_account(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             maybe_block_identifier.map(Into::into),
             account_identifier.into(),
         )

@@ -24,18 +24,18 @@ impl SDK {
     pub async fn deploy_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        verbosity: Option<Verbosity>,
     ) -> JsValue {
         serialize_result(
             self.deploy(
                 node_address,
-                verbosity,
                 deploy_params,
                 session_params,
                 payment_params,
+                verbosity,
             )
             .await,
         )
@@ -46,10 +46,10 @@ impl SDK {
     pub async fn deploy(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
         log("deploy!");
         let deploy = make_deploy(
@@ -66,7 +66,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(node_address, verbosity, deploy.unwrap().into())
+        self.put_deploy(node_address, deploy.unwrap().into(), verbosity)
             .await
             .map_err(SdkError::from)
     }

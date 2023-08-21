@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifier, deploy::Deploy, verbosity::Verbosity},
     SDK,
 };
@@ -18,12 +19,12 @@ impl SDK {
     pub async fn speculative_exec_js_alias(
         &mut self,
         node_address: &str,
-        block_identifier: Option<BlockIdentifier>,
-        verbosity: Verbosity,
         deploy: Deploy,
+        block_identifier: Option<BlockIdentifier>,
+        verbosity: Option<Verbosity>,
     ) -> JsValue {
         serialize_result(
-            self.speculative_exec(node_address, block_identifier, verbosity, deploy)
+            self.speculative_exec(node_address, deploy, block_identifier, verbosity)
                 .await,
         )
     }
@@ -33,16 +34,16 @@ impl SDK {
     pub async fn speculative_exec(
         &mut self,
         node_address: &str,
-        block_identifier: Option<BlockIdentifier>,
-        verbosity: Verbosity,
         deploy: Deploy,
+        block_identifier: Option<BlockIdentifier>,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, Error> {
         //log("speculative_exec!");
         speculative_exec(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             block_identifier.map(Into::into),
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             deploy.into(),
         )
         .await

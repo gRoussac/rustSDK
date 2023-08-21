@@ -1,8 +1,10 @@
 use super::{account_hash::AccountHash, addr::hash_addr::HashAddr, key::Key, uref::URef};
 use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
+use gloo_utils::format::JsValueSerdeExt;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct DictionaryItemIdentifier(_DictionaryItemIdentifier);
 
@@ -45,6 +47,11 @@ impl DictionaryItemIdentifier {
             seed_uref: seed_uref.into(),
             dictionary_item_key,
         })
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
     // #[wasm_bindgen(js_name = newFromItemKey)]

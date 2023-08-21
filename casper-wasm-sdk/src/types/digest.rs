@@ -3,10 +3,13 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     Digest as _Digest,
 };
+use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
+use serde::{Deserialize, Serialize};
+use std::fmt;
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[wasm_bindgen]
 pub struct Digest(_Digest);
 
@@ -30,7 +33,39 @@ impl Digest {
         digest_bytes.copy_from_slice(&bytes);
         Ok(Digest(_Digest::from(digest_bytes)))
     }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
+    }
 }
+
+impl fmt::Display for Digest {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
+// TODO clean up
+// impl Serialize for Digest {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer,
+//     {
+//         serializer.serialize_str(&self.to_string()) // Serialize Digest as a string
+//     }
+// }
+
+// impl<'de> Deserialize<'de> for Digest {
+//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+//     where
+//         D: Deserializer<'de>,
+//     {
+//         let s: String = Deserialize::deserialize(deserializer)?;
+//         let digest = Digest::from(s.as_str());
+//         Ok(digest)
+//     }
+// }
 
 impl From<Digest> for _Digest {
     fn from(digest: Digest) -> Self {

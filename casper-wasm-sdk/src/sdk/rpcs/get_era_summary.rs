@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifier, verbosity::Verbosity},
     SDK,
 };
@@ -18,7 +19,7 @@ impl SDK {
     pub async fn get_era_summary_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
         serialize_result(
@@ -32,14 +33,14 @@ impl SDK {
     pub async fn get_era_summary(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> Result<SuccessResponse<GetEraSummaryResult>, Error> {
         //log("get_era_summary!");
         get_era_summary(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             maybe_block_identifier.map(Into::into),
         )
         .await

@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
+    helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifier, verbosity::Verbosity},
     SDK,
 };
@@ -16,7 +17,7 @@ impl SDK {
     pub async fn get_block_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
         serialize_result(
@@ -29,7 +30,7 @@ impl SDK {
     pub async fn chain_get_block_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> JsValue {
         self.get_block_js_alias(node_address, verbosity, maybe_block_identifier)
@@ -40,14 +41,14 @@ impl SDK {
     pub async fn get_block(
         &mut self,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifier>,
     ) -> Result<SuccessResponse<GetBlockResult>, Error> {
         //log("get_block!");
         get_block(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
-            verbosity.into(),
+            get_verbosity_or_default(verbosity).into(),
             maybe_block_identifier.map(Into::into),
         )
         .await

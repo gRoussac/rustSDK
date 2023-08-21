@@ -27,7 +27,7 @@ impl SDK {
         &mut self,
         maybe_block_id: Option<BlockIdentifier>,
         node_address: &str,
-        verbosity: Verbosity,
+        verbosity: Option<Verbosity>,
         amount: &str,
         target_account: &str,
         deploy_params: DeployStrParams,
@@ -35,13 +35,13 @@ impl SDK {
     ) -> JsValue {
         serialize_result(
             self.speculative_transfer(
-                maybe_block_id,
                 node_address,
-                verbosity,
                 amount,
                 target_account,
                 deploy_params,
                 payment_params,
+                maybe_block_id,
+                verbosity,
             )
             .await,
         )
@@ -52,13 +52,13 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn speculative_transfer(
         &mut self,
-        maybe_block_id: Option<BlockIdentifier>,
         node_address: &str,
-        verbosity: Verbosity,
         amount: &str,
         target_account: &str,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
+        maybe_block_id: Option<BlockIdentifier>,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
         log("speculative_transfer!");
         let deploy = make_transfer(
@@ -79,9 +79,9 @@ impl SDK {
 
         self.speculative_exec(
             node_address,
+            deploy.unwrap().into(),
             maybe_block_id,
             verbosity,
-            deploy.unwrap().into(),
         )
         .await
         .map_err(SdkError::from)
