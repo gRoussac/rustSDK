@@ -1,7 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
-    debug::{error, log},
+    debug::error,
     helpers::get_verbosity_or_default,
     types::{
         deploy_params::dictionary_item_str_params::{
@@ -44,7 +44,7 @@ impl SDK {
     pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
         let options_result: Result<GetDictionaryItemOptions, _> = options.into_serde();
         if let Err(err) = options_result {
-            log(&format!("Deserialization error: {:?}", err));
+            error(&format!("Deserialization error: {:?}", err));
             return GetDictionaryItemOptions::default();
         }
         let options: GetDictionaryItemOptions = options_result.unwrap();
@@ -65,8 +65,6 @@ impl SDK {
             dictionary_item_identifier,
             verbosity,
         } = options;
-
-        log(&format!("get_dictionary_item {:?}", cloned_options));
 
         let dictionary_item = if let Some(identifier) = dictionary_item_identifier {
             DictionaryItemInput::Identifier(identifier)
