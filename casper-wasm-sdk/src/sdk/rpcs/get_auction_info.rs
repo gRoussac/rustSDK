@@ -2,7 +2,11 @@
 use crate::helpers::serialize_result;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{block_identifier::BlockIdentifier, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        block_identifier::{BlockIdentifier, BlockIdentifierInput},
+        sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
@@ -25,11 +29,6 @@ pub struct GetAuctionInfoOptions {
     maybe_block_id: Option<String>,
     maybe_block_identifier: Option<BlockIdentifier>,
     verbosity: Option<Verbosity>,
-}
-
-pub enum BlockIdentifierInput {
-    BlockIdentifier(BlockIdentifier),
-    Id(String),
 }
 
 #[cfg(target_arch = "wasm32")]

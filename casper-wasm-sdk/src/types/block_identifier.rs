@@ -41,3 +41,9 @@ impl From<_BlockIdentifier> for BlockIdentifier {
         BlockIdentifier(block_identifier)
     }
 }
+
+#[derive(Debug, Clone)]
+pub enum BlockIdentifierInput {
+    BlockIdentifier(BlockIdentifier),
+    Id(String),
+}

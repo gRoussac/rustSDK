@@ -5,7 +5,9 @@ use crate::helpers::serialize_result;
 use crate::{
     helpers::get_verbosity_or_default,
     types::{
-        block_identifier::BlockIdentifier, public_key::PublicKey, sdk_error::SdkError,
+        block_identifier::{BlockIdentifier, BlockIdentifierInput},
+        public_key::PublicKey,
+        sdk_error::SdkError,
         verbosity::Verbosity,
     },
     SDK,
@@ -82,12 +84,6 @@ impl SDK {
     pub async fn state_get_account_info_js_alias(&mut self, options: GetAccountOptions) -> JsValue {
         self.get_account_js_alias(options).await
     }
-}
-
-#[derive(Debug, Clone)]
-pub enum BlockIdentifierInput {
-    BlockIdentifier(BlockIdentifier),
-    Id(String),
 }
 
 impl SDK {
