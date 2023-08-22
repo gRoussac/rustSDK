@@ -1,3 +1,4 @@
+use gloo_utils::format::JsValueSerdeExt;
 use js_sys::Array;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -23,6 +24,16 @@ impl Path {
             .collect();
 
         Path { path }
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.path).unwrap_or(JsValue::null())
+    }
+
+    #[wasm_bindgen(js_name = "toString")]
+    pub fn to_string(&self) -> String {
+        self.path.join("/")
     }
 }
 

@@ -71,7 +71,7 @@ impl SDK {
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::Id)
+            maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
         serialize_result(

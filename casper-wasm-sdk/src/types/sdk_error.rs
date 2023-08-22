@@ -63,6 +63,9 @@ pub enum SdkError {
     #[error("Failed to parse state identifier")]
     FailedToParseStateIdentifier,
 
+    #[error("Failed to parse purse identifier")]
+    FailedToParsePurseIdentifier,
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 

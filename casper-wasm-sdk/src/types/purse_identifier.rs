@@ -1,7 +1,9 @@
 use super::{account_hash::AccountHash, public_key::PublicKey, uref::URef};
 use casper_client::rpcs::PurseIdentifier as _PurseIdentifier;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct PurseIdentifier(_PurseIdentifier);
 

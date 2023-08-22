@@ -71,7 +71,7 @@ impl SDK {
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::Id)
+            maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
         serialize_result(
@@ -96,7 +96,7 @@ impl SDK {
     ) -> Result<SuccessResponse<GetAccountResult>, SdkError> {
         //log("get_account!");
 
-        if let Some(BlockIdentifierInput::Id(maybe_block_id)) = maybe_block_identifier {
+        if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 node_address,

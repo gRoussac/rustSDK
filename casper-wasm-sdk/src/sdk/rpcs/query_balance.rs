@@ -1,40 +1,120 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+#[cfg(target_arch = "wasm32")]
+use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
     types::{
-        global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
-        verbosity::Verbosity,
+        digest::Digest, global_state_identifier::GlobalStateIdentifierInput,
+        purse_identifier::PurseIdentifier, sdk_error::SdkError, verbosity::Verbosity,
     },
     SDK,
 };
 use casper_client::{
-    query_balance, rpcs::results::QueryBalanceResult, Error, JsonRpcId, SuccessResponse,
+    cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
+    rpcs::results::QueryBalanceResult, JsonRpcId, SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
+use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
+use serde::Deserialize;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Default)]
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(js_name = "queryBalanceOptions")]
+pub struct QueryBalanceOptions {
+    node_address: String,
+    purse_identifier_as_string: Option<String>,
+    purse_identifier: Option<PurseIdentifier>,
+    verbosity: Option<Verbosity>,
+    global_state_identifier_as_string: Option<String>,
+    global_state_identifier: Option<GlobalStateIdentifier>,
+    state_root_hash: Option<String>,
+    state_root_hash_digest: Option<Digest>,
+    maybe_block_id_as_string: Option<String>,
+}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    #[wasm_bindgen(js_name = "query_balance_options")]
+    pub fn query_balance_options(&self, options: JsValue) -> QueryBalanceOptions {
+        options.into_serde().unwrap_or_default()
+    }
+
     #[wasm_bindgen(js_name = "query_balance")]
-    pub async fn query_balance_js_alias(
-        &mut self,
-        node_address: &str,
-        verbosity: Option<Verbosity>,
-        maybe_global_state_identifier: Option<GlobalStateIdentifier>,
-        purse_identifier: PurseIdentifier,
-    ) -> JsValue {
-        serialize_result(
+    pub async fn query_balance_js_alias(&mut self, options: QueryBalanceOptions) -> JsValue {
+        let QueryBalanceOptions {
+            node_address,
+            verbosity,
+            global_state_identifier_as_string,
+            global_state_identifier,
+            purse_identifier_as_string,
+            purse_identifier,
+            state_root_hash,
+            state_root_hash_digest,
+            maybe_block_id_as_string,
+        } = options;
+
+        let maybe_global_state_identifier =
+            if let Some(global_state_identifier) = global_state_identifier {
+                Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
+                    global_state_identifier,
+                ))
+            } else {
+                global_state_identifier_as_string.map(GlobalStateIdentifierInput::String)
+            };
+
+        let result = if let Some(hash) = state_root_hash_digest {
             self.query_balance(
-                node_address,
-                verbosity,
+                &node_address,
                 maybe_global_state_identifier,
+                purse_identifier_as_string,
                 purse_identifier,
+                Some(hash.to_string()),
+                None,
+                verbosity,
             )
-            .await,
-        )
+            .await
+        } else if let Some(hash) = state_root_hash {
+            self.query_balance(
+                &node_address,
+                maybe_global_state_identifier,
+                purse_identifier_as_string,
+                purse_identifier,
+                Some(hash.to_string()),
+                None,
+                verbosity,
+            )
+            .await
+        } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
+            self.query_balance(
+                &node_address,
+                maybe_global_state_identifier,
+                purse_identifier_as_string,
+                purse_identifier,
+                None,
+                Some(maybe_block_id_as_string),
+                verbosity,
+            )
+            .await
+        } else {
+            self.query_balance(
+                &node_address,
+                maybe_global_state_identifier,
+                purse_identifier_as_string,
+                purse_identifier,
+                None,
+                None,
+                verbosity,
+            )
+            .await
+        };
+
+        serialize_result(result)
     }
 }
 
@@ -42,18 +122,70 @@ impl SDK {
     pub async fn query_balance(
         &mut self,
         node_address: &str,
+        maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
+        purse_identifier_as_string: Option<String>,
+        purse_identifier: Option<PurseIdentifier>,
+        state_root_hash: Option<String>,
+        maybe_block_id: Option<String>,
         verbosity: Option<Verbosity>,
-        maybe_global_state_identifier: Option<GlobalStateIdentifier>,
-        purse_identifier: PurseIdentifier,
-    ) -> Result<SuccessResponse<QueryBalanceResult>, Error> {
+    ) -> Result<SuccessResponse<QueryBalanceResult>, SdkError> {
         //log("query_balance!");
-        query_balance(
-            JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
-            get_verbosity_or_default(verbosity).into(),
-            maybe_global_state_identifier.map(Into::into),
-            purse_identifier.into(),
-        )
-        .await
+        if let Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
+            maybe_global_state_identifier,
+        )) = maybe_global_state_identifier
+        {
+            let purse_identifier = if let Some(purse_identifier) = purse_identifier {
+                purse_identifier
+            } else {
+                return Err(SdkError::FailedToParsePurseIdentifier);
+            };
+
+            query_balance_lib(
+                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                node_address,
+                get_verbosity_or_default(verbosity).into(),
+                Some(maybe_global_state_identifier.into()),
+                purse_identifier.into(),
+            )
+            .await
+            .map_err(SdkError::from)
+        } else if let None = maybe_global_state_identifier {
+            let purse_identifier = if let Some(purse_identifier) = purse_identifier {
+                purse_identifier
+            } else {
+                return Err(SdkError::FailedToParsePurseIdentifier);
+            };
+            query_balance_lib(
+                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                node_address,
+                get_verbosity_or_default(verbosity).into(),
+                None,
+                purse_identifier.into(),
+            )
+            .await
+            .map_err(SdkError::from)
+        } else if let Some(state_root_hash) = state_root_hash {
+            query_balance_cli(
+                &rand::thread_rng().gen::<i64>().to_string(),
+                node_address,
+                get_verbosity_or_default(verbosity).into(),
+                "",
+                &state_root_hash,
+                &purse_identifier_as_string.unwrap_or_default(),
+            )
+            .await
+            .map_err(SdkError::from)
+        } else {
+            query_balance_cli(
+                &rand::thread_rng().gen::<i64>().to_string(),
+                node_address,
+                get_verbosity_or_default(verbosity).into(),
+                &maybe_block_id.unwrap_or_default(),
+                "",
+                &purse_identifier_as_string.unwrap_or_default(),
+            )
+            .await
+            .map_err(SdkError::from)
+        }
     }
 }

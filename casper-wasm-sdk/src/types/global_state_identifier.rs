@@ -43,3 +43,9 @@ impl From<_GlobalStateIdentifier> for GlobalStateIdentifier {
         GlobalStateIdentifier(identifier)
     }
 }
+
+#[derive(Debug, Clone)]
+pub enum GlobalStateIdentifierInput {
+    GlobalStateIdentifier(GlobalStateIdentifier),
+    String(String),
+}
