@@ -114,15 +114,6 @@ impl SDK {
     ) -> Result<SuccessResponse<GetDictionaryItemResult>, SdkError> {
         //log("state_get_dictionary_item!");
         match dictionary_item {
-            DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
-                get_verbosity_or_default(verbosity).into(),
-                state_root_hash.to_digest().into(),
-                dictionary_item_identifier.into(),
-            )
-            .await
-            .map_err(SdkError::from),
             DictionaryItemInput::Params(dictionary_item_params) => {
                 let state_root_hash_as_string: String = state_root_hash.to_digest().into();
                 get_dictionary_item_cli(
@@ -135,6 +126,15 @@ impl SDK {
                 .await
                 .map_err(SdkError::from)
             }
+            DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
+                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                node_address,
+                get_verbosity_or_default(verbosity).into(),
+                state_root_hash.to_digest().into(),
+                dictionary_item_identifier.into(),
+            )
+            .await
+            .map_err(SdkError::from),
         }
     }
 }

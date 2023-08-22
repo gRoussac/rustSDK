@@ -3,9 +3,10 @@ use super::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_add
 use super::era_id::EraId;
 use super::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
 use casper_types::Key as _Key;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct Key(_Key);
 

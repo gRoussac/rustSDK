@@ -24,7 +24,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(js_name = "getAuctionInfoOptions")]
 pub struct GetAuctionInfoOptions {
     node_address: String,
-    maybe_block_id: Option<String>,
+    maybe_block_id_as_string: Option<String>,
     maybe_block_identifier: Option<BlockIdentifier>,
     verbosity: Option<Verbosity>,
 }
@@ -41,7 +41,7 @@ impl SDK {
     pub async fn get_auction_info_js_alias(&mut self, options: GetAuctionInfoOptions) -> JsValue {
         let GetAuctionInfoOptions {
             node_address,
-            maybe_block_id,
+            maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
         } = options;
@@ -51,7 +51,7 @@ impl SDK {
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id.map(BlockIdentifierInput::Id)
+            maybe_block_id_as_string.map(BlockIdentifierInput::Id)
         };
 
         serialize_result(

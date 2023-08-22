@@ -3,7 +3,7 @@ use crate::helpers::serialize_result;
 use crate::{
     debug::{error, log},
     types::{
-        block_identifier::BlockIdentifier,
+        block_identifier::{BlockIdentifier, BlockIdentifierInput},
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -25,7 +25,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_transfer")]
     pub async fn speculative_transfer_js_alias(
         &mut self,
-        maybe_block_id: Option<BlockIdentifier>,
+        maybe_block_identifier: Option<BlockIdentifier>,
         node_address: &str,
         verbosity: Option<Verbosity>,
         amount: &str,
@@ -40,7 +40,7 @@ impl SDK {
                 target_account,
                 deploy_params,
                 payment_params,
-                maybe_block_id,
+                maybe_block_identifier,
                 verbosity,
             )
             .await,
@@ -57,7 +57,7 @@ impl SDK {
         target_account: &str,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-        maybe_block_id: Option<BlockIdentifier>,
+        maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
         log("speculative_transfer!");
@@ -77,10 +77,13 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
+        let maybe_block_identifier =
+            maybe_block_identifier.map(BlockIdentifierInput::BlockIdentifier);
+
         self.speculative_exec(
             node_address,
-            deploy.unwrap().into(),
-            maybe_block_id,
+            deploy.unwrap(),
+            maybe_block_identifier,
             verbosity,
         )
         .await

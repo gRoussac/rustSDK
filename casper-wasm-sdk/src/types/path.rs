@@ -1,6 +1,8 @@
 use js_sys::Array;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+#[derive(Debug, Deserialize, Clone, Serialize, Default)]
 #[wasm_bindgen]
 pub struct Path {
     path: Vec<String>,
