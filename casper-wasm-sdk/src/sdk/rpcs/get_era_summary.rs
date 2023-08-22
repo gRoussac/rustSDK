@@ -51,7 +51,7 @@ impl SDK {
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::Id)
+            maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
         serialize_result(
@@ -70,7 +70,7 @@ impl SDK {
     ) -> Result<SuccessResponse<GetEraSummaryResult>, SdkError> {
         //log("get_era_summary!");
 
-        if let Some(BlockIdentifierInput::Id(maybe_block_id)) = maybe_block_identifier {
+        if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_era_summary_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 node_address,

@@ -2,6 +2,8 @@ use super::addr::transfer_addr::TransferAddr;
 use super::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
 use super::era_id::EraId;
 use super::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
+use crate::debug::error;
+use crate::types::sdk_error::SdkError;
 use casper_types::Key as _Key;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -101,6 +103,22 @@ impl Key {
         _Key::to_formatted_string(self.0)
     }
 
+    #[wasm_bindgen(js_name = fromFormattedString)]
+    pub fn from_formatted_str_js_alias(input: JsValue) -> Result<Key, JsValue> {
+        let input_string = input.as_string();
+        if let Some(input_string) = input_string {
+            Key::from_formatted_str(&input_string)
+                .map_err(|err| {
+                    error(&format!("Error parsing Key from formatted string, {}", err));
+                    JsValue::null()
+                })
+                .map(Into::into)
+        } else {
+            error("Input is not a string");
+            Err(JsValue::null())
+        }
+    }
+
     // #[wasm_bindgen(js_name = intoAccount)]
     // pub fn into_account(self) -> Option<AccountHash> {
     //     match self.0 {
@@ -186,6 +204,17 @@ impl Key {
     // pub fn dictionary(seed_uref: URef, dictionary_item_key: &[u8]) -> Self {
     //     _Key::dictionary(seed_uref, dictionary_item_key)
     // }
+}
+
+impl Key {
+    pub fn from_formatted_str(input: &str) -> Result<Key, SdkError> {
+        _Key::from_formatted_str(input)
+            .map(Into::into)
+            .map_err(|error| SdkError::FailedToParseKey {
+                context: "Key from formatted string",
+                error,
+            })
+    }
 }
 
 impl From<Key> for _Key {

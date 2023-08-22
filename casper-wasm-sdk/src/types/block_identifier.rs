@@ -45,5 +45,5 @@ impl From<_BlockIdentifier> for BlockIdentifier {
 #[derive(Debug, Clone)]
 pub enum BlockIdentifierInput {
     BlockIdentifier(BlockIdentifier),
-    Id(String),
+    String(String),
 }

@@ -57,7 +57,7 @@ impl SDK {
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::Id)
+            maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
         serialize_result(
@@ -76,7 +76,7 @@ impl SDK {
     ) -> Result<SuccessResponse<GetStateRootHashResult>, SdkError> {
         //log("get_state_root_hash!");
 
-        if let Some(BlockIdentifierInput::Id(maybe_block_id)) = maybe_block_identifier {
+        if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_state_root_hash_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 node_address,
