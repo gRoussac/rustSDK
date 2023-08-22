@@ -1,12 +1,10 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+#[cfg(target_arch = "wasm32")]
+use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{
-        block_identifier::{BlockIdentifier, BlockIdentifierInput},
-        sdk_error::SdkError,
-        verbosity::Verbosity,
-    },
+    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{

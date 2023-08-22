@@ -1,5 +1,10 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+#[cfg(target_arch = "wasm32")]
+use crate::{
+    debug::error,
+    types::{digest::Digest, sdk_error::SdkError},
+};
 use crate::{
     helpers::get_verbosity_or_default,
     types::{deploy_hash::DeployHash, verbosity::Verbosity},
@@ -8,37 +13,71 @@ use crate::{
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult, Error, JsonRpcId, SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
+use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
+use serde::Deserialize;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Clone, Default, Deserialize)]
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(js_name = "getDeployOptions")]
+pub struct GetDeployOptions {
+    node_address: String,
+    deploy_hash_as_string: Option<String>,
+    deploy_hash: Option<DeployHash>,
+    finalized_approvals: Option<bool>,
+    verbosity: Option<Verbosity>,
+}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    #[wasm_bindgen(js_name = "get_deploy_options")]
+    pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
+        options.into_serde().unwrap_or_default()
+    }
+
     #[wasm_bindgen(js_name = "get_deploy")]
-    pub async fn get_deploy_js_alias(
-        &mut self,
-        node_address: &str,
-        deploy_hash: DeployHash,
-        finalized_approvals: bool,
-        verbosity: Option<Verbosity>,
-    ) -> JsValue {
+    pub async fn get_deploy_js_alias(&mut self, options: GetDeployOptions) -> JsValue {
+        let GetDeployOptions {
+            node_address,
+            deploy_hash_as_string,
+            deploy_hash,
+            finalized_approvals,
+            verbosity,
+        } = options;
+        let err_msg = "Error: Missing deploy hash as string or deploy hash".to_string();
+        let deploy_hash = if let Some(deploy_hash_as_string) = deploy_hash_as_string {
+            let hash = Digest::new(&deploy_hash_as_string).map_err(|err| {
+                let err_msg = format!("Failed to parse AccountHash from formatted string: {}", err);
+                error(&err_msg);
+                JsValue::null()
+            });
+            let deploy_hash = DeployHash::from_digest(hash.unwrap());
+            if deploy_hash.is_err() {
+                error(&err_msg);
+                return JsValue::null();
+            }
+            deploy_hash.unwrap()
+        } else {
+            if deploy_hash.is_none() {
+                error(&err_msg);
+                return JsValue::null();
+            }
+            deploy_hash.unwrap()
+        };
         serialize_result(
-            self.get_deploy(node_address, verbosity, deploy_hash, finalized_approvals)
+            self.get_deploy(&node_address, deploy_hash, finalized_approvals, verbosity)
                 .await,
         )
     }
 
     #[wasm_bindgen(js_name = "info_get_deploy")]
-    pub async fn info_get_deploy_js_alias(
-        &mut self,
-        node_address: &str,
-        deploy_hash: DeployHash,
-        finalized_approvals: bool,
-        verbosity: Option<Verbosity>,
-    ) -> JsValue {
-        self.get_deploy_js_alias(node_address, deploy_hash, finalized_approvals, verbosity)
-            .await
+    pub async fn info_get_deploy_js_alias(&mut self, options: GetDeployOptions) -> JsValue {
+        self.get_deploy_js_alias(options).await
     }
 }
 
@@ -46,9 +85,9 @@ impl SDK {
     pub async fn get_deploy(
         &mut self,
         node_address: &str,
-        verbosity: Option<Verbosity>,
         deploy_hash: DeployHash,
-        finalized_approvals: bool,
+        finalized_approvals: Option<bool>,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<GetDeployResult>, Error> {
         //log("get_deploy!");
         get_deploy(
@@ -56,7 +95,7 @@ impl SDK {
             node_address,
             get_verbosity_or_default(verbosity).into(),
             deploy_hash.into(),
-            finalized_approvals,
+            finalized_approvals.unwrap_or_default(),
         )
         .await
     }

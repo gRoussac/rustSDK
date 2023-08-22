@@ -1,13 +1,15 @@
 use crate::debug::error;
+use base16::DecodeError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
-    Digest as _Digest,
+    Digest as _Digest, DigestError,
 };
 use gloo_utils::format::JsValueSerdeExt;
-use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use wasm_bindgen::prelude::*;
+
+use super::sdk_error::SdkError;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[wasm_bindgen]
@@ -16,22 +18,22 @@ pub struct Digest(_Digest);
 #[wasm_bindgen]
 impl Digest {
     #[wasm_bindgen(constructor)]
-    pub fn new(digest_hex_str: &str) -> Result<Digest, JsValue> {
-        let bytes = decode(digest_hex_str)
-            .map_err(|err| error(&format!("{:?}", err)))
-            .unwrap();
-        Self::from_digest(bytes)
+    #[wasm_bindgen(js_name = "new")]
+    pub fn new_js_alias(digest_hex_str: &str) -> Result<Digest, JsValue> {
+        Self::from_str(digest_hex_str)
+    }
+
+    #[wasm_bindgen(js_name = "fromString")]
+    pub fn from_str(digest_hex_str: &str) -> Result<Digest, JsValue> {
+        Ok(Digest::from(digest_hex_str))
     }
 
     #[wasm_bindgen(js_name = "fromDigest")]
-    pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, JsValue> {
-        let mut digest_bytes = [0u8; _Digest::LENGTH];
-        if bytes.len() != _Digest::LENGTH {
-            error("Invalid Digest length");
-            return Err(JsValue::null());
-        }
-        digest_bytes.copy_from_slice(&bytes);
-        Ok(Digest(_Digest::from(digest_bytes)))
+    pub fn from_digest_js_alias(bytes: Vec<u8>) -> Result<Digest, JsValue> {
+        Self::from_digest(bytes).map_err(|err| {
+            error(&format!("Failed to parse digest from digest {}", err));
+            JsValue::from_str(&format!("{:?}", err))
+        })
     }
 
     #[wasm_bindgen(js_name = "toJson")]
@@ -40,32 +42,22 @@ impl Digest {
     }
 }
 
+impl Digest {
+    pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
+        Ok(Digest::from(&digest_hex_str[..]))
+    }
+
+    pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, SdkError> {
+        let hex_string = hex::encode(&bytes);
+        Ok(Digest::from(&hex_string[..]))
+    }
+}
+
 impl fmt::Display for Digest {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self.0)
     }
 }
-
-// TODO clean up
-// impl Serialize for Digest {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer,
-//     {
-//         serializer.serialize_str(&self.to_string()) // Serialize Digest as a string
-//     }
-// }
-
-// impl<'de> Deserialize<'de> for Digest {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: Deserializer<'de>,
-//     {
-//         let s: String = Deserialize::deserialize(deserializer)?;
-//         let digest = Digest::from(s.as_str());
-//         Ok(digest)
-//     }
-// }
 
 impl From<Digest> for _Digest {
     fn from(digest: Digest) -> Self {
@@ -109,15 +101,25 @@ impl From<[u8; _Digest::LENGTH]> for Digest {
 impl From<&str> for Digest {
     fn from(s: &str) -> Self {
         let bytes = hex::decode(s)
-            .map_err(|err| error(&format!("{:?}", err)))
-            .expect("Failed to decode hex string");
-        let mut digest_bytes = [0u8; _Digest::LENGTH];
+            .map_err(|err| {
+                let context = "Decoding hex string";
+                let base16_err = DecodeError::InvalidByte {
+                    byte: 0,  // TODO Fix error
+                    index: 0, // Set the index to 0 or a relevant value here
+                };
+                let error = DigestError::Base16DecodeError(base16_err);
+                SdkError::FailedToParseDigest { context, error }
+            })
+            .unwrap_or_default();
 
         if bytes.len() != _Digest::LENGTH {
-            error("Invalid Digest length");
-            panic!("Invalid Digest length");
+            let context = "Invalid Digest length";
+            let error = DigestError::IncorrectDigestLength(bytes.len());
+            let sdk_error = SdkError::FailedToParseDigest { context, error };
+            unreachable!("{:?}", sdk_error);
         }
 
+        let mut digest_bytes = [0u8; _Digest::LENGTH];
         digest_bytes.copy_from_slice(&bytes);
         Digest(_Digest::from(digest_bytes))
     }

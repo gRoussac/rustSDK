@@ -1,9 +1,11 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+#[cfg(target_arch = "wasm32")]
+use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::{error, log},
+    debug::error,
     types::{
-        block_identifier::{BlockIdentifier, BlockIdentifierInput},
+        block_identifier::BlockIdentifierInput,
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -25,6 +27,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_transfer")]
     pub async fn speculative_transfer_js_alias(
         &mut self,
+        maybe_block_id_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifier>,
         node_address: &str,
         verbosity: Option<Verbosity>,
@@ -33,6 +36,14 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
     ) -> JsValue {
+        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
+            Some(BlockIdentifierInput::BlockIdentifier(
+                maybe_block_identifier,
+            ))
+        } else {
+            maybe_block_id_as_string.map(BlockIdentifierInput::String)
+        };
+
         serialize_result(
             self.speculative_transfer(
                 node_address,
@@ -57,10 +68,10 @@ impl SDK {
         target_account: &str,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-        maybe_block_identifier: Option<BlockIdentifier>,
+        maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
-        log("speculative_transfer!");
+        // log("speculative_transfer!");
         let deploy = make_transfer(
             "",
             amount,
@@ -76,9 +87,6 @@ impl SDK {
             error(&err_msg);
             return Err(SdkError::from(err));
         }
-
-        let maybe_block_identifier =
-            maybe_block_identifier.map(BlockIdentifierInput::BlockIdentifier);
 
         self.speculative_exec(
             node_address,

@@ -6,9 +6,10 @@ use casper_types::{
     DeployHash as _DeployHash,
 };
 use hex::decode;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct DeployHash(_DeployHash);
 
