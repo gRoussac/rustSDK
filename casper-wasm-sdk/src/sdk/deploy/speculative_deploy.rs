@@ -1,7 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
-    debug::{error, log},
+    debug::error,
     types::{
         block_identifier::{BlockIdentifier, BlockIdentifierInput},
         deploy_params::{
@@ -55,7 +55,7 @@ impl SDK {
         maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
-        log("speculative_deploy!");
+        // log("speculative_deploy!");
         let deploy = make_deploy(
             "",
             deploy_str_params_to_casper_client(&deploy_params),
