@@ -1,8 +1,9 @@
 use super::{block_hash::BlockHash, digest::Digest};
 use casper_client::rpcs::GlobalStateIdentifier as _GlobalStateIdentifier;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GlobalStateIdentifier(_GlobalStateIdentifier);
 

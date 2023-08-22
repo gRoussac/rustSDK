@@ -24,9 +24,10 @@ use casper_types::{
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use num_traits::cast::FromPrimitive;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct Deploy(_Deploy);
 
