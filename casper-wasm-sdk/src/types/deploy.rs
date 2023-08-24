@@ -32,7 +32,7 @@ use wasm_bindgen::prelude::*;
 pub struct Deploy(_Deploy);
 
 #[derive(Default)]
-struct BuildParams {
+pub struct BuildParams {
     secret_key: Option<String>,
     chain_name: Option<String>,
     ttl: Option<TimeDiff>,
@@ -44,76 +44,6 @@ struct BuildParams {
 
 #[wasm_bindgen]
 impl Deploy {
-    fn build(&self, deploy_params: BuildParams) -> Deploy {
-        let BuildParams {
-            secret_key,
-            chain_name,
-            ttl,
-            timestamp,
-            session,
-            payment,
-            account,
-        } = deploy_params;
-        let deploy: _Deploy = self.0.clone();
-        let chain_name = if let Some(chain_name) = chain_name {
-            chain_name
-        } else {
-            deploy.chain_name().into()
-        };
-        let ttl = if let Some(ttl) = ttl {
-            ttl
-        } else {
-            deploy.ttl()
-        };
-        let timestamp = if let Some(timestamp) = timestamp {
-            timestamp
-        } else {
-            deploy.timestamp()
-        };
-        let session = if let Some(session) = session {
-            session
-        } else {
-            deploy.session().clone()
-        };
-        let payment = if let Some(payment) = payment {
-            payment
-        } else {
-            deploy.payment().clone()
-        };
-        let account = if let Some(account) = account {
-            account
-        } else {
-            deploy.account().clone().into()
-        };
-        let mut deploy_builder = DeployBuilder::new(chain_name, session)
-            .with_account(account.into())
-            .with_payment(payment)
-            .with_ttl(ttl)
-            .with_timestamp(timestamp);
-
-        let secret_key_result = secret_key
-            .clone()
-            .map(|key| secret_key_from_pem(&key).unwrap())
-            .unwrap_or_else(|| {
-                if secret_key.is_some() {
-                    error("Error loading secret key");
-                }
-                // Default will never be used in next if secret_key.is_some()
-                SecretKey::generate_ed25519().unwrap()
-            });
-        if secret_key.is_some() {
-            deploy_builder = deploy_builder.with_secret_key(&secret_key_result);
-        }
-        let deploy = deploy_builder
-            .build()
-            .map_err(|err| error(&format!("Failed to build deploy: {:?}", err)))
-            .unwrap();
-
-        let deploy: Deploy = deploy.into();
-        let _ = deploy.validate_deploy_size();
-        deploy
-    }
-
     #[wasm_bindgen(constructor)]
     pub fn new(deploy: JsValue) -> Deploy {
         let deploy: _Deploy = deploy
@@ -561,6 +491,78 @@ impl Deploy {
             session: Some(new_session),
             ..Default::default()
         })
+    }
+}
+
+impl Deploy {
+    pub fn build(&self, deploy_params: BuildParams) -> Deploy {
+        let BuildParams {
+            secret_key,
+            chain_name,
+            ttl,
+            timestamp,
+            session,
+            payment,
+            account,
+        } = deploy_params;
+        let deploy: _Deploy = self.0.clone();
+        let chain_name = if let Some(chain_name) = chain_name {
+            chain_name
+        } else {
+            deploy.chain_name().into()
+        };
+        let ttl = if let Some(ttl) = ttl {
+            ttl
+        } else {
+            deploy.ttl()
+        };
+        let timestamp = if let Some(timestamp) = timestamp {
+            timestamp
+        } else {
+            deploy.timestamp()
+        };
+        let session = if let Some(session) = session {
+            session
+        } else {
+            deploy.session().clone()
+        };
+        let payment = if let Some(payment) = payment {
+            payment
+        } else {
+            deploy.payment().clone()
+        };
+        let account = if let Some(account) = account {
+            account
+        } else {
+            deploy.account().clone().into()
+        };
+        let mut deploy_builder = DeployBuilder::new(chain_name, session)
+            .with_account(account.into())
+            .with_payment(payment)
+            .with_ttl(ttl)
+            .with_timestamp(timestamp);
+
+        let secret_key_result = secret_key
+            .clone()
+            .map(|key| secret_key_from_pem(&key).unwrap())
+            .unwrap_or_else(|| {
+                if secret_key.is_some() {
+                    error("Error loading secret key");
+                }
+                // Default will never be used in next if secret_key.is_some()
+                SecretKey::generate_ed25519().unwrap()
+            });
+        if secret_key.is_some() {
+            deploy_builder = deploy_builder.with_secret_key(&secret_key_result);
+        }
+        let deploy = deploy_builder
+            .build()
+            .map_err(|err| error(&format!("Failed to build deploy: {:?}", err)))
+            .unwrap();
+
+        let deploy: Deploy = deploy.into();
+        let _ = deploy.validate_deploy_size();
+        deploy
     }
 }
 

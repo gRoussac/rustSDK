@@ -310,7 +310,7 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_364(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_371(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h70dd628200031030(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -1572,6 +1572,13 @@ export class DeployHash {
             wasm.__wbindgen_add_to_stack_pointer(16);
         }
     }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.deployhash_toJson(this.__wbg_ptr);
+        return takeObject(ret);
+    }
 }
 /**
 */
@@ -2158,6 +2165,13 @@ export class GlobalStateIdentifier {
         const ret = wasm.globalstateidentifier_fromStateRootHash(ptr0);
         return GlobalStateIdentifier.__wrap(ret);
     }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.globalstateidentifier_toJson(this.__wbg_ptr);
+        return takeObject(ret);
+    }
 }
 /**
 */
@@ -2245,6 +2259,13 @@ export class Key {
         } finally {
             wasm.__wbindgen_add_to_stack_pointer(16);
         }
+    }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.key_toJson(this.__wbg_ptr);
+        return takeObject(ret);
     }
     /**
     * @param {URef} key
@@ -2962,6 +2983,78 @@ export class SDK {
         wasm.__wbg_sdk_free(ptr);
     }
     /**
+    * @param {DeployStrParams} deploy_params
+    * @param {SessionStrParams} session_params
+    * @param {PaymentStrParams} payment_params
+    * @returns {any}
+    */
+    make_deploy(deploy_params, session_params, payment_params) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
+        return takeObject(ret);
+    }
+    /**
+    * @param {any} options
+    * @returns {getBalanceOptions}
+    */
+    get_balance_options(options) {
+        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, addHeapObject(options));
+        return getBalanceOptions.__wrap(ret);
+    }
+    /**
+    * @param {getBalanceOptions} options
+    * @returns {Promise<any>}
+    */
+    get_balance(options) {
+        _assertClass(options, getBalanceOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {getBalanceOptions} options
+    * @returns {Promise<any>}
+    */
+    state_get_balance(options) {
+        _assertClass(options, getBalanceOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {any} options
+    * @returns {getDictionaryItemOptions}
+    */
+    get_dictionary_item_options(options) {
+        const ret = wasm.sdk_get_dictionary_item_options(this.__wbg_ptr, addHeapObject(options));
+        return getDictionaryItemOptions.__wrap(ret);
+    }
+    /**
+    * @param {getDictionaryItemOptions} options
+    * @returns {Promise<any>}
+    */
+    get_dictionary_item(options) {
+        _assertClass(options, getDictionaryItemOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {getDictionaryItemOptions} options
+    * @returns {Promise<any>}
+    */
+    state_get_dictionary_item(options) {
+        _assertClass(options, getDictionaryItemOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
     * @param {any} options
     * @returns {queryBalanceOptions}
     */
@@ -3041,52 +3134,6 @@ export class SDK {
     }
     /**
     * @param {any} options
-    * @returns {getDictionaryItemOptions}
-    */
-    get_dictionary_item_options(options) {
-        const ret = wasm.sdk_get_dictionary_item_options(this.__wbg_ptr, addHeapObject(options));
-        return getDictionaryItemOptions.__wrap(ret);
-    }
-    /**
-    * @param {getDictionaryItemOptions} options
-    * @returns {Promise<any>}
-    */
-    get_dictionary_item(options) {
-        _assertClass(options, getDictionaryItemOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0);
-        return takeObject(ret);
-    }
-    /**
-    * @param {getDictionaryItemOptions} options
-    * @returns {Promise<any>}
-    */
-    state_get_dictionary_item(options) {
-        _assertClass(options, getDictionaryItemOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0);
-        return takeObject(ret);
-    }
-    /**
-    * @param {any} options
-    * @returns {getBalanceOptions}
-    */
-    get_balance_options(options) {
-        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, addHeapObject(options));
-        return getBalanceOptions.__wrap(ret);
-    }
-    /**
-    * @param {getBalanceOptions} options
-    * @returns {Promise<any>}
-    */
-    get_balance(options) {
-        _assertClass(options, getBalanceOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
-        return takeObject(ret);
-    }
-    /**
-    * @param {any} options
     * @returns {getSpeculativeExecOptions}
     */
     get_speculative_exec_options(options) {
@@ -3102,6 +3149,12 @@ export class SDK {
         var ptr0 = options.__destroy_into_raw();
         const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0);
         return takeObject(ret);
+    }
+    /**
+    */
+    constructor() {
+        const ret = wasm.sdk_new();
+        return SDK.__wrap(ret);
     }
     /**
     * @param {string} node_address
@@ -3125,12 +3178,6 @@ export class SDK {
         var ptr4 = payment_params.__destroy_into_raw();
         const ret = wasm.sdk_transfer(this.__wbg_ptr, ptr0, len0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1, ptr2, len2, ptr3, ptr4);
         return takeObject(ret);
-    }
-    /**
-    */
-    constructor() {
-        const ret = wasm.sdk_new();
-        return SDK.__wrap(ret);
     }
     /**
     * @param {any} options
@@ -3158,6 +3205,60 @@ export class SDK {
         _assertClass(options, getDeployOptions);
         var ptr0 = options.__destroy_into_raw();
         const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {any} options
+    * @returns {getStateRootHashOptions}
+    */
+    get_state_root_hash_options(options) {
+        const ret = wasm.sdk_get_state_root_hash_options(this.__wbg_ptr, addHeapObject(options));
+        return getStateRootHashOptions.__wrap(ret);
+    }
+    /**
+    * @param {getStateRootHashOptions} options
+    * @returns {Promise<any>}
+    */
+    get_state_root_hash(options) {
+        _assertClass(options, getStateRootHashOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_get_state_root_hash(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {getStateRootHashOptions} options
+    * @returns {Promise<any>}
+    */
+    chain_get_state_root_hash(options) {
+        _assertClass(options, getStateRootHashOptions);
+        var ptr0 = options.__destroy_into_raw();
+        const ret = wasm.sdk_chain_get_state_root_hash(this.__wbg_ptr, ptr0);
+        return takeObject(ret);
+    }
+    /**
+    * @param {BlockIdentifier | undefined} maybe_block_identifier
+    * @param {string} node_address
+    * @param {number | undefined} verbosity
+    * @param {DeployStrParams} deploy_params
+    * @param {SessionStrParams} session_params
+    * @param {PaymentStrParams} payment_params
+    * @returns {Promise<any>}
+    */
+    speculative_deploy(maybe_block_identifier, node_address, verbosity, deploy_params, session_params, payment_params) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_block_identifier)) {
+            _assertClass(maybe_block_identifier, BlockIdentifier);
+            ptr0 = maybe_block_identifier.__destroy_into_raw();
+        }
+        const ptr1 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr2 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr3 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr4 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3, ptr4);
         return takeObject(ret);
     }
     /**
@@ -3266,50 +3367,6 @@ export class SDK {
     }
     /**
     * @param {any} options
-    * @returns {getStateRootHashOptions}
-    */
-    get_state_root_hash_options(options) {
-        const ret = wasm.sdk_get_state_root_hash_options(this.__wbg_ptr, addHeapObject(options));
-        return getStateRootHashOptions.__wrap(ret);
-    }
-    /**
-    * @param {getStateRootHashOptions} options
-    * @returns {Promise<any>}
-    */
-    get_state_root_hash(options) {
-        _assertClass(options, getStateRootHashOptions);
-        var ptr0 = options.__destroy_into_raw();
-        const ret = wasm.sdk_get_state_root_hash(this.__wbg_ptr, ptr0);
-        return takeObject(ret);
-    }
-    /**
-    * @param {BlockIdentifier | undefined} maybe_block_identifier
-    * @param {string} node_address
-    * @param {number | undefined} verbosity
-    * @param {DeployStrParams} deploy_params
-    * @param {SessionStrParams} session_params
-    * @param {PaymentStrParams} payment_params
-    * @returns {Promise<any>}
-    */
-    speculative_deploy(maybe_block_identifier, node_address, verbosity, deploy_params, session_params, payment_params) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr0 = maybe_block_identifier.__destroy_into_raw();
-        }
-        const ptr1 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr2 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr3 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr4 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, len1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, ptr3, ptr4);
-        return takeObject(ret);
-    }
-    /**
-    * @param {any} options
     * @returns {getEraInfoOptions}
     */
     get_era_info_options(options) {
@@ -3344,6 +3401,23 @@ export class SDK {
         _assertClass(payment_params, PaymentStrParams);
         var ptr3 = payment_params.__destroy_into_raw();
         const ret = wasm.sdk_deploy(this.__wbg_ptr, ptr0, len0, ptr1, ptr2, ptr3, isLikeNone(verbosity) ? 3 : verbosity);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} node_address
+    * @param {DeployStrParams} deploy_params
+    * @param {string} payment_amount
+    * @param {Uint8Array} wasm
+    * @returns {Promise<any>}
+    */
+    install(node_address, deploy_params, payment_amount, wasm) {
+        const ptr0 = passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr1 = deploy_params.__destroy_into_raw();
+        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, len0, ptr1, ptr2, len2, addHeapObject(wasm));
         return takeObject(ret);
     }
     /**
@@ -3460,22 +3534,6 @@ export class SDK {
         const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0);
         return takeObject(ret);
     }
-    /**
-    * @param {DeployStrParams} deploy_params
-    * @param {SessionStrParams} session_params
-    * @param {PaymentStrParams} payment_params
-    * @returns {any}
-    */
-    make_deploy(deploy_params, session_params, payment_params) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
-        return takeObject(ret);
-    }
 }
 /**
 */
@@ -3541,7 +3599,7 @@ export class SessionStrParams {
     get session_hash() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_amount(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_hash(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3568,7 +3626,7 @@ export class SessionStrParams {
     get session_name() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_hash(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_name(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3595,7 +3653,7 @@ export class SessionStrParams {
     get session_package_hash() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_name(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_package_hash(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3622,7 +3680,7 @@ export class SessionStrParams {
     get session_package_name() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_package_hash(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_package_name(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3649,7 +3707,7 @@ export class SessionStrParams {
     get session_path() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_package_name(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_path(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3716,7 +3774,7 @@ export class SessionStrParams {
     get session_args_complex() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_args_json(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_args_complex(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3743,7 +3801,7 @@ export class SessionStrParams {
     get session_version() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_args_complex(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_version(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3770,7 +3828,7 @@ export class SessionStrParams {
     get session_entry_point() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.paymentstrparams_payment_version(retptr, this.__wbg_ptr);
+            wasm.sessionstrparams_session_entry_point(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -3903,6 +3961,13 @@ export class URef {
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.uref_fromUint8Array(ptr0, len0, access_rights);
         return URef.__wrap(ret);
+    }
+    /**
+    * @returns {any}
+    */
+    toJson() {
+        const ret = wasm.uref_toJson(this.__wbg_ptr);
+        return takeObject(ret);
     }
 }
 /**
@@ -4296,6 +4361,10 @@ async function __wbg_load(module, imports) {
 function __wbg_get_imports() {
     const imports = {};
     imports.wbg = {};
+    imports.wbg.__wbindgen_is_undefined = function(arg0) {
+        const ret = getObject(arg0) === undefined;
+        return ret;
+    };
     imports.wbg.__wbindgen_string_get = function(arg0, arg1) {
         const obj = getObject(arg1);
         const ret = typeof(obj) === 'string' ? obj : undefined;
@@ -4307,16 +4376,15 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
-    imports.wbg.__wbindgen_is_undefined = function(arg0) {
-        const ret = getObject(arg0) === undefined;
-        return ret;
-    };
     imports.wbg.__wbg_error_1fadbb4f0dff80cb = function(arg0, arg1) {
         console.error(getStringFromWasm0(arg0, arg1));
     };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_log_5698f14288623311 = function(arg0, arg1) {
+        console.log(getStringFromWasm0(arg0, arg1));
     };
     imports.wbg.__wbindgen_cb_drop = function(arg0) {
         const obj = takeObject(arg0).original;
@@ -4326,9 +4394,6 @@ function __wbg_get_imports() {
         }
         const ret = false;
         return ret;
-    };
-    imports.wbg.__wbg_log_5698f14288623311 = function(arg0, arg1) {
-        console.log(getStringFromWasm0(arg0, arg1));
     };
     imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
         const ret = getObject(arg0);
@@ -4533,7 +4598,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_364(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_371(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -4613,8 +4678,8 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3924 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 773, __wbg_adapter_26);
+    imports.wbg.__wbindgen_closure_wrapper3979 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 780, __wbg_adapter_26);
         return addHeapObject(ret);
     };
 

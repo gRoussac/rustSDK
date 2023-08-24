@@ -3,6 +3,7 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
+    debug::error,
     helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
@@ -34,7 +35,14 @@ pub struct GetEraSummaryOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_era_summary_options")]
     pub fn get_era_summary_options(&self, options: JsValue) -> GetEraSummaryOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetEraSummaryOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetEraSummaryOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "get_era_summary")]

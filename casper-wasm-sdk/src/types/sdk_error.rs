@@ -56,7 +56,7 @@ pub enum SdkError {
 
     #[error("Failed to parse '{context}' as a hash digest: {error:?}")]
     FailedToParseDigest {
-        context: &'static str,
+        context: String,
         error: casper_types::DigestError,
     },
 
@@ -126,9 +126,10 @@ impl From<CliError> for SdkError {
             CliError::FailedToParseUint { context, error } => {
                 SdkError::FailedToParseUint { context, error }
             }
-            CliError::FailedToParseDigest { context, error } => {
-                SdkError::FailedToParseDigest { context, error }
-            }
+            CliError::FailedToParseDigest { context, error } => SdkError::FailedToParseDigest {
+                context: context.to_owned(),
+                error,
+            },
             CliError::FailedToParseStateIdentifier => SdkError::FailedToParseStateIdentifier,
             CliError::ConflictingArguments { context, args } => {
                 SdkError::ConflictingArguments { context, args }

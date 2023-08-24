@@ -43,7 +43,14 @@ pub struct GetSpeculativeExecOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_speculative_exec_options")]
     pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetSpeculativeExecOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetSpeculativeExecOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "speculative_exec")]

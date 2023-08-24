@@ -3,6 +3,7 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
+    debug::{error, log},
     helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
@@ -25,8 +26,8 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(js_name = "getStateRootHashOptions")]
 pub struct GetStateRootHashOptions {
     node_address: String,
-    maybe_block_id_as_string: Option<String>,
-    maybe_block_identifier: Option<BlockIdentifier>,
+    block_id_as_string: Option<String>,
+    block_identifier: Option<BlockIdentifier>,
     verbosity: Option<Verbosity>,
 }
 
@@ -35,7 +36,14 @@ pub struct GetStateRootHashOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_state_root_hash_options")]
     pub fn get_state_root_hash_options(&self, options: JsValue) -> GetStateRootHashOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetStateRootHashOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetStateRootHashOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "get_state_root_hash")]
@@ -45,23 +53,29 @@ impl SDK {
     ) -> JsValue {
         let GetStateRootHashOptions {
             node_address,
-            maybe_block_id_as_string,
-            maybe_block_identifier,
+            block_id_as_string,
+            block_identifier,
             verbosity,
         } = options;
-
-        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
+        let maybe_block_identifier = if let Some(maybe_block_identifier) = block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,
             ))
         } else {
-            maybe_block_id_as_string.map(BlockIdentifierInput::String)
+            block_id_as_string.map(BlockIdentifierInput::String)
         };
-
         serialize_result(
             self.get_state_root_hash(&node_address, maybe_block_identifier, verbosity)
                 .await,
         )
+    }
+
+    #[wasm_bindgen(js_name = "chain_get_state_root_hash")]
+    pub async fn chain_get_state_root_hash_js_alias(
+        &mut self,
+        options: GetStateRootHashOptions,
+    ) -> JsValue {
+        self.get_state_root_hash_js_alias(options).await
     }
 }
 
@@ -73,7 +87,6 @@ impl SDK {
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<GetStateRootHashResult>, SdkError> {
         //log("get_state_root_hash!");
-
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_state_root_hash_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),

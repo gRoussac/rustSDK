@@ -26,8 +26,8 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(js_name = "getBalanceOptions")]
 pub struct GetBalanceOptions {
     node_address: String,
-    state_root_hash: Option<String>,
-    state_root_hash_digest: Option<Digest>,
+    state_root_hash_as_string: Option<String>,
+    state_root_hash: Option<Digest>,
     purse_uref_as_string: Option<String>,
     purse_uref: Option<URef>,
     verbosity: Option<Verbosity>,
@@ -38,15 +38,22 @@ pub struct GetBalanceOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_balance_options")]
     pub fn get_balance_options(&self, options: JsValue) -> GetBalanceOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetBalanceOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetBalanceOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "get_balance")]
     pub async fn get_balance_js_alias(&mut self, options: GetBalanceOptions) -> JsValue {
         let GetBalanceOptions {
             node_address,
+            state_root_hash_as_string,
             state_root_hash,
-            state_root_hash_digest,
             purse_uref_as_string,
             purse_uref,
             verbosity,
@@ -57,14 +64,14 @@ impl SDK {
         } else if let Some(purse_uref_as_string) = purse_uref_as_string {
             GetBalanceInput::PurseUrefAsString(purse_uref_as_string)
         } else {
-            error("Error: Missing PurseUrefAsString or purseUref");
+            error("Error: Missing purse uref as string or purse uref");
             return JsValue::null();
         };
 
-        let result = if let Some(hash) = state_root_hash_digest {
+        let result = if let Some(hash) = state_root_hash {
             self.get_balance(&node_address, hash, purse_uref, verbosity)
                 .await
-        } else if let Some(hash) = state_root_hash {
+        } else if let Some(hash) = state_root_hash_as_string {
             self.get_balance(&node_address, hash.as_str(), purse_uref, verbosity)
                 .await
         } else {
@@ -72,6 +79,11 @@ impl SDK {
             return JsValue::null();
         };
         serialize_result(result)
+    }
+
+    #[wasm_bindgen(js_name = "state_get_balance")]
+    pub async fn state_get_balance_js_alias(&mut self, options: GetBalanceOptions) -> JsValue {
+        self.get_balance_js_alias(options).await
     }
 }
 
@@ -101,7 +113,7 @@ impl SDK {
             .await
             .map_err(SdkError::from),
             GetBalanceInput::PurseUrefAsString(purse_uref) => {
-                let state_root_hash_as_string: String = state_root_hash.to_digest().into();
+                let state_root_hash_as_string: String = state_root_hash.to_digest().to_string();
                 get_balance_cli(
                     &rand::thread_rng().gen::<i64>().to_string(),
                     node_address,

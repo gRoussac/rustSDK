@@ -8,6 +8,7 @@ use crate::{
 use casper_client::{
     put_deploy, rpcs::results::PutDeployResult, Error, JsonRpcId, SuccessResponse,
 };
+use casper_types::Deploy as _Deploy;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -22,7 +23,10 @@ impl SDK {
         deploy: Deploy,
         verbosity: Option<Verbosity>,
     ) -> JsValue {
-        serialize_result(self.put_deploy(node_address, deploy, verbosity).await)
+        serialize_result(
+            self.put_deploy(node_address, deploy.into(), verbosity)
+                .await,
+        )
     }
 
     #[wasm_bindgen(js_name = "account_put_deploy")]
@@ -41,7 +45,7 @@ impl SDK {
     pub async fn put_deploy(
         &mut self,
         node_address: &str,
-        deploy: Deploy,
+        deploy: _Deploy,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<PutDeployResult>, Error> {
         //log("account_put_deploy!");
@@ -49,7 +53,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             get_verbosity_or_default(verbosity).into(),
-            deploy.into(),
+            deploy,
         )
         .await
     }

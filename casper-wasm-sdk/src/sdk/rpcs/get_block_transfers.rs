@@ -3,6 +3,7 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
+    debug::error,
     helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
@@ -35,7 +36,14 @@ pub struct GetBlockTransfersOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_block_transfers_options")]
     pub fn get_block_transfers_options(&self, options: JsValue) -> GetBlockTransfersOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetBlockTransfersOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetBlockTransfersOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "get_block_transfers")]

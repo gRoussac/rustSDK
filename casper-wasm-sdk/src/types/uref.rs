@@ -3,6 +3,7 @@ use crate::{
     types::{access_rights::AccessRights, addr::uref_addr::URefAddr},
 };
 use casper_types::URef as _URef;
+use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -41,6 +42,11 @@ impl URef {
             address_array,
             AccessRights::new(access_rights).unwrap_or_default().into(),
         ))
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 }
 
