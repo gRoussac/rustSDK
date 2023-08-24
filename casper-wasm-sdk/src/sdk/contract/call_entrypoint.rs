@@ -39,11 +39,6 @@ impl SDK {
     ) -> JsValue {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
-        log(&format!("deploy_params {:?}", deploy_params));
-        log(&format!("session_params {:?}", session_params));
-        log(&format!("payment_params {:?}", payment_params));
-        // let wasm_vec: Vec<u8> = wasm.to_vec();
-        // let wasm_bytes = Bytes::from(wasm_vec);
         serialize_result(
             self.call_entrypoint(
                 node_address,

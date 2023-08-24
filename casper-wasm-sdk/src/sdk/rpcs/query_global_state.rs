@@ -1,6 +1,7 @@
-use crate::debug::{error, log};
+use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+use crate::types::digest::Digest;
 #[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::types::global_state_identifier::GlobalStateIdentifierInput;
@@ -14,8 +15,6 @@ use casper_client::{
     query_global_state as query_global_state_lib, rpcs::results::QueryGlobalStateResult, JsonRpcId,
     SuccessResponse,
 };
-#[cfg(target_arch = "wasm32")]
-use casper_types::Digest;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
@@ -61,6 +60,47 @@ impl SDK {
         &mut self,
         options: QueryGlobalStateOptions,
     ) -> JsValue {
+        match self.query_global_state_js_alias_params(options) {
+            Ok(params) => {
+                let query_result = self.query_global_state(params).await;
+                serialize_result(query_result)
+            }
+            Err(err) => {
+                error(&format!("Error building parameters: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum KeyIdentifierInput {
+    Key(Key),
+    String(String),
+}
+
+#[derive(Debug, Clone)]
+pub enum PathIdentifierInput {
+    Path(Path),
+    String(String),
+}
+
+#[derive(Debug)]
+pub struct QueryGlobalStateParams {
+    pub node_address: String,
+    pub key: KeyIdentifierInput,
+    pub path: Option<PathIdentifierInput>,
+    pub maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
+    pub state_root_hash: Option<String>,
+    pub maybe_block_id: Option<String>,
+    pub verbosity: Option<Verbosity>,
+}
+
+impl SDK {
+    pub fn query_global_state_js_alias_params(
+        &mut self,
+        options: QueryGlobalStateOptions,
+    ) -> Result<QueryGlobalStateParams, SdkError> {
         let QueryGlobalStateOptions {
             node_address,
             verbosity,
@@ -89,8 +129,12 @@ impl SDK {
         } else if let Some(key_as_string) = key_as_string {
             Some(KeyIdentifierInput::String(key_as_string))
         } else {
-            error("Error: Missing key");
-            return JsValue::null();
+            let err_msg = "Error: Missing Key as string or Key".to_string();
+            error(&err_msg);
+            return Err(SdkError::InvalidArgument {
+                context: "query_global_state",
+                error: err_msg,
+            });
         };
 
         let maybe_path = if let Some(path) = path {
@@ -99,8 +143,8 @@ impl SDK {
             path_as_string.map(PathIdentifierInput::String)
         };
 
-        let result = if let Some(hash) = state_root_hash {
-            let query_params = QueryGlobalStateParams {
+        let query_params = if let Some(hash) = state_root_hash {
+            QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
@@ -108,11 +152,9 @@ impl SDK {
                 state_root_hash: Some(hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
-            };
-
-            self.query_global_state(query_params).await
+            }
         } else if let Some(hash) = state_root_hash_as_string {
-            let query_params = QueryGlobalStateParams {
+            QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
@@ -120,11 +162,9 @@ impl SDK {
                 state_root_hash: Some(hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
-            };
-
-            self.query_global_state(query_params).await
+            }
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
-            let query_params = QueryGlobalStateParams {
+            QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
@@ -132,11 +172,9 @@ impl SDK {
                 state_root_hash: None,
                 maybe_block_id: Some(maybe_block_id_as_string),
                 verbosity,
-            };
-
-            self.query_global_state(query_params).await
+            }
         } else {
-            let query_params = QueryGlobalStateParams {
+            QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
@@ -144,38 +182,11 @@ impl SDK {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity,
-            };
-
-            self.query_global_state(query_params).await
+            }
         };
-
-        serialize_result(result)
+        Ok(query_params)
     }
-}
 
-#[derive(Debug, Clone)]
-pub enum KeyIdentifierInput {
-    Key(Key),
-    String(String),
-}
-
-#[derive(Debug, Clone)]
-pub enum PathIdentifierInput {
-    Path(Path),
-    String(String),
-}
-
-pub struct QueryGlobalStateParams {
-    pub node_address: String,
-    pub key: KeyIdentifierInput,
-    pub path: Option<PathIdentifierInput>,
-    pub maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
-    pub state_root_hash: Option<String>,
-    pub maybe_block_id: Option<String>,
-    pub verbosity: Option<Verbosity>,
-}
-
-impl SDK {
     pub async fn query_global_state(
         &mut self,
         query_params: QueryGlobalStateParams,

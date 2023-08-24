@@ -2,12 +2,13 @@
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
+#[cfg(target_arch = "wasm32")]
+use crate::{debug::error, types::digest::Digest};
 use crate::{
-    debug::error,
     helpers::get_verbosity_or_default,
     types::{
-        digest::Digest, global_state_identifier::GlobalStateIdentifierInput,
-        purse_identifier::PurseIdentifier, sdk_error::SdkError, verbosity::Verbosity,
+        global_state_identifier::GlobalStateIdentifierInput, purse_identifier::PurseIdentifier,
+        sdk_error::SdkError, verbosity::Verbosity,
     },
     SDK,
 };
