@@ -1,9 +1,10 @@
 #[cfg(target_arch = "wasm32")]
+use crate::debug::error;
+#[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,

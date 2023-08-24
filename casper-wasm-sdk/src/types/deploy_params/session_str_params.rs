@@ -226,7 +226,15 @@ pub fn session_str_params_to_casper_client(
             args_simple.args().iter().map(String::as_str).collect()
         });
 
-    // Use the appropriate `with_` method based on available fields as SessionStrParams is private
+    if let Some(session_path) = session_params.session_path.get() {
+        return _SessionStrParams::with_path(
+            session_path,
+            session_args_simple,
+            get_str_or_default(session_params.session_args_json.get()),
+            get_str_or_default(session_params.session_args_complex.get()),
+        );
+    }
+
     if let Some(session_hash) = session_params.session_hash.get() {
         return _SessionStrParams::with_hash(
             session_hash.as_str(),
