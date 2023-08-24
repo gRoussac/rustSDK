@@ -1,4 +1,4 @@
-use crate::debug::{error, log};
+use crate::debug::error;
 use base16::DecodeError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
@@ -101,7 +101,6 @@ impl From<&str> for Digest {
     fn from(s: &str) -> Self {
         let bytes = hex::decode(s)
             .map_err(|err| {
-                log(s);
                 let context = format!("Decoding hex string {:?}", err);
                 let base16_err = DecodeError::InvalidByte {
                     byte: 0,  // TODO Fix error

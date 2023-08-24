@@ -30,10 +30,15 @@ impl Path {
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.path).unwrap_or(JsValue::null())
     }
-
     #[wasm_bindgen(js_name = "toString")]
-    pub fn to_string(&self) -> String {
-        self.path.join("/")
+    pub fn to_string_js_alias(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl std::fmt::Display for Path {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.path.join("/"))
     }
 }
 

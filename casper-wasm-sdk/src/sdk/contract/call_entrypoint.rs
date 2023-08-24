@@ -1,5 +1,5 @@
 use crate::{
-    debug::{error, log},
+    debug::error,
     types::{
         deploy::{BuildParams, Deploy},
         sdk_error::SdkError,
@@ -61,7 +61,7 @@ impl SDK {
         payment_params: _PaymentStrParams<'_>,
         secret_key: Option<std::string::String>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
-        log("call_entrypoint!");
+        //log("call_entrypoint!");
         let deploy = make_deploy("", deploy_params, session_params, payment_params, false);
 
         if let Err(err) = deploy {

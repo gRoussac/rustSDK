@@ -2,7 +2,6 @@ use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::types::digest::Digest;
-#[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::types::global_state_identifier::GlobalStateIdentifierInput;
 use crate::{
@@ -18,13 +17,10 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
 use serde::Deserialize;
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
-#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "queryGlobalStateOptions")]
 pub struct QueryGlobalStateOptions {
     node_address: String,

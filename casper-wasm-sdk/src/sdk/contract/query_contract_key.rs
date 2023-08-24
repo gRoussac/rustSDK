@@ -1,23 +1,24 @@
 #[cfg(target_arch = "wasm32")]
 use crate::{
-    debug::{error, log},
-    rpcs::query_global_state::QueryGlobalStateParams,
+    debug::error,
     types::{
         digest::Digest, global_state_identifier::GlobalStateIdentifier, key::Key, path::Path,
-        sdk_error::SdkError, verbosity::Verbosity,
+        verbosity::Verbosity,
     },
-    SDK,
 };
+use crate::{rpcs::query_global_state::QueryGlobalStateParams, types::sdk_error::SdkError, SDK};
 use casper_client::{rpcs::results::QueryGlobalStateResult, SuccessResponse};
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
+#[cfg(target_arch = "wasm32")]
 use serde::Deserialize;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Deserialize, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "queryContractOptions")]
-pub struct QueryContractOptions {
+#[wasm_bindgen(js_name = "QueryContractKeyOptions")]
+pub struct QueryContractKeyOptions {
     #[allow(unused)]
     node_address: String,
     #[allow(unused)]
@@ -47,31 +48,34 @@ pub struct QueryContractOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen(js_name = "query_contract_options")]
-    pub fn query_contract_state_options(&self, options: JsValue) -> QueryContractOptions {
-        let options_result = options.into_serde::<QueryContractOptions>();
+    #[wasm_bindgen(js_name = "query_contract_key_options")]
+    pub fn query_contract_key_state_options(&self, options: JsValue) -> QueryContractKeyOptions {
+        let options_result = options.into_serde::<QueryContractKeyOptions>();
         match options_result {
             Ok(options) => options,
             Err(err) => {
                 error(&format!("Error deserializing options: {:?}", err));
-                QueryContractOptions::default()
+                QueryContractKeyOptions::default()
             }
         }
     }
 
-    #[wasm_bindgen(js_name = "query_contract")]
-    pub async fn query_contract_js_alias(&mut self, options: QueryContractOptions) -> JsValue {
+    #[wasm_bindgen(js_name = "query_contract_key")]
+    pub async fn query_contract_key_js_alias(
+        &mut self,
+        options: QueryContractKeyOptions,
+    ) -> JsValue {
         let options = self.query_global_state_options(JsValue::from(options));
         self.query_global_state_js_alias(options).await
     }
 }
 
 impl SDK {
-    pub async fn query_contract(
+    pub async fn query_contract_key(
         &mut self,
         query_params: QueryGlobalStateParams,
     ) -> Result<SuccessResponse<QueryGlobalStateResult>, SdkError> {
-        log("query_contract!");
+        //log("query_contract_key!");
         self.query_global_state(query_params)
             .await
             .map_err(SdkError::from)

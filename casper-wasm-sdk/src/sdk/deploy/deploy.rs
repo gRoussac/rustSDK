@@ -1,7 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::{
-    debug::{error, log},
+    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -51,7 +51,7 @@ impl SDK {
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
-        log("deploy!");
+        //log("deploy!");
         let deploy = make_deploy(
             "",
             deploy_str_params_to_casper_client(&deploy_params),
