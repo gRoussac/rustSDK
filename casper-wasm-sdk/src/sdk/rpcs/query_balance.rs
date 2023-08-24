@@ -3,6 +3,7 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
+    debug::error,
     helpers::get_verbosity_or_default,
     types::{
         digest::Digest, global_state_identifier::GlobalStateIdentifierInput,
@@ -32,8 +33,8 @@ pub struct QueryBalanceOptions {
     verbosity: Option<Verbosity>,
     global_state_identifier_as_string: Option<String>,
     global_state_identifier: Option<GlobalStateIdentifier>,
-    state_root_hash: Option<String>,
-    state_root_hash_digest: Option<Digest>,
+    state_root_hash_as_string: Option<String>,
+    state_root_hash: Option<Digest>,
     maybe_block_id_as_string: Option<String>,
 }
 
@@ -42,7 +43,14 @@ pub struct QueryBalanceOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "query_balance_options")]
     pub fn query_balance_options(&self, options: JsValue) -> QueryBalanceOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<QueryBalanceOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                QueryBalanceOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "query_balance")]
@@ -54,8 +62,8 @@ impl SDK {
             global_state_identifier,
             purse_identifier_as_string,
             purse_identifier,
+            state_root_hash_as_string,
             state_root_hash,
-            state_root_hash_digest,
             maybe_block_id_as_string,
         } = options;
 
@@ -68,7 +76,7 @@ impl SDK {
                 global_state_identifier_as_string.map(GlobalStateIdentifierInput::String)
             };
 
-        let result = if let Some(hash) = state_root_hash_digest {
+        let result = if let Some(hash) = state_root_hash {
             self.query_balance(
                 &node_address,
                 maybe_global_state_identifier,
@@ -79,7 +87,7 @@ impl SDK {
                 verbosity,
             )
             .await
-        } else if let Some(hash) = state_root_hash {
+        } else if let Some(hash) = state_root_hash_as_string {
             self.query_balance(
                 &node_address,
                 maybe_global_state_identifier,
@@ -149,7 +157,7 @@ impl SDK {
             )
             .await
             .map_err(SdkError::from)
-        } else if let None = maybe_global_state_identifier {
+        } else if maybe_global_state_identifier.is_none() {
             let purse_identifier = if let Some(purse_identifier) = purse_identifier {
                 purse_identifier
             } else {

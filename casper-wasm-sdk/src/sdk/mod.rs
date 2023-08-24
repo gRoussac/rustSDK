@@ -6,6 +6,9 @@ pub use deploy::*;
 pub(crate) mod deploy_utils;
 pub(crate) use deploy_utils::*;
 
+pub(crate) mod contract;
+pub use contract::*;
+
 pub use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

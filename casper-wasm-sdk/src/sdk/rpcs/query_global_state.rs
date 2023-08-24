@@ -1,4 +1,4 @@
-use crate::debug::error;
+use crate::debug::{error, log};
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
@@ -32,8 +32,8 @@ pub struct QueryGlobalStateOptions {
     verbosity: Option<Verbosity>,
     global_state_identifier_as_string: Option<String>,
     global_state_identifier: Option<GlobalStateIdentifier>,
-    state_root_hash: Option<String>,
-    state_root_hash_digest: Option<Digest>,
+    state_root_hash_as_string: Option<String>,
+    state_root_hash: Option<Digest>,
     maybe_block_id_as_string: Option<String>,
     key_as_string: Option<String>,
     key: Option<Key>,
@@ -46,7 +46,14 @@ pub struct QueryGlobalStateOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "query_global_state_options")]
     pub fn query_global_state_options(&self, options: JsValue) -> QueryGlobalStateOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<QueryGlobalStateOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                QueryGlobalStateOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "query_global_state")]
@@ -59,8 +66,8 @@ impl SDK {
             verbosity,
             global_state_identifier_as_string,
             global_state_identifier,
+            state_root_hash_as_string,
             state_root_hash,
-            state_root_hash_digest,
             maybe_block_id_as_string,
             key_as_string,
             key,
@@ -92,7 +99,7 @@ impl SDK {
             path_as_string.map(PathIdentifierInput::String)
         };
 
-        let result = if let Some(hash) = state_root_hash_digest {
+        let result = if let Some(hash) = state_root_hash {
             let query_params = QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
@@ -104,7 +111,7 @@ impl SDK {
             };
 
             self.query_global_state(query_params).await
-        } else if let Some(hash) = state_root_hash {
+        } else if let Some(hash) = state_root_hash_as_string {
             let query_params = QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),

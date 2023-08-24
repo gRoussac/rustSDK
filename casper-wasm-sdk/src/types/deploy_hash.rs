@@ -5,6 +5,7 @@ use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     DeployHash as _DeployHash,
 };
+use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -28,6 +29,11 @@ impl DeployHash {
     #[wasm_bindgen(js_name = "fromDigest")]
     pub fn from_digest(digest: Digest) -> Result<DeployHash, JsValue> {
         Ok(_DeployHash::new(digest.into()).into())
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 }
 

@@ -1,10 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
-use crate::{
-    debug::error,
-    types::{digest::Digest, sdk_error::SdkError},
-};
+use crate::{debug::error, types::digest::Digest};
 use crate::{
     helpers::get_verbosity_or_default,
     types::{deploy_hash::DeployHash, verbosity::Verbosity},
@@ -37,7 +34,14 @@ pub struct GetDeployOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_deploy_options")]
     pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetDeployOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetDeployOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "get_deploy")]

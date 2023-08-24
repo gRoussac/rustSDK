@@ -83,55 +83,46 @@ function App() {
     console.log(sdk);
 
     try {
-      const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(
-        host,
-        Verbosity.High,
-        undefined
-      );
+      let get_state_root_hash_options = sdk.get_state_root_hash_options({
+        node_address: host,
+        verbosity: Verbosity.Low
+      });
+      const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(get_state_root_hash_options);
       setHash(chain_get_state_root_hash?.result.state_root_hash);
       console.log(
         'js chain_get_state_root_hash',
         chain_get_state_root_hash?.result.state_root_hash
       );
       console.log(chain_get_state_root_hash);
+      let chain_get_block_options = sdk.get_block_options({
+        node_address: host,
+        verbosity: Verbosity.High,
+        blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height)
+      });
+      const chain_get_block = await sdk.chain_get_block(chain_get_block_options);
+      setBlock(chain_get_block?.result.block.hash);
+      console.log('js chain_get_block', chain_get_block);
 
-      // const chain_get_block = await sdk.chain_get_block(
-      //   host,
-      //   Verbosity.High,
-      //   BlockIdentifier.fromHeight(block_identifier_height)
-      // );
-      // setBlock(chain_get_block?.result.block.hash);
-      // console.log('js chain_get_block', chain_get_block);
+      const public_key = new PublicKey(pubKey);
+      let state_get_account_info_options = sdk.get_account_options({
+        node_address: host,
+        verbosity: Verbosity.High,
+        blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
+        public_key: public_key.toJson()
+      });
+      const state_get_account_info = await sdk.state_get_account_info(state_get_account_info_options);
+      console.log('js state_get_account_info', state_get_account_info);
 
-      // const public_key = new PublicKey(pubKey);
+      setInfo_get_account_info_hash(
+        state_get_account_info?.result.account.account_hash
+      );
+      setInfo_get_account_info_purse(
+        state_get_account_info?.result.account.main_purse
+      );
 
-      // const state_get_account_info = await sdk.state_get_account_info(
-      //   host,
-      //   Verbosity.High,
-      //   BlockIdentifier.fromHeight(block_identifier_height),
-      //   public_key
-      // );
-      // console.log('js state_get_account_info', state_get_account_info);
-
-      // setInfo_get_account_info_hash(
-      //   state_get_account_info?.result.account.account_hash
-      // );
-      // setInfo_get_account_info_purse(
-      //   state_get_account_info?.result.account.main_purse
-      // );
-
-      // const state_get_balance = await sdk.state_get_balance(
-      //   host,
-      //   new Digest(chain_get_state_root_hash?.result.state_root_hash),
-      //   new URef(
-      //     'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
-      //     AccessRights.READ_ADD_WRITE()
-      //   ),
-      //   Verbosity.High,
-      // );
-      // console.log('js state_get_balance', state_get_balance);
-      // setState_get_balance(state_get_balance?.result.balance_value);
-
+      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
+      console.log(stateRootHashDigest);
+      console.log(stateRootHashDigest.toJson());
       const dictionary_item_identifier =
         DictionaryItemIdentifier.newFromSeedUref(
           new URef(
@@ -141,13 +132,12 @@ function App() {
           '0' // event key
         );
 
-      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
-      console.log(stateRootHashDigest.toJson());
       let get_dictionary_item_options = sdk.get_dictionary_item_options({
         node_address: host,
-        // state_root_hash: chain_get_state_root_hash?.result.state_root_hash,
-        state_root_hash_digest: stateRootHashDigest.toJson(),
-        dictionary_item_identifier: dictionary_item_identifier.toJson()
+        state_root_hash_as_string: chain_get_state_root_hash?.result.state_root_hash,
+        //state_root_hash: stateRootHashDigest.toJson(),
+        dictionary_item_identifier: dictionary_item_identifier.toJson(),
+        //  verbosity: Verbosity.High
       });
       console.log(get_dictionary_item_options);
       const state_get_dictionary_item = await sdk.state_get_dictionary_item(get_dictionary_item_options);
@@ -157,20 +147,42 @@ function App() {
       );
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
 
-      const query_global_state = await sdk.query_global_state(
-        host,
-        GlobalStateIdentifier.fromStateRootHash(
-          new Digest(chain_get_state_root_hash?.result.state_root_hash)
-        ),
-        Key.fromURef(
-          new URef(
-            'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
-            AccessRights.READ_ADD_WRITE()
-          )
-        ),
-        new Path(''),
-        Verbosity.High,
+      stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
+      let state_get_balance_options = sdk.get_balance_options({
+        node_address: host,
+        state_root_hash: stateRootHashDigest.toJson(),
+        purse_uref: new URef(
+          'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
+          AccessRights.READ_ADD_WRITE()
+        ).toJson(),
+        //purse_uref_as_string: 'uref-b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e-007',
+        verbosity: Verbosity.High,
+      });
+      const state_get_balance = await sdk.state_get_balance(state_get_balance_options);
+      console.log('js state_get_balance', state_get_balance);
+      setState_get_balance(state_get_balance?.result.balance_value);
+
+
+      let path = new Path([]).toJson();
+      let key = Key.fromURef(
+        new URef(
+          'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
+          AccessRights.READ_ADD_WRITE()
+        )
       );
+      console.log(key);
+      let query_global_state_options = sdk.query_global_state_options({
+        node_address: host,
+        global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
+          new Digest(chain_get_state_root_hash?.result.state_root_hash)
+        ).toJson(),
+        key: key.toJson(),
+        // path_as_string: new Path('').toString(),
+        path,
+        verbosity: Verbosity.High,
+      });
+      console.log(query_global_state_options);
+      const query_global_state = await sdk.query_global_state(query_global_state_options);
       console.log('js query_global_state', query_global_state);
       setQuery_global_state(
         query_global_state?.result.stored_value.CLValue.parsed
@@ -274,8 +286,8 @@ function App() {
 
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
 
-      // let cl_value_ = CLValue.bool(true);
-      // console.log(CLType.Bool(), cl_value_);
+      // // let cl_value_ = CLValue.bool(true);
+      // // console.log(CLType.Bool(), cl_value_);
 
       deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
       deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 }); // No arrary as one arg
@@ -313,15 +325,16 @@ function App() {
       }
 
       let finalized_approvals = true;
-      const info_get_deploy = await sdk.get_deploy(
-        host,
-        new DeployHash(
-          // '397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
+      let get_deploy_options = sdk.get_deploy_options({
+        node_address: host,
+        deploy_hash: new DeployHash(
+          //'397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
           account_put_deploy?.result.deploy_hash
-        ),
-        finalized_approvals,
-        Verbosity.High,
-      );
+        ).toJson(),
+        finalized_approvals: finalized_approvals,
+        verbosity: Verbosity.High,
+      });
+      const info_get_deploy = await sdk.get_deploy(get_deploy_options);
       console.log('js info_get_deploy', info_get_deploy);
       setInfo_get_deploy(info_get_deploy?.result?.api_version);
 

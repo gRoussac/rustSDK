@@ -42,7 +42,14 @@ pub struct GetAccountOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_account_options")]
     pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {
-        options.into_serde().unwrap_or_default()
+        let options_result = options.into_serde::<GetAccountOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetAccountOptions::default()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "get_account")]

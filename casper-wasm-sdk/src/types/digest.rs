@@ -1,4 +1,4 @@
-use crate::debug::error;
+use crate::debug::{error, log};
 use base16::DecodeError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
@@ -6,7 +6,6 @@ use casper_types::{
 };
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use wasm_bindgen::prelude::*;
 
 use super::sdk_error::SdkError;
@@ -20,11 +19,11 @@ impl Digest {
     #[wasm_bindgen(constructor)]
     #[wasm_bindgen(js_name = "new")]
     pub fn new_js_alias(digest_hex_str: &str) -> Result<Digest, JsValue> {
-        Self::from_str(digest_hex_str)
+        Self::from_string(digest_hex_str)
     }
 
     #[wasm_bindgen(js_name = "fromString")]
-    pub fn from_str(digest_hex_str: &str) -> Result<Digest, JsValue> {
+    pub fn from_string(digest_hex_str: &str) -> Result<Digest, JsValue> {
         Ok(Digest::from(digest_hex_str))
     }
 
@@ -44,18 +43,18 @@ impl Digest {
 
 impl Digest {
     pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
-        Ok(Digest::from(&digest_hex_str[..]))
+        Ok(Digest::from(digest_hex_str))
     }
 
     pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, SdkError> {
-        let hex_string = hex::encode(&bytes);
+        let hex_string = hex::encode(bytes);
         Ok(Digest::from(&hex_string[..]))
     }
 }
 
-impl fmt::Display for Digest {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.0)
+impl ToString for Digest {
+    fn to_string(&self) -> String {
+        hex::encode(self.0)
     }
 }
 
@@ -102,7 +101,8 @@ impl From<&str> for Digest {
     fn from(s: &str) -> Self {
         let bytes = hex::decode(s)
             .map_err(|err| {
-                let context = "Decoding hex string";
+                log(s);
+                let context = format!("Decoding hex string {:?}", err);
                 let base16_err = DecodeError::InvalidByte {
                     byte: 0,  // TODO Fix error
                     index: 0, // Set the index to 0 or a relevant value here
@@ -115,7 +115,10 @@ impl From<&str> for Digest {
         if bytes.len() != _Digest::LENGTH {
             let context = "Invalid Digest length";
             let error = DigestError::IncorrectDigestLength(bytes.len());
-            let sdk_error = SdkError::FailedToParseDigest { context, error };
+            let sdk_error = SdkError::FailedToParseDigest {
+                context: context.to_string(),
+                error,
+            };
             unreachable!("{:?}", sdk_error);
         }
 

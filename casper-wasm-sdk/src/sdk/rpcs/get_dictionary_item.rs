@@ -33,8 +33,8 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(js_name = "getDictionaryItemOptions")]
 pub struct GetDictionaryItemOptions {
     node_address: String,
-    state_root_hash: Option<String>,
-    state_root_hash_digest: Option<Digest>,
+    state_root_hash_as_string: Option<String>,
+    state_root_hash: Option<Digest>,
     dictionary_item_params: Option<DictionaryItemStrParams>,
     dictionary_item_identifier: Option<DictionaryItemIdentifier>,
     verbosity: Option<Verbosity>,
@@ -45,13 +45,14 @@ pub struct GetDictionaryItemOptions {
 impl SDK {
     #[wasm_bindgen(js_name = "get_dictionary_item_options")]
     pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
-        let options_result: Result<GetDictionaryItemOptions, _> = options.into_serde();
-        if let Err(err) = options_result {
-            error(&format!("Deserialization error: {:?}", err));
-            return GetDictionaryItemOptions::default();
+        let options_result = options.into_serde::<GetDictionaryItemOptions>();
+        match options_result {
+            Ok(options) => options,
+            Err(err) => {
+                error(&format!("Error deserializing options: {:?}", err));
+                GetDictionaryItemOptions::default()
+            }
         }
-        let options: GetDictionaryItemOptions = options_result.unwrap();
-        options
     }
 
     #[wasm_bindgen(js_name = "get_dictionary_item")]
@@ -61,8 +62,8 @@ impl SDK {
     ) -> JsValue {
         let GetDictionaryItemOptions {
             node_address,
+            state_root_hash_as_string,
             state_root_hash,
-            state_root_hash_digest,
             dictionary_item_params,
             dictionary_item_identifier,
             verbosity,
@@ -73,14 +74,14 @@ impl SDK {
         } else if let Some(params) = dictionary_item_params {
             DictionaryItemInput::Params(params)
         } else {
-            error("Error: Missing dictionary_item identifier or params");
+            error("Error: Missing dictionary item identifier or params");
             return JsValue::null();
         };
 
-        let result = if let Some(hash) = state_root_hash_digest {
+        let result = if let Some(hash) = state_root_hash {
             self.get_dictionary_item(&node_address, hash, dictionary_item, verbosity)
                 .await
-        } else if let Some(hash) = state_root_hash {
+        } else if let Some(hash) = state_root_hash_as_string {
             self.get_dictionary_item(&node_address, hash.as_str(), dictionary_item, verbosity)
                 .await
         } else {

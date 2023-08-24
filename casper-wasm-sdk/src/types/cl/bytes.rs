@@ -1,3 +1,4 @@
+use casper_types::{CLType, CLTyped};
 use core::ops::Deref;
 use wasm_bindgen::prelude::*;
 
@@ -21,32 +22,32 @@ impl Deref for Bytes {
     }
 }
 
-// impl From<Vec<u8>> for Bytes {
-//     fn from(vec: Vec<u8>) -> Self {
-//         Bytes(vec)
-//     }
-// }
+impl From<Vec<u8>> for Bytes {
+    fn from(vec: Vec<u8>) -> Self {
+        Bytes(vec)
+    }
+}
 
-// impl From<Bytes> for Vec<u8> {
-//     fn from(bytes: Bytes) -> Self {
-//         bytes.0
-//     }
-// }
+impl From<Bytes> for Vec<u8> {
+    fn from(bytes: Bytes) -> Self {
+        bytes.0
+    }
+}
 
-// impl From<&[u8]> for Bytes {
-//     fn from(bytes: &[u8]) -> Self {
-//         Bytes(bytes.to_vec())
-//     }
-// }
+impl From<&[u8]> for Bytes {
+    fn from(bytes: &[u8]) -> Self {
+        Bytes(bytes.to_vec())
+    }
+}
 
-// impl CLTyped for Bytes {
-//     fn cl_type() -> CLType {
-//         <Vec<u8>>::cl_type()
-//     }
-// }
+impl CLTyped for Bytes {
+    fn cl_type() -> CLType {
+        <Vec<u8>>::cl_type()
+    }
+}
 
-// impl AsRef<[u8]> for Bytes {
-//     fn as_ref(&self) -> &[u8] {
-//         self.0.as_ref()
-//     }
-// }
+impl AsRef<[u8]> for Bytes {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_ref()
+    }
+}
