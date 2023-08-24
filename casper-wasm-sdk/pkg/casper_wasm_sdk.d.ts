@@ -1153,11 +1153,11 @@ export class SDK {
 /**
 * @param {string} node_address
 * @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
 * @param {string} payment_amount
-* @param {Uint8Array} wasm
 * @returns {Promise<any>}
 */
-  install(node_address: string, deploy_params: DeployStrParams, payment_amount: string, wasm: Uint8Array): Promise<any>;
+  call_entrypoint(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string): Promise<any>;
 /**
 * @param {string} node_address
 * @param {number | undefined} verbosity
@@ -1208,6 +1208,14 @@ export class SDK {
 * @returns {any}
 */
   sign_deploy(deploy: Deploy, secret_key: string): any;
+/**
+* @param {string} node_address
+* @param {DeployStrParams} deploy_params
+* @param {string} payment_amount
+* @param {ArrayBuffer} wasm
+* @returns {Promise<any>}
+*/
+  install(node_address: string, deploy_params: DeployStrParams, payment_amount: string, wasm: ArrayBuffer): Promise<any>;
 /**
 * @param {any} options
 * @returns {queryGlobalStateOptions}
@@ -1615,7 +1623,7 @@ export interface InitOutput {
   readonly sdk_get_era_info_options: (a: number, b: number) => number;
   readonly sdk_get_era_info: (a: number, b: number) => number;
   readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_blockhash_free: (a: number) => void;
   readonly blockhash_new: (a: number, b: number) => number;
   readonly blockhash_toBytes: (a: number, b: number) => void;
@@ -1648,6 +1656,7 @@ export interface InitOutput {
   readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_contractpackagehash_free: (a: number) => void;
   readonly __wbg_accessrights_free: (a: number) => void;
   readonly accessrights_NONE: () => number;

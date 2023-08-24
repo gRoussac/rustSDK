@@ -4,12 +4,11 @@ use crate::debug::error;
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
+#[cfg(target_arch = "wasm32")]
+use crate::types::deploy::Deploy as _Deploy;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{
-        block_identifier::BlockIdentifierInput, deploy::Deploy as _Deploy, sdk_error::SdkError,
-        verbosity::Verbosity,
-    },
+    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
@@ -19,7 +18,6 @@ use casper_client::{
 use casper_types::Deploy;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
-#[cfg(target_arch = "wasm32")]
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::Deserialize;
