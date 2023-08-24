@@ -1,3 +1,20 @@
+use crate::{
+    debug::{error, log},
+    types::{
+        deploy::{BuildParams, Deploy},
+        sdk_error::SdkError,
+    },
+    SDK,
+};
+#[cfg(target_arch = "wasm32")]
+use crate::{
+    helpers::serialize_result,
+    types::deploy_params::{
+        deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
+        payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
+        session_str_params::{session_str_params_to_casper_client, SessionStrParams},
+    },
+};
 use casper_client::{
     cli::{
         make_deploy, DeployStrParams as _DeployStrParams, PaymentStrParams as _PaymentStrParams,
@@ -6,70 +23,50 @@ use casper_client::{
     rpcs::results::PutDeployResult,
     SuccessResponse,
 };
-use js_sys::{ArrayBuffer, Uint8Array};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
-
-use crate::{
-    debug::{error, log},
-    types::{
-        cl::bytes::Bytes,
-        deploy::{BuildParams, Deploy},
-        deploy_params::{
-            deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
-            payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
-            session_str_params::{session_str_params_to_casper_client, SessionStrParams},
-        },
-        sdk_error::SdkError,
-    },
-    SDK,
-};
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen(js_name = "install")]
-    pub async fn install_js_alias(
+    #[wasm_bindgen(js_name = "call_entrypoint")]
+    pub async fn call_entrypoint_js_alias(
         &mut self,
         node_address: &str,
         deploy_params: DeployStrParams,
+        session_params: SessionStrParams,
         payment_amount: &str,
-        wasm: ArrayBuffer,
     ) -> JsValue {
-        log(&format!("wasm {:?}", wasm));
-        let session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
         log(&format!("deploy_params {:?}", deploy_params));
+        log(&format!("session_params {:?}", session_params));
         log(&format!("payment_params {:?}", payment_params));
         // let wasm_vec: Vec<u8> = wasm.to_vec();
         // let wasm_bytes = Bytes::from(wasm_vec);
-        // serialize_result(
-        //     self.install(
-        //         node_address,
-        //         deploy_str_params_to_casper_client(&deploy_params),
-        //         session_str_params_to_casper_client(&session_params),
-        //         payment_str_params_to_casper_client(&payment_params),
-        //         wasm_bytes,
-        //         deploy_params.secret_key(),
-        //     )
-        //     .await,
-        // )
-        JsValue::null()
+        serialize_result(
+            self.call_entrypoint(
+                node_address,
+                deploy_str_params_to_casper_client(&deploy_params),
+                session_str_params_to_casper_client(&session_params),
+                payment_str_params_to_casper_client(&payment_params),
+                deploy_params.secret_key(),
+            )
+            .await,
+        )
     }
 }
 
 impl SDK {
-    pub async fn install(
+    pub async fn call_entrypoint(
         &mut self,
         node_address: &str,
         deploy_params: _DeployStrParams<'_>,
         session_params: _SessionStrParams<'_>,
         payment_params: _PaymentStrParams<'_>,
-        wasm: Bytes,
         secret_key: Option<std::string::String>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
-        log("install!");
+        log("call_entrypoint!");
         let deploy = make_deploy("", deploy_params, session_params, payment_params, false);
 
         if let Err(err) = deploy {
@@ -78,10 +75,12 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        let deploy: Deploy = deploy.unwrap().into();
+        let mut deploy: Deploy = deploy.unwrap().into();
         let build_params = BuildParams::default();
         deploy.build(build_params);
-        deploy.with_module_bytes(wasm, secret_key);
+        if let Some(secret_key) = secret_key {
+            deploy = deploy.sign(&secret_key);
+        }
 
         self.put_deploy(node_address, deploy.into(), None)
             .await

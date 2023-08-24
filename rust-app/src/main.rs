@@ -2,7 +2,6 @@ use casper_wasm_sdk::{
     debug::{error, log},
     helpers::hex_to_uint8_vec,
     types::{
-        deploy::Deploy,
         deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
@@ -18,7 +17,10 @@ async fn main() {
     println!("Bye world!");
     let mut sdk = SDK::new();
     let peers = sdk
-        .get_peers("https://rpc.integration.casperlabs.io", Verbosity::Low)
+        .get_peers(
+            "https://rpc.integration.casperlabs.io",
+            Some(Verbosity::Low),
+        )
         .await;
     //dbg!(peers.unwrap());
 
@@ -43,7 +45,7 @@ async fn main() {
     // deploy_params.set_default_ttl();
     // deploy_params.set_default_timestamp();
 
-    dbg!(deploy_params);
+    dbg!(deploy_params.clone());
 
     let session_params = SessionStrParams::default();
     session_params
@@ -53,12 +55,6 @@ async fn main() {
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount("5500000000");
 
-    // let test_deploy: Result<Deploy, SdkError> =
-    //     sdk.make_deploy(deploy_params, session_params, payment_params);
-    let test = sdk
-        .get_dictionary_item_test(
-            "386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530",
-        )
-        .await;
-    dbg!(test);
+    let test_deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
+    dbg!(test_deploy);
 }

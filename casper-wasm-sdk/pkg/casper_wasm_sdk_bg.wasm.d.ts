@@ -237,7 +237,7 @@ export function __wbg_geterainfooptions_free(a: number): void;
 export function sdk_get_era_info_options(a: number, b: number): number;
 export function sdk_get_era_info(a: number, b: number): number;
 export function sdk_deploy(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
-export function sdk_install(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
+export function sdk_call_entrypoint(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function __wbg_blockhash_free(a: number): void;
 export function blockhash_new(a: number, b: number): number;
 export function blockhash_toBytes(a: number, b: number): void;
@@ -270,6 +270,7 @@ export function sdk_list_rpcs(a: number, b: number, c: number, d: number): numbe
 export function sdk_put_deploy(a: number, b: number, c: number, d: number, e: number): number;
 export function sdk_account_put_deploy(a: number, b: number, c: number, d: number, e: number): number;
 export function sdk_sign_deploy(a: number, b: number, c: number, d: number): number;
+export function sdk_install(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function __wbg_contractpackagehash_free(a: number): void;
 export function __wbg_accessrights_free(a: number): void;
 export function accessrights_NONE(): number;
