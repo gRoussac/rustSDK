@@ -33,7 +33,7 @@ impl SDK {
 
 impl SDK {
     pub fn make_deploy(
-        &mut self,
+        &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
