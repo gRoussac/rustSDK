@@ -1,9 +1,9 @@
 {
   "build": {
-    "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run start",
+    "beforeBuildCommand": "cd ../frontend && npm run build",
+    "beforeDevCommand": "cd ../frontend && npm run start",
     "devPath": "http://localhost:3000/",
-    "distDir": "../build"
+    "distDir": "../../frontend/build"
   },
   "package": {
     "productName": "casper",
