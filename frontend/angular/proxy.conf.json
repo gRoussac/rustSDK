@@ -1,0 +1,6 @@
+{
+  "/rpc": {
+    "target": "https://rpc.integration.casperlabs.io/",
+    "secure": false
+  }
+}

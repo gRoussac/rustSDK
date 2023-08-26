@@ -1,0 +1,45 @@
+<main class="container">
+  <img src="assets/logo.png" alt="CasperLabs" />
+  <div class="row">
+    <div class="col">
+      <div class="alert alert-success" *ngIf="state_root_hash">
+        <span>state root hash is {{ state_root_hash }}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <form>
+        <div class="col-md-3">
+          <label class="form-label">Choose action</label>
+          <select
+            class="form-select form-control form-control-sm"
+            (change)="selectAction($event)"
+            #selectActionElt
+          >
+            <option></option>
+            <option value="get_peers">Get Peers</option>
+            <option value="get_status">Get Status</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="row mt-3" *ngIf="peers.length">
+      <div class="col-xs-12">
+        <div class="card">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item" *ngFor="let peer of peers; index as i">
+              {{ peer | json }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3" *ngIf="status">
+      <div class="card">
+        <div class="card-body">
+          {{ status | json }}
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
