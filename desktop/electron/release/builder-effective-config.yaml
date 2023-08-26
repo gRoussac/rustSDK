@@ -1,0 +1,18 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.example.myapp
+productName: Casper
+win:
+  target: nsis
+linux:
+  category: Network
+mac:
+  category: Network
+files:
+  - filter:
+      - index.js
+extraFiles:
+  - from: ./../../frontend/angular/dist/casper
+    to: frontend/angular/dist/casper
+electronVersion: 26.1.0
