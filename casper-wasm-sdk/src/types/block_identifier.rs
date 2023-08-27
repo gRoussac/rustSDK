@@ -4,7 +4,7 @@ use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Deserialize, Clone, Serialize)]
+#[derive(Debug, Deserialize, Clone, Serialize, Copy)]
 #[wasm_bindgen]
 pub struct BlockIdentifier(_BlockIdentifier);
 

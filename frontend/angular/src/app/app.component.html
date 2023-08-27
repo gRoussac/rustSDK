@@ -1,43 +1,311 @@
 <main class="container">
   <img src="assets/logo.png" alt="CasperLabs" />
   <div class="row">
-    <div class="col">
-      <div class="alert alert-success" *ngIf="state_root_hash">
+    <div class="col-sm-12">
+      <div
+        class="alert alert-success d-flex justify-content-between align-items-center"
+        *ngIf="state_root_hash"
+      >
         <span>state root hash is {{ state_root_hash }}</span>
+        <button class="btn me-0" (click)="get_state_root_hash()">
+          Refresh
+        </button>
+      </div>
+      <div class="alert alert-warning" *ngIf="account_hash">
+        <span>account hash is {{ account_hash }}</span>
+      </div>
+      <div class="alert alert-warning" *ngIf="main_purse">
+        <span>main purse is {{ main_purse }}</span>
       </div>
     </div>
-
-    <div class="row">
-      <form>
-        <div class="col-md-3">
-          <label class="form-label">Choose action</label>
+  </div>
+  <div class="row">
+    <form>
+      <div class="col-md-4">
+        <div class="input-group">
+          <label class="input-group-text" for="selectActionElt"
+            >Choose action</label
+          >
           <select
+            id="selectActionElt"
             class="form-select form-control form-control-sm"
             (change)="selectAction($event)"
             #selectActionElt
           >
             <option></option>
-            <option value="get_peers">Get Peers</option>
-            <option value="get_status">Get Status</option>
+            <optgroup label="rpc">
+              <option
+                [value]="sdk_method"
+                *ngFor="let sdk_method of sdk_rpc_methods; index as i"
+              >
+                {{ sdk_method }}
+              </option>
+            </optgroup>
+            <optgroup label="deploy utils">
+              <option
+                [value]="sdk_method"
+                *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
+              >
+                {{ sdk_method }}
+              </option>
+            </optgroup>
+            <optgroup label="deploy">
+              <option
+                [value]="sdk_method"
+                *ngFor="let sdk_method of sdk_deploy_methods; index as i"
+              >
+                {{ sdk_method }}
+              </option>
+            </optgroup>
+            <optgroup label="contract">
+              <option
+                [value]="sdk_method"
+                *ngFor="let sdk_method of sdk_contract_methods; index as i"
+              >
+                {{ sdk_method }}
+              </option>
+            </optgroup>
           </select>
         </div>
-      </form>
-    </div>
-    <div class="row mt-3" *ngIf="peers.length">
-      <div class="col-xs-12">
-        <div class="card">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item" *ngFor="let peer of peers; index as i">
-              {{ peer | json }}
-            </li>
-          </ul>
-        </div>
+      </div>
+    </form>
+  </div>
+  <div class="row mt-3" *ngIf="peers.length">
+    <div class="col-xs-12">
+      <div class="card">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" *ngFor="let peer of peers; index as i">
+            {{ peer | json }}
+          </li>
+        </ul>
       </div>
     </div>
-    <div class="row mt-3" *ngIf="status">
+  </div>
+
+  <div
+    class="row mt-3 d-flex align-items-end"
+    *ngIf="
+      [
+        'get_block',
+        'get_block_transfers',
+        'get_era_info',
+        'get_era_summary'
+      ].includes(action)
+    "
+  >
+    <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-2">
+        <label
+          >Block Height
+          <!-- <span class="fw-light small"
+              >({{ block_identifier_height_default }})</span
+            > -->
+        </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            id="blockIdentifierHeightElt"
+            class="form-control form-control-xs"
+            name="block_identifier_height"
+            [value]="block_identifier_height"
+            [placeholder]="block_identifier_height_default"
+            #blockIdentifierHeightElt
+          />
+          <label for="blockIdentifierHeightElt"
+            >ex: {{ block_identifier_height_default }}</label
+          >
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <label
+          >Block Hash
+          <!-- <span class="fw-light small"
+              >({{ block_identifier_hash_default }})</span
+            > -->
+        </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="block_identifier_hash"
+            [value]="block_identifier_hash"
+            [placeholder]="block_identifier_hash_default"
+            id="blockIdentifierHashElt"
+            #blockIdentifierHashElt
+          />
+          <label for="blockIdentifierHeightElt"
+            >ex: {{ block_identifier_hash_default }}</label
+          >
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="submitAction(action)"
+        >
+          Submit
+        </button>
+      </div>
+      <div class="col-sm-1">
+        <button
+          class="btn btn-link"
+          type="reset"
+          value="clear"
+          (click)="cleanDisplay()"
+        >
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div
+    class="row mt-3 d-flex align-items-end"
+    *ngIf="['get_balance', 'query_balance'].includes(action)"
+  >
+    <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-7" *ngIf="action === 'get_balance'">
+        <label
+          >Purse Uref
+          <!-- <span class="fw-light small"
+              >({{ block_identifier_hash_default }})</span
+            > -->
+        </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="purse_uref"
+            [value]="purse_uref || main_purse"
+            [placeholder]="purse_uref || main_purse"
+            id="purseUrefElt"
+            #purseUrefElt
+          />
+          <label for="purseUrefElt">ex: {{ purse_uref || main_purse }}</label>
+        </div>
+      </div>
+      <div class="col-sm-7" *ngIf="action === 'query_balance'">
+        <label
+          >Purse Identifier
+          <!-- <span class="fw-light small"
+              >({{ block_identifier_hash_default }})</span
+            > -->
+        </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="purse_identifier"
+            [value]="purse_identifier"
+            [placeholder]="purse_identifier"
+            id="purseIdentifierElt"
+            #purseIdentifierElt
+          />
+          <label for="purseIdentifierElt"
+            >ex: Public Key, AccountHash, Purse URef</label
+          >
+        </div>
+      </div>
+      <div class="col-sm-7">
+        <label
+          >State Root Hash
+          <!-- <span class="fw-light small"
+              >({{ block_identifier_hash_default }})</span
+            > -->
+        </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="state_root_hash"
+            [value]="state_root_hash"
+            [placeholder]="state_root_hash"
+            id="stateRootHashElt"
+            #stateRootHashElt
+          />
+          <label for="stateRootHashElt">ex: {{ state_root_hash }}</label>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="submitAction(action)"
+        >
+          Submit
+        </button>
+      </div>
+      <div class="col-sm-1">
+        <button
+          class="btn btn-link"
+          type="reset"
+          value="clear"
+          (click)="cleanDisplay()"
+        >
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="row mt-3 d-flex align-items-end" *ngIf="action === 'get_deploy'">
+    <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-6">
+        <label>Deploy Hash </label>
+        <div>
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="deploy_hash"
+            [value]="deploy_hash"
+            [placeholder]="deploy_hash"
+            id="deployHashElt"
+            #deployHashElt
+          />
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <label class="form-label">Finalized approvals</label>
+        <div>
+          <input
+            type="checkbox"
+            class="form-check-input mt-0"
+            name="finalized_approvals"
+            [checked]="finalized_approvals === true"
+            [value]="finalized_approvals"
+            [id]="finalizedApprovalsElt"
+            #finalizedApprovalsElt
+          />
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="submitAction(action)"
+        >
+          Submit
+        </button>
+      </div>
+      <div class="col-sm-1">
+        <button
+          class="btn btn-link"
+          type="reset"
+          value="clear"
+          (click)="cleanDisplay()"
+        >
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="row mt-3" *ngIf="result">
+    <div class="col-xs-12">
       <div class="card">
         <div class="card-body">
-          {{ status | json }}
+          {{ result | json }}
         </div>
       </div>
     </div>

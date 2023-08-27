@@ -36,7 +36,7 @@ impl PublicKey {
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
-
+    // TODO
     //to_account_hash
 }
 

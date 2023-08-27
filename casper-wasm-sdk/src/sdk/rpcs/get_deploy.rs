@@ -20,13 +20,13 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Default, Deserialize)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getDeployOptions")]
+#[wasm_bindgen(js_name = "getDeployOptions", getter_with_clone)]
 pub struct GetDeployOptions {
-    node_address: String,
-    deploy_hash_as_string: Option<String>,
-    deploy_hash: Option<DeployHash>,
-    finalized_approvals: Option<bool>,
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub deploy_hash_as_string: Option<String>,
+    pub deploy_hash: Option<DeployHash>,
+    pub finalized_approvals: Option<bool>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -36,7 +36,13 @@ impl SDK {
     pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
         let options_result = options.into_serde::<GetDeployOptions>();
         match options_result {
-            Ok(options) => options,
+            Ok(mut options) => {
+                if let Some(finalized_approvals) = options.finalized_approvals {
+                    options.finalized_approvals =
+                        Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
+                }
+                options
+            }
             Err(err) => {
                 error(&format!("Error deserializing options: {:?}", err));
                 GetDeployOptions::default()

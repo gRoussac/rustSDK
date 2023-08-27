@@ -118,6 +118,7 @@ impl From<&str> for Digest {
                 context: context.to_string(),
                 error,
             };
+            // TODO remove this unreachable
             unreachable!("{:?}", sdk_error);
         }
 

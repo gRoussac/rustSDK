@@ -1,6 +1,6 @@
-pub mod rpcs;
-
+#[allow(hidden_glob_reexports)]
 pub(crate) mod deploy;
+pub mod rpcs;
 pub use deploy::*;
 
 pub(crate) mod deploy_utils;

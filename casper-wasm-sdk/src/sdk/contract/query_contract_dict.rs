@@ -23,26 +23,17 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Default, Debug, Deserialize, Clone)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "QueryContractDictOptions")]
+#[wasm_bindgen(js_name = "QueryContractDictOptions", getter_with_clone)]
 pub struct QueryContractDictOptions {
-    #[allow(unused)]
-    node_address: String,
-    #[allow(unused)]
-    global_state_identifier_as_string: Option<String>,
-    #[allow(unused)]
-    global_state_identifier: Option<GlobalStateIdentifier>,
-    #[allow(unused)]
-    state_root_hash_as_string: Option<String>,
-    #[allow(unused)]
-    state_root_hash: Option<Digest>,
-    #[allow(unused)]
-    maybe_block_id_as_string: Option<String>,
-    #[allow(unused)]
-    dictionary_item_params: Option<DictionaryItemStrParams>,
-    #[allow(unused)]
-    dictionary_item_identifier: Option<DictionaryItemIdentifier>,
-    #[allow(unused)]
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub global_state_identifier_as_string: Option<String>,
+    pub global_state_identifier: Option<GlobalStateIdentifier>,
+    pub state_root_hash_as_string: Option<String>,
+    pub state_root_hash: Option<Digest>,
+    pub maybe_block_id_as_string: Option<String>,
+    pub dictionary_item_params: Option<DictionaryItemStrParams>,
+    pub dictionary_item_identifier: Option<DictionaryItemIdentifier>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]
