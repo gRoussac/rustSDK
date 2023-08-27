@@ -24,12 +24,12 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getStateRootHashOptions")]
+#[wasm_bindgen(js_name = "getStateRootHashOptions", getter_with_clone)]
 pub struct GetStateRootHashOptions {
-    node_address: String,
-    block_id_as_string: Option<String>,
-    block_identifier: Option<BlockIdentifier>,
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub block_id_as_string: Option<String>,
+    pub block_identifier: Option<BlockIdentifier>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]

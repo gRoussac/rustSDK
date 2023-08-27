@@ -17,32 +17,21 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Deserialize, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "QueryContractKeyOptions")]
+#[wasm_bindgen(js_name = "QueryContractKeyOptions", getter_with_clone)]
 pub struct QueryContractKeyOptions {
-    #[allow(unused)]
-    node_address: String,
-    #[allow(unused)]
-    verbosity: Option<Verbosity>,
-    #[allow(unused)]
-    global_state_identifier_as_string: Option<String>,
-    #[allow(unused)]
-    global_state_identifier: Option<GlobalStateIdentifier>,
-    #[allow(unused)]
-    state_root_hash_as_string: Option<String>,
-    #[allow(unused)]
-    state_root_hash: Option<Digest>,
-    #[allow(unused)]
-    maybe_block_id_as_string: Option<String>,
+    pub node_address: String,
+    pub verbosity: Option<Verbosity>,
+    pub global_state_identifier_as_string: Option<String>,
+    pub global_state_identifier: Option<GlobalStateIdentifier>,
+    pub state_root_hash_as_string: Option<String>,
+    pub state_root_hash: Option<Digest>,
+    pub maybe_block_id_as_string: Option<String>,
     #[serde(rename = "key_as_string")]
-    #[allow(unused)]
-    contract_key_as_string: Option<String>,
+    pub contract_key_as_string: Option<String>,
     #[serde(rename = "key")]
-    #[allow(unused)]
-    contract_key: Option<Key>,
-    #[allow(unused)]
-    path_as_string: Option<String>,
-    #[allow(unused)]
-    path: Option<Path>,
+    pub contract_key: Option<Key>,
+    pub path_as_string: Option<String>,
+    pub path: Option<Path>,
 }
 
 #[cfg(target_arch = "wasm32")]

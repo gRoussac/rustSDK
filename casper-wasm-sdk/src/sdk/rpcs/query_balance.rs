@@ -1,5 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
+use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 #[cfg(target_arch = "wasm32")]
@@ -12,6 +13,7 @@ use crate::{
     },
     SDK,
 };
+use casper_client::cli::parse_purse_identifier;
 use casper_client::{
     cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
     rpcs::results::QueryBalanceResult, JsonRpcId, SuccessResponse,
@@ -26,17 +28,17 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "queryBalanceOptions")]
+#[wasm_bindgen(js_name = "queryBalanceOptions", getter_with_clone)]
 pub struct QueryBalanceOptions {
-    node_address: String,
-    purse_identifier_as_string: Option<String>,
-    purse_identifier: Option<PurseIdentifier>,
-    verbosity: Option<Verbosity>,
-    global_state_identifier_as_string: Option<String>,
-    global_state_identifier: Option<GlobalStateIdentifier>,
-    state_root_hash_as_string: Option<String>,
-    state_root_hash: Option<Digest>,
-    maybe_block_id_as_string: Option<String>,
+    pub node_address: String,
+    pub purse_identifier_as_string: Option<String>,
+    pub purse_identifier: Option<PurseIdentifier>,
+    pub verbosity: Option<Verbosity>,
+    pub global_state_identifier_as_string: Option<String>,
+    pub global_state_identifier: Option<GlobalStateIdentifier>,
+    pub state_root_hash_as_string: Option<String>,
+    pub state_root_hash: Option<Digest>,
+    pub maybe_block_id_as_string: Option<String>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -128,6 +130,7 @@ impl SDK {
 }
 
 impl SDK {
+    #[allow(clippy::too_many_arguments)]
     pub async fn query_balance(
         &mut self,
         node_address: &str,
@@ -139,16 +142,19 @@ impl SDK {
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<QueryBalanceResult>, SdkError> {
         //log("query_balance!");
+
+        let purse_identifier = if let Some(purse_identifier) = purse_identifier {
+            purse_identifier
+        } else if let Some(purse_id) = purse_identifier_as_string.clone() {
+            parse_purse_identifier(&purse_id).unwrap().into()
+        } else {
+            return Err(SdkError::FailedToParsePurseIdentifier);
+        };
+
         if let Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
             maybe_global_state_identifier,
         )) = maybe_global_state_identifier
         {
-            let purse_identifier = if let Some(purse_identifier) = purse_identifier {
-                purse_identifier
-            } else {
-                return Err(SdkError::FailedToParsePurseIdentifier);
-            };
-
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 node_address,
@@ -159,11 +165,6 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         } else if maybe_global_state_identifier.is_none() {
-            let purse_identifier = if let Some(purse_identifier) = purse_identifier {
-                purse_identifier
-            } else {
-                return Err(SdkError::FailedToParsePurseIdentifier);
-            };
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 node_address,
@@ -180,7 +181,7 @@ impl SDK {
                 get_verbosity_or_default(verbosity).into(),
                 "",
                 &state_root_hash,
-                &purse_identifier_as_string.unwrap_or_default(),
+                &purse_identifier.to_string(),
             )
             .await
             .map_err(SdkError::from)
@@ -191,7 +192,7 @@ impl SDK {
                 get_verbosity_or_default(verbosity).into(),
                 &maybe_block_id.unwrap_or_default(),
                 "",
-                &purse_identifier_as_string.unwrap_or_default(),
+                &purse_identifier.to_string(),
             )
             .await
             .map_err(SdkError::from)

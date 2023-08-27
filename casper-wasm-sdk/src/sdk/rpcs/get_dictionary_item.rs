@@ -30,14 +30,14 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Default, Debug, Deserialize, Clone)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getDictionaryItemOptions")]
+#[wasm_bindgen(js_name = "getDictionaryItemOptions", getter_with_clone)]
 pub struct GetDictionaryItemOptions {
-    node_address: String,
-    state_root_hash_as_string: Option<String>,
-    state_root_hash: Option<Digest>,
-    dictionary_item_params: Option<DictionaryItemStrParams>,
-    dictionary_item_identifier: Option<DictionaryItemIdentifier>,
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub state_root_hash_as_string: Option<String>,
+    pub state_root_hash: Option<Digest>,
+    pub dictionary_item_params: Option<DictionaryItemStrParams>,
+    pub dictionary_item_identifier: Option<DictionaryItemIdentifier>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]

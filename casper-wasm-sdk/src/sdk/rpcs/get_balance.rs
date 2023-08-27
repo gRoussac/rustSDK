@@ -23,14 +23,14 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Default, Debug, Deserialize, Clone)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getBalanceOptions")]
+#[wasm_bindgen(js_name = "getBalanceOptions", getter_with_clone)]
 pub struct GetBalanceOptions {
-    node_address: String,
-    state_root_hash_as_string: Option<String>,
-    state_root_hash: Option<Digest>,
-    purse_uref_as_string: Option<String>,
-    purse_uref: Option<URef>,
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub state_root_hash_as_string: Option<String>,
+    pub state_root_hash: Option<Digest>,
+    pub purse_uref_as_string: Option<String>,
+    pub purse_uref: Option<URef>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -72,6 +72,7 @@ impl SDK {
             self.get_balance(&node_address, hash, purse_uref, verbosity)
                 .await
         } else if let Some(hash) = state_root_hash_as_string {
+            // Todo check state root hash validity here _Digest::LENGTH
             self.get_balance(&node_address, hash.as_str(), purse_uref, verbosity)
                 .await
         } else {

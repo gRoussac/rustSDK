@@ -10,18 +10,31 @@ pub struct PurseIdentifier(_PurseIdentifier);
 #[wasm_bindgen]
 impl PurseIdentifier {
     #[wasm_bindgen(constructor)]
-    pub fn new_main_purse_under_public_key(key: PublicKey) -> Self {
+    #[wasm_bindgen(js_name = "fromPublicKey")]
+    pub fn from_main_purse_under_public_key(key: PublicKey) -> Self {
         PurseIdentifier(_PurseIdentifier::MainPurseUnderPublicKey(key.into()))
     }
 
-    pub fn new_main_purse_under_account_hash(account_hash: AccountHash) -> Self {
+    #[wasm_bindgen(js_name = "fromAccountHash")]
+    pub fn from_main_purse_under_account_hash(account_hash: AccountHash) -> Self {
         PurseIdentifier(_PurseIdentifier::MainPurseUnderAccountHash(
             account_hash.into(),
         ))
     }
 
-    pub fn new_purse_uref(uref: URef) -> Self {
+    #[wasm_bindgen(js_name = "fromURef")]
+    pub fn from_purse_uref(uref: URef) -> Self {
         PurseIdentifier(_PurseIdentifier::PurseUref(uref.into()))
+    }
+}
+
+impl ToString for PurseIdentifier {
+    fn to_string(&self) -> String {
+        match &self.0 {
+            _PurseIdentifier::MainPurseUnderPublicKey(key) => key.to_string(),
+            _PurseIdentifier::MainPurseUnderAccountHash(hash) => hash.to_formatted_string(),
+            _PurseIdentifier::PurseUref(uref) => uref.to_formatted_string(),
+        }
     }
 }
 

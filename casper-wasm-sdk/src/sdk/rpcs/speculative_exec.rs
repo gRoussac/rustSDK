@@ -26,14 +26,14 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getSpeculativeExecOptions")]
+#[wasm_bindgen(js_name = "getSpeculativeExecOptions", getter_with_clone)]
 pub struct GetSpeculativeExecOptions {
-    node_address: String,
-    deploy_as_string: Option<String>,
-    deploy: Option<_Deploy>,
-    maybe_block_id_as_string: Option<String>,
-    maybe_block_identifier: Option<BlockIdentifier>,
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub deploy_as_string: Option<String>,
+    pub deploy: Option<_Deploy>,
+    pub maybe_block_id_as_string: Option<String>,
+    pub maybe_block_identifier: Option<BlockIdentifier>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]

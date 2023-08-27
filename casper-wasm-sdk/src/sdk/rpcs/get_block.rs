@@ -21,14 +21,14 @@ use serde::Deserialize;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Deserialize, Clone, Default)]
+#[derive(Debug, Deserialize, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getBlockOptions")]
+#[wasm_bindgen(js_name = "getBlockOptions", getter_with_clone)]
 pub struct GetBlockOptions {
-    node_address: String,
-    maybe_block_id_as_string: Option<String>,
-    maybe_block_identifier: Option<BlockIdentifier>,
-    verbosity: Option<Verbosity>,
+    pub node_address: String,
+    pub maybe_block_id_as_string: Option<String>,
+    pub maybe_block_identifier: Option<BlockIdentifier>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]

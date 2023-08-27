@@ -26,15 +26,15 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getAccountOptions")]
+#[wasm_bindgen(js_name = "getAccountOptions", getter_with_clone)]
 pub struct GetAccountOptions {
-    node_address: String,
-    account_identifier: Option<String>,
-    public_key: Option<PublicKey>,
+    pub node_address: String,
+    pub account_identifier: Option<String>,
+    pub public_key: Option<PublicKey>,
     // account_hash: Option<AccountHash>, PR #99 Account identifier
-    maybe_block_id_as_string: Option<String>,
-    maybe_block_identifier: Option<BlockIdentifier>,
-    verbosity: Option<Verbosity>,
+    pub maybe_block_id_as_string: Option<String>,
+    pub maybe_block_identifier: Option<BlockIdentifier>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]

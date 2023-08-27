@@ -21,19 +21,19 @@ use serde::Deserialize;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Default)]
-#[wasm_bindgen(js_name = "queryGlobalStateOptions")]
+#[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
 pub struct QueryGlobalStateOptions {
-    node_address: String,
-    verbosity: Option<Verbosity>,
-    global_state_identifier_as_string: Option<String>,
-    global_state_identifier: Option<GlobalStateIdentifier>,
-    state_root_hash_as_string: Option<String>,
-    state_root_hash: Option<Digest>,
-    maybe_block_id_as_string: Option<String>,
-    key_as_string: Option<String>,
-    key: Option<Key>,
-    path_as_string: Option<String>,
-    path: Option<Path>,
+    pub node_address: String,
+    pub verbosity: Option<Verbosity>,
+    pub global_state_identifier_as_string: Option<String>,
+    pub global_state_identifier: Option<GlobalStateIdentifier>,
+    pub state_root_hash_as_string: Option<String>,
+    pub state_root_hash: Option<Digest>,
+    pub maybe_block_id_as_string: Option<String>,
+    pub key_as_string: Option<String>,
+    pub key: Option<Key>,
+    pub path_as_string: Option<String>,
+    pub path: Option<Path>,
 }
 
 #[cfg(target_arch = "wasm32")]
