@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -19,38 +19,44 @@ const imports = [
 })
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'casper';
-  state_root_hash = '';
+  state_root_hash!: string;
   peers = [];
-  sdk_methods: string[] = [];
-  sdk_rpc_methods: string[] = [];
-  sdk_contract_methods: string[] = [];
-  sdk_deploy_methods: string[] = [];
-  sdk_deploy_utils_methods: string[] = [];
-  result = '';
+  sdk_methods!: string[];
+  sdk_rpc_methods!: string[];
+  sdk_contract_methods!: string[];
+  sdk_deploy_methods!: string[];
+  sdk_deploy_utils_methods!: string[];
+  result!: string;
   verbosity = Verbosity.High;
   node_address = this.env['node_address'];
-  action = '';
-  block_identifier_height = '';
+  action!: string;
+  block_identifier_height!: string;
   block_identifier_height_default = this.config['block_identifier_height_default'];
-  block_identifier_hash = '';
+  block_identifier_hash!: string;
   block_identifier_hash_default = this.config['block_identifier_hash'];
-  account_hash = '';
-  main_purse = '';
-  purse_uref = '';
+  transfer_amount!: string;
+  ttl!: string;
+  target_account!: string;
+  account_hash!: string;
+  main_purse!: string;
+  purse_uref!: string;
   finalized_approvals = true;
-  deploy_hash = '';
-  purse_identifier = '';
-  item_key = '';
+  deploy_hash!: string;
+  purse_identifier!: string;
+  item_key!: string;
   select_dict_identifier = 'newFromSeedUref';
-  seed_uref = '';
-  seed_contract_hash = '';
-  seed_account_hash = '';
-  seed_name = '';
-  seed_key = '';
-  query_key = '';
-  query_path = '';
-  global_identifier = '';
-  public_key = '';
+  seed_uref!: string;
+  seed_contract_hash!: string;
+  seed_account_hash!: string;
+  seed_name!: string;
+  seed_key!: string;
+  query_key!: string;
+  query_path!: string;
+  account_identifier!: string;
+  public_key!: string;
+  private_key!: string | undefined;
+  has_private_key!: boolean;
+  file_name!: string;
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   @ViewChild('blockIdentifierHeightElt') blockIdentifierHeightElt!: ElementRef;
@@ -68,8 +74,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('seedKeyElt') seedKeyElt!: ElementRef;
   @ViewChild('queryKeyElt') queryKeyElt!: ElementRef;
   @ViewChild('queryPathElt') queryPathElt!: ElementRef;
-  @ViewChild('globalIdentifierElt') globalIdentifierElt!: ElementRef;
+  @ViewChild('accountIdentifierElt') accountIdentifierElt!: ElementRef;
   @ViewChild('publicKeyElt') publicKeyElt!: ElementRef;
+  @ViewChild('privateKeyElt') privateKeyElt!: ElementRef;
+  @ViewChild('TTLElt') TTLElt!: ElementRef;
+  @ViewChild('transferAmountElt') transferAmountElt!: ElementRef;
+  @ViewChild('targetAccountElt') targetAccountElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -101,6 +111,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(this.sdk_deploy_utils_methods, this.sdk_contract_methods).includes(name));
   }
 
+  convert() {
+    const amount = this.transferAmountElt?.nativeElement.value.trim();
+    if (!amount) {
+      return;
+    }
+    // TODO Fix with motesToCSPR
+    return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
+  }
+
   cleanDisplay() {
     this.result = '';
     this.peers = [];
@@ -110,6 +129,28 @@ export class AppComponent implements OnInit, AfterViewInit {
     const action = ($event.target as HTMLInputElement).value;
     await this.execAction(action);
     this.changeDetectorRef.markForCheck();
+  }
+
+  async onPemSelected(event: Event) {
+    this.file_name = this.privateKeyElt?.nativeElement.value.trim();
+    const file = (event.target as HTMLInputElement).files?.item(0);
+    if (file) {
+      const text = await file.text();
+      this.private_key = text.trim();
+      this.has_private_key = true;
+      this.public_key = privateToPublicKey(this.private_key);
+    } else {
+      this.private_key = '';
+    }
+    this.changeDetectorRef.markForCheck();
+    setTimeout;
+    setTimeout(async () => {
+      await this.onPublicKeyChange();
+    }, 0);
+  }
+
+  onPrivateKeyClick() {
+    (this.privateKeyElt.nativeElement as HTMLInputElement).click();
   }
 
   async get_peers() {
@@ -124,18 +165,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     get_node_status && (this.result = get_node_status);
   }
 
-  async get_state_root_hash() {
+  async get_state_root_hash(no_mark_for_check?: boolean) {
     const options: getStateRootHashOptions = this.sdk.get_state_root_hash_options({
       node_address: this.node_address
     });
     const state_root_hash = await this.sdk.get_state_root_hash(options);
     this.state_root_hash = state_root_hash.result?.state_root_hash;
-    this.state_root_hash && (this.result = this.state_root_hash);
+    if (!no_mark_for_check) {
+      this.state_root_hash && (this.result = this.state_root_hash);
+    }
   }
 
-  // TODO Refacto with get_block
-  async get_account() {
-    const account_identifier: string = this.globalIdentifierElt && this.globalIdentifierElt.nativeElement.value.toString().trim();
+  async get_account(account_identifier_param: string) {
+    let account_identifier!: string;
+    if (!account_identifier_param) {
+      account_identifier = this.accountIdentifierElt && this.accountIdentifierElt.nativeElement.value.toString().trim();
+    } else {
+      account_identifier = account_identifier_param;
+    }
     if (!account_identifier) {
       return;
     }
@@ -146,9 +193,22 @@ export class AppComponent implements OnInit, AfterViewInit {
     get_account_options.account_identifier = account_identifier;
     this.getIdentifieBlock(get_account_options);
     const get_account = await this.sdk.get_account(get_account_options);
-    get_account && (this.result = get_account);
-    // this.account_hash = get_account?.result?.account.account_hash;
-    // this.main_purse = get_account?.result?.account.main_purse;
+    if (!account_identifier_param) {
+      get_account && (this.result = get_account);
+    }
+    return get_account;
+  }
+
+  async onPublicKeyChange() {
+    const public_key: string = this.publicKeyElt && this.publicKeyElt.nativeElement.value.toString().trim();
+    this.account_hash = '';
+    this.main_purse = '';
+    const get_account = await this.get_account(public_key);
+    console.log(get_account);
+    this.public_key = public_key;
+    this.account_hash = get_account?.result?.account.account_hash;
+    this.main_purse = get_account?.result?.account.main_purse;
+    this.changeDetectorRef.markForCheck();
   }
 
   async get_auction_info() {
@@ -394,37 +454,34 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async make_transfer() {
-    // const session_account =
-    //   privateToPublicKey(secret_key);
-    // const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
-    // const ttl = '1h';
-
-    // console.log("privateToPublicKey result", session_account);
-
-    // let deploy_params = new DeployStrParams(
-    //   chain_name,
-    //   session_account,
-    //   secret_key,
-    //   timestamp,
-    //   ttl
-    // );
-    // console.log(deploy_params);
-
-    // let payment_params = new PaymentStrParams();
-    // payment_params.payment_amount = '500000000';
-    // console.log(payment_params);
-
-    // // Transfer minimum amount of tokens to recipient
-    // const make_transfer = sdk.make_transfer(
-    //   '2500000000',
-    //   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
-    //   undefined, // transfer_id
-    //   deploy_params,
-    //   payment_params,
-    // );
-    // setMake_transfer(jsonPrettyPrint(make_transfer));
-    // console.log(jsonPrettyPrint(make_transfer, Verbosity.Medium));
-
+    const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
+    const ttl: string = this.TTLElt && this.TTLElt.nativeElement.value.toString().trim();
+    if (!this.public_key) {
+      return;
+    }
+    const deploy_params = new DeployStrParams(
+      this.config['chain_name_integration'],
+      this.public_key,
+      this.private_key || '',
+      timestamp,
+      ttl
+    );
+    const payment_params = new PaymentStrParams();
+    payment_params.payment_amount = this.config['gas_fee_transfer'];
+    const transfer_amount: string = this.transferAmountElt && this.transferAmountElt.nativeElement.value.toString().trim();
+    const target_account: string = this.targetAccountElt && this.targetAccountElt.nativeElement.value.toString().trim();
+    if (!transfer_amount || !target_account) {
+      return;
+    }
+    // Transfer minimum amount of tokens to recipient
+    const make_transfer = this.sdk.make_transfer(
+      transfer_amount,
+      target_account,
+      undefined, // transfer_id
+      deploy_params,
+      payment_params,
+    );
+    make_transfer && (this.result = make_transfer);
   }
 
   async deploy() {
@@ -450,8 +507,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   async speculative_deploy() {
 
   }
-
-
 
   async call_entrypoint() {
     // // test call entry point
@@ -526,7 +581,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async ngAfterViewInit() {
-    await this.get_state_root_hash();
+    const no_mark_for_check = true;
+    await this.get_state_root_hash(no_mark_for_check);
     this.changeDetectorRef.markForCheck();
   }
 

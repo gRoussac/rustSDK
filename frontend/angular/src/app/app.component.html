@@ -34,7 +34,7 @@
           <option></option>
           <optgroup label="rpc">
             <option
-              [value]="sdk_method"
+              [value]="sdk_method || ''"
               *ngFor="let sdk_method of sdk_rpc_methods; index as i"
             >
               {{ sdk_method }}
@@ -42,7 +42,7 @@
           </optgroup>
           <optgroup label="deploy utils">
             <option
-              [value]="sdk_method"
+              [value]="sdk_method || ''"
               *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
             >
               {{ sdk_method }}
@@ -50,7 +50,7 @@
           </optgroup>
           <optgroup label="deploy">
             <option
-              [value]="sdk_method"
+              [value]="sdk_method || ''"
               *ngFor="let sdk_method of sdk_deploy_methods; index as i"
             >
               {{ sdk_method }}
@@ -58,7 +58,7 @@
           </optgroup>
           <optgroup label="contract">
             <option
-              [value]="sdk_method"
+              [value]="sdk_method || ''"
               *ngFor="let sdk_method of sdk_contract_methods; index as i"
             >
               {{ sdk_method }}
@@ -76,15 +76,38 @@
           type="search"
           class="form-control form-control-xs"
           name="public_key"
-          [value]="public_key"
+          [value]="public_key || ''"
           placeholder="ex: 0x"
+          (change)="onPublicKeyChange()"
           id="publicKeyElt"
           #publicKeyElt
         />
       </div>
     </div>
     <div class="col-sm-2">
-      <button class="btn btn-secondary">Private Key</button>
+      <input
+        class="visually-hidden"
+        name="private_key"
+        #privateKeyElt
+        type="file"
+        id="privateKeyElt"
+        (change)="onPemSelected($event)"
+        accept=".pem"
+      />
+      <button
+        class="btn btn-secondary"
+        (click)="onPrivateKeyClick()"
+        *ngIf="!has_private_key"
+      >
+        Load Private Key
+      </button>
+      <button
+        class="btn btn-light"
+        (click)="onPrivateKeyClick()"
+        *ngIf="has_private_key"
+      >
+        Private Key Loaded
+      </button>
     </div>
   </form>
   <div class="row mt-3" *ngIf="peers.length">
@@ -113,18 +136,18 @@
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-12 mb-2">
         <div class="col-sm-7" *ngIf="action === 'get_account'">
-          <label>Global identifier </label>
+          <label>Account identifier</label>
           <div class="form-floating">
             <input
               type="search"
               class="form-control form-control-xs"
-              name="global_identifier"
-              [value]="global_identifier"
+              name="account_identifier"
+              [value]="account_identifier || ''"
               placeholder="ex: Public Key, AccountHash, Purse URef"
-              id="globalIdentifierElt"
-              #globalIdentifierElt
+              id="accountIdentifierElt"
+              #accountIdentifierElt
             />
-            <label for="globalIdentifierElt"
+            <label for="accountIdentifierElt"
               >ex: Public Key, AccountHash, Purse URef</label
             >
           </div>
@@ -138,7 +161,7 @@
             id="blockIdentifierHeightElt"
             class="form-control form-control-xs"
             name="block_identifier_height"
-            [value]="block_identifier_height"
+            [value]="block_identifier_height || ''"
             [placeholder]="block_identifier_height_default"
             #blockIdentifierHeightElt
           />
@@ -154,7 +177,7 @@
             type="search"
             class="form-control form-control-xs"
             name="block_identifier_hash"
-            [value]="block_identifier_hash"
+            [value]="block_identifier_hash || ''"
             [placeholder]="block_identifier_hash_default"
             id="blockIdentifierHashElt"
             #blockIdentifierHashElt
@@ -217,8 +240,8 @@
             type="search"
             class="form-control form-control-xs"
             name="purse_identifier"
-            [value]="purse_identifier"
-            [placeholder]="purse_identifier"
+            [value]="purse_identifier || ''"
+            placeholder="ex: Public Key, AccountHash, Purse URef"
             id="purseIdentifierElt"
             #purseIdentifierElt
           />
@@ -234,7 +257,7 @@
             type="search"
             class="form-control form-control-xs"
             name="state_root_hash"
-            [value]="state_root_hash"
+            [value]="state_root_hash || ''"
             [placeholder]="state_root_hash"
             id="stateRootHashElt"
             #stateRootHashElt
@@ -265,7 +288,7 @@
   </div>
   <div
     class="row mt-3 d-flex align-items-end"
-    *ngIf="['get_dictionary_item', 'query_global_state'].includes(action)"
+    *ngIf="['get_dictionary_item', 'query_account_state'].includes(action)"
   >
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-12 my-3" *ngIf="action === 'get_dictionary_item'">
@@ -278,7 +301,7 @@
               <select
                 id="selectDictIdentifierElt"
                 class="form-select form-control form-control-sm"
-                [value]="select_dict_identifier"
+                [value]="select_dict_identifier || ''"
                 (change)="
                   select_dict_identifier = selectDictIdentifierElt.value
                 "
@@ -324,7 +347,7 @@
               type="search"
               class="form-control form-control-xs"
               name="seed_uref"
-              [value]="seed_uref"
+              [value]="seed_uref || ''"
               placeholder="uref-0x"
               id="seedUrefElt"
               #seedUrefElt
@@ -342,7 +365,7 @@
               type="search"
               class="form-control form-control-xs"
               name="seed_account_hash"
-              [value]="seed_account_hash"
+              [value]="seed_account_hash || ''"
               placeholder="account-hash-0x"
               id="seedAccounttHashElt"
               #seedAccounttHashElt
@@ -360,7 +383,7 @@
               type="search"
               class="form-control form-control-xs"
               name="seed_contract_hash"
-              [value]="seed_contract_hash"
+              [value]="seed_contract_hash || ''"
               placeholder="hash-0x"
               id="seedContractHashElt"
               #seedContractHashElt
@@ -378,7 +401,7 @@
               type="search"
               class="form-control form-control-xs"
               name="seed_key"
-              [value]="seed_key"
+              [value]="seed_key || ''"
               placeholder="dictionary-0x"
               id="seedKeyElt"
               #seedKeyElt
@@ -400,7 +423,7 @@
               type="search"
               class="form-control form-control-xs"
               name="seed_name"
-              [value]="seed_name"
+              [value]="seed_name || ''"
               placeholder="ex: events"
               id="seedNameElt"
               #seedNameElt
@@ -415,7 +438,7 @@
               type="search"
               class="form-control form-control-xs"
               name="item_key"
-              [value]="item_key"
+              [value]="item_key || ''"
               [placeholder]="item_key"
               id="itemKeyElt"
               #itemKeyElt
@@ -424,7 +447,7 @@
           </div>
         </div>
       </ng-container>
-      <ng-container *ngIf="action === 'query_global_state'">
+      <ng-container *ngIf="action === 'query_account_state'">
         <div
           class="col-sm-7 mb-2"
           *ngIf="select_dict_identifier === 'newFromSeedUref'"
@@ -435,7 +458,7 @@
               type="search"
               class="form-control form-control-xs"
               name="query_key"
-              [value]="query_key"
+              [value]="query_key || ''"
               placeholder="ex: uref-0x || hash-0x || account-hash-0x"
               id="queryKeyElt"
               #queryKeyElt
@@ -452,7 +475,7 @@
               type="search"
               class="form-control form-control-xs"
               name="query_path"
-              [value]="query_path"
+              [value]="query_path || ''"
               placeholder="ex: counter/count"
               id="queryPathElt"
               #queryPathElt
@@ -468,7 +491,7 @@
             type="search"
             class="form-control form-control-xs"
             name="state_root_hash"
-            [value]="state_root_hash"
+            [value]="state_root_hash || ''"
             [placeholder]="state_root_hash"
             id="stateRootHashElt"
             #stateRootHashElt
@@ -506,7 +529,7 @@
             type="search"
             class="form-control form-control-xs"
             name="deploy_hash"
-            [value]="deploy_hash"
+            [value]="deploy_hash || ''"
             placeholder="ex: 0x"
             id="deployHashElt"
             #deployHashElt
@@ -522,13 +545,102 @@
             class="form-check-input mt-0"
             name="finalized_approvals"
             [checked]="finalized_approvals === true"
-            [value]="finalized_approvals"
+            [value]="finalized_approvals || ''"
             [id]="finalizedApprovalsElt"
             #finalizedApprovalsElt
           />
         </div>
       </div>
       <div class="col-sm-3">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="submitAction(action)"
+        >
+          Submit
+        </button>
+      </div>
+      <div class="col-sm-1">
+        <button
+          class="btn btn-link"
+          type="reset"
+          value="clear"
+          (click)="cleanDisplay()"
+        >
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+  <div
+    class="row mt-3 d-flex align-items-end"
+    *ngIf="
+      [
+        'make_transfer',
+        'make_deploy',
+        'transfer',
+        'deploy',
+        'get_account'
+      ].includes(action)
+    "
+  >
+    <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-2">
+        <label
+          >Amount
+          <span class="fw-light small" *ngIf="this.transferAmountElt.value"
+            >({{ convert() }} CSPR)</span
+          ></label
+        >
+        <div class="form-floating">
+          <input
+            type="search"
+            id="transferAmountElt"
+            class="form-control form-control-xs"
+            name="transfer_amount"
+            [value]="transfer_amount || ''"
+            [placeholder]="config['minimum_transfer']"
+            (change)="convert()"
+            #transferAmountElt
+          />
+          <label for="transferAmountElt"
+            >ex: {{ config['minimum_transfer'] }}</label
+          >
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <label>TTL</label>
+        <div class="form-floating">
+          <input
+            type="search"
+            id="TTLElt"
+            class="form-control form-control-xs"
+            name="ttl"
+            [value]="ttl || config['TTL']"
+            [placeholder]="config['TTL']"
+            #TTLElt
+          />
+          <label for="TTLElt">ex: {{ config['TTL'] }}</label>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <label>Target Account</label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="target_account"
+            [value]="target_account || ''"
+            placeholder="ex: Public Key, AccountHash, Purse URef"
+            id="targetAccountElt"
+            #targetAccountElt
+          />
+          <label for="blockIdentifierHeightElt"
+            >ex: Public Key, AccountHash, Purse URef</label
+          >
+        </div>
+      </div>
+      <div class="col-sm-1">
         <button
           type="button"
           class="btn btn-success"

@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::{error, log};
+use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
@@ -63,8 +63,6 @@ impl SDK {
             maybe_block_identifier,
             verbosity,
         } = options;
-        log(&format!("{:?}", account_identifier));
-
         let public_key = if let Some(account_identifier) = account_identifier {
             match PublicKey::new(&account_identifier) {
                 Ok(key) => key,
@@ -79,9 +77,6 @@ impl SDK {
             error("Error: Missing account identifier or public key");
             return JsValue::null();
         };
-
-        log(&format!("{:?}", public_key));
-
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,
@@ -89,7 +84,6 @@ impl SDK {
         } else {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
-
         serialize_result(
             self.get_account(&node_address, verbosity, maybe_block_identifier, public_key)
                 .await,
@@ -111,7 +105,6 @@ impl SDK {
         public_key: PublicKey,
     ) -> Result<SuccessResponse<GetAccountResult>, SdkError> {
         //log("get_account!");
-
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
