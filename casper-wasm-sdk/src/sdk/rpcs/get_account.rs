@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
+use crate::debug::{error, log};
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
@@ -63,15 +63,24 @@ impl SDK {
             maybe_block_identifier,
             verbosity,
         } = options;
+        log(&format!("{:?}", account_identifier));
 
         let public_key = if let Some(account_identifier) = account_identifier {
-            PublicKey::new(&account_identifier).unwrap()
+            match PublicKey::new(&account_identifier) {
+                Ok(key) => key,
+                Err(_) => {
+                    error("Error: Failed to create PublicKey from account identifier");
+                    return JsValue::null();
+                }
+            }
         } else if let Some(public_key) = public_key {
             public_key
         } else {
             error("Error: Missing account identifier or public key");
             return JsValue::null();
         };
+
+        log(&format!("{:?}", public_key));
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(

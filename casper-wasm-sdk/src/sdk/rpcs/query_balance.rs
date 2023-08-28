@@ -1,6 +1,5 @@
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
-use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 #[cfg(target_arch = "wasm32")]

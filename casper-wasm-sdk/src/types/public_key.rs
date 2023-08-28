@@ -17,12 +17,14 @@ pub struct PublicKey(_PublicKey);
 impl PublicKey {
     #[wasm_bindgen(constructor)]
     pub fn new(public_key_hex_str: &str) -> Result<PublicKey, JsValue> {
-        let bytes = hex::decode(public_key_hex_str)
-            .map_err(|err| error(&format!("{:?}", err)))
-            .unwrap();
-        let (public_key, _) = _PublicKey::from_bytes(&bytes)
-            .map_err(|err| error(&format!("{:?}", err)))
-            .unwrap();
+        let bytes = hex::decode(public_key_hex_str).map_err(|err| {
+            error(&format!("PublicKey decode {:?}", err));
+            JsValue::null()
+        })?;
+        let (public_key, _) = _PublicKey::from_bytes(&bytes).map_err(|err| {
+            error(&format!("PublicKey from bytes {:?}", err));
+            JsValue::null()
+        })?;
         Ok(PublicKey(public_key))
     }
 
