@@ -13,17 +13,10 @@ pub struct Path {
 impl Path {
     #[wasm_bindgen(constructor)]
     pub fn new(path: JsValue) -> Self {
-        let path: Array = path.into();
-        let path: Vec<String> = path
-            .iter()
-            .map(|value| {
-                value
-                    .as_string()
-                    .unwrap_or_else(|| String::from("Invalid String"))
-            })
-            .collect();
+        let path: String = path.as_string().unwrap_or_else(|| String::from(""));
+        let segments: Vec<String> = path.split('/').map(ToString::to_string).collect();
 
-        Path { path }
+        Path { path: segments }
     }
 
     #[wasm_bindgen(js_name = "toJson")]

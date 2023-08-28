@@ -203,12 +203,7 @@
         </div>
       </div>
       <div class="col-sm-7">
-        <label
-          >State Root Hash
-          <!-- <span class="fw-light small"
-              >({{ block_identifier_hash_default }})</span
-            > -->
-        </label>
+        <label>State Root Hash </label>
         <div class="form-floating">
           <input
             type="search"
@@ -246,10 +241,10 @@
 
   <div
     class="row mt-3 d-flex align-items-end"
-    *ngIf="['get_dictionary_item'].includes(action)"
+    *ngIf="['get_dictionary_item', 'query_global_state'].includes(action)"
   >
     <form class="row align-items-end" (submit)="(false)">
-      <div class="col-sm-12 my-3">
+      <div class="col-sm-12 my-3" *ngIf="action === 'get_dictionary_item'">
         <div class="row">
           <div class="col-sm-5">
             <div class="input-group">
@@ -294,116 +289,154 @@
           </div>
         </div>
       </div>
-
-      <div
-        class="col-sm-7"
-        *ngIf="select_dict_identifier === 'newFromSeedUref'"
-      >
-        <label>Seed Uref </label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="seed_uref"
-            [value]="seed_uref"
-            placeholder="uref-0x"
-            id="seedUrefElt"
-            #seedUrefElt
-          />
-          <label for="seedUrefElt">ex: uref-0x</label>
+      <ng-container *ngIf="action === 'get_dictionary_item'">
+        <div
+          class="col-sm-7"
+          *ngIf="select_dict_identifier === 'newFromSeedUref'"
+        >
+          <label>Seed Uref </label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="seed_uref"
+              [value]="seed_uref"
+              placeholder="uref-0x"
+              id="seedUrefElt"
+              #seedUrefElt
+            />
+            <label for="seedUrefElt">ex: uref-0x</label>
+          </div>
         </div>
-      </div>
-      <div
-        class="col-sm-7"
-        *ngIf="select_dict_identifier === 'newFromAccountInfo'"
-      >
-        <label>Account Hash</label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="seed_account_hash"
-            [value]="seed_account_hash"
-            placeholder="account-hash-0x"
-            id="seedAccounttHashElt"
-            #seedAccounttHashElt
-          />
-          <label for="seedAccounttHashElt">ex: account-hash-0x</label>
+        <div
+          class="col-sm-7"
+          *ngIf="select_dict_identifier === 'newFromAccountInfo'"
+        >
+          <label>Account Hash</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="seed_account_hash"
+              [value]="seed_account_hash"
+              placeholder="account-hash-0x"
+              id="seedAccounttHashElt"
+              #seedAccounttHashElt
+            />
+            <label for="seedAccounttHashElt">ex: account-hash-0x</label>
+          </div>
         </div>
-      </div>
-      <div
-        class="col-sm-7"
-        *ngIf="select_dict_identifier === 'newFromContractInfo'"
-      >
-        <label>Contract Hash</label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="seed_contract_hash"
-            [value]="seed_contract_hash"
-            placeholder="hash-0x"
-            id="seedContractHashElt"
-            #seedContractHashElt
-          />
-          <label for="seedContractHashElt">ex: hash-0x</label>
+        <div
+          class="col-sm-7"
+          *ngIf="select_dict_identifier === 'newFromContractInfo'"
+        >
+          <label>Contract Hash</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="seed_contract_hash"
+              [value]="seed_contract_hash"
+              placeholder="hash-0x"
+              id="seedContractHashElt"
+              #seedContractHashElt
+            />
+            <label for="seedContractHashElt">ex: hash-0x</label>
+          </div>
         </div>
-      </div>
-      <div
-        class="col-sm-7"
-        *ngIf="select_dict_identifier === 'newFromDictionaryKey'"
-      >
-        <label>Dictionary Key</label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="seed_key"
-            [value]="seed_key"
-            placeholder="dictionary-0x"
-            id="seedKeyElt"
-            #seedKeyElt
-          />
-          <label for="seedKeyElt">ex: dictionary-0x</label>
+        <div
+          class="col-sm-7"
+          *ngIf="select_dict_identifier === 'newFromDictionaryKey'"
+        >
+          <label>Dictionary Key</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="seed_key"
+              [value]="seed_key"
+              placeholder="dictionary-0x"
+              id="seedKeyElt"
+              #seedKeyElt
+            />
+            <label for="seedKeyElt">ex: dictionary-0x</label>
+          </div>
         </div>
-      </div>
-      <div
-        class="col-sm-7"
-        *ngIf="
-          ['newFromContractInfo', 'newFromAccountInfo'].includes(
-            select_dict_identifier
-          )
-        "
-      >
-        <label>Dictionary Name</label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="seed_name"
-            [value]="seed_name"
-            placeholder="ex: events"
-            id="seedNameElt"
-            #seedNameElt
-          />
-          <label for="seedNameElt">ex: events</label>
+        <div
+          class="col-sm-7"
+          *ngIf="
+            ['newFromContractInfo', 'newFromAccountInfo'].includes(
+              select_dict_identifier
+            )
+          "
+        >
+          <label>Dictionary Name</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="seed_name"
+              [value]="seed_name"
+              placeholder="ex: events"
+              id="seedNameElt"
+              #seedNameElt
+            />
+            <label for="seedNameElt">ex: events</label>
+          </div>
         </div>
-      </div>
-      <div class="col-sm-7">
-        <label>Dictionary Item key </label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="item_key"
-            [value]="item_key"
-            [placeholder]="item_key"
-            id="itemKeyElt"
-            #itemKeyElt
-          />
-          <label for="itemKeyElt">ex: Item key string</label>
+        <div class="col-sm-7">
+          <label>Dictionary Item key </label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="item_key"
+              [value]="item_key"
+              [placeholder]="item_key"
+              id="itemKeyElt"
+              #itemKeyElt
+            />
+            <label for="itemKeyElt">ex: Item key string</label>
+          </div>
         </div>
-      </div>
+      </ng-container>
+      <ng-container *ngIf="action === 'query_global_state'">
+        <div
+          class="col-sm-7"
+          *ngIf="select_dict_identifier === 'newFromSeedUref'"
+        >
+          <label>Key </label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="query_key"
+              [value]="query_key"
+              placeholder="ex: uref-0x || hash-0x || account-hash-0x"
+              id="queryKeyElt"
+              #queryKeyElt
+            />
+            <label for="queryKeyElt"
+              >ex: uref-0x || hash-0x || account-hash-0x</label
+            >
+          </div>
+        </div>
+        <div class="col-sm-7">
+          <label>Path</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="query_path"
+              [value]="query_path"
+              placeholder="ex: counter/count"
+              id="queryPathElt"
+              #queryPathElt
+            />
+            <label for="queryPathElt">ex: counter/count</label>
+          </div>
+        </div>
+      </ng-container>
       <div class="col-sm-7">
         <label>State Root Hash </label>
         <div class="form-floating">
@@ -445,16 +478,17 @@
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-6">
         <label>Deploy Hash </label>
-        <div>
+        <div class="form-floating">
           <input
             type="search"
             class="form-control form-control-xs"
             name="deploy_hash"
             [value]="deploy_hash"
-            [placeholder]="deploy_hash"
+            placeholder="ex: 0x"
             id="deployHashElt"
             #deployHashElt
           />
+          <label for="stateRootHashElt">ex: 0x</label>
         </div>
       </div>
       <div class="col-sm-2">
