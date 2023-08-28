@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, URef, AccessRights } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -40,6 +40,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   finalized_approvals = true;
   deploy_hash = '';
   purse_identifier = '';
+  item_key = '';
+  select_dict_identifier = 'newFromSeedUref';
+  seed_uref = '';
+  seed_contract_hash = '';
+  seed_account_hash = '';
+  seed_name = '';
+  seed_key = '';
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   @ViewChild('blockIdentifierHeightElt') blockIdentifierHeightElt!: ElementRef;
@@ -49,6 +56,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('finalizedApprovalsElt') finalizedApprovalsElt!: ElementRef;
   @ViewChild('deployHashElt') deployHashElt!: ElementRef;
   @ViewChild('purseIdentifierElt') purseIdentifierElt!: ElementRef;
+  @ViewChild('itemKeyElt') itemKeyElt!: ElementRef;
+  @ViewChild('seedUrefElt') seedUrefElt!: ElementRef;
+  @ViewChild('seedAccounttHashElt') seedAccounttHashElt!: ElementRef;
+  @ViewChild('seedContractHashElt') seedContractHashElt!: ElementRef;
+  @ViewChild('seedNameElt') seedNameElt!: ElementRef;
+  @ViewChild('seedKeyElt') seedKeyElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -236,27 +249,63 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_dictionary_item() {
-    // let stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
-    // console.log(stateRootHashDigest);
-    // console.log(stateRootHashDigest.toJson());
-    // const dictionary_item_identifier =
-    //   DictionaryItemIdentifier.newFromSeedUref(
-    //     new URef(
-    //       '386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530',
-    //       AccessRights.READ_ADD_WRITE()
-    //     ),
-    //     '0' // event key
-    //   );
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim(' ');
+    const item_key: string = this.itemKeyElt && this.itemKeyElt.nativeElement.value.toString().trim(' ');
+    if (!item_key) {
+      return;
+    }
+    const seed_uref: string = this.seedUrefElt && this.seedUrefElt.nativeElement.value.toString().trim(' ');
+    let dictionary_item_identifier: DictionaryItemIdentifier | undefined;
+    if (seed_uref && this.select_dict_identifier === 'newFromSeedUref') {
+      dictionary_item_identifier =
+        DictionaryItemIdentifier.newFromSeedUref(
+          seed_uref,
+          item_key
+        );
+    } else {
+      const seed_key: string = this.seedKeyElt && this.seedKeyElt.nativeElement.value.toString().trim(' ');
+      if (seed_key && this.select_dict_identifier === 'newFromDictionaryKey') {
+        dictionary_item_identifier =
+          DictionaryItemIdentifier.newFromDictionaryKey(
+            seed_key
+          );
+      } else {
+        const seed_contract_hash: string = this.seedContractHashElt && this.seedContractHashElt.nativeElement.value.toString().trim(' ');
+        const seed_account_hash: string = this.seedAccounttHashElt && this.seedAccounttHashElt.nativeElement.value.toString().trim(' ');
+        const seed_name: string = this.seedNameElt && this.seedNameElt.nativeElement.value.toString().trim(' ');
+        if (!seed_name) {
+          return;
+        }
+        if (seed_contract_hash && this.select_dict_identifier === 'newFromContractInfo') {
+          dictionary_item_identifier =
+            DictionaryItemIdentifier.newFromContractInfo(
+              seed_contract_hash,
+              seed_name,
+              item_key
+            );
+        }
+        else if (seed_account_hash && this.select_dict_identifier === 'newFromContractInfo') {
+          dictionary_item_identifier =
+            DictionaryItemIdentifier.newFromAccountInfo(
+              seed_account_hash,
+              seed_name,
+              item_key
+            );
+        }
+      }
+    }
 
-    // let get_dictionary_item_options = sdk.get_dictionary_item_options({
-    //   node_address: host,
-    //   state_root_hash_as_string: chain_get_state_root_hash?.result.state_root_hash,
-    //   //state_root_hash: stateRootHashDigest.toJson(),
-    //   dictionary_item_identifier: dictionary_item_identifier.toJson(),
-    //   //  verbosity: Verbosity.High
-    // });
-    // console.log(get_dictionary_item_options);
-    // const state_get_dictionary_item = await sdk.state_get_dictionary_item(get_dictionary_item_options);
+    if (!dictionary_item_identifier) {
+      return;
+    }
+    const get_dictionary_item_options = this.sdk.get_dictionary_item_options({
+      node_address: this.node_address,
+      verbosity: this.verbosity,
+      state_root_hash_as_string: state_root_hash || this.state_root_hash || '',
+    });
+    get_dictionary_item_options.dictionary_item_identifier = dictionary_item_identifier;
+    const state_get_dictionary_item = await this.sdk.state_get_dictionary_item(get_dictionary_item_options);
+    state_get_dictionary_item && (this.result = state_get_dictionary_item);
   }
 
   // TODO Refacto
