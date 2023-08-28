@@ -1,7 +1,7 @@
 use super::public_key::PublicKey;
 use crate::debug::error;
 use casper_types::{
-    account::AccountHash as _AccountHash,
+    account::{AccountHash as _AccountHash, ACCOUNT_HASH_LENGTH},
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
     crypto,
 };
@@ -17,21 +17,20 @@ pub struct AccountHash(_AccountHash);
 impl AccountHash {
     #[wasm_bindgen(constructor)]
     pub fn new(account_hash_hex_str: &str) -> Result<AccountHash, JsValue> {
-        let account_hash = _AccountHash::from_formatted_str(account_hash_hex_str)
-            .map_err(|err| error(&format!("Failed to parse AccountHash: {:?}", err)))
-            .unwrap();
-        Ok(AccountHash(account_hash))
-    }
-
-    #[wasm_bindgen(js_name = "fromPublicKey")]
-    pub fn from_public_key(public_key: PublicKey) -> AccountHash {
-        let account_hash = _AccountHash::from_public_key(&(public_key.into()), crypto::blake2b);
-        AccountHash(account_hash)
+        let bytes = hex::decode(account_hash_hex_str)
+            .map_err(|err| JsValue::from_str(&format!("Failed to decode hex string: {:?}", err)))?;
+        if bytes.len() != ACCOUNT_HASH_LENGTH {
+            return Err(JsValue::from_str("Invalid account hash length"));
+        }
+        let mut array = [0u8; ACCOUNT_HASH_LENGTH];
+        array.copy_from_slice(&bytes);
+        let account_hash = _AccountHash(array);
+        Ok(account_hash.into())
     }
 
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(input: &str) -> Result<AccountHash, JsValue> {
-        let account_hash = _AccountHash::from_formatted_str(input)
+    pub fn from_formatted_str(formatted_str: &str) -> Result<AccountHash, JsValue> {
+        let account_hash = _AccountHash::from_formatted_str(formatted_str)
             .map_err(|err| {
                 error(&format!(
                     "Failed to parse AccountHash from formatted string: {:?}",
@@ -40,6 +39,12 @@ impl AccountHash {
             })
             .unwrap();
         Ok(AccountHash(account_hash))
+    }
+
+    #[wasm_bindgen(js_name = "fromPublicKey")]
+    pub fn from_public_key(public_key: PublicKey) -> AccountHash {
+        let account_hash = _AccountHash::from_public_key(&(public_key.into()), crypto::blake2b);
+        AccountHash(account_hash)
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]

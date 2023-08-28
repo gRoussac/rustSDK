@@ -1,5 +1,8 @@
-use super::{account_hash::AccountHash, addr::hash_addr::HashAddr, key::Key, uref::URef};
+use crate::debug::error;
+
+use super::key::Key;
 use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
+use casper_types::Key as _Key;
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -13,60 +16,104 @@ impl DictionaryItemIdentifier {
     // static context
     #[wasm_bindgen(js_name = "newFromAccountInfo")]
     pub fn new_from_account_info(
-        account_hash: AccountHash,
+        account_hash: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Self {
-        let key = Key::from_account(account_hash).to_formatted_string();
-        DictionaryItemIdentifier(_DictionaryItemIdentifier::AccountNamedKey {
-            key,
-            dictionary_name: dictionary_name.to_string(),
-            dictionary_item_key: dictionary_item_key.to_string(),
-        })
+    ) -> Result<DictionaryItemIdentifier, JsValue> {
+        let key = Key::from_formatted_str(account_hash)
+            .map_err(|err| {
+                error(&format!(
+                    "Failed to parse key from formatted string: {:?}",
+                    err
+                ));
+                JsValue::null()
+            })
+            .unwrap();
+
+        Ok(DictionaryItemIdentifier(
+            _DictionaryItemIdentifier::AccountNamedKey {
+                key: key.to_formatted_string(),
+                dictionary_name: dictionary_name.to_string(),
+                dictionary_item_key: dictionary_item_key.to_string(),
+            },
+        ))
     }
 
     // static context
     #[wasm_bindgen(js_name = "newFromContractInfo")]
     pub fn new_from_contract_info(
-        contract_addr: HashAddr,
+        contract_addr: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Self {
-        let key = Key::from_hash(contract_addr).to_formatted_string();
-        DictionaryItemIdentifier(_DictionaryItemIdentifier::ContractNamedKey {
-            key,
-            dictionary_name: dictionary_name.to_string(),
-            dictionary_item_key: dictionary_item_key.to_string(),
-        })
+    ) -> Result<DictionaryItemIdentifier, JsValue> {
+        let key = Key::from_formatted_str(contract_addr)
+            .map_err(|err| {
+                error(&format!(
+                    "Failed to parse key from formatted string: {:?}",
+                    err
+                ));
+                JsValue::null()
+            })
+            .unwrap();
+
+        Ok(DictionaryItemIdentifier(
+            _DictionaryItemIdentifier::ContractNamedKey {
+                key: key.to_formatted_string(),
+                dictionary_name: dictionary_name.to_string(),
+                dictionary_item_key: dictionary_item_key.to_string(),
+            },
+        ))
     }
 
     // static context
     #[wasm_bindgen(js_name = "newFromSeedUref")]
-    pub fn new_from_seed_uref(seed_uref: URef, dictionary_item_key: String) -> Self {
-        DictionaryItemIdentifier(_DictionaryItemIdentifier::URef {
-            seed_uref: seed_uref.into(),
-            dictionary_item_key,
-        })
+    pub fn new_from_seed_uref(
+        seed_uref: &str,
+        dictionary_item_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsValue> {
+        let key: _Key = Key::from_formatted_str(seed_uref)
+            .map_err(|err| {
+                error(&format!(
+                    "Failed to parse key from formatted string: {:?}",
+                    err
+                ));
+                JsValue::null()
+            })
+            .unwrap()
+            .into();
+
+        Ok(DictionaryItemIdentifier(_DictionaryItemIdentifier::URef {
+            seed_uref: *key.as_uref().ok_or_else(|| {
+                error("Key is not a URef");
+                JsValue::null()
+            })?,
+            dictionary_item_key: dictionary_item_key.to_string(),
+        }))
+    }
+
+    // static context
+    #[wasm_bindgen(js_name = "newFromDictionaryKey")]
+    pub fn new_from_dictionary_key(
+        dictionary_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsValue> {
+        let _ = Key::from_formatted_str(dictionary_key)
+            .map_err(|err| {
+                error(&format!(
+                    "Failed to parse key from formatted string: {:?}",
+                    err
+                ));
+                JsValue::null()
+            })
+            .unwrap();
+        Ok(DictionaryItemIdentifier(
+            _DictionaryItemIdentifier::Dictionary(dictionary_key.to_string()),
+        ))
     }
 
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
-
-    // #[wasm_bindgen(js_name = newFromItemKey)]
-    // pub fn new_from_item_key(item_key: Key) -> Result<JsValue, JsValue> {
-    //     if item_key.as_dictionary().is_some() {
-    //         Ok(JsValue::from(DictionaryItemIdentifier(
-    //             _DictionaryItemIdentifier::Dictionary(item_key.to_formatted_string()),
-    //         )))
-    //     } else {
-    //         Err(JsValue::from(Error::InvalidKeyVariant {
-    //             expected_variant: "Key::Dictionary".to_string(),
-    //             actual: JsValue::from(item_key.into()),
-    //         }))
-    //     }
-    // }
 }
 
 impl From<DictionaryItemIdentifier> for _DictionaryItemIdentifier {

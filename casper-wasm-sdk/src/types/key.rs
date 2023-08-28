@@ -47,7 +47,7 @@ impl Key {
         Key(_Key::Hash(key.into()))
     }
 
-    #[wasm_bindgen(js_name = fromTransfer)]
+    #[wasm_bindgen(js_name = "fromTransfer")]
     pub fn from_transfer(key: Vec<u8>) -> TransferAddr {
         // TODO Fix with TransferAddr as _TransferAddr, and [u8; 32]
         // Key(_Key::Transfer(key.into()))
@@ -74,9 +74,17 @@ impl Key {
         Key(_Key::Withdraw(key.into()))
     }
 
-    #[wasm_bindgen(js_name = "fromDictionary")]
-    pub fn from_dictionary(key: DictionaryAddr) -> Key {
+    #[wasm_bindgen(js_name = "fromDictionaryAddr")]
+    pub fn from_dictionary_addr(key: DictionaryAddr) -> Key {
         Key(_Key::Dictionary(key.into()))
+    }
+
+    #[wasm_bindgen(js_name = "asDictionaryAddr")]
+    pub fn as_dictionary(&self) -> Option<DictionaryAddr> {
+        match &self.0 {
+            _Key::Dictionary(v) => Some((*v).into()),
+            _ => None,
+        }
     }
 
     #[wasm_bindgen(js_name = "fromSystemContractRegistry")]
@@ -125,91 +133,64 @@ impl Key {
         }
     }
 
-    // #[wasm_bindgen(js_name = intoAccount)]
-    // pub fn into_account(self) -> Option<AccountHash> {
-    //     match self.0 {
-    //         _Key::Account(bytes) => Some(bytes),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "fromDictionaryKey")]
+    pub fn from_dictionary_key(seed_uref: URef, dictionary_item_key: &[u8]) -> Self {
+        _Key::dictionary(seed_uref.into(), dictionary_item_key).into()
+    }
 
-    // #[wasm_bindgen(js_name = intoHash)]
-    // pub fn into_hash(self) -> Option<HashAddr> {
-    //     match self.0 {
-    //         _Key::Hash(hash) => Some(hash),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "isDictionaryKey")]
+    pub fn is_dictionary_key(&self) -> bool {
+        matches!(&self.0, _Key::Dictionary(_))
+    }
 
-    // #[wasm_bindgen(js_name = asURef)]
-    // pub fn as_uref(&self) -> Option<&URef> {
-    //     match &self.0 {
-    //         _Key::URef(uref) => Some(uref),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "intoAccount")]
+    pub fn into_account(self) -> Option<AccountHash> {
+        match self.0 {
+            _Key::Account(bytes) => Some(bytes.into()),
+            _ => None,
+        }
+    }
 
-    // #[wasm_bindgen(js_name = asURefMut)]
-    // pub fn as_uref_mut(&mut self) -> Option<&mut URef> {
-    //     match &mut self.0 {
-    //         _Key::URef(uref) => Some(uref),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "intoHash")]
+    pub fn into_hash(self) -> Option<HashAddr> {
+        match self.0 {
+            _Key::Hash(hash) => Some(hash.into()),
+            _ => None,
+        }
+    }
 
-    // #[wasm_bindgen(js_name = asBalance)]
-    // pub fn as_balance(&self) -> Option<&URefAddr> {
-    //     match &self.0 {
-    //         _Key::Balance(v) => Some(v),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "asBalance")]
+    pub fn as_balance(&self) -> Option<URefAddr> {
+        match &self.0 {
+            _Key::Balance(v) => Some((*v).into()),
+            _ => None,
+        }
+    }
 
-    // #[wasm_bindgen(js_name = intoURef)]
-    // pub fn into_uref(self) -> Option<URef> {
-    //     match self.0 {
-    //         _Key::URef(uref) => Some(uref),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "intoURef")]
+    pub fn into_uref(self) -> Option<URef> {
+        match self.0 {
+            _Key::URef(uref) => Some(uref.into()),
+            _ => None,
+        }
+    }
 
-    // #[wasm_bindgen(js_name = asDictionary)]
-    // pub fn as_dictionary(&self) -> Option<&DictionaryAddr> {
-    //     match &self.0 {
-    //         _Key::Dictionary(v) => Some(v),
-    //         _ => None,
-    //     }
-    // }
+    #[wasm_bindgen(js_name = "urefToHash")]
+    pub fn uref_to_hash(&self) -> Option<Key> {
+        if let _Key::URef(uref) = &self.0 {
+            let addr = uref.addr();
+            return Some(Key(_Key::Hash(addr)));
+        }
+        None
+    }
 
-    // #[wasm_bindgen(js_name = urefToHash)]
-    // pub fn uref_to_hash(&self) -> Option<Key> {
-    //     if let _Key::URef(uref) = &self.0 {
-    //         let addr = uref.addr();
-    //         return Some(Key(_Key::Hash(addr)));
-    //     }
-    //     None
-    // }
-
-    // #[wasm_bindgen(js_name = withdrawToUnbond)]
-    // pub fn withdraw_to_unbond(&self) -> Option<Key> {
-    //     if let _Key::Withdraw(account_hash) = &self.0 {
-    //         return Some(Key(_Key::Unbond(*account_hash)));
-    //     }
-    //     None
-    // }
-
-    // #[wasm_bindgen(js_name = isDictionaryKey)]
-    // pub fn is_dictionary_key(&self) -> bool {
-    //     match &self.0 {
-    //         _Key::Dictionary(_) => true,
-    //         _ => false,
-    //     }
-    // }
-
-    // #[wasm_bindgen(js_name = dictionary)]
-    // pub fn dictionary(seed_uref: URef, dictionary_item_key: &[u8]) -> Self {
-    //     _Key::dictionary(seed_uref, dictionary_item_key)
-    // }
+    #[wasm_bindgen(js_name = "withdrawToUnbond")]
+    pub fn withdraw_to_unbond(&self) -> Option<Key> {
+        if let _Key::Withdraw(account_hash) = &self.0 {
+            return Some(Key(_Key::Unbond(*account_hash)));
+        }
+        None
+    }
 }
 
 impl Key {
