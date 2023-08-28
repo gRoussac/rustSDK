@@ -47,6 +47,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   seed_account_hash = '';
   seed_name = '';
   seed_key = '';
+  query_key = '';
+  query_path = '';
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   @ViewChild('blockIdentifierHeightElt') blockIdentifierHeightElt!: ElementRef;
@@ -62,6 +64,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('seedContractHashElt') seedContractHashElt!: ElementRef;
   @ViewChild('seedNameElt') seedNameElt!: ElementRef;
   @ViewChild('seedKeyElt') seedKeyElt!: ElementRef;
+  @ViewChild('queryKeyElt') queryKeyElt!: ElementRef;
+  @ViewChild('queryPathElt') queryPathElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -80,6 +84,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       .filter(name => !name.endsWith('_options'))
       .filter(name => !name.startsWith('chain_'))
       .filter(name => !name.startsWith('state_'))
+      .filter(name => !name.startsWith('info_'))
       .filter(name => !name.startsWith('account'))
       .sort();
 
@@ -150,8 +155,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   // TODO Refacto with get_block
   async get_auction_info() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim(' ');
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim(' ');
+    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
     this.block_identifier_height = block_identifier_height || "";
     this.block_identifier_hash = block_identifier_hash || "";
     const get_auction_info_options = this.sdk.get_auction_info_options({
@@ -169,8 +174,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_balance() {
-    const purse_uref_as_string: string = this.purseUrefElt && this.purseUrefElt.nativeElement.value.toString().trim(' ');
-    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim(' ');
+    const purse_uref_as_string: string = this.purseUrefElt && this.purseUrefElt.nativeElement.value.toString().trim();
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
     if (!purse_uref_as_string) {
       return;
     }
@@ -185,8 +190,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_block_transfers() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim(' ');
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim(' ');
+    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
     this.block_identifier_height = block_identifier_height || "";
     this.block_identifier_hash = block_identifier_hash || "";
     const get_block_transfers_options = this.sdk.get_block_transfers_options({
@@ -204,8 +209,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_block() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim(' ');
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim(' ');
+    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
     this.block_identifier_height = block_identifier_height || "";
     this.block_identifier_hash = block_identifier_hash || "";
     const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({
@@ -234,7 +239,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_deploy() {
     const finalized_approvals: boolean = this.finalizedApprovalsElt && this.finalizedApprovalsElt.nativeElement.value as boolean;
-    const deploy_hash_as_string: string = this.deployHashElt && this.deployHashElt.nativeElement.value.toString().trim(' ');
+    const deploy_hash_as_string: string = this.deployHashElt && this.deployHashElt.nativeElement.value.toString().trim();
     if (!deploy_hash_as_string) {
       return;
     }
@@ -249,12 +254,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_dictionary_item() {
-    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim(' ');
-    const item_key: string = this.itemKeyElt && this.itemKeyElt.nativeElement.value.toString().trim(' ');
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
+    const item_key: string = this.itemKeyElt && this.itemKeyElt.nativeElement.value.toString().trim();
     if (!item_key) {
       return;
     }
-    const seed_uref: string = this.seedUrefElt && this.seedUrefElt.nativeElement.value.toString().trim(' ');
+    const seed_uref: string = this.seedUrefElt && this.seedUrefElt.nativeElement.value.toString().trim();
     let dictionary_item_identifier: DictionaryItemIdentifier | undefined;
     if (seed_uref && this.select_dict_identifier === 'newFromSeedUref') {
       dictionary_item_identifier =
@@ -263,16 +268,16 @@ export class AppComponent implements OnInit, AfterViewInit {
           item_key
         );
     } else {
-      const seed_key: string = this.seedKeyElt && this.seedKeyElt.nativeElement.value.toString().trim(' ');
+      const seed_key: string = this.seedKeyElt && this.seedKeyElt.nativeElement.value.toString().trim();
       if (seed_key && this.select_dict_identifier === 'newFromDictionaryKey') {
         dictionary_item_identifier =
           DictionaryItemIdentifier.newFromDictionaryKey(
             seed_key
           );
       } else {
-        const seed_contract_hash: string = this.seedContractHashElt && this.seedContractHashElt.nativeElement.value.toString().trim(' ');
-        const seed_account_hash: string = this.seedAccounttHashElt && this.seedAccounttHashElt.nativeElement.value.toString().trim(' ');
-        const seed_name: string = this.seedNameElt && this.seedNameElt.nativeElement.value.toString().trim(' ');
+        const seed_contract_hash: string = this.seedContractHashElt && this.seedContractHashElt.nativeElement.value.toString().trim();
+        const seed_account_hash: string = this.seedAccounttHashElt && this.seedAccounttHashElt.nativeElement.value.toString().trim();
+        const seed_name: string = this.seedNameElt && this.seedNameElt.nativeElement.value.toString().trim();
         if (!seed_name) {
           return;
         }
@@ -308,10 +313,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     state_get_dictionary_item && (this.result = state_get_dictionary_item);
   }
 
-  // TODO Refacto
+  // TODO Refacto with get_block
   async get_era_info() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim(' ');
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim(' ');
+    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
     this.block_identifier_height = block_identifier_height || "";
     this.block_identifier_hash = block_identifier_hash || "";
     const get_era_info_options = this.sdk.get_era_info_options({
@@ -328,10 +333,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.result = get_era_info;
   }
 
-  // TODO Refacto
+  // TODO Refacto with get_block
   async get_era_summary() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim(' ');
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim(' ');
+    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
     this.block_identifier_height = block_identifier_height || "";
     this.block_identifier_hash = block_identifier_hash || "";
     const get_era_summary_options = this.sdk.get_era_summary_options({
@@ -358,16 +363,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.result = list_rpcs;
   }
 
-  async put_deploy() {
-
-  }
-
   async query_balance() {
-    const purse_identifier_as_string: string = this.purseIdentifierElt && this.purseIdentifierElt.nativeElement.value.toString().trim(' ');
-    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim(' ');
+    const purse_identifier_as_string: string = this.purseIdentifierElt && this.purseIdentifierElt.nativeElement.value.toString().trim();
     if (!purse_identifier_as_string) {
       return;
     }
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
     const global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
       new Digest(state_root_hash || this.state_root_hash)
     );
@@ -379,39 +380,27 @@ export class AppComponent implements OnInit, AfterViewInit {
     query_balance_options.global_state_identifier = global_state_identifier;
     const query_balance = await this.sdk.query_balance(query_balance_options);
     query_balance && (this.result = query_balance);
-
   }
 
   async query_global_state() {
-    // let path = new Path([]).toJson();
-    // let key = Key.fromURef(
-    //   new URef(
-    //     'b57dfc006ca3cff3f3f17852447d3de86ca69c1086405097ceda3b2a492290e8',
-    //     AccessRights.READ_ADD_WRITE()
-    //   )
-    // );
-    // console.log(key);
-    // let query_global_state_options = sdk.query_global_state_options({
-    //   node_address: host,
-    //   global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
-    //     new Digest(chain_get_state_root_hash?.result.state_root_hash)
-    //   ).toJson(),
-    //   key: key.toJson(),
-    //   // path_as_string: new Path('').toString(),
-    //   path,
-    //   verbosity: Verbosity.High,
-    // });
-    // console.log(query_global_state_options);
-    // const query_global_state = await sdk.query_global_state(query_global_state_options);
-    // console.log('js query_global_state', query_global_state);
-    // setQuery_global_state(
-    //   query_global_state?.result.stored_value.CLValue.parsed
-    // );
-
-  }
-
-  async speculative_exec() {
-
+    const path_as_string: string = this.queryPathElt && this.queryPathElt.nativeElement.value.toString().trim().replace(/^\/+|\/+$/g, '');
+    const key_as_string: string = this.queryKeyElt && this.queryKeyElt.nativeElement.value.toString().trim();
+    if (!key_as_string) {
+      return;
+    }
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
+    const global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
+      new Digest(state_root_hash || this.state_root_hash)
+    );
+    const query_global_state_options = this.sdk.query_global_state_options({
+      node_address: this.node_address,
+      key_as_string,
+      path_as_string,
+      verbosity: Verbosity.High,
+    });
+    query_global_state_options.global_state_identifier = global_state_identifier;
+    const query_global_state = await this.sdk.query_global_state(query_global_state_options);
+    query_global_state && (this.result = query_global_state?.result?.stored_value);
   }
 
   async make_deploy() {
@@ -466,7 +455,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   async make_transfer() {
     // const session_account =
     //   privateToPublicKey(secret_key);
-    // const timestamp = getTimestamp(); // or Date.now().toString().trim(' '); // or undefined
+    // const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
     // const ttl = '1h';
 
     // console.log("privateToPublicKey result", session_account);
@@ -497,7 +486,19 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   }
 
+  async deploy() {
+
+  }
+
+  async put_deploy() {
+
+  }
+
   async sign_deploy() {
+
+  }
+
+  async speculative_exec() {
 
   }
 
@@ -509,9 +510,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   }
 
-  async deploy() {
 
-  }
 
   async call_entrypoint() {
     // // test call entry point
