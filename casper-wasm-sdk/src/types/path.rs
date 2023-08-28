@@ -1,5 +1,4 @@
 use gloo_utils::format::JsValueSerdeExt;
-use js_sys::Array;
 use serde::{Deserialize, Deserializer, Serialize};
 use wasm_bindgen::prelude::*;
 

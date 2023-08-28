@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, URef, AccessRights } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -49,6 +49,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   seed_key = '';
   query_key = '';
   query_path = '';
+  global_identifier = '';
+  public_key = '';
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   @ViewChild('blockIdentifierHeightElt') blockIdentifierHeightElt!: ElementRef;
@@ -66,6 +68,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('seedKeyElt') seedKeyElt!: ElementRef;
   @ViewChild('queryKeyElt') queryKeyElt!: ElementRef;
   @ViewChild('queryPathElt') queryPathElt!: ElementRef;
+  @ViewChild('globalIdentifierElt') globalIdentifierElt!: ElementRef;
+  @ViewChild('publicKeyElt') publicKeyElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -108,17 +112,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.changeDetectorRef.markForCheck();
   }
 
-  private async execAction(action: string) {
-    const fn = (this as any)[action];
-    if (typeof fn === 'function') {
-      this.cleanDisplay();
-      await fn.bind(this).call();
-      this.action = action;
-    } else {
-      console.error(`Method ${action} is not defined on the component.`);
-    }
-  }
-
   async get_peers() {
     const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
     if (peers_result) {
@@ -140,35 +133,30 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.state_root_hash && (this.result = this.state_root_hash);
   }
 
+  // TODO Refacto with get_block
   async get_account() {
+    const account_identifier: string = this.globalIdentifierElt && this.globalIdentifierElt.nativeElement.value.toString().trim();
+    if (!account_identifier) {
+      return;
+    }
     const get_account_options = this.sdk.get_account_options({
       node_address: this.node_address,
       verbosity: this.verbosity,
-      //blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
-      account_identifier: this.config['pubKey_default']
     });
+    get_account_options.account_identifier = account_identifier;
+    this.getIdentifieBlock(get_account_options);
     const get_account = await this.sdk.get_account(get_account_options);
     get_account && (this.result = get_account);
-    this.account_hash = get_account?.result?.account.account_hash;
-    this.main_purse = get_account?.result?.account.main_purse;
+    // this.account_hash = get_account?.result?.account.account_hash;
+    // this.main_purse = get_account?.result?.account.main_purse;
   }
 
-  // TODO Refacto with get_block
   async get_auction_info() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
-    this.block_identifier_height = block_identifier_height || "";
-    this.block_identifier_hash = block_identifier_hash || "";
     const get_auction_info_options = this.sdk.get_auction_info_options({
       node_address: this.node_address,
       verbosity: this.verbosity,
     });
-    if (this.block_identifier_hash) {
-      get_auction_info_options.maybe_block_id_as_string = this.block_identifier_hash;
-    } else if (this.block_identifier_height) {
-      const maybe_block_identifier = BlockIdentifier.fromHeight(BigInt(this.block_identifier_height));
-      get_auction_info_options.maybe_block_identifier = maybe_block_identifier;
-    }
+    this.getIdentifieBlock(get_auction_info_options);
     const get_auction_info = await this.sdk.get_auction_info(get_auction_info_options);
     get_auction_info && (this.result = get_auction_info);
   }
@@ -190,39 +178,21 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_block_transfers() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
-    this.block_identifier_height = block_identifier_height || "";
-    this.block_identifier_hash = block_identifier_hash || "";
     const get_block_transfers_options = this.sdk.get_block_transfers_options({
       node_address: this.node_address,
       verbosity: this.verbosity
     });
-    if (this.block_identifier_hash) {
-      get_block_transfers_options.maybe_block_id_as_string = this.block_identifier_hash;
-    } else if (this.block_identifier_height) {
-      const maybe_block_identifier = BlockIdentifier.fromHeight(BigInt(this.block_identifier_height));
-      get_block_transfers_options.maybe_block_identifier = maybe_block_identifier;
-    }
+    this.getIdentifieBlock(get_block_transfers_options);
     const get_block_transfers = await this.sdk.get_block_transfers(get_block_transfers_options);
     this.result = get_block_transfers;
   }
 
   async get_block() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
-    this.block_identifier_height = block_identifier_height || "";
-    this.block_identifier_hash = block_identifier_hash || "";
     const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({
       node_address: this.node_address,
       verbosity: this.verbosity
     });
-    if (this.block_identifier_hash) {
-      chain_get_block_options.maybe_block_id_as_string = this.block_identifier_hash;
-    } else if (this.block_identifier_height) {
-      const maybe_block_identifier = BlockIdentifier.fromHeight(BigInt(this.block_identifier_height));
-      chain_get_block_options.maybe_block_identifier = maybe_block_identifier;
-    }
+    this.getIdentifieBlock(chain_get_block_options);
     const chain_get_block = await this.sdk.get_block(chain_get_block_options);
     this.result = chain_get_block;
   }
@@ -299,7 +269,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       }
     }
-
     if (!dictionary_item_identifier) {
       return;
     }
@@ -313,42 +282,22 @@ export class AppComponent implements OnInit, AfterViewInit {
     state_get_dictionary_item && (this.result = state_get_dictionary_item);
   }
 
-  // TODO Refacto with get_block
   async get_era_info() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
-    this.block_identifier_height = block_identifier_height || "";
-    this.block_identifier_hash = block_identifier_hash || "";
     const get_era_info_options = this.sdk.get_era_info_options({
       node_address: this.node_address,
       verbosity: this.verbosity
     });
-    if (this.block_identifier_hash) {
-      get_era_info_options.maybe_block_id_as_string = this.block_identifier_hash;
-    } else if (this.block_identifier_height) {
-      const maybe_block_identifier = BlockIdentifier.fromHeight(BigInt(this.block_identifier_height));
-      get_era_info_options.maybe_block_identifier = maybe_block_identifier;
-    }
+    this.getIdentifieBlock(get_era_info_options);
     const get_era_info = await this.sdk.get_era_info(get_era_info_options);
     this.result = get_era_info;
   }
 
-  // TODO Refacto with get_block
   async get_era_summary() {
-    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
-    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
-    this.block_identifier_height = block_identifier_height || "";
-    this.block_identifier_hash = block_identifier_hash || "";
     const get_era_summary_options = this.sdk.get_era_summary_options({
       node_address: this.node_address,
       verbosity: this.verbosity
     });
-    if (this.block_identifier_hash) {
-      get_era_summary_options.maybe_block_id_as_string = this.block_identifier_hash;
-    } else if (this.block_identifier_height) {
-      const maybe_block_identifier = BlockIdentifier.fromHeight(BigInt(this.block_identifier_height));
-      get_era_summary_options.maybe_block_identifier = maybe_block_identifier;
-    }
+    this.getIdentifieBlock(get_era_summary_options);
     const get_era_summary = await this.sdk.get_era_summary(get_era_summary_options);
     this.result = get_era_summary;
   }
@@ -368,16 +317,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!purse_identifier_as_string) {
       return;
     }
-    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
-    const global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
-      new Digest(state_root_hash || this.state_root_hash)
-    );
     const query_balance_options = this.sdk.query_balance_options({
       node_address: this.node_address,
       purse_identifier_as_string,
       verbosity: this.verbosity,
     });
-    query_balance_options.global_state_identifier = global_state_identifier;
+    this.getGlobalIdentifier(query_balance_options);
     const query_balance = await this.sdk.query_balance(query_balance_options);
     query_balance && (this.result = query_balance);
   }
@@ -388,17 +333,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!key_as_string) {
       return;
     }
-    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
-    const global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
-      new Digest(state_root_hash || this.state_root_hash)
-    );
     const query_global_state_options = this.sdk.query_global_state_options({
       node_address: this.node_address,
       key_as_string,
       path_as_string,
       verbosity: Verbosity.High,
     });
-    query_global_state_options.global_state_identifier = global_state_identifier;
+    this.getGlobalIdentifier(query_global_state_options);
     const query_global_state = await this.sdk.query_global_state(query_global_state_options);
     query_global_state && (this.result = query_global_state?.result?.stored_value);
   }
@@ -587,6 +528,41 @@ export class AppComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit() {
     await this.get_state_root_hash();
     this.changeDetectorRef.markForCheck();
+  }
+
+  private async execAction(action: string) {
+    const fn = (this as any)[action];
+    if (typeof fn === 'function') {
+      this.cleanDisplay();
+      await fn.bind(this).call();
+      this.action = action;
+    } else {
+      console.error(`Method ${action} is not defined on the component.`);
+    }
+  }
+
+  private getGlobalIdentifier(options: { global_state_identifier?: GlobalStateIdentifier; }) {
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
+    const global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
+      new Digest(state_root_hash || this.state_root_hash)
+    );
+    options.global_state_identifier = global_state_identifier;
+  }
+
+  private getIdentifieBlock(options: { maybe_block_id_as_string?: string; maybe_block_identifier?: BlockIdentifier; }) {
+    const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+    const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
+    if (block_identifier_hash) {
+      options.maybe_block_id_as_string = block_identifier_hash;
+      options.maybe_block_identifier = undefined;
+    } else if (block_identifier_height) {
+      const maybe_block_identifier = BlockIdentifier.fromHeight(BigInt(block_identifier_height));
+      options.maybe_block_id_as_string = undefined;
+      options.maybe_block_identifier = maybe_block_identifier;
+    } else {
+      options.maybe_block_id_as_string = undefined;
+      options.maybe_block_identifier = undefined;
+    }
   }
 
 }

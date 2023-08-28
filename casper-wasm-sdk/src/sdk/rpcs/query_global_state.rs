@@ -1,4 +1,4 @@
-use crate::debug::{error, log};
+use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::types::digest::Digest;
@@ -224,8 +224,6 @@ impl SDK {
         } else {
             Path::new(String::from("").into())
         };
-
-        log(&format!("{:?}", path));
 
         if let Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
             maybe_global_state_identifier,
