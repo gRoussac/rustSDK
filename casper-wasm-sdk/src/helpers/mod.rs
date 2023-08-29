@@ -11,7 +11,7 @@ use gloo_utils::format::JsValueSerdeExt;
 use serde::Serialize;
 use wasm_bindgen::{JsCast, JsValue};
 
-pub fn get_current_timestamp(timestamp: &Option<String>) -> String {
+pub fn get_current_timestamp(timestamp: Option<String>) -> String {
     let parsed_timestamp = timestamp.as_ref().and_then(|ts| ts.parse::<i64>().ok());
     let current_timestamp = parsed_timestamp
         .map(|parsed_time| {
@@ -34,9 +34,6 @@ pub fn get_ttl_or_default(ttl: Option<String>) -> String {
 }
 
 pub fn parse_timestamp(value: &str) -> Result<Timestamp, SdkError> {
-    if value.is_empty() {
-        return Ok(Timestamp::now());
-    }
     Timestamp::from_str(value).map_err(|error| SdkError::FailedToParseTimestamp {
         context: "timestamp",
         error,

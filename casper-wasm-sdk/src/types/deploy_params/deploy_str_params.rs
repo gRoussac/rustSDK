@@ -43,10 +43,8 @@ impl DeployStrParams {
         if let Some(secret_key) = secret_key {
             deploy_params.set_secret_key(&secret_key);
         };
-        let current_timestamp = get_current_timestamp(&timestamp);
-        let ttl = get_ttl_or_default(ttl);
-        deploy_params.set_timestamp(Some(current_timestamp));
-        deploy_params.set_ttl(Some(ttl));
+        deploy_params.set_timestamp(timestamp);
+        deploy_params.set_ttl(ttl);
         deploy_params
     }
 
@@ -69,17 +67,20 @@ impl DeployStrParams {
 
     #[wasm_bindgen(setter)]
     pub fn set_timestamp(&self, timestamp: Option<String>) {
-        if let Some(timestamp) = timestamp {
+        if let Some(mut timestamp) = timestamp {
+            if timestamp.is_empty() {
+                timestamp = get_current_timestamp(None);
+            }
             self.timestamp.set(timestamp.to_string()).unwrap();
         } else {
-            let current_timestamp = get_current_timestamp(&timestamp);
-            self.timestamp.set(current_timestamp).unwrap();
+            let timestamp = get_current_timestamp(timestamp);
+            self.timestamp.set(timestamp).unwrap();
         };
     }
 
     #[wasm_bindgen(js_name = "setDefaultTimestamp")]
     pub fn set_default_timestamp(&self) {
-        let current_timestamp = get_current_timestamp(&None);
+        let current_timestamp = get_current_timestamp(None);
         self.timestamp.set(current_timestamp).unwrap();
     }
 
@@ -91,7 +92,10 @@ impl DeployStrParams {
 
     #[wasm_bindgen(setter)]
     pub fn set_ttl(&self, ttl: Option<String>) {
-        if let Some(ttl) = ttl {
+        if let Some(mut ttl) = ttl {
+            if ttl.is_empty() {
+                ttl = get_ttl_or_default(None);
+            }
             self.ttl.set(ttl.to_string()).unwrap();
         } else {
             let ttl = get_ttl_or_default(ttl);

@@ -43,5 +43,5 @@ pub fn secret_to_public_key(secret_key: &str) -> JsValue {
 
 #[wasm_bindgen(js_name = "getTimestamp")]
 pub fn get_timestamp() -> JsValue {
-    get_current_timestamp(&None).into()
+    get_current_timestamp(None).into()
 }
