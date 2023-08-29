@@ -77,7 +77,7 @@
           class="form-control form-control-xs"
           name="public_key"
           [value]="public_key || ''"
-          placeholder="ex: 0x"
+          placeholder="e.g. 0x"
           (change)="onPublicKeyChange()"
           id="publicKeyElt"
           #publicKeyElt
@@ -143,12 +143,12 @@
               class="form-control form-control-xs"
               name="account_identifier"
               [value]="account_identifier || ''"
-              placeholder="ex: Public Key, AccountHash, Purse URef"
+              placeholder="e.g. Public Key, AccountHash, Purse URef"
               id="accountIdentifierElt"
               #accountIdentifierElt
             />
             <label for="accountIdentifierElt"
-              >ex: Public Key, AccountHash, Purse URef</label
+              >e.g. Public Key, AccountHash, Purse URef</label
             >
           </div>
         </div>
@@ -166,7 +166,7 @@
             #blockIdentifierHeightElt
           />
           <label for="blockIdentifierHeightElt"
-            >ex: {{ block_identifier_height_default }}</label
+            >e.g. {{ block_identifier_height_default }}</label
           >
         </div>
       </div>
@@ -183,7 +183,7 @@
             #blockIdentifierHashElt
           />
           <label for="blockIdentifierHeightElt"
-            >ex: {{ block_identifier_hash_default }}</label
+            >e.g. {{ block_identifier_hash_default }}</label
           >
         </div>
       </div>
@@ -230,7 +230,7 @@
             id="purseUrefElt"
             #purseUrefElt
           />
-          <label for="purseUrefElt">ex: {{ purse_uref || main_purse }}</label>
+          <label for="purseUrefElt">e.g. {{ purse_uref || main_purse }}</label>
         </div>
       </div>
       <div class="col-sm-7 mb-2" *ngIf="action === 'query_balance'">
@@ -241,12 +241,12 @@
             class="form-control form-control-xs"
             name="purse_identifier"
             [value]="purse_identifier || ''"
-            placeholder="ex: Public Key, AccountHash, Purse URef"
+            placeholder="e.g. Public Key, AccountHash, Purse URef"
             id="purseIdentifierElt"
             #purseIdentifierElt
           />
           <label for="purseIdentifierElt"
-            >ex: Public Key, AccountHash, Purse URef</label
+            >e.g. Public Key, AccountHash, Purse URef</label
           >
         </div>
       </div>
@@ -262,7 +262,7 @@
             id="stateRootHashElt"
             #stateRootHashElt
           />
-          <label for="stateRootHashElt">ex: {{ state_root_hash }}</label>
+          <label for="stateRootHashElt">e.g. {{ state_root_hash }}</label>
         </div>
       </div>
       <div class="col-sm-3">
@@ -352,7 +352,7 @@
               id="seedUrefElt"
               #seedUrefElt
             />
-            <label for="seedUrefElt">ex: uref-0x</label>
+            <label for="seedUrefElt">e.g. uref-0x</label>
           </div>
         </div>
         <div
@@ -370,7 +370,7 @@
               id="seedAccounttHashElt"
               #seedAccounttHashElt
             />
-            <label for="seedAccounttHashElt">ex: account-hash-0x</label>
+            <label for="seedAccounttHashElt">e.g. account-hash-0x</label>
           </div>
         </div>
         <div
@@ -388,7 +388,7 @@
               id="seedContractHashElt"
               #seedContractHashElt
             />
-            <label for="seedContractHashElt">ex: hash-0x</label>
+            <label for="seedContractHashElt">e.g. hash-0x</label>
           </div>
         </div>
         <div
@@ -406,7 +406,7 @@
               id="seedKeyElt"
               #seedKeyElt
             />
-            <label for="seedKeyElt">ex: dictionary-0x</label>
+            <label for="seedKeyElt">e.g. dictionary-0x</label>
           </div>
         </div>
         <div
@@ -424,11 +424,11 @@
               class="form-control form-control-xs"
               name="seed_name"
               [value]="seed_name || ''"
-              placeholder="ex: events"
+              placeholder="e.g. events"
               id="seedNameElt"
               #seedNameElt
             />
-            <label for="seedNameElt">ex: events</label>
+            <label for="seedNameElt">e.g. events</label>
           </div>
         </div>
         <div class="col-sm-7 mb-2">
@@ -443,7 +443,7 @@
               id="itemKeyElt"
               #itemKeyElt
             />
-            <label for="itemKeyElt">ex: Item key string</label>
+            <label for="itemKeyElt">e.g. Item key string</label>
           </div>
         </div>
       </ng-container>
@@ -459,12 +459,12 @@
               class="form-control form-control-xs"
               name="query_key"
               [value]="query_key || ''"
-              placeholder="ex: uref-0x || hash-0x || account-hash-0x"
+              placeholder="e.g. uref-0x || hash-0x || account-hash-0x"
               id="queryKeyElt"
               #queryKeyElt
             />
             <label for="queryKeyElt"
-              >ex: uref-0x || hash-0x || account-hash-0x</label
+              >e.g. uref-0x || hash-0x || account-hash-0x</label
             >
           </div>
         </div>
@@ -476,11 +476,11 @@
               class="form-control form-control-xs"
               name="query_path"
               [value]="query_path || ''"
-              placeholder="ex: counter/count"
+              placeholder="e.g. counter/count"
               id="queryPathElt"
               #queryPathElt
             />
-            <label for="queryPathElt">ex: counter/count</label>
+            <label for="queryPathElt">e.g. counter/count</label>
           </div>
         </div>
       </ng-container>
@@ -496,7 +496,7 @@
             id="stateRootHashElt"
             #stateRootHashElt
           />
-          <label for="stateRootHashElt">ex: {{ state_root_hash }}</label>
+          <label for="stateRootHashElt">e.g. {{ state_root_hash }}</label>
         </div>
       </div>
       <div class="col-sm-3">
@@ -530,11 +530,11 @@
             class="form-control form-control-xs"
             name="deploy_hash"
             [value]="deploy_hash || ''"
-            placeholder="ex: 0x"
+            placeholder="e.g. 0x"
             id="deployHashElt"
             #deployHashElt
           />
-          <label for="stateRootHashElt">ex: 0x</label>
+          <label for="stateRootHashElt">e.g. 0x</label>
         </div>
       </div>
       <div class="col-sm-2">
@@ -544,7 +544,7 @@
             type="checkbox"
             class="form-check-input mt-0"
             name="finalized_approvals"
-            [checked]="finalized_approvals === true"
+            [checked]="finalized_approvals"
             [value]="finalized_approvals || ''"
             [id]="finalizedApprovalsElt"
             #finalizedApprovalsElt
@@ -580,16 +580,25 @@
         'make_deploy',
         'transfer',
         'deploy',
-        'get_account'
+        'speculative_transfer',
+        'speculative_deploy',
+        'speculative_exec'
       ].includes(action)
     "
   >
     <form class="row align-items-end" (submit)="(false)">
-      <div class="col-sm-2">
-        <label
-          >Amount
-          <span class="fw-light small" *ngIf="this.transferAmountElt.value"
-            >({{ convert() }} CSPR)</span
+      <div
+        class="col-sm-2"
+        *ngIf="
+          ['make_transfer', 'transfer', 'speculative_transfer'].includes(action)
+        "
+      >
+        <label class="text-nowrap"
+          >Transfer Amount
+          <span
+            class="fw-light small text-nowrap"
+            *ngIf="this.transferAmountElt.value"
+            >({{ convert(transferAmountElt) }} CSPR)</span
           ></label
         >
         <div class="form-floating">
@@ -600,15 +609,52 @@
             name="transfer_amount"
             [value]="transfer_amount || ''"
             [placeholder]="config['minimum_transfer']"
-            (change)="convert()"
+            (change)="convert(transferAmountElt)"
             #transferAmountElt
           />
           <label for="transferAmountElt"
-            >ex: {{ config['minimum_transfer'] }}</label
+            >e.g. {{ config['minimum_transfer'] }}</label
           >
         </div>
       </div>
-      <div class="col-sm-2">
+      <div
+        class="col-sm-3"
+        *ngIf="['make_deploy', 'deploy', 'speculative_deploy'].includes(action)"
+      >
+        <label class="text-nowrap"
+          >Payment Amount
+          <span
+            class="fw-light small text-nowrap"
+            *ngIf="this.paymentAmountElt.value"
+            >({{ convert(paymentAmountElt) }} CSPR)</span
+          ></label
+        >
+        <div class="form-floating">
+          <input
+            type="search"
+            id="paymentAmountElt"
+            class="form-control form-control-xs"
+            name="payment_amount"
+            [value]="payment_amount || ''"
+            (change)="convert(paymentAmountElt)"
+            #paymentAmountElt
+          />
+        </div>
+      </div>
+      <div
+        class="col-sm-1"
+        *ngIf="
+          [
+            'make_transfer',
+            'make_deploy',
+            'transfer',
+            'deploy',
+            'speculative_transfer',
+            'speculative_deploy',
+            'speculative_exec'
+          ].includes(action)
+        "
+      >
         <label>TTL</label>
         <div class="form-floating">
           <input
@@ -620,10 +666,15 @@
             [placeholder]="config['TTL']"
             #TTLElt
           />
-          <label for="TTLElt">ex: {{ config['TTL'] }}</label>
+          <label for="TTLElt">e.g. {{ config['TTL'] }}</label>
         </div>
       </div>
-      <div class="col-sm-6">
+      <div
+        class="col-sm-6"
+        *ngIf="
+          ['make_transfer', 'transfer', 'speculative_transfer'].includes(action)
+        "
+      >
         <label>Target Account</label>
         <div class="form-floating">
           <input
@@ -631,13 +682,136 @@
             class="form-control form-control-xs"
             name="target_account"
             [value]="target_account || ''"
-            placeholder="ex: Public Key, AccountHash, Purse URef"
+            placeholder="e.g. Public Key, AccountHash, Purse URef"
             id="targetAccountElt"
             #targetAccountElt
           />
           <label for="blockIdentifierHeightElt"
-            >ex: Public Key, AccountHash, Purse URef</label
+            >e.g. Public Key, AccountHash, Purse URef</label
           >
+        </div>
+      </div>
+      <div
+        class="row mt-2"
+        *ngIf="['make_deploy', 'deploy', 'speculative_deploy'].includes(action)"
+      >
+        <div class="col-sm-7 mb-2">
+          <label>Smart Contract hash or Package hash</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="session_hash"
+              [value]="session_hash || ''"
+              placeholder="e.g. Contract Hash or Package Hash"
+              id="sessionHashElt"
+              (change)="(true)"
+              [disabled]="!!sessionNameElt.value"
+              #sessionHashElt
+            />
+            <label for="sessionHashElt"
+              >e.g. Contract Hash or Package Hash</label
+            >
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <label class="form-label">Call Package</label>
+          <div>
+            <input
+              type="checkbox"
+              class="form-check-input mt-0"
+              name="call_package"
+              [checked]="call_package"
+              [value]="call_package || ''"
+              [id]="callPackageElt"
+              #callPackageElt
+            />
+          </div>
+        </div>
+        <div class="col-sm-3 mb-2">
+          <label>Version</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="version"
+              [value]="version || ''"
+              placeholder="e.g.1, empty for last version"
+              id="versionElt"
+              #versionElt
+            />
+            <label for="versionElt">e.g.1, empty for last version</label>
+          </div>
+        </div>
+        <div class="col-sm-7 mb-2">
+          <label>Smart Contract name or Package name</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="session_name"
+              [value]="session_name || ''"
+              placeholder="e.g. Counter"
+              id="sessionNameElt"
+              [disabled]="!!sessionHashElt.value"
+              (change)="(true)"
+              #sessionNameElt
+            />
+            <label for="sessionNameElt">e.g. Counter</label>
+          </div>
+        </div>
+        <div class="col-sm-5 mb-2">
+          <label>Entry point</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="entry_point"
+              [value]="entry_point || ''"
+              placeholder="e.g. counter_inc"
+              id="entryPointElt"
+              #entryPointElt
+            />
+            <label for="entryPointElt">e.g. counter_inc</label>
+          </div>
+        </div>
+        <div class="col-sm-7 mb-2">
+          <label>Args</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="args_simple"
+              [value]="args_simple || ''"
+              placeholder="e.g. joe:bool='true', bob:bool='false'"
+              id="argsSimpleElt"
+              [disabled]="!!argsJsonElt.value"
+              (change)="(true)"
+              #argsSimpleElt
+            />
+            <label for="argsSimpleElt"
+              >e.g. joe:bool='true'", "bob:bool='false'</label
+            >
+          </div>
+        </div>
+        <div class="col-sm-7 mb-2">
+          <label>Args Json</label>
+          <div class="form-floating">
+            <input
+              type="search"
+              class="form-control form-control-xs"
+              name="args_json"
+              [value]="args_json || ''"
+              placeholder='e.g. [{ "name": "joe", "type": "U256", "value": 1 }]'
+              [disabled]="!!argsSimpleElt.value"
+              (change)="(true)"
+              #argsJsonElt
+            />
+            <label for="argsJsonElt"
+              >e.g. [&#123; "name": "joe", "type": "U256", "value": 1
+              &#125;]</label
+            >
+          </div>
         </div>
       </div>
       <div class="col-sm-1">

@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -57,6 +57,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   private_key!: string | undefined;
   has_private_key!: boolean;
   file_name!: string;
+  session_hash!: string;
+  session_name!: string;
+  payment_amount!: string;
+  entry_point!: string;
+  args_json!: string;
+  args_simple!: string;
+  version!: string;
+  call_package = false;
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   @ViewChild('blockIdentifierHeightElt') blockIdentifierHeightElt!: ElementRef;
@@ -80,6 +88,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('TTLElt') TTLElt!: ElementRef;
   @ViewChild('transferAmountElt') transferAmountElt!: ElementRef;
   @ViewChild('targetAccountElt') targetAccountElt!: ElementRef;
+  @ViewChild('entryPointElt') entryPointElt!: ElementRef;
+  @ViewChild('argsSimpleElt') argsSimpleElt!: ElementRef;
+  @ViewChild('argsJsonElt') argsJsonElt!: ElementRef;
+  @ViewChild('sessionHashElt') sessionHashElt!: ElementRef;
+  @ViewChild('sessionNameElt') sessionNameElt!: ElementRef;
+  @ViewChild('versionElt') versionElt!: ElementRef;
+  @ViewChild('callPackageElt') callPackageElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -111,12 +126,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(this.sdk_deploy_utils_methods, this.sdk_contract_methods).includes(name));
   }
 
-  convert() {
-    const amount = this.transferAmountElt?.nativeElement.value.trim();
+  // TODO Fix with motesToCSPR
+  convert(elt: HTMLInputElement) {
+    const amount: any = elt.value;
     if (!amount) {
       return;
     }
-    // TODO Fix with motesToCSPR
     return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
   }
 
@@ -204,7 +219,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.account_hash = '';
     this.main_purse = '';
     const get_account = await this.get_account(public_key);
-    console.log(get_account);
     this.public_key = public_key;
     this.account_hash = get_account?.result?.account.account_hash;
     this.main_purse = get_account?.result?.account.main_purse;
@@ -405,52 +419,76 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async make_deploy() {
-    // deploy_params = new DeployStrParams(
-    //   chain_name,
-    //   session_account
-    // );
-    // console.log(deploy_params);
+    const timestamp = getTimestamp();
+    const ttl: string = this.TTLElt && this.TTLElt.nativeElement.value.toString().trim();
+    if (!this.public_key) {
+      return;
+    }
+    const deploy_params = new DeployStrParams(
+      this.config['chain_name_integration'],
+      this.public_key,
+      this.private_key,
+      timestamp,
+      ttl
+    );
+    const entry_point: string = this.entryPointElt && this.entryPointElt.nativeElement.value.toString().trim();
+    const session_params = new SessionStrParams();
+    if (entry_point) {
+      session_params.session_entry_point = entry_point;
+    }
+    const args_simple: [string] = this.argsSimpleElt && this.argsSimpleElt.nativeElement.value.toString()
+      .trim()
+      .split(',')
+      .map((item: string) => item.trim())
+      .filter((item: string) => item !== '');
+    const args_json: string = this.argsJsonElt && this.argsJsonElt.nativeElement.value.toString().trim();
+    if (args_simple?.length) {
+      session_params.session_args_simple = args_simple;
+    }
+    else if (args_json) {
+      session_params.session_args_json = args_json;
+    }
+    const call_package: boolean = this.callPackageElt && this.callPackageElt.nativeElement.value as boolean;
+    const session_hash: string = this.sessionHashElt && this.sessionHashElt.nativeElement.value.toString().trim();
+    const session_name: string = this.sessionNameElt && this.sessionNameElt.nativeElement.value.toString().trim();
+    if (!call_package) {
+      if (session_hash) {
+        session_params.session_hash = session_hash;
+      } else if (session_name) {
+        session_params.session_hash = session_name;
+      }
+    } else {
+      if (session_hash) {
+        session_params.session_package_hash = session_hash;
+      } else if (session_name) {
+        session_params.session_package_name = session_name;
+      }
+    }
+    const version: string = this.versionElt && this.versionElt.nativeElement.value.toString().trim();
+    if (version) {
+      session_params.session_version = version;
+    }
+    // TODO Fix better
+    // Fix invalid form
+    const payment_params = new PaymentStrParams();
+    payment_params.payment_amount = this.config['gas_fee_transfer'];
 
-    // let session_params = new SessionStrParams();
-    // // Call an erc 20 token in the wild
-    // session_params.session_hash =
-    //   '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
-    // session_params.session_entry_point = 'decimals';
-    // session_params.session_args_simple = ["joe:bool='true'", "bob:bool='false'"]; // session_args_simple or session_args_json but not both
-    // //session_params.session_args_json = JSON.stringify([{ "name": "joe", "type": "U256", "value": 1 }]); // Arrary of objects as multiple args
-    // console.log(session_params);
-
-    // payment_params = new PaymentStrParams();
-    // payment_params.payment_amount = '5500000000';
-    // console.log(payment_params);
-
-    // // let test_deploy = Deploy.withPaymentAndSession(
-    // //   deploy_params,
-    // //   session_params,
-    // //   payment_params,
-    // // );
-
-    // // test_deploy = test_deploy.sign(secret_key);
-    // // test_deploy = test_deploy.withTTL('60m', secret_key);
-    // // test_deploy = test_deploy.withSession(JSON.parse('{ "StoredContractByHash": { "hash": "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477", "entry_point": "decimals", "args": []}}'));
-    // // console.log(test_deploy.toJson());
-
-    // // let test_transfer = Deploy.withTransfer(
-    // //   '2500000000',
-    // //   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
-    // //   undefined,
-    // //   deploy_params,
-    // //   payment_params,
-    // // );
-    // // console.log(test_transfer);
-
-    // const make_deploy = sdk.make_deploy(
+    // let test_deploy = Deploy.withPaymentAndSession(
     //   deploy_params,
     //   session_params,
     //   payment_params,
     // );
-    // setMake_deploy(jsonPrettyPrint(make_deploy));
-    // console.log(jsonPrettyPrint(make_deploy, Verbosity.Medium));
+    // if (this.private_key) {
+    //   test_deploy = test_deploy.sign(this.private_key);
+    // }
+
+    const make_deploy = this.sdk.make_deploy(
+      deploy_params,
+      session_params,
+      payment_params,
+    );
+    make_deploy && (this.result = make_deploy);
+    return make_deploy;
   }
 
   async make_transfer() {
@@ -459,10 +497,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!this.public_key) {
       return;
     }
+
     const deploy_params = new DeployStrParams(
       this.config['chain_name_integration'],
       this.public_key,
-      this.private_key || '',
+      this.private_key,
       timestamp,
       ttl
     );
@@ -473,6 +512,16 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!transfer_amount || !target_account) {
       return;
     }
+
+    // // let test_transfer = Deploy.withTransfer(
+    // //   '2500000000',
+    // //   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
+    // //   undefined,
+    // //   deploy_params,
+    // //   payment_params,
+    // // );
+    // // console.log(test_transfer);
+
     // Transfer minimum amount of tokens to recipient
     const make_transfer = this.sdk.make_transfer(
       transfer_amount,
@@ -482,14 +531,30 @@ export class AppComponent implements OnInit, AfterViewInit {
       payment_params,
     );
     make_transfer && (this.result = make_transfer);
+    return make_transfer;
   }
 
   async deploy() {
 
   }
 
-  async put_deploy() {
+  async transfer() {
 
+  }
+
+  async put_deploy() {
+    // let signed_deploy = new Deploy(make_transfer); // or make_deploy
+    // console.log(signed_deploy);
+    // const account_put_deploy = await sdk.account_put_deploy(
+    //   host,
+    //   signed_deploy,
+    //   Verbosity.High,
+    // );
+    // console.log('js account_put_deploy', account_put_deploy);
+
+    // if (!account_put_deploy?.result.deploy_hash) {
+    //   return;
+    // }
   }
 
   async sign_deploy() {

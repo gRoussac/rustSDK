@@ -133,7 +133,7 @@ impl Deploy {
         let mut timestamp = parse_timestamp(timestamp);
         if let Err(err) = &timestamp {
             error(&format!("Error parsing Timestamp: {}", err));
-            timestamp = parse_timestamp(&get_current_timestamp(&None));
+            timestamp = parse_timestamp(&get_current_timestamp(None));
         }
         self.build(BuildParams {
             secret_key,
