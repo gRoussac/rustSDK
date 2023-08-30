@@ -129,7 +129,10 @@
         'get_block_transfers',
         'get_era_info',
         'get_era_summary',
-        'get_account'
+        'get_account',
+        'speculative_exec',
+        'speculative_deploy',
+        'speculative_transfer'
       ].includes(action)
     "
   >
@@ -187,25 +190,37 @@
           >
         </div>
       </div>
-      <div class="col-sm-3">
-        <button
-          type="button"
-          class="btn btn-success"
-          (click)="submitAction(action)"
-        >
-          Submit
-        </button>
-      </div>
-      <div class="col-sm-1">
-        <button
-          class="btn btn-link"
-          type="reset"
-          value="clear"
-          (click)="cleanDisplay()"
-        >
-          Clear
-        </button>
-      </div>
+      <ng-container
+        *ngIf="
+          [
+            'get_block',
+            'get_block_transfers',
+            'get_era_info',
+            'get_era_summary',
+            'get_account'
+          ].includes(action)
+        "
+      >
+        <div class="col-sm-3">
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="submitAction(action)"
+          >
+            Submit
+          </button>
+        </div>
+        <div class="col-sm-1">
+          <button
+            class="btn btn-link"
+            type="reset"
+            value="clear"
+            (click)="cleanDisplay()"
+          >
+            Clear
+          </button>
+        </div>
+      </ng-container>
     </form>
   </div>
   <div

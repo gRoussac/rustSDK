@@ -27,14 +27,15 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_transfer")]
     pub async fn speculative_transfer_js_alias(
         &mut self,
-        maybe_block_id_as_string: Option<String>,
-        maybe_block_identifier: Option<BlockIdentifier>,
         node_address: &str,
-        verbosity: Option<Verbosity>,
         amount: &str,
         target_account: &str,
+        transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
+        maybe_block_id_as_string: Option<String>,
+        maybe_block_identifier: Option<BlockIdentifier>,
+        verbosity: Option<Verbosity>,
     ) -> JsValue {
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
@@ -49,6 +50,7 @@ impl SDK {
                 node_address,
                 amount,
                 target_account,
+                transfer_id,
                 deploy_params,
                 payment_params,
                 maybe_block_identifier,
@@ -66,17 +68,23 @@ impl SDK {
         node_address: &str,
         amount: &str,
         target_account: &str,
+        transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
         // log("speculative_transfer!");
+        let transfer_id = if let Some(transfer_id) = transfer_id {
+            transfer_id
+        } else {
+            rand::thread_rng().gen::<u64>().to_string()
+        };
         let deploy = make_transfer(
             "",
             amount,
             target_account,
-            &rand::thread_rng().gen::<u64>().to_string(),
+            &transfer_id,
             deploy_str_params_to_casper_client(&deploy_params),
             payment_str_params_to_casper_client(&payment_params),
             false,

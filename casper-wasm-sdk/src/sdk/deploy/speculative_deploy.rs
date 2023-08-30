@@ -24,12 +24,12 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_deploy")]
     pub async fn speculative_deploy_js_alias(
         &mut self,
-        maybe_block_identifier: Option<BlockIdentifier>,
         node_address: &str,
-        verbosity: Option<Verbosity>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        maybe_block_identifier: Option<BlockIdentifier>,
+        verbosity: Option<Verbosity>,
     ) -> JsValue {
         serialize_result(
             self.speculative_deploy(

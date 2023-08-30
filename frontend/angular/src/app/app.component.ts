@@ -95,6 +95,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('sessionNameElt') sessionNameElt!: ElementRef;
   @ViewChild('versionElt') versionElt!: ElementRef;
   @ViewChild('callPackageElt') callPackageElt!: ElementRef;
+  @ViewChild('signedDeployElt') signedDeployElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -418,7 +419,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     query_global_state && (this.result = query_global_state?.result?.stored_value);
   }
 
-  async make_deploy() {
+  async deploy(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp();
     const ttl: string = this.TTLElt && this.TTLElt.nativeElement.value.toString().trim();
     if (!this.public_key) {
@@ -481,17 +482,45 @@ export class AppComponent implements OnInit, AfterViewInit {
     // if (this.private_key) {
     //   test_deploy = test_deploy.sign(this.private_key);
     // }
-
-    const make_deploy = this.sdk.make_deploy(
-      deploy_params,
-      session_params,
-      payment_params,
-    );
-    make_deploy && (this.result = make_deploy);
-    return make_deploy;
+    let result;
+    if (speculative) {
+      const maybe_block_options = {
+        maybe_block_id_as_string: undefined,
+        maybe_block_identifier: undefined,
+      };
+      this.getIdentifieBlock(maybe_block_options);
+      const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
+      result = await this.sdk.speculative_deploy(
+        this.node_address,
+        deploy_params,
+        session_params,
+        payment_params,
+        maybe_block_id_as_string,
+        maybe_block_identifier
+      );
+    }
+    else if (deploy_result) {
+      result = await this.sdk.deploy(
+        this.node_address,
+        deploy_params,
+        session_params,
+        payment_params,
+      );
+    } else {
+      result = await this.sdk.make_deploy(
+        deploy_params,
+        session_params,
+        payment_params,
+      );
+      result && (this.result = result);
+    }
+    if (result) {
+      this.result = result;
+    }
+    return result;
   }
 
-  async make_transfer() {
+  async transfer(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
     const ttl: string = this.TTLElt && this.TTLElt.nativeElement.value.toString().trim();
     if (!this.public_key) {
@@ -521,56 +550,99 @@ export class AppComponent implements OnInit, AfterViewInit {
     // //   payment_params,
     // // );
     // // console.log(test_transfer);
+    let result;
+    if (speculative) {
+      const maybe_block_options = {
+        maybe_block_id_as_string: undefined,
+        maybe_block_identifier: undefined,
+      };
+      this.getIdentifieBlock(maybe_block_options);
+      const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
 
-    // Transfer minimum amount of tokens to recipient
-    const make_transfer = this.sdk.make_transfer(
-      transfer_amount,
-      target_account,
-      undefined, // transfer_id
-      deploy_params,
-      payment_params,
-    );
-    make_transfer && (this.result = make_transfer);
-    return make_transfer;
-  }
-
-  async deploy() {
-
-  }
-
-  async transfer() {
-
+      console.log(maybe_block_options);
+      result = await this.sdk.speculative_transfer(
+        this.node_address,
+        transfer_amount,
+        target_account,
+        undefined, // transfer_id
+        deploy_params,
+        payment_params,
+        maybe_block_id_as_string,
+        maybe_block_identifier
+      );
+    }
+    else if (deploy_result) {
+      result = await this.sdk.transfer(
+        this.node_address,
+        transfer_amount,
+        target_account,
+        undefined, // transfer_id
+        deploy_params,
+        payment_params,
+      );
+    } else {
+      result = await this.sdk.make_transfer(
+        transfer_amount,
+        target_account,
+        undefined, // transfer_id
+        deploy_params,
+        payment_params,
+      );
+    }
+    result && (this.result = result);
+    return result;
   }
 
   async put_deploy() {
-    // let signed_deploy = new Deploy(make_transfer); // or make_deploy
-    // console.log(signed_deploy);
-    // const account_put_deploy = await sdk.account_put_deploy(
-    //   host,
-    //   signed_deploy,
-    //   Verbosity.High,
-    // );
-    // console.log('js account_put_deploy', account_put_deploy);
+    const signed_deploy_as_string: string = this.signedDeployElt && this.signedDeployElt.nativeElement.value.toString().trim();
+    const signed_deploy = new Deploy(signed_deploy_as_string);
+    console.log(signed_deploy);
 
-    // if (!account_put_deploy?.result.deploy_hash) {
-    //   return;
-    // }
+    if (!signed_deploy.isValid()) {
+      console.error('Deploy is not valid.');
+      return;
+    }
+    // the deploy hash is correct (should be the hash of the header), and
+    // the body hash is correct (should be the hash of the body), and
+    // approvals are non empty, and
+    // all approvals are valid signatures of the deploy hash
+    const account_put_deploy = await this.sdk.put_deploy(
+      this.node_address,
+      signed_deploy,
+      this.verbosity
+    );
+    console.log('js account_put_deploy', account_put_deploy);
+    return account_put_deploy;
+  }
+
+  async speculative_exec() {
   }
 
   async sign_deploy() {
 
   }
 
-  async speculative_exec() {
-
+  async make_deploy() {
+    const deploy_result = false;
+    await this.deploy(deploy_result);
   }
 
-  async speculative_transfer() {
+  async make_transfer() {
+    const deploy_result = false;
+    await this.transfer(deploy_result);
+  }
 
+
+  async speculative_transfer() {
+    const speculative = true;
+    const deploy_result = !speculative;
+    await this.transfer(deploy_result, speculative);
   }
 
   async speculative_deploy() {
-
+    const speculative = true;
+    const deploy_result = !speculative;
+    await this.deploy(deploy_result, speculative);
   }
 
   async call_entrypoint() {

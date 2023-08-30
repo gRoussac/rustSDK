@@ -24,7 +24,6 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
 pub struct QueryGlobalStateOptions {
     pub node_address: String,
-    pub verbosity: Option<Verbosity>,
     pub global_state_identifier_as_string: Option<String>,
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
@@ -34,6 +33,7 @@ pub struct QueryGlobalStateOptions {
     pub key: Option<Key>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]
