@@ -22,20 +22,23 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(js_name = "transfer")]
+    #[allow(clippy::too_many_arguments)]
     pub async fn transfer_js_alias(
         &mut self,
         node_address: &str,
-        verbosity: Option<Verbosity>,
         amount: &str,
         target_account: &str,
+        transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
+        verbosity: Option<Verbosity>,
     ) -> JsValue {
         serialize_result(
             self.transfer(
                 node_address,
                 amount,
                 target_account,
+                transfer_id,
                 deploy_params,
                 payment_params,
                 verbosity,
@@ -46,21 +49,28 @@ impl SDK {
 }
 
 impl SDK {
+    #[allow(clippy::too_many_arguments)]
     pub async fn transfer(
         &mut self,
         node_address: &str,
         amount: &str,
         target_account: &str,
+        transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
         //log("transfer!");
+        let transfer_id = if let Some(transfer_id) = transfer_id {
+            transfer_id
+        } else {
+            rand::thread_rng().gen::<u64>().to_string()
+        };
         let deploy = make_transfer(
             "",
             amount,
             target_account,
-            &rand::thread_rng().gen::<u64>().to_string(),
+            &transfer_id,
             deploy_str_params_to_casper_client(&deploy_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
