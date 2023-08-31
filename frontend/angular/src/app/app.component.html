@@ -528,7 +528,7 @@
   </div>
   <div
     class="row mt-3 d-flex align-items-end"
-    *ngIf="['put_deploy', 'sign_deploy'].includes(action)"
+    *ngIf="['put_deploy', 'sign_deploy', 'speculative_exec'].includes(action)"
   >
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-2">
@@ -576,7 +576,6 @@
         'deploy',
         'speculative_transfer',
         'speculative_deploy',
-        'speculative_exec',
         'call_entrypoint',
         'install'
       ].includes(action)
@@ -655,7 +654,6 @@
             'deploy',
             'speculative_transfer',
             'speculative_deploy',
-            'speculative_exec',
             'install'
           ].includes(action)
         "
@@ -699,13 +697,9 @@
       <div
         class="col-sm-6"
         *ngIf="
-          [
-            'make_deploy',
-            'deploy',
-            'install',
-            'speculative_deploy',
-            'speculative_exec'
-          ].includes(action)
+          ['make_deploy', 'deploy', 'install', 'speculative_deploy'].includes(
+            action
+          )
         "
       >
         <div class="col-sm-2">
@@ -908,7 +902,9 @@
     </div>
     <div
       class="col-sm-1"
-      *ngIf="!['sign_deploy', 'put_deploy'].includes(action)"
+      *ngIf="
+        !['sign_deploy', 'put_deploy', 'speculative_exec'].includes(action)
+      "
     >
       <button
         class="btn btn-link"
