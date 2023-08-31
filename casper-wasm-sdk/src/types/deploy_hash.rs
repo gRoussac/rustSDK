@@ -1,10 +1,7 @@
 use super::digest::Digest;
 use crate::debug::error;
+use casper_types::DeployHash as _DeployHash;
 use casper_types::Digest as _Digest;
-use casper_types::{
-    bytesrepr::{self, FromBytes, ToBytes},
-    DeployHash as _DeployHash,
-};
 use gloo_utils::format::JsValueSerdeExt;
 use hex::decode;
 use serde::{Deserialize, Serialize};
@@ -52,26 +49,5 @@ impl From<_DeployHash> for DeployHash {
 impl From<Digest> for DeployHash {
     fn from(digest: Digest) -> Self {
         _DeployHash::new(digest.into()).into()
-    }
-}
-
-impl ToBytes for DeployHash {
-    fn to_bytes(&self) -> Result<Vec<u8>, bytesrepr::Error> {
-        self.0.to_bytes()
-    }
-
-    fn write_bytes(&self, writer: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
-        self.0.write_bytes(writer)
-    }
-
-    fn serialized_length(&self) -> usize {
-        self.0.serialized_length()
-    }
-}
-
-impl FromBytes for DeployHash {
-    fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
-        let (digest, remainder) = Digest::from_bytes(bytes)?;
-        Ok((DeployHash::from(digest), remainder))
     }
 }

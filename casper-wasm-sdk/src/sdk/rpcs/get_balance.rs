@@ -5,6 +5,7 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
 use crate::{
+    debug::log,
     helpers::get_verbosity_or_default,
     types::{digest::ToDigest, sdk_error::SdkError, uref::URef, verbosity::Verbosity},
     SDK,
@@ -17,11 +18,11 @@ use casper_client::{
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-#[derive(Default, Debug, Deserialize, Clone)]
+#[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getBalanceOptions", getter_with_clone)]
 pub struct GetBalanceOptions {
@@ -71,7 +72,7 @@ impl SDK {
         let result = if let Some(hash) = state_root_hash {
             self.get_balance(&node_address, hash, purse_uref, verbosity)
                 .await
-        } else if let Some(hash) = state_root_hash_as_string {
+        } else if let Some(hash) = state_root_hash_as_string.clone() {
             // Todo check state root hash validity here _Digest::LENGTH
             self.get_balance(&node_address, hash.as_str(), purse_uref, verbosity)
                 .await

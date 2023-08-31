@@ -17,10 +17,11 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-use serde::Deserialize;
+#[cfg(target_arch = "wasm32")]
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Deserialize, Clone, Default)]
+#[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
 pub struct QueryGlobalStateOptions {
     pub node_address: String,
