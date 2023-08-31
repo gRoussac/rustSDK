@@ -5,7 +5,6 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
 use crate::{
-    debug::log,
     helpers::get_verbosity_or_default,
     types::{digest::ToDigest, sdk_error::SdkError, uref::URef, verbosity::Verbosity},
     SDK,
