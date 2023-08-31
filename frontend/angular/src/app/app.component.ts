@@ -587,7 +587,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.error('Deploy is expired.');
       return;
     }
-    console.log(signed_deploy);
     // the deploy hash is correct (should be the hash of the header), and
     // the body hash is correct (should be the hash of the body), and
     // approvals are non empty, and
@@ -602,7 +601,31 @@ export class AppComponent implements OnInit, AfterViewInit {
     return put_deploy;
   }
 
-  async speculative_exec() { }
+  async speculative_exec() {
+    const signed_deploy_as_string: string = this.deployJsonElt && this.deployJsonElt.nativeElement.value.toString().trim();
+    if (!signed_deploy_as_string) {
+      return;
+    }
+    const signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
+    if (!signed_deploy.isValid()) {
+      console.error('Deploy is not valid.');
+      return;
+    }
+    if (signed_deploy.isExpired()) {
+      console.error('Deploy is expired.');
+      return;
+    }
+    console.log(signed_deploy);
+    const speculative_exec_options = this.sdk.speculative_exec_options({
+      node_address: this.node_address,
+      verbosity: this.verbosity,
+      deploy: signed_deploy.toJson()
+    });
+    this.getIdentifieBlock(speculative_exec_options);
+    const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
+    speculative_exec && (this.result = speculative_exec);
+    return speculative_exec;
+  }
 
   async sign_deploy() {
     if (!this.private_key) {

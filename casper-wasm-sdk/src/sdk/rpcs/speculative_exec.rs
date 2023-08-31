@@ -5,7 +5,7 @@ use crate::helpers::serialize_result;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 #[cfg(target_arch = "wasm32")]
-use crate::types::deploy::Deploy as _Deploy;
+use crate::types::deploy::Deploy;
 use crate::{
     helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -15,7 +15,7 @@ use casper_client::{
     rpcs::results::SpeculativeExecResult, speculative_exec as speculative_exec_lib, JsonRpcId,
     SuccessResponse,
 };
-use casper_types::Deploy;
+use casper_types::Deploy as CasperTypesDeploy;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
@@ -30,7 +30,7 @@ use wasm_bindgen::prelude::*;
 pub struct GetSpeculativeExecOptions {
     pub node_address: String,
     pub deploy_as_string: Option<String>,
-    pub deploy: Option<_Deploy>,
+    pub deploy: Option<Deploy>,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
     pub verbosity: Option<Verbosity>,
@@ -39,7 +39,7 @@ pub struct GetSpeculativeExecOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    #[wasm_bindgen(js_name = "get_speculative_exec_options")]
+    #[wasm_bindgen(js_name = "speculative_exec_options")]
     pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecOptions {
         let options_result = options.into_serde::<GetSpeculativeExecOptions>();
         match options_result {
@@ -66,7 +66,7 @@ impl SDK {
         } = options;
 
         let deploy = if let Some(deploy_as_string) = deploy_as_string {
-            _Deploy::new(deploy_as_string.into())
+            Deploy::new(deploy_as_string.into())
         } else if let Some(deploy) = deploy {
             deploy
         } else {
@@ -98,7 +98,7 @@ impl SDK {
     pub async fn speculative_exec(
         &mut self,
         node_address: &str,
-        deploy: Deploy,
+        deploy: CasperTypesDeploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {

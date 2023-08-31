@@ -9,7 +9,7 @@ use super::{
     public_key::PublicKey,
 };
 use crate::{
-    debug::{error, log},
+    debug::error,
     helpers::{
         get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
         secret_key_from_pem,
