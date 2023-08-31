@@ -451,20 +451,28 @@
         *ngIf="['query_global_state', 'query_contract_key'].includes(action)"
       >
         <div class="col-sm-7 mb-2">
-          <label>Key </label>
+          <label>{{
+            action === 'query_global_state' ? 'Key' : 'Contract Hash'
+          }}</label>
           <div class="form-floating">
             <input
               type="search"
               class="form-control form-control-xs"
               name="query_key"
               [value]="query_key || ''"
-              placeholder="e.g. uref-0x || hash-0x || account-hash-0x"
+              [placeholder]="
+                action === 'query_global_state'
+                  ? 'e.g. uref-0x || hash-0x || account-hash-0x'
+                  : 'e.g. hash-0x'
+              "
               id="queryKeyElt"
               #queryKeyElt
             />
-            <label for="queryKeyElt"
-              >e.g. uref-0x || hash-0x || account-hash-0x</label
-            >
+            <label for="queryKeyElt">{{
+              action === 'query_global_state'
+                ? 'e.g. uref-0x || hash-0x || account-hash-0x'
+                : 'e.g. hash-0x'
+            }}</label>
           </div>
         </div>
         <div class="col-sm-7 mb-2">
@@ -529,7 +537,8 @@
         'speculative_transfer',
         'speculative_deploy',
         'speculative_exec',
-        'call_entrypoint'
+        'call_entrypoint',
+        'install'
       ].includes(action)
     "
   >
@@ -571,7 +580,8 @@
             'make_deploy',
             'deploy',
             'speculative_deploy',
-            'call_entrypoint'
+            'call_entrypoint',
+            'install'
           ].includes(action)
         "
       >
@@ -605,7 +615,8 @@
             'deploy',
             'speculative_transfer',
             'speculative_deploy',
-            'speculative_exec'
+            'speculative_exec',
+            'install'
           ].includes(action)
         "
       >
@@ -646,96 +657,155 @@
         </div>
       </div>
       <div
+        class="col-sm-6"
+        *ngIf="
+          [
+            'make_deploy',
+            'deploy',
+            'install',
+            'speculative_deploy',
+            'speculative_exec'
+          ].includes(action)
+        "
+      >
+        <div class="col-sm-2">
+          <input
+            class="visually-hidden"
+            name="wasm"
+            #wasmElt
+            type="file"
+            id="wasmElt"
+            (change)="onWasmSelected($event)"
+            accept=".wasm"
+          />
+          <button
+            class="btn btn-secondary"
+            (click)="onWasmClick()"
+            *ngIf="!file_name"
+          >
+            Wasm Module Bytes
+          </button>
+          <span
+            class="break-all text-nowrap"
+            class="btn btn-light"
+            (click)="resetWasmClick()"
+            *ngIf="file_name"
+          >
+            {{ file_name }}
+            <svg
+              class="w-6 h-6 ml-1 cursor-pointer shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              ></path>
+            </svg>
+          </span>
+        </div>
+      </div>
+      <div
         class="row mt-2"
         *ngIf="
           [
             'make_deploy',
             'deploy',
             'speculative_deploy',
-            'call_entrypoint'
+            'call_entrypoint',
+            'install'
           ].includes(action)
         "
       >
-        <div class="col-sm-7 mb-2">
-          <label>Smart Contract hash or Package hash</label>
-          <div class="form-floating">
-            <input
-              type="search"
-              class="form-control form-control-xs"
-              name="session_hash"
-              [value]="session_hash || ''"
-              placeholder="e.g. Contract Hash or Package Hash"
-              id="sessionHashElt"
-              (change)="(true)"
-              [disabled]="!!sessionNameElt.value"
-              #sessionHashElt
-            />
-            <label for="sessionHashElt"
-              >e.g. Contract Hash or Package Hash</label
-            >
+        <ng-container *ngIf="action !== 'install' && !file_name">
+          <div class="col-sm-7 mb-2">
+            <label>Smart Contract hash or Package hash</label>
+            <div class="form-floating">
+              <input
+                type="search"
+                class="form-control form-control-xs"
+                name="session_hash"
+                [value]="session_hash || ''"
+                placeholder="e.g. Contract Hash or Package Hash"
+                id="sessionHashElt"
+                (change)="(true)"
+                [disabled]="!!sessionNameElt.value || file_name"
+                #sessionHashElt
+              />
+              <label for="sessionHashElt"
+                >e.g. Contract Hash or Package Hash</label
+              >
+            </div>
           </div>
-        </div>
-        <div class="col-sm-2">
-          <label class="form-label">Call Package</label>
-          <div>
-            <input
-              type="checkbox"
-              class="form-check-input mt-0"
-              name="call_package"
-              [checked]="call_package"
-              [value]="call_package || ''"
-              [id]="callPackageElt"
-              #callPackageElt
-            />
+          <div class="col-sm-2">
+            <label class="form-label">Call Package</label>
+            <div>
+              <input
+                type="checkbox"
+                class="form-check-input mt-0"
+                name="call_package"
+                [checked]="call_package"
+                [value]="call_package || ''"
+                [id]="callPackageElt"
+                [disabled]="file_name"
+                #callPackageElt
+              />
+            </div>
           </div>
-        </div>
-        <div class="col-sm-3 mb-2">
-          <label>Version</label>
-          <div class="form-floating">
-            <input
-              type="search"
-              class="form-control form-control-xs"
-              name="version"
-              [value]="version || ''"
-              placeholder="e.g.1, empty for last version"
-              id="versionElt"
-              #versionElt
-            />
-            <label for="versionElt">e.g.1, empty for last version</label>
+          <div class="col-sm-3 mb-2">
+            <label>Version</label>
+            <div class="form-floating">
+              <input
+                type="search"
+                class="form-control form-control-xs"
+                name="version"
+                [value]="version || ''"
+                placeholder="e.g.1, empty for last version"
+                [disabled]="file_name"
+                id="versionElt"
+                #versionElt
+              />
+              <label for="versionElt">e.g.1, empty for last version</label>
+            </div>
           </div>
-        </div>
-        <div class="col-sm-7 mb-2">
-          <label>Smart Contract name or Package name</label>
-          <div class="form-floating">
-            <input
-              type="search"
-              class="form-control form-control-xs"
-              name="session_name"
-              [value]="session_name || ''"
-              placeholder="e.g. Counter"
-              id="sessionNameElt"
-              [disabled]="!!sessionHashElt.value"
-              (change)="(true)"
-              #sessionNameElt
-            />
-            <label for="sessionNameElt">e.g. Counter</label>
+          <div class="col-sm-7 mb-2">
+            <label>Smart Contract name or Package name</label>
+            <div class="form-floating">
+              <input
+                type="search"
+                class="form-control form-control-xs"
+                name="session_name"
+                [value]="session_name || ''"
+                placeholder="e.g. Counter"
+                id="sessionNameElt"
+                [disabled]="!!sessionHashElt.value || file_name"
+                (change)="(true)"
+                #sessionNameElt
+              />
+              <label for="sessionNameElt">e.g. Counter</label>
+            </div>
           </div>
-        </div>
-        <div class="col-sm-5 mb-2">
-          <label>Entry point</label>
-          <div class="form-floating">
-            <input
-              type="search"
-              class="form-control form-control-xs"
-              name="entry_point"
-              [value]="entry_point || ''"
-              placeholder="e.g. counter_inc"
-              id="entryPointElt"
-              #entryPointElt
-            />
-            <label for="entryPointElt">e.g. counter_inc</label>
+          <div class="col-sm-5 mb-2">
+            <label>Entry point</label>
+            <div class="form-floating">
+              <input
+                type="search"
+                class="form-control form-control-xs"
+                name="entry_point"
+                [value]="entry_point || ''"
+                placeholder="e.g. counter_inc"
+                id="entryPointElt"
+                [disabled]="file_name"
+                #entryPointElt
+              />
+              <label for="entryPointElt">e.g. counter_inc</label>
+            </div>
           </div>
-        </div>
+        </ng-container>
         <div class="col-sm-7 mb-2">
           <label>Args</label>
           <div class="form-floating">
