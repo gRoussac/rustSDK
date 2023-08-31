@@ -1,4 +1,4 @@
-use crate::debug::error;
+use crate::debug::{error, log};
 use base16::DecodeError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
@@ -125,13 +125,6 @@ impl From<&str> for Digest {
         let mut digest_bytes = [0u8; _Digest::LENGTH];
         digest_bytes.copy_from_slice(&bytes);
         Digest(_Digest::from(digest_bytes))
-    }
-}
-
-impl From<Digest> for String {
-    fn from(digest: Digest) -> Self {
-        let digest: _Digest = digest.into();
-        digest.to_string()
     }
 }
 

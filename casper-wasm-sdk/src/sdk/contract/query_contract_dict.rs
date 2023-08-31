@@ -4,10 +4,7 @@ use crate::types::{
     dictionary_item_identifier::DictionaryItemIdentifier,
 };
 #[cfg(target_arch = "wasm32")]
-use crate::{
-    debug::error,
-    types::{digest::Digest, global_state_identifier::GlobalStateIdentifier},
-};
+use crate::{debug::error, types::digest::Digest};
 use crate::{
     rpcs::get_dictionary_item::DictionaryItemInput,
     types::{digest::ToDigest, verbosity::Verbosity},
@@ -17,20 +14,20 @@ use casper_client::{rpcs::results::GetDictionaryItemResult, SuccessResponse};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-#[derive(Default, Debug, Deserialize, Clone)]
+#[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "QueryContractDictOptions", getter_with_clone)]
+#[wasm_bindgen(js_name = "queryContractDictOptions", getter_with_clone)]
 pub struct QueryContractDictOptions {
     pub node_address: String,
-    pub global_state_identifier_as_string: Option<String>,
-    pub global_state_identifier: Option<GlobalStateIdentifier>,
+    // Not supported by get_dictionary_item
+    // pub global_state_identifier_as_string: Option<String>,
+    // pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
-    pub maybe_block_id_as_string: Option<String>,
     pub dictionary_item_params: Option<DictionaryItemStrParams>,
     pub dictionary_item_identifier: Option<DictionaryItemIdentifier>,
     pub verbosity: Option<Verbosity>,
@@ -45,7 +42,10 @@ impl SDK {
         match options_result {
             Ok(options) => options,
             Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
+                error(&format!(
+                    "Error deserializing query_contract_dict_options: {:?}",
+                    err
+                ));
                 QueryContractDictOptions::default()
             }
         }
@@ -56,7 +56,12 @@ impl SDK {
         &mut self,
         options: QueryContractDictOptions,
     ) -> JsValue {
-        let options = self.get_dictionary_item_options(JsValue::from(options));
+        let js_value_options = JsValue::from_serde::<QueryContractDictOptions>(&options);
+        if let Err(err) = js_value_options {
+            error(&format!("Error serializing options: {:?}", err));
+            return JsValue::null();
+        }
+        let options = self.get_dictionary_item_options(js_value_options.unwrap());
         self.get_dictionary_item_js_alias(options).await
     }
 }

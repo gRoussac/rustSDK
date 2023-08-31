@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   deploy_hash!: string;
   purse_identifier!: string;
   item_key!: string;
-  select_dict_identifier = 'newFromSeedUref';
+  select_dict_identifier = 'newFromContractInfo';
   seed_uref!: string;
   seed_contract_hash!: string;
   seed_account_hash!: string;
@@ -96,6 +96,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('versionElt') versionElt!: ElementRef;
   @ViewChild('callPackageElt') callPackageElt!: ElementRef;
   @ViewChild('signedDeployElt') signedDeployElt!: ElementRef;
+  @ViewChild('paymentAmountElt') paymentAmountElt!: ElementRef;
+  @ViewChild('selectDictIdentifierElt') selectDictIdentifierElt!: ElementRef;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -432,48 +434,15 @@ export class AppComponent implements OnInit, AfterViewInit {
       timestamp,
       ttl
     );
-    const entry_point: string = this.entryPointElt && this.entryPointElt.nativeElement.value.toString().trim();
-    const session_params = new SessionStrParams();
-    if (entry_point) {
-      session_params.session_entry_point = entry_point;
-    }
-    const args_simple: [string] = this.argsSimpleElt && this.argsSimpleElt.nativeElement.value.toString()
-      .trim()
-      .split(',')
-      .map((item: string) => item.trim())
-      .filter((item: string) => item !== '');
-    const args_json: string = this.argsJsonElt && this.argsJsonElt.nativeElement.value.toString().trim();
-    if (args_simple?.length) {
-      session_params.session_args_simple = args_simple;
-    }
-    else if (args_json) {
-      session_params.session_args_json = args_json;
-    }
-    const call_package: boolean = this.callPackageElt && this.callPackageElt.nativeElement.value as boolean;
-    const session_hash: string = this.sessionHashElt && this.sessionHashElt.nativeElement.value.toString().trim();
-    const session_name: string = this.sessionNameElt && this.sessionNameElt.nativeElement.value.toString().trim();
-    if (!call_package) {
-      if (session_hash) {
-        session_params.session_hash = session_hash;
-      } else if (session_name) {
-        session_params.session_hash = session_name;
-      }
-    } else {
-      if (session_hash) {
-        session_params.session_package_hash = session_hash;
-      } else if (session_name) {
-        session_params.session_package_name = session_name;
-      }
-    }
-    const version: string = this.versionElt && this.versionElt.nativeElement.value.toString().trim();
-    if (version) {
-      session_params.session_version = version;
-    }
     // TODO Fix better
     // Fix invalid form
     const payment_params = new PaymentStrParams();
-    payment_params.payment_amount = this.config['gas_fee_transfer'];
-
+    const payment_amount: string = this.paymentAmountElt && this.paymentAmountElt.nativeElement.value.toString().trim();
+    if (!payment_amount) {
+      return;
+    }
+    payment_params.payment_amount = payment_amount;
+    const session_params = this.get_session_params();
     // let test_deploy = Deploy.withPaymentAndSession(
     //   deploy_params,
     //   session_params,
@@ -542,14 +511,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // // let test_transfer = Deploy.withTransfer(
-    // //   '2500000000',
-    // //   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
-    // //   undefined,
-    // //   deploy_params,
-    // //   payment_params,
-    // // );
-    // // console.log(test_transfer);
+    // let test_transfer = Deploy.withTransfer(
+    //   '2500000000',
+    //   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54',
+    //   undefined,
+    //   deploy_params,
+    //   payment_params,
+    // );
+    // console.log(test_transfer);
     let result;
     if (speculative) {
       const maybe_block_options = {
@@ -558,8 +527,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       };
       this.getIdentifieBlock(maybe_block_options);
       const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
-
-      console.log(maybe_block_options);
       result = await this.sdk.speculative_transfer(
         this.node_address,
         transfer_amount,
@@ -632,7 +599,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     await this.transfer(deploy_result);
   }
 
-
   async speculative_transfer() {
     const speculative = true;
     const deploy_result = !speculative;
@@ -646,29 +612,26 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async call_entrypoint() {
-    // // test call entry point
-    // let session_account = privateToPublicKey(secret_key);
-    // let deploy_params = new DeployStrParams(
-    //   chain_name,
-    //   session_account,
-    //   secret_key
-    // );
-    // console.log(deploy_params);
-    // let session_params = new SessionStrParams();
-    // // Call an erc 20 token in the wild
-    // session_params.session_hash =
-    //   '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
-    // session_params.session_entry_point = 'decimals';
-    // // let payment_params = new PaymentStrParams();
-    // // payment_params.payment_amount = '5500000000';
-    // // console.log(payment_params);
-    // let test_call_entrypoint = await sdk.call_entrypoint(
-    //   host,
-    //   deploy_params,
-    //   session_params,
-    //   '5500000000'
-    // );
-    // console.log(test_call_entrypoint.result.deploy_hash);
+    if (!this.public_key || !this.private_key) {
+      return;
+    }
+    const deploy_params = new DeployStrParams(
+      this.config['chain_name_integration'],
+      this.public_key,
+      this.private_key,
+    );
+    const session_params = this.get_session_params();
+    const payment_amount: string = this.paymentAmountElt && this.paymentAmountElt.nativeElement.value.toString().trim();
+    if (!payment_amount) {
+      return;
+    }
+    const call_entrypoint = await this.sdk.call_entrypoint(
+      this.node_address,
+      deploy_params,
+      session_params,
+      payment_amount
+    );
+    call_entrypoint && (this.result = call_entrypoint);
   }
 
   async install() {
@@ -710,7 +673,41 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async query_contract_dict() {
-
+    const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
+    const dictionary_item_key: string = this.itemKeyElt && this.itemKeyElt.nativeElement.value.toString().trim();
+    if (!dictionary_item_key) {
+      return;
+    }
+    const contract_named_key: string = this.seedContractHashElt && this.seedContractHashElt.nativeElement.value.toString().trim();
+    const dictionary_name: string = this.seedNameElt && this.seedNameElt.nativeElement.value.toString().trim();
+    if (!dictionary_name) {
+      return;
+    }
+    let dictionary_item_params: DictionaryItemStrParams | undefined;
+    if (contract_named_key) {
+      // We have two ways to identify a dictionary, either by identifier or by item params
+      // const dictionary_item_identifier =
+      //   DictionaryItemIdentifier.newFromContractInfo(
+      //     contract_named_key,
+      //     dictionary_name,
+      //     dictionary_item_key
+      //   );
+      dictionary_item_params = new DictionaryItemStrParams();
+      dictionary_item_params.setContractNamedKey(contract_named_key, dictionary_name, dictionary_item_key);
+    }
+    if (!dictionary_item_params) {
+      return;
+    }
+    const query_contract_dict_options = this.sdk.query_contract_dict_options({
+      node_address: this.node_address,
+      verbosity: this.verbosity,
+      state_root_hash_as_string: state_root_hash || this.state_root_hash || '',
+      // dictionary_item_identifier: dictionary_item_identifier.toJson() // you need to send JSON of the object, not the object or you need to use setter
+    });
+    // Here setter does take instance of DictionaryItemStrParams
+    query_contract_dict_options.dictionary_item_params = dictionary_item_params;
+    const query_contract_dict = await this.sdk.query_contract_dict(query_contract_dict_options);
+    query_contract_dict && (this.result = query_contract_dict);
   }
 
   async query_contract_key() {
@@ -736,10 +733,23 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private getGlobalIdentifier(options: { global_state_identifier?: GlobalStateIdentifier; }) {
     const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
-    const global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
-      new Digest(state_root_hash || this.state_root_hash)
-    );
-    options.global_state_identifier = global_state_identifier;
+    let global_state_identifier!: GlobalStateIdentifier;
+    if (state_root_hash) {
+      global_state_identifier = GlobalStateIdentifier.fromStateRootHash(
+        new Digest(state_root_hash)
+      );
+    } else {
+      const block_identifier_height: string = this.blockIdentifierHeightElt && this.blockIdentifierHeightElt.nativeElement.value.toString().trim();
+      const block_identifier_hash: string = this.blockIdentifierHashElt && this.blockIdentifierHashElt.nativeElement.value.toString().trim();
+      if (block_identifier_hash) {
+        global_state_identifier = GlobalStateIdentifier.fromBlockHash(new BlockHash(block_identifier_hash));
+      } else if (block_identifier_height) {
+        global_state_identifier = GlobalStateIdentifier.fromBlockHeight(BigInt(block_identifier_height));
+      }
+    }
+    if (global_state_identifier) {
+      options.global_state_identifier = global_state_identifier;
+    }
   }
 
   private getIdentifieBlock(options: { maybe_block_id_as_string?: string; maybe_block_identifier?: BlockIdentifier; }) {
@@ -756,6 +766,47 @@ export class AppComponent implements OnInit, AfterViewInit {
       options.maybe_block_id_as_string = undefined;
       options.maybe_block_identifier = undefined;
     }
+  }
+
+  private get_session_params(): SessionStrParams {
+    const session_params = new SessionStrParams();
+    const entry_point: string = this.entryPointElt && this.entryPointElt.nativeElement.value.toString().trim();
+    if (entry_point) {
+      session_params.session_entry_point = entry_point;
+    }
+    const args_simple: [string] = this.argsSimpleElt && this.argsSimpleElt.nativeElement.value.toString()
+      .trim()
+      .split(',')
+      .map((item: string) => item.trim())
+      .filter((item: string) => item !== '');
+    const args_json: string = this.argsJsonElt && this.argsJsonElt.nativeElement.value.toString().trim();
+    if (args_simple?.length) {
+      session_params.session_args_simple = args_simple;
+    }
+    else if (args_json) {
+      session_params.session_args_json = args_json;
+    }
+    const call_package: boolean = this.callPackageElt && this.callPackageElt.nativeElement.value as boolean;
+    const session_hash: string = this.sessionHashElt && this.sessionHashElt.nativeElement.value.toString().trim();
+    const session_name: string = this.sessionNameElt && this.sessionNameElt.nativeElement.value.toString().trim();
+    if (!call_package) {
+      if (session_hash) {
+        session_params.session_hash = session_hash;
+      } else if (session_name) {
+        session_params.session_hash = session_name;
+      }
+    } else {
+      if (session_hash) {
+        session_params.session_package_hash = session_hash;
+      } else if (session_name) {
+        session_params.session_package_name = session_name;
+      }
+    }
+    const version: string = this.versionElt && this.versionElt.nativeElement.value.toString().trim();
+    if (version) {
+      session_params.session_version = version;
+    }
+    return session_params;
   }
 
 }

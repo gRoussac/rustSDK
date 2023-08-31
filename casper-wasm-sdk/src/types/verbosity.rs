@@ -15,13 +15,23 @@ impl<'de> Deserialize<'de> for Verbosity {
     where
         D: Deserializer<'de>,
     {
-        let value: u64 = Deserialize::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Value {
+            IntValue(u64),
+            StrValue(String),
+        }
+
+        let value: Value = Deserialize::deserialize(deserializer)?;
 
         match value {
-            0 => Ok(Verbosity::Low),
-            1 => Ok(Verbosity::Medium),
-            2 => Ok(Verbosity::High),
-            _ => Err(serde::de::Error::custom("Invalid verbosity value")),
+            Value::IntValue(v) => match v {
+                0 => Ok(Verbosity::Low),
+                1 => Ok(Verbosity::Medium),
+                2 => Ok(Verbosity::High),
+                _ => Err(serde::de::Error::custom("Invalid verbosity value")),
+            },
+            Value::StrValue(s) => Ok(Verbosity::from(s.as_str())),
         }
     }
 }

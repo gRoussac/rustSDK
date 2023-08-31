@@ -24,11 +24,11 @@ use casper_client::{
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-#[derive(Default, Debug, Deserialize, Clone)]
+#[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getDictionaryItemOptions", getter_with_clone)]
 pub struct GetDictionaryItemOptions {
@@ -81,7 +81,7 @@ impl SDK {
         let result = if let Some(hash) = state_root_hash {
             self.get_dictionary_item(&node_address, hash, dictionary_item, verbosity)
                 .await
-        } else if let Some(hash) = state_root_hash_as_string {
+        } else if let Some(hash) = state_root_hash_as_string.clone() {
             self.get_dictionary_item(&node_address, hash.as_str(), dictionary_item, verbosity)
                 .await
         } else {
@@ -116,7 +116,7 @@ impl SDK {
         //log("state_get_dictionary_item!");
         match dictionary_item {
             DictionaryItemInput::Params(dictionary_item_params) => {
-                let state_root_hash_as_string: String = state_root_hash.to_digest().into();
+                let state_root_hash_as_string: String = state_root_hash.to_digest().to_string();
                 get_dictionary_item_cli(
                     &rand::thread_rng().gen::<i64>().to_string(),
                     node_address,

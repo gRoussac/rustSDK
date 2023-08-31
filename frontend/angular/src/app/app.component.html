@@ -132,11 +132,47 @@
         'get_account',
         'speculative_exec',
         'speculative_deploy',
-        'speculative_transfer'
+        'speculative_transfer',
+        'query_balance',
+        'query_global_state'
       ].includes(action)
     "
   >
     <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-2 mb-2">
+        <label>Block Height </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            id="blockIdentifierHeightElt"
+            class="form-control form-control-xs"
+            name="block_identifier_height"
+            [value]="block_identifier_height || ''"
+            [placeholder]="block_identifier_height_default"
+            #blockIdentifierHeightElt
+          />
+          <label for="blockIdentifierHeightElt"
+            >e.g. {{ block_identifier_height_default }}</label
+          >
+        </div>
+      </div>
+      <div class="col-sm-6 mb-2">
+        <label>Block Hash </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="block_identifier_hash"
+            [value]="block_identifier_hash || ''"
+            [placeholder]="block_identifier_hash_default"
+            id="blockIdentifierHashElt"
+            #blockIdentifierHashElt
+          />
+          <label for="blockIdentifierHeightElt"
+            >e.g. {{ block_identifier_hash_default }}</label
+          >
+        </div>
+      </div>
       <div class="col-sm-12 mb-2">
         <div class="col-sm-7" *ngIf="action === 'get_account'">
           <label>Account identifier</label>
@@ -156,78 +192,37 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-2">
-        <label>Block Height </label>
-        <div class="form-floating">
-          <input
-            type="search"
-            id="blockIdentifierHeightElt"
-            class="form-control form-control-xs"
-            name="block_identifier_height"
-            [value]="block_identifier_height || ''"
-            [placeholder]="block_identifier_height_default"
-            #blockIdentifierHeightElt
-          />
-          <label for="blockIdentifierHeightElt"
-            >e.g. {{ block_identifier_height_default }}</label
-          >
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <label>Block Hash </label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="block_identifier_hash"
-            [value]="block_identifier_hash || ''"
-            [placeholder]="block_identifier_hash_default"
-            id="blockIdentifierHashElt"
-            #blockIdentifierHashElt
-          />
-          <label for="blockIdentifierHeightElt"
-            >e.g. {{ block_identifier_hash_default }}</label
-          >
-        </div>
-      </div>
-      <ng-container
-        *ngIf="
-          [
-            'get_block',
-            'get_block_transfers',
-            'get_era_info',
-            'get_era_summary',
-            'get_account'
-          ].includes(action)
-        "
-      >
-        <div class="col-sm-3">
-          <button
-            type="button"
-            class="btn btn-success"
-            (click)="submitAction(action)"
-          >
-            Submit
-          </button>
-        </div>
-        <div class="col-sm-1">
-          <button
-            class="btn btn-link"
-            type="reset"
-            value="clear"
-            (click)="cleanDisplay()"
-          >
-            Clear
-          </button>
-        </div>
-      </ng-container>
     </form>
   </div>
   <div
     class="row mt-3 d-flex align-items-end"
-    *ngIf="['get_balance', 'query_balance'].includes(action)"
+    *ngIf="
+      [
+        'get_balance',
+        'query_balance',
+        'query_global_state',
+        'query_contract_dict',
+        'query_contract_key',
+        'get_dictionary_item'
+      ].includes(action)
+    "
   >
     <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-7 mb-2">
+        <label>State Root Hash </label>
+        <div class="form-floating">
+          <input
+            type="search"
+            class="form-control form-control-xs"
+            name="state_root_hash"
+            [value]="state_root_hash || ''"
+            [placeholder]="state_root_hash"
+            id="stateRootHashElt"
+            #stateRootHashElt
+          />
+          <label for="stateRootHashElt">e.g. {{ state_root_hash }}</label>
+        </div>
+      </div>
       <div class="col-sm-7 mb-2" *ngIf="action === 'get_balance'">
         <label
           >Purse Uref
@@ -240,12 +235,12 @@
             type="search"
             class="form-control form-control-xs"
             name="purse_uref"
-            [value]="purse_uref || main_purse"
-            [placeholder]="purse_uref || main_purse"
+            [value]="purse_uref || main_purse || ''"
+            placeholder="e.g. {{ main_purse || 'uref-0x' }}"
             id="purseUrefElt"
             #purseUrefElt
           />
-          <label for="purseUrefElt">e.g. {{ purse_uref || main_purse }}</label>
+          <label for="purseUrefElt">e.g. {{ main_purse || 'uref-0x' }}</label>
         </div>
       </div>
       <div class="col-sm-7 mb-2" *ngIf="action === 'query_balance'">
@@ -265,48 +260,24 @@
           >
         </div>
       </div>
-      <div class="col-sm-7">
-        <label>State Root Hash </label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="state_root_hash"
-            [value]="state_root_hash || ''"
-            [placeholder]="state_root_hash"
-            id="stateRootHashElt"
-            #stateRootHashElt
-          />
-          <label for="stateRootHashElt">e.g. {{ state_root_hash }}</label>
-        </div>
-      </div>
-      <div class="col-sm-3">
-        <button
-          type="button"
-          class="btn btn-success"
-          (click)="submitAction(action)"
-        >
-          Submit
-        </button>
-      </div>
-      <div class="col-sm-1">
-        <button
-          class="btn btn-link"
-          type="reset"
-          value="clear"
-          (click)="cleanDisplay()"
-        >
-          Clear
-        </button>
-      </div>
     </form>
   </div>
   <div
     class="row mt-3 d-flex align-items-end"
-    *ngIf="['get_dictionary_item', 'query_account_state'].includes(action)"
+    *ngIf="
+      [
+        'get_dictionary_item',
+        'query_global_state',
+        'query_contract_dict',
+        'query_contract_key'
+      ].includes(action)
+    "
   >
     <form class="row align-items-end" (submit)="(false)">
-      <div class="col-sm-12 my-3" *ngIf="action === 'get_dictionary_item'">
+      <div
+        class="col-sm-12 mb-3"
+        *ngIf="['get_dictionary_item'].includes(action)"
+      >
         <div class="row">
           <div class="col-sm-5 mb-2">
             <div class="input-group">
@@ -351,10 +322,15 @@
           </div>
         </div>
       </div>
-      <ng-container *ngIf="action === 'get_dictionary_item'">
+      <ng-container
+        *ngIf="['get_dictionary_item', 'query_contract_dict'].includes(action)"
+      >
         <div
           class="col-sm-7 mb-2"
-          *ngIf="select_dict_identifier === 'newFromSeedUref'"
+          *ngIf="
+            !!this.selectDictIdentifierElt &&
+            select_dict_identifier === 'newFromSeedUref'
+          "
         >
           <label>Seed Uref </label>
           <div class="form-floating">
@@ -372,7 +348,10 @@
         </div>
         <div
           class="col-sm-7 mb-2"
-          *ngIf="select_dict_identifier === 'newFromAccountInfo'"
+          *ngIf="
+            !!this.selectDictIdentifierElt &&
+            select_dict_identifier === 'newFromAccountInfo'
+          "
         >
           <label>Account Hash</label>
           <div class="form-floating">
@@ -390,7 +369,10 @@
         </div>
         <div
           class="col-sm-7 mb-2"
-          *ngIf="select_dict_identifier === 'newFromContractInfo'"
+          *ngIf="
+            select_dict_identifier === 'newFromContractInfo' ||
+            action === 'query_contract_dict'
+          "
         >
           <label>Contract Hash</label>
           <div class="form-floating">
@@ -408,7 +390,10 @@
         </div>
         <div
           class="col-sm-7 mb-2"
-          *ngIf="select_dict_identifier === 'newFromDictionaryKey'"
+          *ngIf="
+            !!this.selectDictIdentifierElt &&
+            select_dict_identifier === 'newFromDictionaryKey'
+          "
         >
           <label>Dictionary Key</label>
           <div class="form-floating">
@@ -429,7 +414,7 @@
           *ngIf="
             ['newFromContractInfo', 'newFromAccountInfo'].includes(
               select_dict_identifier
-            )
+            ) || action === 'query_contract_dict'
           "
         >
           <label>Dictionary Name</label>
@@ -462,11 +447,10 @@
           </div>
         </div>
       </ng-container>
-      <ng-container *ngIf="action === 'query_account_state'">
-        <div
-          class="col-sm-7 mb-2"
-          *ngIf="select_dict_identifier === 'newFromSeedUref'"
-        >
+      <ng-container
+        *ngIf="['query_global_state', 'query_contract_key'].includes(action)"
+      >
+        <div class="col-sm-7 mb-2">
           <label>Key </label>
           <div class="form-floating">
             <input
@@ -499,40 +483,6 @@
           </div>
         </div>
       </ng-container>
-      <div class="col-sm-7">
-        <label>State Root Hash </label>
-        <div class="form-floating">
-          <input
-            type="search"
-            class="form-control form-control-xs"
-            name="state_root_hash"
-            [value]="state_root_hash || ''"
-            [placeholder]="state_root_hash"
-            id="stateRootHashElt"
-            #stateRootHashElt
-          />
-          <label for="stateRootHashElt">e.g. {{ state_root_hash }}</label>
-        </div>
-      </div>
-      <div class="col-sm-3">
-        <button
-          type="button"
-          class="btn btn-success"
-          (click)="submitAction(action)"
-        >
-          Submit
-        </button>
-      </div>
-      <div class="col-sm-1">
-        <button
-          class="btn btn-link"
-          type="reset"
-          value="clear"
-          (click)="cleanDisplay()"
-        >
-          Clear
-        </button>
-      </div>
     </form>
   </div>
   <div class="row mt-3 d-flex align-items-end" *ngIf="action === 'get_deploy'">
@@ -566,25 +516,6 @@
           />
         </div>
       </div>
-      <div class="col-sm-3">
-        <button
-          type="button"
-          class="btn btn-success"
-          (click)="submitAction(action)"
-        >
-          Submit
-        </button>
-      </div>
-      <div class="col-sm-1">
-        <button
-          class="btn btn-link"
-          type="reset"
-          value="clear"
-          (click)="cleanDisplay()"
-        >
-          Clear
-        </button>
-      </div>
     </form>
   </div>
   <div
@@ -597,7 +528,8 @@
         'deploy',
         'speculative_transfer',
         'speculative_deploy',
-        'speculative_exec'
+        'speculative_exec',
+        'call_entrypoint'
       ].includes(action)
     "
   >
@@ -634,7 +566,14 @@
       </div>
       <div
         class="col-sm-3"
-        *ngIf="['make_deploy', 'deploy', 'speculative_deploy'].includes(action)"
+        *ngIf="
+          [
+            'make_deploy',
+            'deploy',
+            'speculative_deploy',
+            'call_entrypoint'
+          ].includes(action)
+        "
       >
         <label class="text-nowrap"
           >Payment Amount
@@ -708,7 +647,14 @@
       </div>
       <div
         class="row mt-2"
-        *ngIf="['make_deploy', 'deploy', 'speculative_deploy'].includes(action)"
+        *ngIf="
+          [
+            'make_deploy',
+            'deploy',
+            'speculative_deploy',
+            'call_entrypoint'
+          ].includes(action)
+        "
       >
         <div class="col-sm-7 mb-2">
           <label>Smart Contract hash or Package hash</label>
@@ -829,26 +775,28 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-1">
-        <button
-          type="button"
-          class="btn btn-success"
-          (click)="submitAction(action)"
-        >
-          Submit
-        </button>
-      </div>
-      <div class="col-sm-1">
-        <button
-          class="btn btn-link"
-          type="reset"
-          value="clear"
-          (click)="cleanDisplay()"
-        >
-          Clear
-        </button>
-      </div>
     </form>
+  </div>
+  <div class="row d-flex mt-4 justify-content-end" *ngIf="action">
+    <div class="col-sm-1">
+      <button
+        type="button"
+        class="btn btn-success"
+        (click)="submitAction(action)"
+      >
+        Submit
+      </button>
+    </div>
+    <div class="col-sm-1">
+      <button
+        class="btn btn-link"
+        type="reset"
+        value="clear"
+        (click)="cleanDisplay()"
+      >
+        Clear
+      </button>
+    </div>
   </div>
   <div class="row mt-3" *ngIf="result">
     <div class="col-xs-12">
