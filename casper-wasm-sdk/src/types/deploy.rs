@@ -9,7 +9,7 @@ use super::{
     public_key::PublicKey,
 };
 use crate::{
-    debug::error,
+    debug::{error, log},
     helpers::{
         get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
         secret_key_from_pem,
@@ -333,11 +333,13 @@ impl Deploy {
     pub fn expired(&self) -> bool {
         let deploy: _Deploy = self.0.clone();
         let now: DateTime<Utc> = Utc::now();
-        match deploy.expired(Timestamp::from(now.timestamp() as u64)) {
-            true => true,
-            false => {
+        let now_millis = now.timestamp_millis() as u64;
+        let timestamp = Timestamp::from(now_millis);
+        match deploy.expired(timestamp) {
+            false => false,
+            true => {
                 error("Deploy has expired");
-                false
+                true
             }
         }
     }

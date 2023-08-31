@@ -1,4 +1,4 @@
-use crate::debug::{error, log};
+use crate::debug::error;
 use base16::DecodeError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
