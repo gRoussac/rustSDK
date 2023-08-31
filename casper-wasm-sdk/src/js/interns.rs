@@ -5,6 +5,14 @@ use casper_types::PublicKey;
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
+#[wasm_bindgen(js_name = "hexToString")]
+pub fn hex_to_string_js_alias(hex_string: &str) -> String {
+    match hex::decode(hex_string) {
+        Ok(bytes) => String::from_utf8_lossy(&bytes).to_string(),
+        Err(_) => hex_string.to_string(),
+    }
+}
+
 #[wasm_bindgen(js_name = "hexToUint8Array")]
 pub fn hex_to_uint8_vec_js_alias(hex_string: &str) -> Vec<u8> {
     hex_to_uint8_vec(hex_string)
