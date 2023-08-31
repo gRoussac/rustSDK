@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -27,6 +27,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
   result!: string;
+  result_text!: string;
   verbosity = Verbosity.High;
   node_address = this.env['node_address'];
   action!: string;
@@ -65,8 +66,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   version!: string;
   call_package = false;
   file_name!: string;
+  deploy_json!: string;
   private _wasm!: Uint8Array | undefined;
-  private _deploy?: Deploy;
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   @ViewChild('blockIdentifierHeightElt') blockIdentifierHeightElt!: ElementRef;
@@ -97,10 +98,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('sessionNameElt') sessionNameElt!: ElementRef;
   @ViewChild('versionElt') versionElt!: ElementRef;
   @ViewChild('callPackageElt') callPackageElt!: ElementRef;
-  @ViewChild('signedDeployElt') signedDeployElt!: ElementRef;
+  @ViewChild('deployJsonElt') deployJsonElt!: ElementRef;
   @ViewChild('paymentAmountElt') paymentAmountElt!: ElementRef;
   @ViewChild('selectDictIdentifierElt') selectDictIdentifierElt!: ElementRef;
   @ViewChild('wasmElt') wasmElt!: ElementRef;
+  @ViewChild('deployFileElt') deployFileElt!: ElementRef;
 
   constructor(
     // @Inject(DOCUMENT) private document: Document,
@@ -125,7 +127,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.sdk_deploy_methods = this.sdk_methods.filter(name => ['deploy', 'speculative_deploy', 'speculative_transfer', 'transfer'].includes(name));
 
-    this.sdk_deploy_utils_methods = this.sdk_methods.filter(name => ['make_deploy', 'make_transfer', 'sign_deploy'].includes(name));
+    this.sdk_deploy_utils_methods = this.sdk_methods.filter(name => ['make_deploy', 'make_transfer', 'sign_deploy', 'put_deploy'].includes(name));
 
     this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
 
@@ -139,21 +141,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
-  }
-
-  cleanDisplay() {
-    this.result = '';
-    this.peers = [];
-  }
-
-  async selectAction($event: Event) {
-    const action = ($event.target as HTMLInputElement).value;
-    await this.execAction(action);
-    this.changeDetectorRef.markForCheck();
-  }
-
-  onPrivateKeyClick() {
-    (this.privateKeyElt.nativeElement as HTMLInputElement).click();
   }
 
   async get_peers() {
@@ -263,55 +250,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     install && (this.result = install);
   }
 
-  async onWasmSelected(event: Event) {
-    this.file_name = this.wasmElt?.nativeElement.value.split('\\').pop();
-    const file = (event.target as HTMLInputElement).files?.item(0), buffer = await file?.arrayBuffer();
-    this._wasm = buffer && new Uint8Array(buffer);
-    const wasmBuffer = this._wasm?.buffer;
-    if (!wasmBuffer) {
-      this.resetWasmClick();
-    }
-  }
-
-
-  onWasmClick() {
-    (this.wasmElt.nativeElement as HTMLInputElement).click();
-  }
-
-  resetWasmClick() {
-    this.wasmElt.nativeElement.value = '';
-    this._wasm = undefined;
-    this.file_name = '';
-    this._deploy = undefined;
-  }
-
-  async onPemSelected(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.item(0);
-    if (file) {
-      let text = await file.text();
-      if (!text.trim()) {
-        return;
-      }
-      text = text.trim();
-      this.public_key = '';
-      const public_key = privateToPublicKey(text);
-      if (public_key) {
-        this.public_key = public_key;
-        this.private_key = text;
-        this.has_private_key = true;
-      }
-
-    } else {
-      this.private_key = '';
-      this.has_private_key = false;
-      this.privateKeyElt.nativeElement.value = '';
-    }
-    this.changeDetectorRef.markForCheck();
-    setTimeout(async () => {
-      await this.onPublicKeyChange();
-    }, 0);
-  }
-
   async get_balance() {
     const purse_uref_as_string: string = this.purseUrefElt && this.purseUrefElt.nativeElement.value.toString().trim();
     const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
@@ -349,13 +287,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async submitAction(action: string) {
-    await this.execAction(action);
+    const exec = true;
+    await this.handleAction(action, exec);
     this.changeDetectorRef.markForCheck();
   }
 
   async get_chainspec() {
     const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
-    this.result = get_chainspec;
+    this.result_text = hexToString(get_chainspec?.result?.chainspec_bytes.chainspec_bytes);
   }
 
   async get_deploy() {
@@ -635,32 +574,57 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async put_deploy() {
-    const signed_deploy_as_string: string = this.signedDeployElt && this.signedDeployElt.nativeElement.value.toString().trim();
-    const signed_deploy = new Deploy(signed_deploy_as_string);
-    console.log(signed_deploy);
-
+    const signed_deploy_as_string: string = this.deployJsonElt && this.deployJsonElt.nativeElement.value.toString().trim();
+    if (!signed_deploy_as_string) {
+      return;
+    }
+    const signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
     if (!signed_deploy.isValid()) {
       console.error('Deploy is not valid.');
       return;
     }
+    if (signed_deploy.isExpired()) {
+      console.error('Deploy is expired.');
+      return;
+    }
+    console.log(signed_deploy);
     // the deploy hash is correct (should be the hash of the header), and
     // the body hash is correct (should be the hash of the body), and
     // approvals are non empty, and
     // all approvals are valid signatures of the deploy hash
-    const account_put_deploy = await this.sdk.put_deploy(
+
+    const put_deploy = await this.sdk.put_deploy(
       this.node_address,
       signed_deploy,
       this.verbosity
     );
-    console.log('js account_put_deploy', account_put_deploy);
-    return account_put_deploy;
+    put_deploy && (this.result = put_deploy);
+    return put_deploy;
   }
 
-  async speculative_exec() {
-  }
+  async speculative_exec() { }
 
   async sign_deploy() {
-
+    if (!this.private_key) {
+      return;
+    }
+    const signed_deploy_as_string: string = this.deployJsonElt && this.deployJsonElt.nativeElement.value.toString().trim();
+    if (!signed_deploy_as_string) {
+      return;
+    }
+    let signed_deploy;
+    try {
+      signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
+    }
+    catch {
+      console.error("Error parsing deploy");
+    }
+    if (!signed_deploy) {
+      return;
+    }
+    signed_deploy = signed_deploy.sign(this.private_key);
+    this.deploy_json = jsonPrettyPrint(signed_deploy.toJson(), Verbosity.High);
+    this.deployJsonElt.nativeElement.value = this.deploy_json;
   }
 
   async make_deploy() {
@@ -770,11 +734,101 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.changeDetectorRef.markForCheck();
   }
 
-  private async execAction(action: string) {
+  async onDeployFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.item(0);
+    let text;
+    if (file) {
+      text = await file.text();
+      if (!text.trim()) {
+        return;
+      }
+      text = text.trim();
+      try {
+        const deploy_json = JSON.parse(text);
+        this.deploy_json = jsonPrettyPrint(new Deploy(deploy_json).toJson(), Verbosity.High);
+      } catch {
+        console.error("Error parsing deploy");
+      }
+    } else {
+      this.deploy_json = '';
+    }
+    this.changeDetectorRef.markForCheck();
+  }
+
+  deployFileClick() {
+    (this.deployFileElt.nativeElement as HTMLInputElement).click();
+  }
+
+  onPrivateKeyClick() {
+    (this.privateKeyElt.nativeElement as HTMLInputElement).click();
+  }
+
+  onWasmClick() {
+    (this.wasmElt.nativeElement as HTMLInputElement).click();
+  }
+
+  resetWasmClick() {
+    this.wasmElt.nativeElement.value = '';
+    this._wasm = undefined;
+    this.file_name = '';
+  }
+
+  cleanDisplay() {
+    this.result = '';
+    this.result_text = '';
+    this.peers = [];
+  }
+
+  async selectAction($event: Event) {
+    const action = ($event.target as HTMLInputElement).value;
+    await this.handleAction(action);
+    this.changeDetectorRef.markForCheck();
+  }
+
+  async onWasmSelected(event: Event) {
+    this.file_name = this.wasmElt?.nativeElement.value.split('\\').pop();
+    const file = (event.target as HTMLInputElement).files?.item(0), buffer = await file?.arrayBuffer();
+    this._wasm = buffer && new Uint8Array(buffer);
+    const wasmBuffer = this._wasm?.buffer;
+    if (!wasmBuffer) {
+      this.resetWasmClick();
+    }
+  }
+
+  async onPemSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.item(0);
+    if (file) {
+      let text = await file.text();
+      if (!text.trim()) {
+        return;
+      }
+      text = text.trim();
+      this.public_key = '';
+      const public_key = privateToPublicKey(text);
+      if (public_key) {
+        this.public_key = public_key;
+        this.private_key = text;
+        this.has_private_key = true;
+      }
+
+    } else {
+      this.private_key = '';
+      this.has_private_key = false;
+      this.privateKeyElt.nativeElement.value = '';
+    }
+    this.changeDetectorRef.markForCheck();
+    setTimeout(async () => {
+      await this.onPublicKeyChange();
+    }, 0);
+  }
+
+  private async handleAction(action: string, exec?: boolean) {
     const fn = (this as any)[action];
     if (typeof fn === 'function') {
       this.cleanDisplay();
-      await fn.bind(this).call();
+      if (exec) {
+        await fn.bind(this).call();
+      }
       this.action = action;
     } else {
       console.error(`Method ${action} is not defined on the component.`);

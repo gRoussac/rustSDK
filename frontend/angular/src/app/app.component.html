@@ -528,6 +528,46 @@
   </div>
   <div
     class="row mt-3 d-flex align-items-end"
+    *ngIf="['put_deploy', 'sign_deploy'].includes(action)"
+  >
+    <form class="row align-items-end" (submit)="(false)">
+      <div class="col-sm-2">
+        <input
+          class="visually-hidden"
+          name="deploy_file"
+          #deployFileElt
+          type="file"
+          id="deployFileElt"
+          (change)="onDeployFileSelected($event)"
+          accept=".json, .txt"
+        />
+        <button
+          class="btn btn-secondary"
+          (click)="deployFileClick()"
+          *ngIf="!file_name"
+        >
+          Load deploy file
+        </button>
+      </div>
+      <div class="col-sm-12">
+        <div class="form-floating mt-3">
+          <textarea
+            style="height: 300px; white-space: pre-wrap"
+            class="form-control"
+            name="deploy_json"
+            value="deploy_json"
+            [innerHTML]="deploy_json || ''"
+            [id]="deployJsonElt"
+            #deployJsonElt
+          >
+          </textarea>
+          <label for="deployJsonElt">Deploy as Json string</label>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div
+    class="row mt-3 d-flex align-items-end"
     *ngIf="
       [
         'make_transfer',
@@ -847,8 +887,8 @@
       </div>
     </form>
   </div>
-  <div class="row d-flex mt-4 justify-content-end" *ngIf="action">
-    <div class="col-sm-1">
+  <div class="row d-flex mt-4 justify-content-start" *ngIf="action">
+    <div class="col-sm-1" *ngIf="!['sign_deploy'].includes(action)">
       <button
         type="button"
         class="btn btn-success"
@@ -857,7 +897,19 @@
         Submit
       </button>
     </div>
-    <div class="col-sm-1">
+    <div class="col-sm-1" *ngIf="['sign_deploy'].includes(action)">
+      <button
+        type="button"
+        class="btn btn-warning"
+        (click)="submitAction(action)"
+      >
+        Sign
+      </button>
+    </div>
+    <div
+      class="col-sm-1"
+      *ngIf="!['sign_deploy', 'put_deploy'].includes(action)"
+    >
       <button
         class="btn btn-link"
         type="reset"
@@ -868,12 +920,23 @@
       </button>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="result">
+  <div class="row mt-3" *ngIf="result && !result_text">
     <div class="col-xs-12">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body" style="white-space: pre-wrap">
           {{ result | json }}
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3" *ngIf="!result && result_text">
+    <div class="col-xs-12">
+      <div class="card">
+        <div
+          class="card-body"
+          [innerHTML]="result_text"
+          style="white-space: pre-wrap"
+        ></div>
       </div>
     </div>
   </div>
