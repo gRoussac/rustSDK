@@ -8,6 +8,16 @@ const imports = [
   CommonModule,
 ];
 
+type network = {
+  name: string;
+  node_address: string;
+  chain_name: string;
+};
+
+type peer = {
+  node_id: string;
+  address: string;
+};
 
 @Component({
   standalone: true,
@@ -20,7 +30,8 @@ const imports = [
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'casper';
   state_root_hash!: string;
-  peers = [];
+  peers!: peer[];
+  networks!: network[];
   sdk_methods!: string[];
   sdk_rpc_methods!: string[];
   sdk_contract_methods!: string[];
@@ -29,12 +40,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   result!: string;
   result_text!: string;
   verbosity = Verbosity.High;
-  node_address = this.env['node_address'];
+  node_address = this.env['node_address'].toString();
   action!: string;
   block_identifier_height!: string;
-  block_identifier_height_default = this.config['block_identifier_height_default'];
+  block_identifier_height_default = this.config['block_identifier_height_default'].toString();
   block_identifier_hash!: string;
-  block_identifier_hash_default = this.config['block_identifier_hash'];
+  block_identifier_hash_default = this.config['block_identifier_hash'].toString();
   transfer_amount!: string;
   ttl!: string;
   target_account!: string;
@@ -67,6 +78,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   call_package = false;
   file_name!: string;
   deploy_json!: string;
+  chain_name = this.env['chain_name'].toString();
+  network: network = {
+    name: 'default',
+    node_address: this.env['node_address'].toString(),
+    chain_name: this.env['chain_name'].toString()
+  };
   private _wasm!: Uint8Array | undefined;
 
   @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
@@ -103,6 +120,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('selectDictIdentifierElt') selectDictIdentifierElt!: ElementRef;
   @ViewChild('wasmElt') wasmElt!: ElementRef;
   @ViewChild('deployFileElt') deployFileElt!: ElementRef;
+  @ViewChild('selectNetworkElt') selectNetworkElt!: ElementRef;
 
   constructor(
     // @Inject(DOCUMENT) private document: Document,
@@ -132,12 +150,27 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
 
     this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(this.sdk_deploy_utils_methods, this.sdk_contract_methods).includes(name));
+  };
+
+  selectNetwork() {
+    let network = this.selectNetworkElt.nativeElement.value;
+    network = network && this.networks.find(x => x.name == network);
+    if (!network) {
+      const network = this.selectNetworkElt.nativeElement.value;
+      // To do fix chain-name
+      if (network) {
+        this.node_address = network;
+      }
+    }
+    this.network = network;
+    this.chain_name = network.chain_name;
+    this.node_address = network.node_address;
   }
 
   async get_peers() {
     const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
     if (peers_result) {
-      this.peers = peers_result.result.peers;
+      this.peers = peers_result?.result?.peers;
     }
   }
 
@@ -151,7 +184,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       node_address: this.node_address
     });
     const state_root_hash = await this.sdk.get_state_root_hash(options);
-    this.state_root_hash = state_root_hash.result?.state_root_hash;
+    this.state_root_hash = state_root_hash?.result?.state_root_hash;
     if (!no_mark_for_check) {
       this.state_root_hash && (this.result = this.state_root_hash);
     }
@@ -220,7 +253,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const deploy_params = new DeployStrParams(
-      this.config['chain_name_integration'],
+      this.chain_name,
       this.public_key,
       this.private_key,
     );
@@ -443,7 +476,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const deploy_params = new DeployStrParams(
-      this.config['chain_name_integration'],
+      this.chain_name,
       this.public_key,
       this.private_key,
       timestamp,
@@ -512,14 +545,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     const deploy_params = new DeployStrParams(
-      this.config['chain_name_integration'],
+      this.chain_name,
       this.public_key,
       this.private_key,
       timestamp,
       ttl
     );
     const payment_params = new PaymentStrParams();
-    payment_params.payment_amount = this.config['gas_fee_transfer'];
+    payment_params.payment_amount = this.config['gas_fee_transfer'].toString();
     const transfer_amount: string = this.transferAmountElt && this.transferAmountElt.nativeElement.value.toString().trim();
     const target_account: string = this.targetAccountElt && this.targetAccountElt.nativeElement.value.toString().trim();
     if (!transfer_amount || !target_account) {
@@ -678,7 +711,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const deploy_params = new DeployStrParams(
-      this.config['chain_name_integration'],
+      this.chain_name,
       this.public_key,
       this.private_key,
     );
@@ -753,6 +786,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async ngAfterViewInit() {
+    console.log(this.config['networks']);
+    this.networks = Object.entries(this.config['networks']).map(([name, network]) => ({
+      name,
+      ...network,
+    }));
+    console.log(this.networks);
     const no_mark_for_check = true;
     await this.get_state_root_hash(no_mark_for_check);
     this.changeDetectorRef.markForCheck();
@@ -798,9 +837,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   cleanDisplay() {
+    this.action = '';
     this.result = '';
     this.result_text = '';
-    this.peers = [];
   }
 
   async selectAction($event: Event) {
@@ -952,6 +991,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       session_params.session_version = version;
     }
     return session_params;
+  }
+
+  changePort(peer: peer) {
+    const address = peer.address.split(':');
+    const new_address = ['http://', address.shift(), ':', '7777'].join('');
+    return (new_address);
   }
 
 }

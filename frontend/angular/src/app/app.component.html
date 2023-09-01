@@ -1,5 +1,44 @@
 <main class="container">
-  <img src="assets/logo.png" alt="CasperLabs" />
+  <nav class="navbar navbar-light">
+    <a class="navbar-brand"><img src="assets/logo.png" alt="CasperLabs" /></a>
+    <span class="badge rounded-pill bg-success" [hidden]="!chain_name">{{
+      chain_name
+    }}</span>
+    <span class="badge rounded-pill bg-success" [hidden]="!node_address">{{
+      node_address
+    }}</span>
+    <form class="form-inline">
+      <div class="input-group">
+        <label class="input-group-text" for="selectActionElt">RPC</label>
+        <select
+          id="selectNetworkElt"
+          class="form-select form-control form-control-sm"
+          (change)="selectNetwork()"
+          #selectNetworkElt
+        >
+          <option></option>
+          <optgroup label="default">
+            <option
+              [value]="network.name"
+              [selected]="network.node_address === node_address"
+              *ngFor="let network of networks; index as i"
+            >
+              {{ network.name }} ({{ network.node_address }})
+            </option>
+          </optgroup>
+          <optgroup label="fetched">
+            <option
+              [value]="changePort(peer)"
+              [selected]="changePort(peer) === node_address"
+              *ngFor="let peer of peers; index as i"
+            >
+              {{ changePort(peer) }} ({{ chain_name }})
+            </option>
+          </optgroup>
+        </select>
+      </div>
+    </form>
+  </nav>
   <div class="row">
     <div class="col-sm-12">
       <div
@@ -22,9 +61,7 @@
   <form class="row align-items-start" (submit)="(false)">
     <div class="col-sm-4">
       <div class="input-group">
-        <label class="input-group-text" for="selectActionElt"
-          >Choose action</label
-        >
+        <label class="input-group-text" for="selectActionElt">Action</label>
         <select
           id="selectActionElt"
           class="form-select form-control form-control-sm"
@@ -34,7 +71,7 @@
           <option></option>
           <optgroup label="rpc">
             <option
-              [value]="sdk_method || ''"
+              [value]="sdk_method"
               *ngFor="let sdk_method of sdk_rpc_methods; index as i"
             >
               {{ sdk_method }}
@@ -42,7 +79,7 @@
           </optgroup>
           <optgroup label="deploy utils">
             <option
-              [value]="sdk_method || ''"
+              [value]="sdk_method"
               *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
             >
               {{ sdk_method }}
@@ -50,7 +87,7 @@
           </optgroup>
           <optgroup label="deploy">
             <option
-              [value]="sdk_method || ''"
+              [value]="sdk_method"
               *ngFor="let sdk_method of sdk_deploy_methods; index as i"
             >
               {{ sdk_method }}
@@ -58,7 +95,7 @@
           </optgroup>
           <optgroup label="contract">
             <option
-              [value]="sdk_method || ''"
+              [value]="sdk_method"
               *ngFor="let sdk_method of sdk_contract_methods; index as i"
             >
               {{ sdk_method }}
@@ -84,7 +121,7 @@
         />
       </div>
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-2 d-flex justify-content-end">
       <input
         class="visually-hidden"
         name="private_key"
@@ -110,7 +147,7 @@
       </button>
     </div>
   </form>
-  <div class="row mt-3" *ngIf="peers.length">
+  <div class="row mt-3" *ngIf="peers && peers.length && action === 'get_peers'">
     <div class="col-xs-12">
       <div class="card">
         <ul class="list-group list-group-flush">

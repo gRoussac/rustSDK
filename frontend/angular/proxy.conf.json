@@ -1,6 +1,7 @@
 {
   "/rpc": {
-    "target": "https://rpc.integration.casperlabs.io/",
-    "secure": false
+    "target": "http://localhost:11101",
+    "secure": false,
+    "changeOrigin": false
   }
 }
