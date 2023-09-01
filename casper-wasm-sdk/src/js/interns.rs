@@ -1,6 +1,6 @@
-use crate::debug::log;
 use crate::helpers::get_current_timestamp;
 use crate::helpers::hex_to_uint8_vec;
+use crate::types::cl::bytes::Bytes;
 use crate::{debug::error, helpers::secret_key_from_pem, types::verbosity::Verbosity};
 use casper_types::PublicKey;
 use gloo_utils::format::JsValueSerdeExt;
@@ -19,6 +19,11 @@ pub fn hex_to_string_js_alias(hex_string: &str) -> String {
 #[wasm_bindgen(js_name = "hexToUint8Array")]
 pub fn hex_to_uint8_vec_js_alias(hex_string: &str) -> Vec<u8> {
     hex_to_uint8_vec(hex_string)
+}
+
+#[wasm_bindgen(js_name = "uint8ArrayToBytes")]
+pub fn uint8_array_to_bytes(uint8_array: js_sys::Uint8Array) -> Bytes {
+    Bytes::from_uint8_array(uint8_array)
 }
 
 #[wasm_bindgen(js_name = "motesToCSPR")]

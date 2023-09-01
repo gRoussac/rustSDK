@@ -1,4 +1,5 @@
 use gloo_utils::format::JsValueSerdeExt;
+use js_sys::Array;
 use serde::{Deserialize, Deserializer, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -12,10 +13,27 @@ pub struct Path {
 impl Path {
     #[wasm_bindgen(constructor)]
     pub fn new(path: JsValue) -> Self {
-        let path: String = path.as_string().unwrap_or_else(|| String::from(""));
-        let segments: Vec<String> = path.split('/').map(ToString::to_string).collect();
+        let path_string: String = if path.is_null() {
+            String::from("")
+        } else {
+            path.as_string().unwrap_or_else(|| String::from(""))
+        };
+        Path::from(path_string)
+    }
 
-        Path { path: segments }
+    #[wasm_bindgen(js_name = "fromArray")]
+    pub fn from_js_array(path: JsValue) -> Self {
+        let path: Array = path.into();
+        let path: Vec<String> = path
+            .iter()
+            .map(|value| {
+                value
+                    .as_string()
+                    .unwrap_or_else(|| String::from("Invalid String"))
+            })
+            .collect();
+
+        Path { path }
     }
 
     #[wasm_bindgen(js_name = "toJson")]
@@ -25,6 +43,10 @@ impl Path {
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.path.is_empty() || self.path.iter().all(|s| s.is_empty())
     }
 }
 
@@ -53,5 +75,12 @@ impl From<Path> for Vec<String> {
 impl From<Vec<String>> for Path {
     fn from(path: Vec<String>) -> Self {
         Path { path }
+    }
+}
+
+impl From<String> for Path {
+    fn from(path_string: String) -> Self {
+        let segments: Vec<String> = path_string.split('/').map(ToString::to_string).collect();
+        Path { path: segments }
     }
 }

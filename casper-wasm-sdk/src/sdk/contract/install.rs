@@ -39,14 +39,11 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
-        module_bytes: Uint8Array,
+        module_bytes: Option<Uint8Array>,
     ) -> JsValue {
-        // TODO fix session_path in client
-        session_params.set_session_path("sdk"); // We will add module bytes later in install
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
-        let wasm_vec: Vec<u8> = module_bytes.to_vec();
-        let wasm_bytes = Bytes::from(wasm_vec);
+        let wasm_bytes = module_bytes.map(|bytes| Bytes::from(bytes.to_vec()));
         serialize_result(
             self.install(
                 node_address,
@@ -68,23 +65,22 @@ impl SDK {
         deploy_params: _DeployStrParams<'_>,
         session_params: _SessionStrParams<'_>,
         payment_params: _PaymentStrParams<'_>,
-        module_bytes: Bytes,
+        module_bytes: Option<Bytes>,
         secret_key: Option<std::string::String>,
     ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
         //log("install!");
         let deploy = make_deploy("", deploy_params, session_params, payment_params, false);
-
         if let Err(err) = deploy {
             let err_msg = format!("Error during install: {}", err);
             error(&err_msg);
             return Err(SdkError::from(err));
         }
-
         let mut deploy: Deploy = deploy.unwrap().into();
-        let build_params = BuildParams::default();
-        deploy.build(build_params);
-        deploy = deploy.with_module_bytes(module_bytes, secret_key);
-
+        if let Some(module_bytes) = module_bytes {
+            let build_params = BuildParams::default();
+            deploy.build(build_params);
+            deploy = deploy.with_module_bytes(module_bytes, secret_key);
+        }
         self.put_deploy(node_address, deploy.into(), None)
             .await
             .map_err(SdkError::from)
