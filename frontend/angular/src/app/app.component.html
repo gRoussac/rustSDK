@@ -593,18 +593,20 @@
           <span
             class="fw-light small text-nowrap"
             *ngIf="this.transferAmountElt.value"
-            >({{ convert(transferAmountElt) }} CSPR)</span
+            >({{ motesToCSPR(transferAmountElt) }} CSPR)</span
           ></label
         >
         <div class="form-floating">
           <input
-            type="search"
+            type="tel"
             id="transferAmountElt"
             class="form-control form-control-xs"
             name="transfer_amount"
             [value]="transfer_amount || ''"
             [placeholder]="config['minimum_transfer']"
-            (change)="convert(transferAmountElt)"
+            pattern="\d*"
+            (change)="motesToCSPR(transferAmountElt)"
+            maxlength="28"
             #transferAmountElt
           />
           <label for="transferAmountElt"
@@ -629,17 +631,19 @@
           <span
             class="fw-light small text-nowrap"
             *ngIf="this.paymentAmountElt.value"
-            >({{ convert(paymentAmountElt) }} CSPR)</span
+            >({{ motesToCSPR(paymentAmountElt) }} CSPR)</span
           ></label
         >
         <div class="form-floating">
           <input
-            type="search"
+            type="tel"
             id="paymentAmountElt"
             class="form-control form-control-xs"
             name="payment_amount"
             [value]="payment_amount || ''"
-            (change)="convert(paymentAmountElt)"
+            pattern="\d*"
+            (change)="motesToCSPR(paymentAmountElt)"
+            maxlength="28"
             #paymentAmountElt
           />
         </div>
