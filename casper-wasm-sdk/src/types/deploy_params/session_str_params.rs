@@ -1,5 +1,5 @@
 use super::args_simple::ArgsSimple;
-use crate::helpers::get_str_or_default;
+use crate::{helpers::get_str_or_default, types::cl::bytes::Bytes};
 use casper_client::cli::SessionStrParams as _SessionStrParams;
 use js_sys::Array;
 use once_cell::sync::OnceCell;
@@ -13,6 +13,7 @@ pub struct SessionStrParams {
     session_package_hash: OnceCell<String>,
     session_package_name: OnceCell<String>,
     session_path: OnceCell<String>,
+    session_bytes: OnceCell<Bytes>,
     session_args_simple: OnceCell<ArgsSimple>,
     session_args_json: OnceCell<String>,
     session_args_complex: OnceCell<String>,
@@ -31,6 +32,7 @@ impl SessionStrParams {
         session_package_hash: Option<String>,
         session_package_name: Option<String>,
         session_path: Option<String>,
+        session_bytes: Option<Bytes>,
         session_args_simple: Option<Array>,
         session_args_json: Option<String>,
         session_args_complex: Option<String>,
@@ -53,6 +55,9 @@ impl SessionStrParams {
         };
         if let Some(session_path) = session_path {
             session_params.set_session_path(&session_path);
+        };
+        if let Some(session_bytes) = session_bytes {
+            session_params.set_session_bytes(session_bytes);
         };
         if let Some(session_args_simple) = session_args_simple {
             session_params.set_session_args_simple(session_args_simple);
@@ -133,6 +138,17 @@ impl SessionStrParams {
     #[wasm_bindgen(setter)]
     pub fn set_session_path(&self, session_path: &str) {
         self.session_path.set(session_path.to_string()).unwrap();
+    }
+
+    // Getter and setter for session_bytes field
+    #[wasm_bindgen(getter)]
+    pub fn session_bytes(&self) -> Option<Bytes> {
+        self.session_bytes.get().cloned()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_session_bytes(&self, session_bytes: Bytes) {
+        self.session_bytes.set(session_bytes).unwrap();
     }
 
     // Getter and setter for session_args_simple field
@@ -229,6 +245,15 @@ pub fn session_str_params_to_casper_client(
     if let Some(session_path) = session_params.session_path.get() {
         return _SessionStrParams::with_path(
             session_path,
+            session_args_simple,
+            get_str_or_default(session_params.session_args_json.get()),
+            get_str_or_default(session_params.session_args_complex.get()),
+        );
+    }
+
+    if let Some(session_bytes) = session_params.session_bytes.get() {
+        return _SessionStrParams::with_bytes(
+            (*session_bytes).clone().into(),
             session_args_simple,
             get_str_or_default(session_params.session_args_json.get()),
             get_str_or_default(session_params.session_args_complex.get()),

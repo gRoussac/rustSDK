@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -225,18 +225,29 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.private_key,
     );
     console.log(deploy_params);
+    const args_simple: [string] = this.argsSimpleElt && this.argsSimpleElt.nativeElement.value.toString()
+      .trim()
+      .split(',')
+      .map((item: string) => item.trim())
+      .filter((item: string) => item !== '');
+    const args_json: string = this.argsJsonElt && this.argsJsonElt.nativeElement.value.toString().trim();
     const session_params = new SessionStrParams();
-    session_params.session_args_simple = ["message:string='hello casper"];
-    console.log(session_params);
+    if (args_simple?.length) {
+      session_params.session_args_simple = args_simple;
+    }
+    else if (args_json) {
+      session_params.session_args_json = args_json;
+    }
     if (!wasmBuffer || !this._wasm) {
       return;
     }
+    // Two ways to pass the bytes array here, either in session param `session_bytes` with Bytes either install param module_bytes as Uint8Array
+    session_params.session_bytes = Bytes.fromUint8Array(this._wasm);
     const install = await this.sdk.install(
       this.node_address,
       deploy_params,
       session_params,
       payment_amount,
-      this._wasm
     );
     install && (this.result = install);
   }
@@ -927,20 +938,19 @@ export class AppComponent implements OnInit, AfterViewInit {
         session_params.session_hash = session_name;
       }
     } else {
-      if (this._wasm) {
-        session_params.session_path = 'sdk';
-      }
-      else if (session_hash) {
+      if (session_hash) {
         session_params.session_package_hash = session_hash;
       } else if (session_name) {
         session_params.session_package_name = session_name;
       }
     }
+    if (this._wasm) {
+      session_params.session_bytes = Bytes.fromUint8Array(this._wasm);
+    }
     const version: string = this.versionElt && this.versionElt.nativeElement.value.toString().trim();
     if (version) {
       session_params.session_version = version;
     }
-
     return session_params;
   }
 

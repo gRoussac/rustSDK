@@ -1,4 +1,5 @@
 use crate::debug::error;
+use crate::debug::log;
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::serialize_result;
 use crate::types::digest::Digest;
@@ -136,8 +137,14 @@ impl SDK {
 
         let maybe_path = if let Some(path) = path {
             Some(PathIdentifierInput::Path(path))
+        } else if let Some(path_str) = path_as_string {
+            if path_str.is_empty() {
+                None
+            } else {
+                Some(PathIdentifierInput::String(path_str))
+            }
         } else {
-            path_as_string.map(PathIdentifierInput::String)
+            None
         };
 
         let query_params = if let Some(hash) = state_root_hash {
@@ -218,12 +225,18 @@ impl SDK {
         }
 
         let path = if let Some(path) = path {
-            match path {
+            let path = match path {
                 PathIdentifierInput::Path(path) => path,
-                PathIdentifierInput::String(path_string) => Path::new(path_string.into()),
-            }
+                PathIdentifierInput::String(path_string) => Path::from(path_string),
+            };
+            Some(path)
         } else {
-            Path::new(String::from("").into())
+            None
+        };
+
+        let path_str: String = match path.clone() {
+            Some(p) => p.to_string(),
+            None => String::new(),
         };
 
         if let Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
@@ -236,7 +249,11 @@ impl SDK {
                 get_verbosity_or_default(verbosity).into(),
                 maybe_global_state_identifier.into(),
                 key.unwrap().into(),
-                path.into(),
+                match path {
+                    Some(path) if path.is_empty() => Vec::new(),
+                    Some(path) => path.into(),
+                    None => Vec::new(),
+                },
             )
             .await
             .map_err(SdkError::from)
@@ -248,7 +265,7 @@ impl SDK {
                 "",
                 &state_root_hash,
                 &key.unwrap().to_formatted_string(),
-                &(path.to_string()),
+                &path_str,
             )
             .await
             .map_err(SdkError::from)
@@ -260,7 +277,7 @@ impl SDK {
                 &maybe_block_id.unwrap_or_default(),
                 "",
                 &key.unwrap().to_formatted_string(),
-                &(path.to_string()),
+                &path_str,
             )
             .await
             .map_err(SdkError::from)
