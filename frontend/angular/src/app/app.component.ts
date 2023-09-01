@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -132,15 +132,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
 
     this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(this.sdk_deploy_utils_methods, this.sdk_contract_methods).includes(name));
-  }
-
-  // TODO Fix with motesToCSPR
-  convert(elt: HTMLInputElement) {
-    const amount: any = elt.value;
-    if (!amount) {
-      return;
-    }
-    return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
   }
 
   async get_peers() {
@@ -615,7 +606,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.error('Deploy is expired.');
       return;
     }
-    console.log(signed_deploy);
     const speculative_exec_options = this.sdk.speculative_exec_options({
       node_address: this.node_address,
       verbosity: this.verbosity,
@@ -856,6 +846,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     } else {
       console.error(`Method ${action} is not defined on the component.`);
     }
+  }
+
+  motesToCSPR(elt: HTMLInputElement) {
+    let amount: string = elt.value;
+    if (!amount) {
+      return;
+    }
+    amount = this.parse_commas(amount);
+    elt.value = amount.toString();
+    return motesToCSPR(amount);
+  }
+
+  private parse_commas(amount: string) {
+    return amount.replace(/[,.]/g, '');
   }
 
   private getGlobalIdentifier(options: { global_state_identifier?: GlobalStateIdentifier; }) {
