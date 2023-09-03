@@ -2,12 +2,11 @@
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
+#[cfg(target_arch = "wasm32")]
+use crate::types::digest::Digest;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{
-        block_identifier::BlockIdentifierInput, digest::Digest, sdk_error::SdkError,
-        verbosity::Verbosity,
-    },
+    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
@@ -23,22 +22,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetStateRootHashResult(_GetStateRootHashResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetStateRootHashResult> for _GetStateRootHashResult {
     fn from(result: GetStateRootHashResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetStateRootHashResult> for GetStateRootHashResult {
     fn from(result: _GetStateRootHashResult) -> Self {
         GetStateRootHashResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetStateRootHashResult {
     #[wasm_bindgen(getter)]

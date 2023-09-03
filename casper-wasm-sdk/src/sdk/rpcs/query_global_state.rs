@@ -15,7 +15,6 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-#[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -35,6 +34,7 @@ impl From<_QueryGlobalStateResult> for QueryGlobalStateResult {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl QueryGlobalStateResult {
     #[wasm_bindgen(getter)]

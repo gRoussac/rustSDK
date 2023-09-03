@@ -1,9 +1,8 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
-use crate::{
-    debug::error, deploy::deploy::PutDeployResult, helpers::get_verbosity_or_default,
-    types::verbosity::Verbosity, SDK,
-};
+#[cfg(target_arch = "wasm32")]
+use crate::{debug::error, deploy::deploy::PutDeployResult};
+use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
 use casper_client::{
     put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, Error, JsonRpcId,
     SuccessResponse,

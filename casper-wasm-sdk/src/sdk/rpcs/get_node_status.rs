@@ -1,13 +1,14 @@
+#[cfg(target_arch = "wasm32")]
 use crate::{
     debug::error,
-    helpers::get_verbosity_or_default,
-    types::{digest::Digest, public_key::PublicKey, verbosity::Verbosity},
-    SDK,
+    types::{digest::Digest, public_key::PublicKey},
 };
+use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, Error, JsonRpcId,
     SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
@@ -15,22 +16,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetNodeStatusResult(_GetNodeStatusResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetNodeStatusResult> for _GetNodeStatusResult {
     fn from(result: GetNodeStatusResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetNodeStatusResult> for GetNodeStatusResult {
     fn from(result: _GetNodeStatusResult) -> Self {
         GetNodeStatusResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetNodeStatusResult {
     #[wasm_bindgen(getter)]

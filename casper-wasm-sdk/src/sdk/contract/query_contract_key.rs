@@ -1,13 +1,11 @@
 #[cfg(target_arch = "wasm32")]
+use crate::rpcs::query_global_state::QueryGlobalStateResult;
+#[cfg(target_arch = "wasm32")]
 use crate::{
     debug::error,
     types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity},
 };
-use crate::{
-    rpcs::query_global_state::{QueryGlobalStateParams, QueryGlobalStateResult},
-    types::sdk_error::SdkError,
-    SDK,
-};
+use crate::{rpcs::query_global_state::QueryGlobalStateParams, types::sdk_error::SdkError, SDK};
 use casper_client::{
     rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, SuccessResponse,
 };

@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 use crate::rpcs::get_dictionary_item::GetDictionaryItemResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::{

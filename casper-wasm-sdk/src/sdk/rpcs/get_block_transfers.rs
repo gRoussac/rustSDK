@@ -1,13 +1,12 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
+use crate::types::block_hash::BlockHash;
+#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{
-        block_hash::BlockHash, block_identifier::BlockIdentifierInput, sdk_error::SdkError,
-        verbosity::Verbosity,
-    },
+    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
@@ -23,22 +22,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetBlockTransfersResult(_GetBlockTransfersResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetBlockTransfersResult> for _GetBlockTransfersResult {
     fn from(result: GetBlockTransfersResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetBlockTransfersResult> for GetBlockTransfersResult {
     fn from(result: _GetBlockTransfersResult) -> Self {
         GetBlockTransfersResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBlockTransfersResult {
     #[wasm_bindgen(getter)]

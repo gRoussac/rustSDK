@@ -1,8 +1,10 @@
 #[cfg(target_arch = "wasm32")]
+use crate::types::deploy::Deploy;
+#[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{deploy::Deploy, deploy_hash::DeployHash, verbosity::Verbosity},
+    types::{deploy_hash::DeployHash, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
@@ -17,22 +19,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetDeployResult(_GetDeployResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetDeployResult> for _GetDeployResult {
     fn from(result: GetDeployResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetDeployResult> for GetDeployResult {
     fn from(result: _GetDeployResult) -> Self {
         GetDeployResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetDeployResult {
     #[wasm_bindgen(getter)]

@@ -19,22 +19,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetBlockResult(_GetBlockResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetBlockResult> for _GetBlockResult {
     fn from(result: GetBlockResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetBlockResult> for GetBlockResult {
     fn from(result: _GetBlockResult) -> Self {
         GetBlockResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBlockResult {
     #[wasm_bindgen(getter)]

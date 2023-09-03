@@ -26,22 +26,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetDictionaryItemResult(_GetDictionaryItemResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetDictionaryItemResult> for _GetDictionaryItemResult {
     fn from(result: GetDictionaryItemResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetDictionaryItemResult> for GetDictionaryItemResult {
     fn from(result: _GetDictionaryItemResult) -> Self {
         GetDictionaryItemResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetDictionaryItemResult {
     #[wasm_bindgen(getter)]

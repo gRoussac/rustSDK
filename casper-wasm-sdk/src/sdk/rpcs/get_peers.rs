@@ -1,7 +1,10 @@
-use crate::{debug::error, helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+#[cfg(target_arch = "wasm32")]
+use crate::debug::error;
+use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_peers, rpcs::results::GetPeersResult as _GetPeersResult, Error, JsonRpcId, SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
@@ -9,22 +12,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetPeersResult(_GetPeersResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetPeersResult> for _GetPeersResult {
     fn from(result: GetPeersResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetPeersResult> for GetPeersResult {
     fn from(result: _GetPeersResult) -> Self {
         GetPeersResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetPeersResult {
     #[wasm_bindgen(getter)]
