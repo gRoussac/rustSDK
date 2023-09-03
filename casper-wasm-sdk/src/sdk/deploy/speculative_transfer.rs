@@ -1,8 +1,9 @@
 #[cfg(target_arch = "wasm32")]
+use crate::rpcs::speculative_exec::SpeculativeExecResult;
+#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     debug::error,
-    rpcs::speculative_exec::SpeculativeExecResult,
     types::{
         block_identifier::BlockIdentifierInput,
         deploy_params::{

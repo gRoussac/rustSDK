@@ -19,22 +19,24 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetAuctionInfoResult(_GetAuctionInfoResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetAuctionInfoResult> for _GetAuctionInfoResult {
     fn from(result: GetAuctionInfoResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetAuctionInfoResult> for GetAuctionInfoResult {
     fn from(result: _GetAuctionInfoResult) -> Self {
         GetAuctionInfoResult(result)
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetAuctionInfoResult {
     #[wasm_bindgen(getter)]

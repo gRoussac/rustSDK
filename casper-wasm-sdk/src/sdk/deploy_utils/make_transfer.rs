@@ -1,5 +1,8 @@
+#[cfg(target_arch = "wasm32")]
+use super::sign_deploy::Deploy;
+#[cfg(target_arch = "wasm32")]
+use crate::debug::error;
 use crate::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -14,8 +17,6 @@ use casper_types::Deploy as _Deploy;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
-
-use super::sign_deploy::Deploy;
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]

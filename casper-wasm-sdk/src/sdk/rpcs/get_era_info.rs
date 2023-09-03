@@ -20,22 +20,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetEraInfoResult(_GetEraInfoResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetEraInfoResult> for _GetEraInfoResult {
     fn from(result: GetEraInfoResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetEraInfoResult> for GetEraInfoResult {
     fn from(result: _GetEraInfoResult) -> Self {
         GetEraInfoResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetEraInfoResult {
     #[wasm_bindgen(getter)]

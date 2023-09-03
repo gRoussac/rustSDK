@@ -19,22 +19,24 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetBalanceResult(_GetBalanceResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetBalanceResult> for _GetBalanceResult {
     fn from(result: GetBalanceResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetBalanceResult> for GetBalanceResult {
     fn from(result: _GetBalanceResult) -> Self {
         GetBalanceResult(result)
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBalanceResult {
     #[wasm_bindgen(getter)]

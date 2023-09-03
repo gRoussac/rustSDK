@@ -1,4 +1,6 @@
 #[cfg(target_arch = "wasm32")]
+use crate::deploy::deploy::PutDeployResult;
+#[cfg(target_arch = "wasm32")]
 use crate::types::deploy_params::{
     deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
     payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -6,7 +8,6 @@ use crate::types::deploy_params::{
 };
 use crate::{
     debug::error,
-    deploy::deploy::PutDeployResult,
     types::{
         deploy::{BuildParams, Deploy},
         sdk_error::SdkError,

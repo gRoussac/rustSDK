@@ -1,7 +1,10 @@
-use crate::{debug::error, helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+#[cfg(target_arch = "wasm32")]
+use crate::debug::error;
+use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
 use casper_client::{
     list_rpcs, rpcs::results::ListRpcsResult as _ListRpcsResult, Error, JsonRpcId, SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
@@ -9,22 +12,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct ListRpcsResult(_ListRpcsResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<ListRpcsResult> for _ListRpcsResult {
     fn from(result: ListRpcsResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_ListRpcsResult> for ListRpcsResult {
     fn from(result: _ListRpcsResult) -> Self {
         ListRpcsResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl ListRpcsResult {
     #[wasm_bindgen(getter)]

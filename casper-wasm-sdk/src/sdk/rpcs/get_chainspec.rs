@@ -1,8 +1,11 @@
-use crate::{debug::error, helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+#[cfg(target_arch = "wasm32")]
+use crate::debug::error;
+use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_chainspec, rpcs::results::GetChainspecResult as _GetChainspecResult, Error, JsonRpcId,
     SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
@@ -10,22 +13,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetChainspecResult(_GetChainspecResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetChainspecResult> for _GetChainspecResult {
     fn from(result: GetChainspecResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetChainspecResult> for GetChainspecResult {
     fn from(result: _GetChainspecResult) -> Self {
         GetChainspecResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetChainspecResult {
     #[wasm_bindgen(getter)]

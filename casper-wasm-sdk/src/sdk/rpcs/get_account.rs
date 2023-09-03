@@ -22,22 +22,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetAccountResult(_GetAccountResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetAccountResult> for _GetAccountResult {
     fn from(result: GetAccountResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetAccountResult> for GetAccountResult {
     fn from(result: _GetAccountResult) -> Self {
         GetAccountResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetAccountResult {
     #[wasm_bindgen(getter)]

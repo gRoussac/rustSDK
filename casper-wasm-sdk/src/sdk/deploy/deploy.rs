@@ -1,7 +1,8 @@
+#[cfg(target_arch = "wasm32")]
+use crate::types::deploy_hash::DeployHash;
 use crate::{
     debug::error,
     types::{
-        deploy_hash::DeployHash,
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -15,28 +16,32 @@ use crate::{
 use casper_client::{
     cli::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct PutDeployResult(_PutDeployResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<PutDeployResult> for _PutDeployResult {
     fn from(result: PutDeployResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_PutDeployResult> for PutDeployResult {
     fn from(result: _PutDeployResult) -> Self {
         PutDeployResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl PutDeployResult {
     #[wasm_bindgen(getter)]

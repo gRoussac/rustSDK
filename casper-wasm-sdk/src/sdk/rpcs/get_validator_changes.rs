@@ -1,8 +1,11 @@
-use crate::{debug::error, helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+#[cfg(target_arch = "wasm32")]
+use crate::debug::error;
+use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult as _GetValidatorChangesResult,
     Error, JsonRpcId, SuccessResponse,
 };
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
@@ -10,22 +13,25 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetValidatorChangesResult(_GetValidatorChangesResult);
 
+#[cfg(target_arch = "wasm32")]
 impl From<GetValidatorChangesResult> for _GetValidatorChangesResult {
     fn from(result: GetValidatorChangesResult) -> Self {
         result.0
     }
 }
-
+#[cfg(target_arch = "wasm32")]
 impl From<_GetValidatorChangesResult> for GetValidatorChangesResult {
     fn from(result: _GetValidatorChangesResult) -> Self {
         GetValidatorChangesResult(result)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetValidatorChangesResult {
     #[wasm_bindgen(getter)]
