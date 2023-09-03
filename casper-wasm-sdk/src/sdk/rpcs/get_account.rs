@@ -1,8 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
@@ -14,7 +12,7 @@ use crate::{
 };
 use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
-    rpcs::results::GetAccountResult, JsonRpcId, SuccessResponse,
+    rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -23,6 +21,45 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetAccountResult(_GetAccountResult);
+
+impl From<GetAccountResult> for _GetAccountResult {
+    fn from(result: GetAccountResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetAccountResult> for GetAccountResult {
+    fn from(result: _GetAccountResult) -> Self {
+        GetAccountResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetAccountResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn account(&self) -> JsValue {
+        JsValue::from_serde(&self.0.account).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn merkle_proof(&self) -> String {
+        self.0.merkle_proof.clone()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -53,7 +90,10 @@ impl SDK {
     }
 
     #[wasm_bindgen(js_name = "get_account")]
-    pub async fn get_account_js_alias(&mut self, options: GetAccountOptions) -> JsValue {
+    pub async fn get_account_js_alias(
+        &mut self,
+        options: GetAccountOptions,
+    ) -> Result<GetAccountResult, JsError> {
         let GetAccountOptions {
             node_address,
             account_identifier,
@@ -66,16 +106,21 @@ impl SDK {
         let public_key = if let Some(account_identifier) = account_identifier {
             match PublicKey::new(&account_identifier) {
                 Ok(key) => key,
-                Err(_) => {
-                    error("Error: Failed to create PublicKey from account identifier");
-                    return JsValue::null();
+                Err(err) => {
+                    let err = &format!(
+                        "Error: Failed to create PublicKey from account identifier {:?}",
+                        err
+                    );
+                    error(err);
+                    return Err(JsError::new(err));
                 }
             }
         } else if let Some(public_key) = public_key {
             public_key
         } else {
-            error("Error: Missing account identifier or public key");
-            return JsValue::null();
+            let err = "Error: Missing account identifier or public key";
+            error(err);
+            return Err(JsError::new(err));
         };
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
@@ -84,14 +129,25 @@ impl SDK {
         } else {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
-        serialize_result(
-            self.get_account(&node_address, verbosity, maybe_block_identifier, public_key)
-                .await,
-        )
+
+        let result = self
+            .get_account(&node_address, verbosity, maybe_block_identifier, public_key)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "state_get_account_info")]
-    pub async fn state_get_account_info_js_alias(&mut self, options: GetAccountOptions) -> JsValue {
+    pub async fn state_get_account_info_js_alias(
+        &mut self,
+        options: GetAccountOptions,
+    ) -> Result<GetAccountResult, JsError> {
         self.get_account_js_alias(options).await
     }
 }
@@ -103,7 +159,7 @@ impl SDK {
         verbosity: Option<Verbosity>,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         public_key: PublicKey,
-    ) -> Result<SuccessResponse<GetAccountResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
         //log("get_account!");
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(

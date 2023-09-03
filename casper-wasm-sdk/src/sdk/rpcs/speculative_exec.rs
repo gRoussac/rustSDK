@@ -1,19 +1,20 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 #[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        block_hash::BlockHash, block_identifier::BlockIdentifierInput, sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
-    rpcs::results::SpeculativeExecResult, speculative_exec as speculative_exec_lib, JsonRpcId,
-    SuccessResponse,
+    rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
+    speculative_exec as speculative_exec_lib, JsonRpcId, SuccessResponse,
 };
 use casper_types::Deploy as CasperTypesDeploy;
 #[cfg(target_arch = "wasm32")]
@@ -23,6 +24,45 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct SpeculativeExecResult(_SpeculativeExecResult);
+
+impl From<SpeculativeExecResult> for _SpeculativeExecResult {
+    fn from(result: SpeculativeExecResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_SpeculativeExecResult> for SpeculativeExecResult {
+    fn from(result: _SpeculativeExecResult) -> Self {
+        SpeculativeExecResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl SpeculativeExecResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn block_hash(&self) -> BlockHash {
+        self.0.block_hash.into()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn execution_result(&self) -> JsValue {
+        JsValue::from_serde(&self.0.execution_result).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -55,7 +95,7 @@ impl SDK {
     pub async fn speculative_exec_js_alias(
         &mut self,
         options: GetSpeculativeExecOptions,
-    ) -> JsValue {
+    ) -> Result<SpeculativeExecResult, JsError> {
         let GetSpeculativeExecOptions {
             node_address,
             deploy_as_string,
@@ -70,8 +110,9 @@ impl SDK {
         } else if let Some(deploy) = deploy {
             deploy
         } else {
-            error("Error: Missing deploy as json or deploy");
-            return JsValue::null();
+            let err = &format!("Error: Missing deploy as json or deploy");
+            error(err);
+            return Err(JsError::new(err));
         };
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -82,15 +123,22 @@ impl SDK {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
-        serialize_result(
-            self.speculative_exec(
+        let result = self
+            .speculative_exec(
                 &node_address,
                 deploy.into(),
                 maybe_block_identifier,
                 verbosity,
             )
-            .await,
-        )
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -101,7 +149,7 @@ impl SDK {
         deploy: CasperTypesDeploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
+    ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         //log("speculative_exec!");
 
         let maybe_block_identifier =

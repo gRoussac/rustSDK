@@ -1,14 +1,13 @@
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{deploy_hash::DeployHash, verbosity::Verbosity},
+    types::{deploy::Deploy, deploy_hash::DeployHash, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
-    get_deploy, rpcs::results::GetDeployResult, Error, JsonRpcId, SuccessResponse,
+    get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
+    SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -17,6 +16,45 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetDeployResult(_GetDeployResult);
+
+impl From<GetDeployResult> for _GetDeployResult {
+    fn from(result: GetDeployResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetDeployResult> for GetDeployResult {
+    fn from(result: _GetDeployResult) -> Self {
+        GetDeployResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetDeployResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn deploy(&self) -> Deploy {
+        self.0.deploy.clone().into()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn execution_info(&self) -> JsValue {
+        JsValue::from_serde(&self.0.execution_info).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -51,7 +89,10 @@ impl SDK {
     }
 
     #[wasm_bindgen(js_name = "get_deploy")]
-    pub async fn get_deploy_js_alias(&mut self, options: GetDeployOptions) -> JsValue {
+    pub async fn get_deploy_js_alias(
+        &mut self,
+        options: GetDeployOptions,
+    ) -> Result<GetDeployResult, JsError> {
         let GetDeployOptions {
             node_address,
             deploy_hash_as_string,
@@ -61,32 +102,44 @@ impl SDK {
         } = options;
         let err_msg = "Error: Missing deploy hash as string or deploy hash".to_string();
         let deploy_hash = if let Some(deploy_hash_as_string) = deploy_hash_as_string {
-            let hash = Digest::new(&deploy_hash_as_string).map_err(|err| {
+            let hash = Digest::new(&deploy_hash_as_string);
+            if let Err(err) = hash {
                 let err_msg = format!("Failed to parse AccountHash from formatted string: {}", err);
                 error(&err_msg);
-                JsValue::null()
-            });
+                return Err(JsError::new(&err_msg));
+            }
             let deploy_hash = DeployHash::from_digest(hash.unwrap());
             if deploy_hash.is_err() {
                 error(&err_msg);
-                return JsValue::null();
+                return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
         } else {
             if deploy_hash.is_none() {
                 error(&err_msg);
-                return JsValue::null();
+                return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
         };
-        serialize_result(
-            self.get_deploy(&node_address, deploy_hash, finalized_approvals, verbosity)
-                .await,
-        )
+
+        let result = self
+            .get_deploy(&node_address, deploy_hash, finalized_approvals, verbosity)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "info_get_deploy")]
-    pub async fn info_get_deploy_js_alias(&mut self, options: GetDeployOptions) -> JsValue {
+    pub async fn info_get_deploy_js_alias(
+        &mut self,
+        options: GetDeployOptions,
+    ) -> Result<GetDeployResult, JsError> {
         self.get_deploy_js_alias(options).await
     }
 }
@@ -98,7 +151,7 @@ impl SDK {
         deploy_hash: DeployHash,
         finalized_approvals: Option<bool>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetDeployResult>, Error> {
+    ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
         //log("get_deploy!");
         get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),

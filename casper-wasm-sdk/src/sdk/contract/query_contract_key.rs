@@ -3,8 +3,14 @@ use crate::{
     debug::error,
     types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity},
 };
-use crate::{rpcs::query_global_state::QueryGlobalStateParams, types::sdk_error::SdkError, SDK};
-use casper_client::{rpcs::results::QueryGlobalStateResult, SuccessResponse};
+use crate::{
+    rpcs::query_global_state::{QueryGlobalStateParams, QueryGlobalStateResult},
+    types::sdk_error::SdkError,
+    SDK,
+};
+use casper_client::{
+    rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, SuccessResponse,
+};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]
@@ -51,11 +57,12 @@ impl SDK {
     pub async fn query_contract_key_js_alias(
         &mut self,
         options: QueryContractKeyOptions,
-    ) -> JsValue {
+    ) -> Result<QueryGlobalStateResult, JsError> {
         let js_value_options = JsValue::from_serde::<QueryContractKeyOptions>(&options);
         if let Err(err) = js_value_options {
-            error(&format!("Error serializing options: {:?}", err));
-            return JsValue::null();
+            let err = &format!("Error serializing options:  {:?}", err);
+            error(err);
+            return Err(JsError::new(err));
         }
         let options = self.query_global_state_options(js_value_options.unwrap());
         self.query_global_state_js_alias(options).await
@@ -66,7 +73,7 @@ impl SDK {
     pub async fn query_contract_key(
         &mut self,
         query_params: QueryGlobalStateParams,
-    ) -> Result<SuccessResponse<QueryGlobalStateResult>, SdkError> {
+    ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
         //log("query_contract_key!");
         self.query_global_state(query_params)
             .await

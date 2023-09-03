@@ -1,7 +1,4 @@
 use crate::debug::error;
-use crate::debug::log;
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::types::global_state_identifier::GlobalStateIdentifierInput;
@@ -12,8 +9,8 @@ use crate::{
 };
 use casper_client::{
     cli::query_global_state as query_global_state_cli,
-    query_global_state as query_global_state_lib, rpcs::results::QueryGlobalStateResult, JsonRpcId,
-    SuccessResponse,
+    query_global_state as query_global_state_lib,
+    rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -21,6 +18,50 @@ use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct QueryGlobalStateResult(_QueryGlobalStateResult);
+
+impl From<QueryGlobalStateResult> for _QueryGlobalStateResult {
+    fn from(result: QueryGlobalStateResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_QueryGlobalStateResult> for QueryGlobalStateResult {
+    fn from(result: _QueryGlobalStateResult) -> Self {
+        QueryGlobalStateResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl QueryGlobalStateResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn block_header(&self) -> JsValue {
+        JsValue::from_serde(&self.0.block_header).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn stored_value(&self) -> JsValue {
+        JsValue::from_serde(&self.0.stored_value).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn merkle_proof(&self) -> String {
+        self.0.merkle_proof.clone()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
@@ -57,15 +98,23 @@ impl SDK {
     pub async fn query_global_state_js_alias(
         &mut self,
         options: QueryGlobalStateOptions,
-    ) -> JsValue {
+    ) -> Result<QueryGlobalStateResult, JsError> {
         match self.query_global_state_js_alias_params(options) {
             Ok(params) => {
-                let query_result = self.query_global_state(params).await;
-                serialize_result(query_result)
+                let result = self.query_global_state(params).await;
+                match result {
+                    Ok(data) => Ok(data.result.into()),
+                    Err(err) => {
+                        let err = &format!("Error occurred: {:?}", err);
+                        error(err);
+                        Err(JsError::new(err))
+                    }
+                }
             }
             Err(err) => {
-                error(&format!("Error building parameters: {:?}", err));
-                JsValue::null()
+                let err = &format!("Error building parameters: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
             }
         }
     }
@@ -194,7 +243,7 @@ impl SDK {
     pub async fn query_global_state(
         &mut self,
         query_params: QueryGlobalStateParams,
-    ) -> Result<SuccessResponse<QueryGlobalStateResult>, SdkError> {
+    ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
         //log("query_global_state!");
 
         let QueryGlobalStateParams {

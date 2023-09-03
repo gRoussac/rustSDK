@@ -1,7 +1,6 @@
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
 use crate::{
     debug::error,
+    rpcs::speculative_exec::SpeculativeExecResult,
     types::{
         block_identifier::{BlockIdentifier, BlockIdentifierInput},
         deploy_params::{
@@ -14,7 +13,10 @@ use crate::{
     },
     SDK,
 };
-use casper_client::{cli::make_deploy, rpcs::results::SpeculativeExecResult, SuccessResponse};
+use casper_client::{
+    cli::make_deploy, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
+    SuccessResponse,
+};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
@@ -30,9 +32,9 @@ impl SDK {
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
-    ) -> JsValue {
-        serialize_result(
-            self.speculative_deploy(
+    ) -> Result<SpeculativeExecResult, JsError> {
+        let result = self
+            .speculative_deploy(
                 node_address,
                 deploy_params,
                 session_params,
@@ -40,8 +42,15 @@ impl SDK {
                 maybe_block_identifier,
                 verbosity,
             )
-            .await,
-        )
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -54,7 +63,7 @@ impl SDK {
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
+    ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_deploy!");
         let deploy = make_deploy(
             "",

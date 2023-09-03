@@ -1,8 +1,7 @@
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
 use crate::{
     debug::error,
     types::{
+        deploy_hash::DeployHash,
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
             payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
@@ -13,9 +12,48 @@ use crate::{
     },
     SDK,
 };
-use casper_client::{cli::make_deploy, rpcs::results::PutDeployResult, SuccessResponse};
+use casper_client::{
+    cli::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
+};
+use gloo_utils::format::JsValueSerdeExt;
+#[cfg(target_arch = "wasm32")]
+use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct PutDeployResult(_PutDeployResult);
+
+impl From<PutDeployResult> for _PutDeployResult {
+    fn from(result: PutDeployResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_PutDeployResult> for PutDeployResult {
+    fn from(result: _PutDeployResult) -> Self {
+        PutDeployResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl PutDeployResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn deploy_hash(&self) -> DeployHash {
+        self.0.deploy_hash.into()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
@@ -28,17 +66,24 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-    ) -> JsValue {
-        serialize_result(
-            self.deploy(
+    ) -> Result<PutDeployResult, JsError> {
+        let result = self
+            .deploy(
                 node_address,
                 deploy_params,
                 session_params,
                 payment_params,
                 verbosity,
             )
-            .await,
-        )
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -50,7 +95,7 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("deploy!");
         let deploy = make_deploy(
             "",

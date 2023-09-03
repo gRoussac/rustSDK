@@ -41,7 +41,7 @@ function App() {
   const [block_identifier_height, setBlock_identifier_height] = useState(
     block_identifier_height_default
   );
-  const [hash, setHash] = useState(false);
+  const [hash, setHash] = useState('');
   const [pubKey] = useState(pubKey_default);
   const [block, setBlock] = useState('');
   const [info_get_account_info_hash, setInfo_get_account_info_hash] =
@@ -91,11 +91,12 @@ function App() {
         node_address: host,
         verbosity: Verbosity.Low
       });
-      const chain_get_state_root_hash = await sdk.chain_get_state_root_hash(get_state_root_hash_options);
-      setHash(chain_get_state_root_hash?.result.state_root_hash);
+      const chain_get_state_root_hash = (await sdk.chain_get_state_root_hash(get_state_root_hash_options));
+      console.log(chain_get_state_root_hash);
+      setHash(chain_get_state_root_hash?.state_root_hash_as_string);
       console.log(
         'js chain_get_state_root_hash',
-        chain_get_state_root_hash?.result.state_root_hash
+        chain_get_state_root_hash?.state_root_hash_as_string
       );
       console.log(chain_get_state_root_hash);
       let chain_get_block_options = sdk.get_block_options({
@@ -104,7 +105,7 @@ function App() {
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height)
       });
       const chain_get_block = await sdk.chain_get_block(chain_get_block_options);
-      setBlock(chain_get_block?.result.block.hash);
+      setBlock(chain_get_block?.block.hash);
       console.log('js chain_get_block', chain_get_block);
 
       const public_key = new PublicKey(pubKey);
@@ -114,17 +115,18 @@ function App() {
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
         public_key: public_key.toJson()
       });
-      const state_get_account_info = await sdk.state_get_account_info(state_get_account_info_options);
+      const state_get_account_info = (await sdk.state_get_account_info(state_get_account_info_options)).toJson();
       console.log('js state_get_account_info', state_get_account_info);
 
       setInfo_get_account_info_hash(
-        state_get_account_info?.result.account.account_hash
+        state_get_account_info?.account.account_hash
       );
       setInfo_get_account_info_purse(
-        state_get_account_info?.result.account.main_purse
+        state_get_account_info?.account.main_purse
       );
 
-      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
+      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
+
       console.log(stateRootHashDigest);
       console.log(stateRootHashDigest.toJson());
       const dictionary_item_identifier =
@@ -134,20 +136,20 @@ function App() {
 
       let get_dictionary_item_options = sdk.get_dictionary_item_options({
         node_address: host,
-        state_root_hash_as_string: chain_get_state_root_hash?.result.state_root_hash,
+        state_root_hash_as_string: chain_get_state_root_hash?.state_root_hash_as_string,
         //state_root_hash: stateRootHashDigest.toJson(),
         dictionary_item_identifier: dictionary_item_identifier.toJson(),
         //  verbosity: Verbosity.High
       });
       console.log(get_dictionary_item_options);
-      const state_get_dictionary_item = await sdk.state_get_dictionary_item(get_dictionary_item_options);
+      const state_get_dictionary_item = (await sdk.state_get_dictionary_item(get_dictionary_item_options)).toJson();
 
       setState_get_dictionary_item(
-        state_get_dictionary_item?.result.stored_value.CLValue.parsed
+        state_get_dictionary_item?.stored_value.CLValue.parsed
       );
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
-
-      stateRootHashDigest = new Digest(chain_get_state_root_hash?.result.state_root_hash);
+      console.log(chain_get_state_root_hash?.state_root_hash);
+      stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
       let state_get_balance_options = sdk.get_balance_options({
         node_address: host,
         state_root_hash: stateRootHashDigest.toJson(),
@@ -158,9 +160,9 @@ function App() {
         //purse_uref_as_string: 'uref-b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e-007',
         verbosity: Verbosity.High,
       });
-      const state_get_balance = await sdk.state_get_balance(state_get_balance_options);
+      const state_get_balance = (await sdk.state_get_balance(state_get_balance_options)).toJson();
       console.log('js state_get_balance', state_get_balance);
-      setState_get_balance(state_get_balance?.result.balance_value);
+      setState_get_balance(state_get_balance?.balance_value);
 
 
       let path = new Path('');
@@ -174,7 +176,7 @@ function App() {
       let query_global_state_options = sdk.query_global_state_options({
         node_address: host,
         global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
-          new Digest(chain_get_state_root_hash?.result.state_root_hash)
+          new Digest(chain_get_state_root_hash?.state_root_hash_as_string)
         ).toJson(),
         key: key.toJson(),
         //path_as_string: path.toString(),
@@ -182,10 +184,10 @@ function App() {
         verbosity: Verbosity.High,
       });
       console.log(query_global_state_options);
-      const query_global_state = await sdk.query_global_state(query_global_state_options);
+      const query_global_state = (await sdk.query_global_state(query_global_state_options)).toJson();
       console.log('js query_global_state', query_global_state);
       setQuery_global_state(
-        query_global_state?.result.stored_value.CLValue.parsed
+        query_global_state?.stored_value.CLValue.parsed
       );
 
       let session_account =
@@ -215,7 +217,7 @@ function App() {
         undefined, // transfer_id
         deploy_params,
         payment_params,
-      );
+      ).toJson();
       setMake_transfer(jsonPrettyPrint(make_transfer));
       console.log(jsonPrettyPrint(make_transfer, Verbosity.Medium));
 
@@ -280,7 +282,7 @@ function App() {
         deploy_params,
         session_params,
         payment_params,
-      );
+      ).toJson();
       setMake_deploy(jsonPrettyPrint(make_deploy));
       console.log(jsonPrettyPrint(make_deploy, Verbosity.Medium));
 
@@ -291,22 +293,23 @@ function App() {
       let deploy_to_sign = new Deploy(JSON.parse(deployAsString));
       console.log(deploy_to_sign.toJson());
 
-      let deploy_signed = await sdk.sign_deploy(
+      let deploy_signed = (await sdk.sign_deploy(
         deploy_to_sign,
         secret_key
-      );
+      )).toJson();
       console.log('js deploy_signed two parties', deploy_signed.approvals);
+      console.log(deploy_signed);
       console.assert(deploy_signed.approvals.length === 2); // Deploy has two approvals
 
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
       deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
       deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 }); // No arrary as one arg
-      console.assert(deploy_to_sign.toJson().approvals.length === 0);
       console.log('deploy_to_sign ', deploy_to_sign.toJson());
-      deploy_signed = await sdk.sign_deploy(
+      console.assert(deploy_to_sign.toJson().approvals.length === 0);
+      deploy_signed = (await sdk.sign_deploy(
         deploy_to_sign,
         secret_key
-      );
+      )).toJson();
       console.log('js deploy + addArg > sign_deploy', deploy_signed.approvals);
       console.assert(deploy_signed.approvals.length === 1); // Deploy should have one approval
 
@@ -322,15 +325,15 @@ function App() {
 
       let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);
-      const account_put_deploy = await sdk.account_put_deploy(
+      const account_put_deploy = (await sdk.account_put_deploy(
         host,
         signed_deploy,
         Verbosity.High,
-      );
+      )).toJson();
       console.log('js account_put_deploy', account_put_deploy);
-      setAccount_put_deploy(account_put_deploy?.result?.deploy_hash);
+      setAccount_put_deploy(account_put_deploy?.deploy_hash);
 
-      if (!account_put_deploy?.result.deploy_hash) {
+      if (!account_put_deploy?.deploy_hash) {
         return;
       }
 
@@ -339,14 +342,14 @@ function App() {
         node_address: host,
         deploy_hash: new DeployHash(
           //'397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
-          account_put_deploy?.result.deploy_hash
+          account_put_deploy?.deploy_hash
         ).toJson(),
         finalized_approvals: finalized_approvals,
         verbosity: Verbosity.High,
       });
-      const info_get_deploy = await sdk.get_deploy(get_deploy_options);
-      console.log('js info_get_deploy', info_get_deploy);
-      setInfo_get_deploy(info_get_deploy?.result?.api_version);
+      // const info_get_deploy = await sdk.get_deploy(get_deploy_options);
+      // console.log('js info_get_deploy', info_get_deploy);
+      // setInfo_get_deploy(info_get_deploy?.api_version);
 
       // test call entry point
       session_account = privateToPublicKey(secret_key);
@@ -364,13 +367,13 @@ function App() {
       // let payment_params = new PaymentStrParams();
       // payment_params.payment_amount = '5500000000';
       // console.log(payment_params);
-      let test_call_entrypoint = await sdk.call_entrypoint(
+      let test_call_entrypoint = (await sdk.call_entrypoint(
         host,
         deploy_params,
         session_params,
         '5500000000'
-      );
-      console.log(test_call_entrypoint.result.deploy_hash);
+      )).toJson();
+      console.log(test_call_entrypoint.deploy_hash);
 
     } catch (error) {
       console.error(error);

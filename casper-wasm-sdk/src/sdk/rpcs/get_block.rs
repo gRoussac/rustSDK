@@ -1,8 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
@@ -10,8 +8,8 @@ use crate::{
     SDK,
 };
 use casper_client::{
-    cli::get_block as get_block_cli, get_block as get_block_lib, rpcs::results::GetBlockResult,
-    JsonRpcId, SuccessResponse,
+    cli::get_block as get_block_cli, get_block as get_block_lib,
+    rpcs::results::GetBlockResult as _GetBlockResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -20,6 +18,40 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetBlockResult(_GetBlockResult);
+
+impl From<GetBlockResult> for _GetBlockResult {
+    fn from(result: GetBlockResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetBlockResult> for GetBlockResult {
+    fn from(result: _GetBlockResult) -> Self {
+        GetBlockResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetBlockResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn block(&self) -> JsValue {
+        JsValue::from_serde(&self.0.block).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -47,7 +79,10 @@ impl SDK {
     }
 
     #[wasm_bindgen(js_name = "get_block")]
-    pub async fn get_block_js_alias(&mut self, options: GetBlockOptions) -> JsValue {
+    pub async fn get_block_js_alias(
+        &mut self,
+        options: GetBlockOptions,
+    ) -> Result<GetBlockResult, JsError> {
         let GetBlockOptions {
             node_address,
             maybe_block_id_as_string,
@@ -63,14 +98,24 @@ impl SDK {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
-        serialize_result(
-            self.get_block(&node_address, maybe_block_identifier, verbosity)
-                .await,
-        )
+        let result = self
+            .get_block(&node_address, maybe_block_identifier, verbosity)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "chain_get_block")]
-    pub async fn chain_get_block_js_alias(&mut self, options: GetBlockOptions) -> JsValue {
+    pub async fn chain_get_block_js_alias(
+        &mut self,
+        options: GetBlockOptions,
+    ) -> Result<GetBlockResult, JsError> {
         self.get_block_js_alias(options).await
     }
 }
@@ -81,7 +126,7 @@ impl SDK {
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetBlockResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetBlockResult>, SdkError> {
         //log("get_block!");
 
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
