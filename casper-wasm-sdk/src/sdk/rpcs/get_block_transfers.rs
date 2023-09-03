@@ -1,18 +1,19 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        block_hash::BlockHash, block_identifier::BlockIdentifierInput, sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
     cli::get_block_transfers as get_block_transfers_cli,
-    get_block_transfers as get_block_transfers_lib, rpcs::results::GetBlockTransfersResult,
-    JsonRpcId, SuccessResponse,
+    get_block_transfers as get_block_transfers_lib,
+    rpcs::results::GetBlockTransfersResult as _GetBlockTransfersResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -21,6 +22,45 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetBlockTransfersResult(_GetBlockTransfersResult);
+
+impl From<GetBlockTransfersResult> for _GetBlockTransfersResult {
+    fn from(result: GetBlockTransfersResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetBlockTransfersResult> for GetBlockTransfersResult {
+    fn from(result: _GetBlockTransfersResult) -> Self {
+        GetBlockTransfersResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetBlockTransfersResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn block_hash(&self) -> Option<BlockHash> {
+        self.0.block_hash.map(Into::into)
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn transfers(&self) -> JsValue {
+        JsValue::from_serde(&self.0.transfers).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -51,7 +91,7 @@ impl SDK {
     pub async fn get_block_transfers_js_alias(
         &mut self,
         options: GetBlockTransfersOptions,
-    ) -> JsValue {
+    ) -> Result<GetBlockTransfersResult, JsError> {
         let GetBlockTransfersOptions {
             node_address,
             maybe_block_id_as_string,
@@ -67,10 +107,17 @@ impl SDK {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
-        serialize_result(
-            self.get_block_transfers(&node_address, maybe_block_identifier, verbosity)
-                .await,
-        )
+        let result = self
+            .get_block_transfers(&node_address, maybe_block_identifier, verbosity)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -80,7 +127,7 @@ impl SDK {
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetBlockTransfersResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetBlockTransfersResult>, SdkError> {
         //log("get_block_transfers!");
 
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {

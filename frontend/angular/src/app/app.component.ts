@@ -2,7 +2,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes, SpeculativeExecResult, getAccountOptions, PeerEntry } from "casper-sdk";
 
 const imports = [
   CommonModule,
@@ -12,11 +12,6 @@ type network = {
   name: string;
   node_address: string;
   chain_name: string;
-};
-
-type peer = {
-  node_id: string;
-  address: string;
 };
 
 @Component({
@@ -30,14 +25,14 @@ type peer = {
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'casper';
   state_root_hash!: string;
-  peers!: peer[];
+  peers!: PeerEntry[];
   networks!: network[];
   sdk_methods!: string[];
   sdk_rpc_methods!: string[];
   sdk_contract_methods!: string[];
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
-  result!: string;
+  result!: string | object;
   result_text!: string;
   verbosity = Verbosity.High;
   node_address = this.env['node_address'].toString();
@@ -132,7 +127,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit(): Promise<void> {
-    console.log(this.sdk);
+    console.info(this.sdk);
     this.sdk_methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this.sdk))
       .filter(name => typeof (this.sdk as any)[name] === 'function')
       .filter(name => !['free', 'constructor', '__destroy_into_raw'].includes(name))
@@ -170,13 +165,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   async get_peers() {
     const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
     if (peers_result) {
-      this.peers = peers_result?.result?.peers;
+      this.peers = peers_result?.peers;
     }
   }
 
   async get_node_status() {
     const get_node_status = await this.sdk.get_node_status(this.node_address, this.verbosity);
-    get_node_status && (this.result = get_node_status);
+    get_node_status && (this.result = get_node_status.toJson());
   }
 
   async get_state_root_hash(no_mark_for_check?: boolean) {
@@ -184,7 +179,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       node_address: this.node_address
     });
     const state_root_hash = await this.sdk.get_state_root_hash(options);
-    this.state_root_hash = state_root_hash?.result?.state_root_hash;
+    this.state_root_hash = state_root_hash.state_root_hash_as_string;
     if (!no_mark_for_check) {
       this.state_root_hash && (this.result = this.state_root_hash);
     }
@@ -208,7 +203,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.getIdentifieBlock(get_account_options);
     const get_account = await this.sdk.get_account(get_account_options);
     if (!account_identifier_param) {
-      get_account && (this.result = get_account);
+      get_account && (this.result = get_account.account);
     }
     return get_account;
   }
@@ -224,8 +219,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.has_private_key = false;
       this.privateKeyElt.nativeElement.value = '';
     }
-    this.account_hash = get_account?.result?.account.account_hash;
-    this.main_purse = get_account?.result?.account.main_purse;
+    this.account_hash = get_account?.account.account_hash;
+    this.main_purse = get_account?.account.main_purse;
     this.changeDetectorRef.markForCheck();
   }
 
@@ -244,7 +239,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!payment_amount) {
       return;
     }
-    console.log(payment_amount);
     if (!this.public_key || !this.private_key) {
       return;
     }
@@ -257,7 +251,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.public_key,
       this.private_key,
     );
-    console.log(deploy_params);
+
     const args_simple: [string] = this.argsSimpleElt && this.argsSimpleElt.nativeElement.value.toString()
       .trim()
       .split(',')
@@ -282,7 +276,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       session_params,
       payment_amount,
     );
-    install && (this.result = install);
+    install && (this.result = install.toJson());
   }
 
   async get_balance() {
@@ -298,7 +292,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       verbosity: this.verbosity,
     });
     const get_balance = await this.sdk.get_balance(get_balance_options);
-    get_balance && (this.result = get_balance?.result?.balance_value);
+    get_balance && (this.result = get_balance?.balance_value);
   }
 
   async get_block_transfers() {
@@ -308,7 +302,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(get_block_transfers_options);
     const get_block_transfers = await this.sdk.get_block_transfers(get_block_transfers_options);
-    this.result = get_block_transfers;
+    this.result = get_block_transfers.transfers;
   }
 
   async get_block() {
@@ -318,7 +312,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(chain_get_block_options);
     const chain_get_block = await this.sdk.get_block(chain_get_block_options);
-    this.result = chain_get_block;
+    this.result = chain_get_block.block;
   }
 
   async submitAction(action: string) {
@@ -329,7 +323,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_chainspec() {
     const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
-    this.result_text = hexToString(get_chainspec?.result?.chainspec_bytes.chainspec_bytes);
+    this.result_text = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
   }
 
   async get_deploy() {
@@ -345,7 +339,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     get_deploy_options.deploy_hash = new DeployHash(deploy_hash_as_string);
     get_deploy_options.finalized_approvals = finalized_approvals;
     const get_deploy = await this.sdk.get_deploy(get_deploy_options);
-    get_deploy && (this.result = get_deploy);
+    get_deploy && (this.result = get_deploy.toJson());
   }
 
   async get_dictionary_item() {
@@ -404,7 +398,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     get_dictionary_item_options.dictionary_item_identifier = dictionary_item_identifier;
     const state_get_dictionary_item = await this.sdk.state_get_dictionary_item(get_dictionary_item_options);
-    state_get_dictionary_item && (this.result = state_get_dictionary_item);
+    state_get_dictionary_item && (this.result = state_get_dictionary_item.stored_value);
   }
 
   async get_era_info() {
@@ -414,7 +408,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(get_era_info_options);
     const get_era_info = await this.sdk.get_era_info(get_era_info_options);
-    this.result = get_era_info;
+    get_era_info && (this.result = get_era_info.era_summary);
   }
 
   async get_era_summary() {
@@ -424,17 +418,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(get_era_summary_options);
     const get_era_summary = await this.sdk.get_era_summary(get_era_summary_options);
-    this.result = get_era_summary;
+    this.result = get_era_summary.era_summary;
   }
 
   async get_validator_changes() {
     const get_validator_changes = await this.sdk.get_validator_changes(this.node_address, this.verbosity);
-    this.result = get_validator_changes;
+    this.result = get_validator_changes.changes;
   }
 
   async list_rpcs() {
     const list_rpcs = await this.sdk.list_rpcs(this.node_address, this.verbosity);
-    this.result = list_rpcs;
+    this.result = list_rpcs.toJson();
   }
 
   async query_balance() {
@@ -449,7 +443,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getGlobalIdentifier(query_balance_options);
     const query_balance = await this.sdk.query_balance(query_balance_options);
-    query_balance && (this.result = query_balance);
+    query_balance && (this.result = query_balance.balance);
   }
 
   async query_global_state() {
@@ -466,7 +460,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getGlobalIdentifier(query_global_state_options);
     const query_global_state = await this.sdk.query_global_state(query_global_state_options);
-    query_global_state && (this.result = query_global_state?.result?.stored_value);
+    query_global_state && (this.result = query_global_state?.stored_value);
   }
 
   async deploy(deploy_result = true, speculative?: boolean) {
@@ -500,6 +494,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   test_deploy = test_deploy.sign(this.private_key);
     // }
     let result;
+
     if (speculative) {
       const maybe_block_options = {
         maybe_block_id_as_string: undefined,
@@ -529,10 +524,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         session_params,
         payment_params,
       );
-      result && (this.result = result);
     }
     if (result) {
-      this.result = result;
+      this.result = result.toJson();
     }
     return result;
   }
@@ -604,7 +598,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         payment_params,
       );
     }
-    result && (this.result = result);
+    result && (this.result = result.toJson());
     return result;
   }
 
@@ -632,7 +626,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       signed_deploy,
       this.verbosity
     );
-    put_deploy && (this.result = put_deploy);
+    put_deploy && (this.result = put_deploy.toJson());
     return put_deploy;
   }
 
@@ -657,7 +651,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(speculative_exec_options);
     const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
-    speculative_exec && (this.result = speculative_exec);
+    speculative_exec && (this.result = speculative_exec.toJson());
     return speculative_exec;
   }
 
@@ -726,7 +720,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       session_params,
       payment_amount
     );
-    call_entrypoint && (this.result = call_entrypoint);
+    call_entrypoint && (this.result = call_entrypoint.toJson());
   }
 
   async query_contract_dict() {
@@ -764,14 +758,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Here setter does take instance of DictionaryItemStrParams
     query_contract_dict_options.dictionary_item_params = dictionary_item_params;
     const query_contract_dict = await this.sdk.query_contract_dict(query_contract_dict_options);
-    query_contract_dict && (this.result = query_contract_dict);
+    query_contract_dict && (this.result = query_contract_dict.toJson());
   }
 
   async query_contract_key() {
     const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
     const path_as_string: string = this.queryPathElt && this.queryPathElt.nativeElement.value.toString().trim().replace(/^\/+|\/+$/g, '');
     const key_as_string: string = this.queryKeyElt && this.queryKeyElt.nativeElement.value.toString().trim();
-    if (!key_as_string) {
+    if (!key_as_string || !path_as_string) {
       return;
     }
     const query_contract_key_options = this.sdk.query_contract_key_options({
@@ -782,16 +776,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       verbosity: Verbosity.High,
     });
     const query_contract_key = await this.sdk.query_contract_key(query_contract_key_options);
-    query_contract_key && (this.result = query_contract_key?.result?.stored_value);
+    query_contract_key && (this.result = query_contract_key?.stored_value);
   }
 
   async ngAfterViewInit() {
-    console.log(this.config['networks']);
     this.networks = Object.entries(this.config['networks']).map(([name, network]) => ({
       name,
       ...network,
     }));
-    console.log(this.networks);
     const no_mark_for_check = true;
     await this.get_state_root_hash(no_mark_for_check);
     this.changeDetectorRef.markForCheck();
@@ -837,7 +829,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   cleanDisplay() {
-    this.action = '';
     this.result = '';
     this.result_text = '';
   }
@@ -993,7 +984,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     return session_params;
   }
 
-  changePort(peer: peer) {
+  changePort(peer: PeerEntry) {
     const address = peer.address.split(':');
     const new_address = ['http://', address.shift(), ':', '7777'].join('');
     return (new_address);

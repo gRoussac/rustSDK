@@ -1,6 +1,5 @@
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
 use crate::{
+    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -11,10 +10,12 @@ use crate::{
     SDK,
 };
 use casper_client::cli::make_transfer as client_make_transfer;
-use casper_types::Deploy;
+use casper_types::Deploy as _Deploy;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+use super::sign_deploy::Deploy;
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
@@ -27,16 +28,23 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> JsValue {
+    ) -> Result<Deploy, JsError> {
         // log("make_transfer");
-        let deploy = self.make_transfer(
+        let result = self.make_transfer(
             amount,
             target_account,
             transfer_id,
             deploy_params,
             payment_params,
         );
-        serialize_result(deploy)
+        match result {
+            Ok(data) => Ok(data.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -48,7 +56,7 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<Deploy, SdkError> {
+    ) -> Result<_Deploy, SdkError> {
         // log("make_transfer");
         make_transfer(
             amount,
@@ -67,7 +75,7 @@ pub(crate) fn make_transfer(
     transfer_id: Option<String>,
     deploy_params: DeployStrParams,
     payment_params: PaymentStrParams,
-) -> Result<Deploy, SdkError> {
+) -> Result<_Deploy, SdkError> {
     let transfer_id = if let Some(transfer_id) = transfer_id {
         transfer_id
     } else {

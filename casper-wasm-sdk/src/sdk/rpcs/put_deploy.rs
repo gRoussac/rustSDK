@@ -1,10 +1,12 @@
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
-use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+use crate::{
+    debug::error, deploy::deploy::PutDeployResult, helpers::get_verbosity_or_default,
+    types::verbosity::Verbosity, SDK,
+};
 use casper_client::{
-    put_deploy, rpcs::results::PutDeployResult, Error, JsonRpcId, SuccessResponse,
+    put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, Error, JsonRpcId,
+    SuccessResponse,
 };
 use casper_types::Deploy as _Deploy;
 use rand::Rng;
@@ -20,11 +22,18 @@ impl SDK {
         node_address: &str,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
-    ) -> JsValue {
-        serialize_result(
-            self.put_deploy(node_address, deploy.into(), verbosity)
-                .await,
-        )
+    ) -> Result<PutDeployResult, JsError> {
+        let result = self
+            .put_deploy(node_address, deploy.into(), verbosity)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "account_put_deploy")]
@@ -33,7 +42,7 @@ impl SDK {
         node_address: &str,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
-    ) -> JsValue {
+    ) -> Result<PutDeployResult, JsError> {
         self.put_deploy_js_alias(node_address, deploy, verbosity)
             .await
     }
@@ -45,7 +54,7 @@ impl SDK {
         node_address: &str,
         deploy: _Deploy,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<PutDeployResult>, Error> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, Error> {
         //log("account_put_deploy!");
         put_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),

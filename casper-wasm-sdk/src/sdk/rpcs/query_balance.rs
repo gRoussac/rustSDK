@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 #[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
@@ -15,7 +13,7 @@ use crate::{
 use casper_client::cli::parse_purse_identifier;
 use casper_client::{
     cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
-    rpcs::results::QueryBalanceResult, JsonRpcId, SuccessResponse,
+    rpcs::results::QueryBalanceResult as _QueryBalanceResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -24,6 +22,40 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct QueryBalanceResult(_QueryBalanceResult);
+
+impl From<QueryBalanceResult> for _QueryBalanceResult {
+    fn from(result: QueryBalanceResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_QueryBalanceResult> for QueryBalanceResult {
+    fn from(result: _QueryBalanceResult) -> Self {
+        QueryBalanceResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl QueryBalanceResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn balance(&self) -> JsValue {
+        JsValue::from_serde(&self.0.balance).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -56,7 +88,10 @@ impl SDK {
     }
 
     #[wasm_bindgen(js_name = "query_balance")]
-    pub async fn query_balance_js_alias(&mut self, options: QueryBalanceOptions) -> JsValue {
+    pub async fn query_balance_js_alias(
+        &mut self,
+        options: QueryBalanceOptions,
+    ) -> Result<QueryBalanceResult, JsError> {
         let QueryBalanceOptions {
             node_address,
             verbosity,
@@ -123,8 +158,14 @@ impl SDK {
             )
             .await
         };
-
-        serialize_result(result)
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -139,7 +180,7 @@ impl SDK {
         state_root_hash: Option<String>,
         maybe_block_id: Option<String>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<QueryBalanceResult>, SdkError> {
+    ) -> Result<SuccessResponse<_QueryBalanceResult>, SdkError> {
         //log("query_balance!");
 
         let purse_identifier = if let Some(purse_identifier) = purse_identifier {

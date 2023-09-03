@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
+use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
@@ -10,7 +10,7 @@ use crate::{
 #[allow(deprecated)]
 use casper_client::{
     cli::get_era_info as get_era_info_cli, get_era_info as get_era_info_lib,
-    rpcs::results::GetEraInfoResult, JsonRpcId, SuccessResponse,
+    rpcs::results::GetEraInfoResult as _GetEraInfoResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -19,6 +19,40 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetEraInfoResult(_GetEraInfoResult);
+
+impl From<GetEraInfoResult> for _GetEraInfoResult {
+    fn from(result: GetEraInfoResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetEraInfoResult> for GetEraInfoResult {
+    fn from(result: _GetEraInfoResult) -> Self {
+        GetEraInfoResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetEraInfoResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn era_summary(&self) -> JsValue {
+        JsValue::from_serde(&self.0.era_summary).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -43,7 +77,10 @@ impl SDK {
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
     #[allow(deprecated)]
     #[wasm_bindgen(js_name = "get_era_info")]
-    pub async fn get_era_info_js_alias(&mut self, options: GetEraInfoOptions) -> JsValue {
+    pub async fn get_era_info_js_alias(
+        &mut self,
+        options: GetEraInfoOptions,
+    ) -> Result<GetEraInfoResult, JsError> {
         let GetEraInfoOptions {
             node_address,
             maybe_block_id_as_string,
@@ -58,11 +95,17 @@ impl SDK {
         } else {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
-
-        serialize_result(
-            self.get_era_info(&node_address, maybe_block_identifier, verbosity)
-                .await,
-        )
+        let result = self
+            .get_era_info(&node_address, maybe_block_identifier, verbosity)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -74,7 +117,7 @@ impl SDK {
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetEraInfoResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetEraInfoResult>, SdkError> {
         //log("get_era_info!");
 
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {

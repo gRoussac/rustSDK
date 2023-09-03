@@ -1,9 +1,8 @@
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     debug::error,
+    rpcs::speculative_exec::SpeculativeExecResult,
     types::{
         block_identifier::BlockIdentifierInput,
         deploy_params::{
@@ -15,7 +14,10 @@ use crate::{
     },
     SDK,
 };
-use casper_client::{cli::make_transfer, rpcs::results::SpeculativeExecResult, SuccessResponse};
+use casper_client::{
+    cli::make_transfer, rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
+    SuccessResponse,
+};
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -36,7 +38,7 @@ impl SDK {
         maybe_block_id_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
-    ) -> JsValue {
+    ) -> Result<SpeculativeExecResult, JsError> {
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,
@@ -44,9 +46,8 @@ impl SDK {
         } else {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
-
-        serialize_result(
-            self.speculative_transfer(
+        let result = self
+            .speculative_transfer(
                 node_address,
                 amount,
                 target_account,
@@ -56,8 +57,15 @@ impl SDK {
                 maybe_block_identifier,
                 verbosity,
             )
-            .await,
-        )
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -73,7 +81,7 @@ impl SDK {
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<SpeculativeExecResult>, SdkError> {
+    ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
             transfer_id

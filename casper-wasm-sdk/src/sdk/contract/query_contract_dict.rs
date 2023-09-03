@@ -1,3 +1,4 @@
+use crate::rpcs::get_dictionary_item::GetDictionaryItemResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::{
     deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
@@ -10,7 +11,9 @@ use crate::{
     types::{digest::ToDigest, verbosity::Verbosity},
 };
 use crate::{types::sdk_error::SdkError, SDK};
-use casper_client::{rpcs::results::GetDictionaryItemResult, SuccessResponse};
+use casper_client::{
+    rpcs::results::GetDictionaryItemResult as _GetDictionaryItemResult, SuccessResponse,
+};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]
@@ -55,11 +58,12 @@ impl SDK {
     pub async fn query_contract_dict_js_alias(
         &mut self,
         options: QueryContractDictOptions,
-    ) -> JsValue {
+    ) -> Result<GetDictionaryItemResult, JsError> {
         let js_value_options = JsValue::from_serde::<QueryContractDictOptions>(&options);
         if let Err(err) = js_value_options {
-            error(&format!("Error serializing options: {:?}", err));
-            return JsValue::null();
+            let err = &format!("Error serializing options: {:?}", err);
+            error(err);
+            return Err(JsError::new(err));
         }
         let options = self.get_dictionary_item_options(js_value_options.unwrap());
         self.get_dictionary_item_js_alias(options).await
@@ -73,7 +77,7 @@ impl SDK {
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetDictionaryItemResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("query_contract_dict!");
         self.get_dictionary_item(node_address, state_root_hash, dictionary_item, verbosity)
             .await

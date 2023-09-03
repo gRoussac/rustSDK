@@ -1,5 +1,12 @@
+#[cfg(target_arch = "wasm32")]
+use crate::types::deploy_params::{
+    deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
+    payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
+    session_str_params::{session_str_params_to_casper_client, SessionStrParams},
+};
 use crate::{
     debug::error,
+    deploy::deploy::PutDeployResult,
     types::{
         cl::bytes::Bytes,
         deploy::{BuildParams, Deploy},
@@ -7,21 +14,12 @@ use crate::{
     },
     SDK,
 };
-#[cfg(target_arch = "wasm32")]
-use crate::{
-    helpers::serialize_result,
-    types::deploy_params::{
-        deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
-        payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
-        session_str_params::{session_str_params_to_casper_client, SessionStrParams},
-    },
-};
 use casper_client::{
     cli::{
         make_deploy, DeployStrParams as _DeployStrParams, PaymentStrParams as _PaymentStrParams,
         SessionStrParams as _SessionStrParams,
     },
-    rpcs::results::PutDeployResult,
+    rpcs::results::PutDeployResult as _PutDeployResult,
     SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
@@ -40,12 +38,12 @@ impl SDK {
         session_params: SessionStrParams,
         payment_amount: &str,
         module_bytes: Option<Uint8Array>,
-    ) -> JsValue {
+    ) -> Result<PutDeployResult, JsError> {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
         let wasm_bytes = module_bytes.map(|bytes| Bytes::from(bytes.to_vec()));
-        serialize_result(
-            self.install(
+        let result = self
+            .install(
                 node_address,
                 deploy_str_params_to_casper_client(&deploy_params),
                 session_str_params_to_casper_client(&session_params),
@@ -53,8 +51,15 @@ impl SDK {
                 wasm_bytes,
                 deploy_params.secret_key(),
             )
-            .await,
-        )
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -67,7 +72,7 @@ impl SDK {
         payment_params: _PaymentStrParams<'_>,
         module_bytes: Option<Bytes>,
         secret_key: Option<std::string::String>,
-    ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("install!");
         let deploy = make_deploy("", deploy_params, session_params, payment_params, false);
         if let Err(err) = deploy {

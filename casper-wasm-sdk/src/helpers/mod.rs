@@ -77,32 +77,6 @@ pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {
     bytes
 }
 
-pub fn serialize_result<T, E>(result: Result<T, E>) -> JsValue
-where
-    T: Serialize,
-    E: std::error::Error,
-{
-    match result {
-        Ok(data) => {
-            // Let's not use serde-wasm-bindgen for now but from_serde as per https://rustwasm.github.io/wasm-bindgen/reference/arbitrary-data-with-serde.html
-            // use serde_wasm_bindgen::Serializer;
-            // let serializer =
-            //     Serializer::json_compatible().serialize_large_number_types_as_bigints(true);
-            match JsValue::from_serde(&data) {
-                Ok(json) => json,
-                Err(err) => {
-                    error(&format!("Error serializing data to JSON: {:?}", err));
-                    JsValue::null()
-                }
-            }
-        }
-        Err(err) => {
-            error(&format!("Error occurred: {:?}", err));
-            JsValue::null()
-        }
-    }
-}
-
 pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> String
 where
     T: Serialize,

@@ -39,6 +39,11 @@ impl Digest {
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
+
+    #[wasm_bindgen(js_name = "toString")]
+    pub fn to_string_js_name(&self) -> String {
+        self.to_string()
+    }
 }
 
 impl Digest {

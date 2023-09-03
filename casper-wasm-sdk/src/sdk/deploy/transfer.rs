@@ -1,6 +1,4 @@
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-
+use super::deploy::PutDeployResult;
 use crate::{
     debug::error,
     types::{
@@ -13,7 +11,9 @@ use crate::{
     },
     SDK,
 };
-use casper_client::{cli::make_transfer, rpcs::results::PutDeployResult, SuccessResponse};
+use casper_client::{
+    cli::make_transfer, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
+};
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -32,9 +32,9 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-    ) -> JsValue {
-        serialize_result(
-            self.transfer(
+    ) -> Result<PutDeployResult, JsError> {
+        let result = self
+            .transfer(
                 node_address,
                 amount,
                 target_account,
@@ -43,8 +43,15 @@ impl SDK {
                 payment_params,
                 verbosity,
             )
-            .await,
-        )
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -59,7 +66,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<PutDeployResult>, SdkError> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
             transfer_id

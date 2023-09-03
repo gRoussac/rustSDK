@@ -1,18 +1,19 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        block_identifier::BlockIdentifierInput, digest::Digest, sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
     cli::get_state_root_hash as get_state_root_hash_cli,
-    get_state_root_hash as get_state_root_hash_lib, rpcs::results::GetStateRootHashResult,
-    JsonRpcId, SuccessResponse,
+    get_state_root_hash as get_state_root_hash_lib,
+    rpcs::results::GetStateRootHashResult as _GetStateRootHashResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -21,6 +22,49 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetStateRootHashResult(_GetStateRootHashResult);
+
+impl From<GetStateRootHashResult> for _GetStateRootHashResult {
+    fn from(result: GetStateRootHashResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetStateRootHashResult> for GetStateRootHashResult {
+    fn from(result: _GetStateRootHashResult) -> Self {
+        GetStateRootHashResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetStateRootHashResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn state_root_hash(&self) -> Option<Digest> {
+        self.0.state_root_hash.map(Into::into)
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn state_root_hash_as_string(&self) -> String {
+        self.0
+            .state_root_hash
+            .map(Into::<Digest>::into)
+            .map(|digest| digest.to_string())
+            .unwrap_or_default()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -51,7 +95,7 @@ impl SDK {
     pub async fn get_state_root_hash_js_alias(
         &mut self,
         options: GetStateRootHashOptions,
-    ) -> JsValue {
+    ) -> Result<GetStateRootHashResult, JsError> {
         let GetStateRootHashOptions {
             node_address,
             block_id_as_string,
@@ -65,17 +109,25 @@ impl SDK {
         } else {
             block_id_as_string.map(BlockIdentifierInput::String)
         };
-        serialize_result(
-            self.get_state_root_hash(&node_address, maybe_block_identifier, verbosity)
-                .await,
-        )
+
+        let result = self
+            .get_state_root_hash(&node_address, maybe_block_identifier, verbosity)
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "chain_get_state_root_hash")]
     pub async fn chain_get_state_root_hash_js_alias(
         &mut self,
         options: GetStateRootHashOptions,
-    ) -> JsValue {
+    ) -> Result<GetStateRootHashResult, JsError> {
         self.get_state_root_hash_js_alias(options).await
     }
 }
@@ -86,7 +138,7 @@ impl SDK {
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetStateRootHashResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetStateRootHashResult>, SdkError> {
         //log("get_state_root_hash!");
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_state_root_hash_cli(

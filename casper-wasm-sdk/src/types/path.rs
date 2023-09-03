@@ -40,6 +40,7 @@ impl Path {
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.path).unwrap_or(JsValue::null())
     }
+
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()

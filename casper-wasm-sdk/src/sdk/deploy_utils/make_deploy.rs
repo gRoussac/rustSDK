@@ -1,6 +1,6 @@
-#[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
+use super::sign_deploy::Deploy;
 use crate::{
+    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -12,7 +12,7 @@ use crate::{
     SDK,
 };
 use casper_client::cli::make_deploy as client_make_deploy;
-use casper_types::Deploy;
+use casper_types::Deploy as _Deploy;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
@@ -25,9 +25,16 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> JsValue {
-        let deploy = make_deploy(deploy_params, session_params, payment_params);
-        serialize_result(deploy)
+    ) -> Result<Deploy, JsError> {
+        let result = make_deploy(deploy_params, session_params, payment_params);
+        match result {
+            Ok(data) => Ok(data.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 }
 
@@ -37,7 +44,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<Deploy, SdkError> {
+    ) -> Result<_Deploy, SdkError> {
         make_deploy(deploy_params, session_params, payment_params).map_err(SdkError::from)
     }
 }
@@ -46,7 +53,7 @@ pub(crate) fn make_deploy(
     deploy_params: DeployStrParams,
     session_params: SessionStrParams,
     payment_params: PaymentStrParams,
-) -> Result<Deploy, SdkError> {
+) -> Result<_Deploy, SdkError> {
     // log("make_deploy");
     client_make_deploy(
         "",

@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
 use crate::{
     helpers::get_verbosity_or_default,
@@ -17,8 +15,8 @@ use crate::{
 };
 use casper_client::{
     cli::get_dictionary_item as get_dictionary_item_cli,
-    get_dictionary_item as get_dictionary_item_lib, rpcs::results::GetDictionaryItemResult,
-    JsonRpcId, SuccessResponse,
+    get_dictionary_item as get_dictionary_item_lib,
+    rpcs::results::GetDictionaryItemResult as _GetDictionaryItemResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -27,6 +25,50 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetDictionaryItemResult(_GetDictionaryItemResult);
+
+impl From<GetDictionaryItemResult> for _GetDictionaryItemResult {
+    fn from(result: GetDictionaryItemResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetDictionaryItemResult> for GetDictionaryItemResult {
+    fn from(result: _GetDictionaryItemResult) -> Self {
+        GetDictionaryItemResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetDictionaryItemResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn dictionary_key(&self) -> String {
+        self.0.dictionary_key.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn stored_value(&self) -> JsValue {
+        JsValue::from_serde(&self.0.stored_value).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn merkle_proof(&self) -> String {
+        self.0.merkle_proof.clone()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -59,7 +101,7 @@ impl SDK {
     pub async fn get_dictionary_item_js_alias(
         &mut self,
         options: GetDictionaryItemOptions,
-    ) -> JsValue {
+    ) -> Result<GetDictionaryItemResult, JsError> {
         let GetDictionaryItemOptions {
             node_address,
             state_root_hash_as_string,
@@ -74,8 +116,9 @@ impl SDK {
         } else if let Some(params) = dictionary_item_params {
             DictionaryItemInput::Params(params)
         } else {
-            error("Error: Missing dictionary item identifier or params");
-            return JsValue::null();
+            let err = "Error: Missing dictionary item identifier or params";
+            error(err);
+            return Err(JsError::new(err));
         };
 
         let result = if let Some(hash) = state_root_hash {
@@ -85,17 +128,25 @@ impl SDK {
             self.get_dictionary_item(&node_address, hash.as_str(), dictionary_item, verbosity)
                 .await
         } else {
-            error("Error: Missing state_root_hash");
-            return JsValue::null();
+            let err = "Error: Missing state_root_hash";
+            error(err);
+            return Err(JsError::new(err));
         };
-        serialize_result(result)
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
         &mut self,
         options: GetDictionaryItemOptions,
-    ) -> JsValue {
+    ) -> Result<GetDictionaryItemResult, JsError> {
         self.get_dictionary_item_js_alias(options).await
     }
 }
@@ -112,7 +163,7 @@ impl SDK {
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetDictionaryItemResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         //log("state_get_dictionary_item!");
         match dictionary_item {
             DictionaryItemInput::Params(dictionary_item_params) => {

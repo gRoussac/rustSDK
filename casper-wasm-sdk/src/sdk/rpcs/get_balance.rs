@@ -1,8 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
-use crate::helpers::serialize_result;
-#[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
 use crate::{
     helpers::get_verbosity_or_default,
@@ -11,7 +9,7 @@ use crate::{
 };
 use casper_client::{
     cli::get_balance as get_balance_cli, get_balance as get_balance_lib,
-    rpcs::results::GetBalanceResult, JsonRpcId, SuccessResponse,
+    rpcs::results::GetBalanceResult as _GetBalanceResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -20,6 +18,45 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Deserialize, Clone, Serialize)]
+#[wasm_bindgen]
+pub struct GetBalanceResult(_GetBalanceResult);
+
+impl From<GetBalanceResult> for _GetBalanceResult {
+    fn from(result: GetBalanceResult) -> Self {
+        result.0
+    }
+}
+
+impl From<_GetBalanceResult> for GetBalanceResult {
+    fn from(result: _GetBalanceResult) -> Self {
+        GetBalanceResult(result)
+    }
+}
+
+#[wasm_bindgen]
+impl GetBalanceResult {
+    #[wasm_bindgen(getter)]
+    pub fn api_version(&self) -> JsValue {
+        JsValue::from_serde(&self.0.api_version).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn balance_value(&self) -> JsValue {
+        JsValue::from_serde(&self.0.balance_value).unwrap()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn merkle_proof(&self) -> String {
+        self.0.merkle_proof.clone()
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
+    }
+}
 
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
@@ -49,7 +86,10 @@ impl SDK {
     }
 
     #[wasm_bindgen(js_name = "get_balance")]
-    pub async fn get_balance_js_alias(&mut self, options: GetBalanceOptions) -> JsValue {
+    pub async fn get_balance_js_alias(
+        &mut self,
+        options: GetBalanceOptions,
+    ) -> Result<GetBalanceResult, JsError> {
         let GetBalanceOptions {
             node_address,
             state_root_hash_as_string,
@@ -64,8 +104,9 @@ impl SDK {
         } else if let Some(purse_uref_as_string) = purse_uref_as_string {
             GetBalanceInput::PurseUrefAsString(purse_uref_as_string)
         } else {
-            error("Error: Missing purse uref as string or purse uref");
-            return JsValue::null();
+            let err = "Error: Missing purse uref as string or purse uref";
+            error(err);
+            return Err(JsError::new(err));
         };
 
         let result = if let Some(hash) = state_root_hash {
@@ -76,14 +117,25 @@ impl SDK {
             self.get_balance(&node_address, hash.as_str(), purse_uref, verbosity)
                 .await
         } else {
-            error("Error: Missing state_root_hash");
-            return JsValue::null();
+            let err = "Error: Missing state_root_hash";
+            error(err);
+            return Err(JsError::new(err));
         };
-        serialize_result(result)
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred: {:?}", err);
+                error(err);
+                Err(JsError::new(err))
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "state_get_balance")]
-    pub async fn state_get_balance_js_alias(&mut self, options: GetBalanceOptions) -> JsValue {
+    pub async fn state_get_balance_js_alias(
+        &mut self,
+        options: GetBalanceOptions,
+    ) -> Result<GetBalanceResult, JsError> {
         self.get_balance_js_alias(options).await
     }
 }
@@ -101,7 +153,7 @@ impl SDK {
         state_root_hash: impl ToDigest,
         purse_uref: GetBalanceInput,
         verbosity: Option<Verbosity>,
-    ) -> Result<SuccessResponse<GetBalanceResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
         //log("get_balance!");
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
