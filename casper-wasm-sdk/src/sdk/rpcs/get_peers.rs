@@ -54,7 +54,7 @@ impl GetPeersResult {
 impl SDK {
     #[wasm_bindgen(js_name = "get_peers")]
     pub async fn get_peers_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<GetPeersResult, JsError> {

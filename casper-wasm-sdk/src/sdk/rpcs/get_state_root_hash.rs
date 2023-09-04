@@ -95,7 +95,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_state_root_hash")]
     pub async fn get_state_root_hash_js_alias(
-        &mut self,
+        &self,
         options: GetStateRootHashOptions,
     ) -> Result<GetStateRootHashResult, JsError> {
         let GetStateRootHashOptions {
@@ -127,7 +127,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "chain_get_state_root_hash")]
     pub async fn chain_get_state_root_hash_js_alias(
-        &mut self,
+        &self,
         options: GetStateRootHashOptions,
     ) -> Result<GetStateRootHashResult, JsError> {
         self.get_state_root_hash_js_alias(options).await
@@ -136,7 +136,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_state_root_hash(
-        &mut self,
+        &self,
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,

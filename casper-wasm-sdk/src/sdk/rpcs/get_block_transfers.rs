@@ -91,7 +91,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_block_transfers")]
     pub async fn get_block_transfers_js_alias(
-        &mut self,
+        &self,
         options: GetBlockTransfersOptions,
     ) -> Result<GetBlockTransfersResult, JsError> {
         let GetBlockTransfersOptions {
@@ -125,7 +125,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_block_transfers(
-        &mut self,
+        &self,
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,

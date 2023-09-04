@@ -55,7 +55,7 @@ impl GetValidatorChangesResult {
 impl SDK {
     #[wasm_bindgen(js_name = "get_validator_changes")]
     pub async fn get_validator_changes_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<GetValidatorChangesResult, JsError> {
@@ -73,7 +73,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_validator_changes(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetValidatorChangesResult>, Error> {

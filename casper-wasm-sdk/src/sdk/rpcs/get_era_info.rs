@@ -81,7 +81,7 @@ impl SDK {
     #[allow(deprecated)]
     #[wasm_bindgen(js_name = "get_era_info")]
     pub async fn get_era_info_js_alias(
-        &mut self,
+        &self,
         options: GetEraInfoOptions,
     ) -> Result<GetEraInfoResult, JsError> {
         let GetEraInfoOptions {
@@ -116,7 +116,7 @@ impl SDK {
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
     #[allow(deprecated)]
     pub async fn get_era_info(
-        &mut self,
+        &self,
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,

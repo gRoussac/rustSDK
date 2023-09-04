@@ -17,7 +17,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen(js_name = "put_deploy")]
     pub async fn put_deploy_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
@@ -37,7 +37,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "account_put_deploy")]
     pub async fn account_put_deploy_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         deploy: Deploy,
         verbosity: Option<Verbosity>,
@@ -49,7 +49,7 @@ impl SDK {
 
 impl SDK {
     pub async fn put_deploy(
-        &mut self,
+        &self,
         node_address: &str,
         deploy: _Deploy,
         verbosity: Option<Verbosity>,

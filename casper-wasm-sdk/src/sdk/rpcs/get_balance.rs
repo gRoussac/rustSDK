@@ -89,7 +89,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_balance")]
     pub async fn get_balance_js_alias(
-        &mut self,
+        &self,
         options: GetBalanceOptions,
     ) -> Result<GetBalanceResult, JsError> {
         let GetBalanceOptions {
@@ -135,7 +135,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "state_get_balance")]
     pub async fn state_get_balance_js_alias(
-        &mut self,
+        &self,
         options: GetBalanceOptions,
     ) -> Result<GetBalanceResult, JsError> {
         self.get_balance_js_alias(options).await
@@ -150,7 +150,7 @@ pub enum GetBalanceInput {
 
 impl SDK {
     pub async fn get_balance(
-        &mut self,
+        &self,
         node_address: &str,
         state_root_hash: impl ToDigest,
         purse_uref: GetBalanceInput,

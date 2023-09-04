@@ -82,7 +82,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_auction_info")]
     pub async fn get_auction_info_js_alias(
-        &mut self,
+        &self,
         options: GetAuctionInfoOptions,
     ) -> Result<GetAuctionInfoResult, JsError> {
         let GetAuctionInfoOptions {
@@ -116,7 +116,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_auction_info(
-        &mut self,
+        &self,
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,

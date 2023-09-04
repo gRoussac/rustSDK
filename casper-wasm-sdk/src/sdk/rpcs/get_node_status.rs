@@ -119,7 +119,7 @@ impl GetNodeStatusResult {
 impl SDK {
     #[wasm_bindgen(js_name = "get_node_status")]
     pub async fn get_node_status_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<GetNodeStatusResult, JsError> {
@@ -137,7 +137,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_node_status(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetNodeStatusResult>, Error> {

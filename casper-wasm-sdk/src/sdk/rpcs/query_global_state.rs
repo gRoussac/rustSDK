@@ -96,7 +96,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "query_global_state")]
     pub async fn query_global_state_js_alias(
-        &mut self,
+        &self,
         options: QueryGlobalStateOptions,
     ) -> Result<QueryGlobalStateResult, JsError> {
         match self.query_global_state_js_alias_params(options) {
@@ -145,7 +145,7 @@ pub struct QueryGlobalStateParams {
 
 impl SDK {
     pub fn query_global_state_js_alias_params(
-        &mut self,
+        &self,
         options: QueryGlobalStateOptions,
     ) -> Result<QueryGlobalStateParams, SdkError> {
         let QueryGlobalStateOptions {
@@ -241,7 +241,7 @@ impl SDK {
     }
 
     pub async fn query_global_state(
-        &mut self,
+        &self,
         query_params: QueryGlobalStateParams,
     ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
         //log("query_global_state!");

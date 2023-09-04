@@ -83,7 +83,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_era_summary")]
     pub async fn get_era_summary_js_alias(
-        &mut self,
+        &self,
         options: GetEraSummaryOptions,
     ) -> Result<GetEraSummaryResult, JsError> {
         let GetEraSummaryOptions {
@@ -117,7 +117,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_era_summary(
-        &mut self,
+        &self,
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
