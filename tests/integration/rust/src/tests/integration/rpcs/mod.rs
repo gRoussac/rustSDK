@@ -7,9 +7,6 @@ pub mod test_module {
         },
         integration_tests::test_module::WAIT_TIME,
     };
-    use casper_types::{
-        bytesrepr::ToBytes, AsymmetricType, DeployHash, Digest as CasperTypesDigest, PublicKey,
-    };
     use casper_wasm_sdk::{
         rpcs::{
             get_balance::GetBalanceInput,
@@ -17,9 +14,9 @@ pub mod test_module {
             query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
         },
         types::{
-            block_identifier::BlockIdentifierInput,
+            block_identifier::BlockIdentifierInput, deploy_hash::DeployHash,
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams, digest::Digest,
-            global_state_identifier::GlobalStateIdentifierInput,
+            global_state_identifier::GlobalStateIdentifierInput, public_key::PublicKey,
         },
     };
     use std::thread;
@@ -34,11 +31,11 @@ pub mod test_module {
     }
 
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let public_key = PublicKey::from_hex(DEFAULT_SESSION_ACCOUNT).unwrap();
+        let public_key = PublicKey::new(DEFAULT_SESSION_ACCOUNT).unwrap();
         let get_account = create_test_sdk()
             .get_account(
                 &CONFIG.node_address,
-                public_key.clone(),
+                public_key,
                 maybe_block_identifier,
                 CONFIG.verbosity,
             )
@@ -151,7 +148,7 @@ pub mod test_module {
         let get_deploy = create_test_sdk()
             .get_deploy(
                 &CONFIG.node_address,
-                DeployHash::new(CasperTypesDigest::from_hex(DEFAULT_DEPLOY).unwrap()),
+                DeployHash::new(DEFAULT_DEPLOY).unwrap(),
                 Some(true),
                 CONFIG.verbosity,
             )
@@ -198,8 +195,7 @@ pub mod test_module {
             .stored_value
             .as_cl_value()
             .unwrap()
-            .to_bytes()
-            .unwrap()
+            .inner_bytes()
             .is_empty());
         thread::sleep(WAIT_TIME);
     }
@@ -321,8 +317,7 @@ pub mod test_module {
             .stored_value
             .as_cl_value()
             .unwrap()
-            .to_bytes()
-            .unwrap()
+            .inner_bytes()
             .is_empty());
     }
 }

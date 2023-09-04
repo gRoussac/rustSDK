@@ -1,4 +1,3 @@
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 #[cfg(target_arch = "wasm32")]
 use crate::{debug::error, deploy::deploy::PutDeployResult};
@@ -7,7 +6,6 @@ use casper_client::{
     put_deploy, rpcs::results::PutDeployResult as _PutDeployResult, Error, JsonRpcId,
     SuccessResponse,
 };
-use casper_types::Deploy as _Deploy;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -51,7 +49,7 @@ impl SDK {
     pub async fn put_deploy(
         &self,
         node_address: &str,
-        deploy: _Deploy,
+        deploy: Deploy,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_PutDeployResult>, Error> {
         //log("account_put_deploy!");
@@ -59,7 +57,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             get_verbosity_or_default(verbosity).into(),
-            deploy,
+            deploy.into(),
         )
         .await
     }
