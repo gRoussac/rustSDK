@@ -59,7 +59,7 @@ impl ListRpcsResult {
 impl SDK {
     #[wasm_bindgen(js_name = "list_rpcs")]
     pub async fn list_rpcs_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<ListRpcsResult, JsError> {
@@ -77,7 +77,7 @@ impl SDK {
 
 impl SDK {
     pub async fn list_rpcs(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_ListRpcsResult>, Error> {

@@ -1,9 +1,6 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::tests::helpers::{
-        CHAIN_NAME, CONFIG, DEFAULT_SESSION_ACCOUNT, DEFAULT_TTL, SDK, TTL,
-    };
-    use casper_types::DeployHash;
+    use crate::tests::helpers::{CHAIN_NAME, DEFAULT_SESSION_ACCOUNT, DEFAULT_TTL, TTL};
     use casper_wasm_sdk::{
         debug::{error, log},
         helpers::hex_to_uint8_vec,
@@ -12,13 +9,9 @@ pub mod test_module {
             session_str_params::SessionStrParams,
         },
     };
-
-    pub async fn test_get_peers() {
-        let peers_result = SDK.get_peers(&CONFIG.node_address, CONFIG.verbosity).await;
-        let peers = peers_result.unwrap();
-        assert!(!peers.result.api_version.to_string().is_empty());
-        assert!(!peers.result.peers.is_empty());
-    }
+    use std::time;
+    // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static not working
+    pub const WAIT_TIME: std::time::Duration = time::Duration::from_millis(2000);
 
     pub async fn test_hex_to_uint8_vec() {
         let test: Vec<u8> =
@@ -88,42 +81,13 @@ pub mod test_module {
         payment_params.set_payment_amount(amount);
         assert_eq!(payment_params.payment_amount().unwrap(), amount);
     }
-
-    pub async fn test_deploy() {
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
-        let amount = "5500000000";
-        let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            None,
-            None,
-            Some(TTL.to_string()),
-        );
-        let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(amount);
-        let test_deploy = SDK
-            .make_deploy(deploy_params, session_params, payment_params)
-            .unwrap();
-        assert_eq!(test_deploy.hash().serialized_length(), DeployHash::LENGTH);
-        assert_eq!(test_deploy.session().entry_point_name(), entrypoint);
-    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::test_module::{
-        test_deploy, test_deploy_params, test_deploy_params_defaults, test_error, test_get_peers,
-        test_hex_to_uint8_vec, test_log, test_payment_params, test_session_params,
-    };
+    use super::test_module::*;
     use tokio::test;
-    #[test]
-    pub async fn test_get_peers_test() {
-        test_get_peers().await;
-    }
+
     #[test]
     pub async fn test_hex_to_uint8_vec_test() {
         test_hex_to_uint8_vec().await;
@@ -151,9 +115,5 @@ mod tests {
     #[test]
     pub async fn test_payment_params_test() {
         test_payment_params().await;
-    }
-    #[test]
-    pub async fn test_deploy_test() {
-        test_deploy().await;
     }
 }

@@ -83,7 +83,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_block")]
     pub async fn get_block_js_alias(
-        &mut self,
+        &self,
         options: GetBlockOptions,
     ) -> Result<GetBlockResult, JsError> {
         let GetBlockOptions {
@@ -116,7 +116,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "chain_get_block")]
     pub async fn chain_get_block_js_alias(
-        &mut self,
+        &self,
         options: GetBlockOptions,
     ) -> Result<GetBlockResult, JsError> {
         self.get_block_js_alias(options).await
@@ -125,7 +125,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_block(
-        &mut self,
+        &self,
         node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,

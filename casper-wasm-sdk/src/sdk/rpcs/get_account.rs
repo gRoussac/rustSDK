@@ -2,18 +2,18 @@
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
+#[cfg(target_arch = "wasm32")]
+use crate::types::public_key::PublicKey;
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{
-        block_identifier::BlockIdentifierInput, public_key::PublicKey, sdk_error::SdkError,
-        verbosity::Verbosity,
-    },
+    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
     rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,
 };
+use casper_types::PublicKey as _PublicKey;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
@@ -94,7 +94,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_account")]
     pub async fn get_account_js_alias(
-        &mut self,
+        &self,
         options: GetAccountOptions,
     ) -> Result<GetAccountResult, JsError> {
         let GetAccountOptions {
@@ -134,7 +134,12 @@ impl SDK {
         };
 
         let result = self
-            .get_account(&node_address, verbosity, maybe_block_identifier, public_key)
+            .get_account(
+                &node_address,
+                public_key.into(),
+                maybe_block_identifier,
+                verbosity,
+            )
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -148,7 +153,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "state_get_account_info")]
     pub async fn state_get_account_info_js_alias(
-        &mut self,
+        &self,
         options: GetAccountOptions,
     ) -> Result<GetAccountResult, JsError> {
         self.get_account_js_alias(options).await
@@ -157,11 +162,11 @@ impl SDK {
 
 impl SDK {
     pub async fn get_account(
-        &mut self,
+        &self,
         node_address: &str,
-        verbosity: Option<Verbosity>,
+        public_key: _PublicKey,
         maybe_block_identifier: Option<BlockIdentifierInput>,
-        public_key: PublicKey,
+        verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
         //log("get_account!");
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
@@ -188,7 +193,7 @@ impl SDK {
                 node_address,
                 get_verbosity_or_default(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
-                public_key.into(),
+                public_key,
             )
             .await
             .map_err(SdkError::from)

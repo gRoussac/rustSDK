@@ -55,7 +55,7 @@ impl GetChainspecResult {
 impl SDK {
     #[wasm_bindgen(js_name = "get_chainspec")]
     pub async fn get_chainspec_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<GetChainspecResult, JsError> {
@@ -73,7 +73,7 @@ impl SDK {
 
 impl SDK {
     pub async fn get_chainspec(
-        &mut self,
+        &self,
         node_address: &str,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetChainspecResult>, Error> {

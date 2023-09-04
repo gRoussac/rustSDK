@@ -102,7 +102,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "get_dictionary_item")]
     pub async fn get_dictionary_item_js_alias(
-        &mut self,
+        &self,
         options: GetDictionaryItemOptions,
     ) -> Result<GetDictionaryItemResult, JsError> {
         let GetDictionaryItemOptions {
@@ -147,7 +147,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
-        &mut self,
+        &self,
         options: GetDictionaryItemOptions,
     ) -> Result<GetDictionaryItemResult, JsError> {
         self.get_dictionary_item_js_alias(options).await
@@ -161,7 +161,7 @@ pub enum DictionaryItemInput {
 
 impl SDK {
     pub async fn get_dictionary_item(
-        &mut self,
+        &self,
         node_address: &str,
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,

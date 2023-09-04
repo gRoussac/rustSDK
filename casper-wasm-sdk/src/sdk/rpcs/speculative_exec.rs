@@ -95,7 +95,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "speculative_exec")]
     pub async fn speculative_exec_js_alias(
-        &mut self,
+        &self,
         options: GetSpeculativeExecOptions,
     ) -> Result<SpeculativeExecResult, JsError> {
         let GetSpeculativeExecOptions {
@@ -146,7 +146,7 @@ impl SDK {
 
 impl SDK {
     pub async fn speculative_exec(
-        &mut self,
+        &self,
         node_address: &str,
         deploy: CasperTypesDeploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
