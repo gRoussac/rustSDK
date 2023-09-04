@@ -7638,16 +7638,12 @@ function __wbg_get_imports() {
         const ret = GetDeployResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_getaccountresult_new = function(arg0) {
-        const ret = GetAccountResult.__wrap(arg0);
+    imports.wbg.__wbg_putdeployresult_new = function(arg0) {
+        const ret = PutDeployResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getbalanceresult_new = function(arg0) {
         const ret = GetBalanceResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_putdeployresult_new = function(arg0) {
-        const ret = PutDeployResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
@@ -7688,6 +7684,10 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbg_listrpcsresult_new = function(arg0) {
         const ret = ListRpcsResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getaccountresult_new = function(arg0) {
+        const ret = GetAccountResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getchainspecresult_new = function(arg0) {
@@ -8030,7 +8030,7 @@ function __wbg_get_imports() {
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_closure_wrapper4256 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 759, __wbg_adapter_32);
+        const ret = makeMutClosure(arg0, arg1, 760, __wbg_adapter_32);
         return addHeapObject(ret);
     };
 

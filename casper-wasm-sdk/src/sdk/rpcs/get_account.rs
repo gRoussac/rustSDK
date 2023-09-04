@@ -2,7 +2,6 @@
 use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
-#[cfg(target_arch = "wasm32")]
 use crate::types::public_key::PublicKey;
 use crate::{
     helpers::get_verbosity_or_default,
@@ -13,7 +12,6 @@ use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
     rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,
 };
-use casper_types::PublicKey as _PublicKey;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
@@ -164,7 +162,7 @@ impl SDK {
     pub async fn get_account(
         &self,
         node_address: &str,
-        public_key: _PublicKey,
+        public_key: PublicKey,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
@@ -193,7 +191,7 @@ impl SDK {
                 node_address,
                 get_verbosity_or_default(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
-                public_key,
+                public_key.into(),
             )
             .await
             .map_err(SdkError::from)

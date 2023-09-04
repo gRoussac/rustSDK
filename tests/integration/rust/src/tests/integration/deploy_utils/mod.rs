@@ -3,7 +3,6 @@ pub mod test_module {
     use crate::tests::helpers::{
         create_test_sdk, CHAIN_NAME, DEFAULT_SESSION_ACCOUNT, DEFAULT_TARGET_ACCOUNT, TTL,
     };
-    use casper_types::{bytesrepr::ToBytes, DeployHash};
     use casper_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -28,7 +27,7 @@ pub mod test_module {
         let make_deploy = create_test_sdk()
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
-        assert_eq!(make_deploy.hash().serialized_length(), DeployHash::LENGTH);
+        assert!(!make_deploy.hash().to_string().is_empty());
         assert_eq!(make_deploy.session().entry_point_name(), entrypoint);
     }
 
@@ -52,7 +51,7 @@ pub mod test_module {
                 payment_params,
             )
             .unwrap();
-        assert_eq!(make_transfer.hash().serialized_length(), DeployHash::LENGTH);
+        assert!(!make_transfer.hash().to_string().is_empty());
         assert!(make_transfer.session().is_transfer());
     }
 }

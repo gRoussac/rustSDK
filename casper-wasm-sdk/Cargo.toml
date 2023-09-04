@@ -33,6 +33,7 @@ num-traits = "0.2"
 humantime = "2"
 thiserror = "=1.0.34"
 base16 = "0.2.1"
+rust_decimal = "1.10"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

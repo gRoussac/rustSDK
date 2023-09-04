@@ -116,7 +116,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(node_address, deploy.unwrap(), verbosity)
+        self.put_deploy(node_address, deploy.unwrap().into(), verbosity)
             .await
             .map_err(SdkError::from)
     }

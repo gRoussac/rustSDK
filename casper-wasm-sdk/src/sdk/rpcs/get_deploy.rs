@@ -1,6 +1,5 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy_hash::DeployHash;
 #[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
@@ -9,7 +8,6 @@ use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
     SuccessResponse,
 };
-use casper_types::DeployHash as _DeployHash;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
@@ -152,7 +150,7 @@ impl SDK {
     pub async fn get_deploy(
         &self,
         node_address: &str,
-        deploy_hash: _DeployHash,
+        deploy_hash: DeployHash,
         finalized_approvals: Option<bool>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
@@ -161,7 +159,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             node_address,
             get_verbosity_or_default(verbosity).into(),
-            deploy_hash,
+            deploy_hash.into(),
             finalized_approvals.unwrap_or_default(),
         )
         .await
