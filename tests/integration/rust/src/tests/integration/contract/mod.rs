@@ -4,8 +4,8 @@ pub mod test_module {
 
     use crate::tests::{
         helpers::{
-            create_test_sdk, CHAIN_NAME, CONFIG, DEFAULT_CONTRACT_HASH, DEFAULT_SESSION_ACCOUNT,
-            DEFAULT_TEST_PRIVATE_KEY, TTL,
+            create_test_sdk, read_wasm_file, CHAIN_NAME, CONFIG, DEFAULT_CONTRACT_HASH,
+            DEFAULT_SESSION_ACCOUNT, DEFAULT_TEST_KEY, TTL,
         },
         integration_tests::test_module::WAIT_TIME,
     };
@@ -28,11 +28,11 @@ pub mod test_module {
     pub async fn test_call_entrypoint() {
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
-        let amount = "5500000000";
+        let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
             CHAIN_NAME,
             DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_PRIVATE_KEY.to_string()),
+            Some(DEFAULT_TEST_KEY.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -40,7 +40,7 @@ pub mod test_module {
         session_params.set_session_hash(session_hash);
         session_params.set_session_entry_point(entrypoint);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(amount);
+        payment_params.set_payment_amount(payment_amount);
         let test_call_entrypoint = create_test_sdk()
             .call_entrypoint(
                 &CONFIG.node_address,
@@ -130,6 +130,51 @@ pub mod test_module {
             .to_string()
             .is_empty());
     }
+
+    pub async fn test_install() {
+        let payment_amount = "5500000000";
+        let deploy_params = DeployStrParams::new(
+            CHAIN_NAME,
+            DEFAULT_SESSION_ACCOUNT,
+            Some(DEFAULT_TEST_KEY.to_string()),
+            None,
+            Some(TTL.to_string()),
+        );
+        let session_params = SessionStrParams::default();
+        let payment_params = PaymentStrParams::default();
+        let file_path = "contract.wasm";
+        let module_bytes = match read_wasm_file(file_path) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return;
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        payment_params.set_payment_amount(payment_amount);
+        let install = create_test_sdk()
+            .install(
+                &CONFIG.node_address,
+                deploy_params,
+                session_params,
+                payment_params,
+            )
+            .await;
+        assert!(!install
+            .as_ref()
+            .unwrap()
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+        assert!(!install
+            .as_ref()
+            .unwrap()
+            .result
+            .deploy_hash
+            .to_string()
+            .is_empty());
+    }
 }
 
 #[cfg(test)]
@@ -149,14 +194,12 @@ mod tests {
         test_call_entrypoint().await;
         thread::sleep(WAIT_TIME);
     }
-
     #[test]
     pub async fn test_query_contract_dict_test() {
         thread::sleep(WAIT_TIME);
         test_query_contract_dict().await;
         thread::sleep(WAIT_TIME);
     }
-
     #[test]
     pub async fn test_query_contract_key_test() {
         thread::sleep(WAIT_TIME);
@@ -164,6 +207,13 @@ mod tests {
             BlockHash::new(DEFAULT_BLOCK_HASH).unwrap(),
         ));
         query_contract_key(maybe_global_state_identifier).await;
+        thread::sleep(WAIT_TIME);
+    }
+
+    #[test]
+    pub async fn test_install_test() {
+        thread::sleep(WAIT_TIME);
+        test_install().await;
         thread::sleep(WAIT_TIME);
     }
 }

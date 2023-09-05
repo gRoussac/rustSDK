@@ -268,8 +268,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!wasmBuffer || !this._wasm) {
       return;
     }
-    // Two ways to pass the bytes array here, either in session param `session_bytes` with Bytes either install param module_bytes as Uint8Array
-    session_params.session_bytes = Bytes.fromUint8Array(this._wasm);
     const install = await this.sdk.install(
       this.node_address,
       deploy_params,
@@ -494,7 +492,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   test_deploy = test_deploy.sign(this.private_key);
     // }
     let result;
-
     if (speculative) {
       const maybe_block_options = {
         maybe_block_id_as_string: undefined,
@@ -525,6 +522,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         payment_params,
       );
     }
+
     if (result) {
       this.result = result.toJson();
     }
@@ -829,14 +827,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   cleanDisplay() {
+    this.deploy_json = '';
     this.result = '';
     this.result_text = '';
+    // this.deployJsonElt && (this.deployJsonElt.nativeElement.value = '');
   }
 
   async selectAction($event: Event) {
     const action = ($event.target as HTMLInputElement).value;
     await this.handleAction(action);
-    this.changeDetectorRef.markForCheck();
+    this.changeDetectorRef.detectChanges();
   }
 
   async onWasmSelected(event: Event) {
@@ -859,7 +859,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       text = text.trim();
       this.public_key = '';
       const public_key = privateToPublicKey(text);
-      console.log(public_key);
       if (public_key) {
         this.public_key = public_key;
         this.private_key = text;
@@ -880,7 +879,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   private async handleAction(action: string, exec?: boolean) {
     const fn = (this as any)[action];
     if (typeof fn === 'function') {
-      this.cleanDisplay();
       if (exec) {
         await fn.bind(this).call();
       }

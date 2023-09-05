@@ -1,6 +1,9 @@
 use casper_wasm_sdk::SDK;
 use once_cell::sync::Lazy;
 use sdk_tests::config::{get_test_config, TestConfig};
+use std::fs::File;
+use std::io::{self, Read};
+use std::path::Path;
 
 pub fn create_test_sdk() -> SDK {
     SDK::new()
@@ -23,6 +26,15 @@ pub const DEFAULT_CONTRACT_HASH: &str =
     "hash-2549777f17f32b3966ca616ca9060c05b8e3a531eff42b67815024a4ce237ed8";
 pub const DEFAULT_TARGET_ACCOUNT: &str =
     "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
-pub const DEFAULT_TEST_PRIVATE_KEY: &str = "-----BEGIN PRIVATE KEY-----
+pub const DEFAULT_TEST_KEY: &str = "-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEIFQBgrG+PRSS0uehoYE15rjUP1J28UIjGWGvNpcsw+xU
 -----END PRIVATE KEY-----";
+
+pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
+    let root_path = Path::new("src/wasm/");
+    let path = root_path.join(file_path);
+    let mut file = File::open(path)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(buffer)
+}

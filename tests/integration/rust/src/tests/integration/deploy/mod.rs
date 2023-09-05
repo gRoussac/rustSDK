@@ -2,7 +2,7 @@
 pub mod test_module {
     use crate::tests::helpers::{
         create_test_sdk, CHAIN_NAME, CONFIG, DEFAULT_SESSION_ACCOUNT, DEFAULT_TARGET_ACCOUNT,
-        DEFAULT_TEST_PRIVATE_KEY, TTL,
+        DEFAULT_TEST_KEY, TTL,
     };
     use casper_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
@@ -12,11 +12,11 @@ pub mod test_module {
     pub async fn test_deploy() {
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
-        let amount = "5500000000";
+        let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
             CHAIN_NAME,
             DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_PRIVATE_KEY.to_string()),
+            Some(DEFAULT_TEST_KEY.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -24,7 +24,7 @@ pub mod test_module {
         session_params.set_session_hash(session_hash);
         session_params.set_session_entry_point(entrypoint);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(amount);
+        payment_params.set_payment_amount(payment_amount);
         let deploy = create_test_sdk()
             .deploy(
                 &CONFIG.node_address,
@@ -55,7 +55,7 @@ pub mod test_module {
         let deploy_params = DeployStrParams::new(
             CHAIN_NAME,
             DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_PRIVATE_KEY.to_string()),
+            Some(DEFAULT_TEST_KEY.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -91,11 +91,11 @@ pub mod test_module {
     pub async fn test_speculative_deploy() {
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
-        let amount = "5500000000";
+        let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
             CHAIN_NAME,
             DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_PRIVATE_KEY.to_string()),
+            Some(DEFAULT_TEST_KEY.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -103,7 +103,7 @@ pub mod test_module {
         session_params.set_session_hash(session_hash);
         session_params.set_session_entry_point(entrypoint);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(amount);
+        payment_params.set_payment_amount(payment_amount);
         let deploy = create_test_sdk()
             .speculative_deploy(
                 &CONFIG.node_address,
@@ -136,7 +136,7 @@ pub mod test_module {
         let deploy_params = DeployStrParams::new(
             CHAIN_NAME,
             DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_PRIVATE_KEY.to_string()),
+            Some(DEFAULT_TEST_KEY.to_string()),
             None,
             Some(TTL.to_string()),
         );

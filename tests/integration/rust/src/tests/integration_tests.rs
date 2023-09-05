@@ -76,10 +76,10 @@ pub mod test_module {
     }
 
     pub async fn test_payment_params() {
-        let amount = "5500000000";
+        let payment_amount = "5500000000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(amount);
-        assert_eq!(payment_params.payment_amount().unwrap(), amount);
+        payment_params.set_payment_amount(payment_amount);
+        assert_eq!(payment_params.payment_amount().unwrap(), payment_amount);
     }
 }
 
