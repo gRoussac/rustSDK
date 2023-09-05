@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   node_address: 'http://localhost:4200',
-  chain_name: "integration-test",
+  chain_name: "casper-net-1",
 };
 
 /*

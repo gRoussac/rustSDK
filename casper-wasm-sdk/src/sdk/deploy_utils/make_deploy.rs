@@ -23,7 +23,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen(js_name = "make_deploy")]
     pub fn make_deploy_js_alias(
-        &mut self,
+        &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,

@@ -33,7 +33,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen(js_name = "install")]
     pub async fn install_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -66,7 +66,7 @@ impl SDK {
 
 impl SDK {
     pub async fn install(
-        &mut self,
+        &self,
         node_address: &str,
         deploy_params: _DeployStrParams<'_>,
         session_params: _SessionStrParams<'_>,

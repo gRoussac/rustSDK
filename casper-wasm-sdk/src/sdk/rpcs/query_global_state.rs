@@ -1,7 +1,6 @@
 use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
-use crate::types::global_state_identifier::GlobalStateIdentifierInput;
 use crate::{
     helpers::get_verbosity_or_default,
     types::{key::Key, path::Path, sdk_error::SdkError, verbosity::Verbosity},
@@ -67,7 +66,6 @@ impl QueryGlobalStateResult {
 #[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
 pub struct QueryGlobalStateOptions {
     pub node_address: String,
-    pub global_state_identifier_as_string: Option<String>,
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -137,7 +135,7 @@ pub struct QueryGlobalStateParams {
     pub node_address: String,
     pub key: KeyIdentifierInput,
     pub path: Option<PathIdentifierInput>,
-    pub maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
+    pub maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash: Option<String>,
     pub maybe_block_id: Option<String>,
     pub verbosity: Option<Verbosity>,
@@ -151,7 +149,6 @@ impl SDK {
         let QueryGlobalStateOptions {
             node_address,
             verbosity,
-            global_state_identifier_as_string,
             global_state_identifier,
             state_root_hash_as_string,
             state_root_hash,
@@ -161,15 +158,6 @@ impl SDK {
             path_as_string,
             path,
         } = options;
-
-        let maybe_global_state_identifier =
-            if let Some(global_state_identifier) = global_state_identifier {
-                Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
-                    global_state_identifier,
-                ))
-            } else {
-                global_state_identifier_as_string.map(GlobalStateIdentifierInput::String)
-            };
 
         let key = if let Some(key) = key {
             Some(KeyIdentifierInput::Key(key))
@@ -201,7 +189,7 @@ impl SDK {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
-                maybe_global_state_identifier: maybe_global_state_identifier.clone(),
+                maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: Some(hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
@@ -211,7 +199,7 @@ impl SDK {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
-                maybe_global_state_identifier: maybe_global_state_identifier.clone(),
+                maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: Some(hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
@@ -221,7 +209,7 @@ impl SDK {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
-                maybe_global_state_identifier: maybe_global_state_identifier.clone(),
+                maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: None,
                 maybe_block_id: Some(maybe_block_id_as_string),
                 verbosity,
@@ -231,7 +219,7 @@ impl SDK {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
-                maybe_global_state_identifier: maybe_global_state_identifier.clone(),
+                maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity,
@@ -287,11 +275,7 @@ impl SDK {
             Some(p) => p.to_string(),
             None => String::new(),
         };
-
-        if let Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
-            maybe_global_state_identifier,
-        )) = maybe_global_state_identifier
-        {
+        if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_global_state_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &node_address,
@@ -318,13 +302,33 @@ impl SDK {
             )
             .await
             .map_err(SdkError::from)
-        } else {
+        } else if let Some(maybe_block_id) = maybe_block_id {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &node_address,
                 get_verbosity_or_default(verbosity).into(),
-                &maybe_block_id.unwrap_or_default(),
+                &maybe_block_id,
                 "",
+                &key.unwrap().to_formatted_string(),
+                &path_str,
+            )
+            .await
+            .map_err(SdkError::from)
+        } else {
+            let state_root_hash: Digest = self
+                .get_state_root_hash(&node_address, None, None)
+                .await
+                .unwrap()
+                .result
+                .state_root_hash
+                .unwrap()
+                .into();
+            query_global_state_cli(
+                &rand::thread_rng().gen::<i64>().to_string(),
+                &node_address,
+                get_verbosity_or_default(verbosity).into(),
+                "",
+                &state_root_hash.to_string(),
                 &key.unwrap().to_formatted_string(),
                 &path_str,
             )

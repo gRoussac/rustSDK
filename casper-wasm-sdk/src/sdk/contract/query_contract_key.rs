@@ -1,6 +1,8 @@
 #[cfg(target_arch = "wasm32")]
 use crate::rpcs::query_global_state::QueryGlobalStateResult;
 #[cfg(target_arch = "wasm32")]
+use crate::types::global_state_identifier::GlobalStateIdentifier;
+#[cfg(target_arch = "wasm32")]
 use crate::{
     debug::error,
     types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity},
@@ -21,9 +23,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(js_name = "queryContractKeyOptions", getter_with_clone)]
 pub struct QueryContractKeyOptions {
     pub node_address: String,
-    // Not supported by get_dictionary_item
-    // pub global_state_identifier_as_string: Option<String>,
-    // pub global_state_identifier: Option<GlobalStateIdentifier>,
+    pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub maybe_block_id_as_string: Option<String>,
@@ -53,7 +53,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "query_contract_key")]
     pub async fn query_contract_key_js_alias(
-        &mut self,
+        &self,
         options: QueryContractKeyOptions,
     ) -> Result<QueryGlobalStateResult, JsError> {
         let js_value_options = JsValue::from_serde::<QueryContractKeyOptions>(&options);
@@ -69,7 +69,7 @@ impl SDK {
 
 impl SDK {
     pub async fn query_contract_key(
-        &mut self,
+        &self,
         query_params: QueryGlobalStateParams,
     ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
         //log("query_contract_key!");

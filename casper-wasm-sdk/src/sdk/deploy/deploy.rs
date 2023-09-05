@@ -65,7 +65,7 @@ impl PutDeployResult {
 impl SDK {
     #[wasm_bindgen(js_name = "deploy")]
     pub async fn deploy_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -94,7 +94,7 @@ impl SDK {
 
 impl SDK {
     pub async fn deploy(
-        &mut self,
+        &self,
         node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,

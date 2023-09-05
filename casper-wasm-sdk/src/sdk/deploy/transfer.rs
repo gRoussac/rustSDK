@@ -25,7 +25,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "transfer")]
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         amount: &str,
         target_account: &str,
@@ -59,7 +59,7 @@ impl SDK {
 impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer(
-        &mut self,
+        &self,
         node_address: &str,
         amount: &str,
         target_account: &str,

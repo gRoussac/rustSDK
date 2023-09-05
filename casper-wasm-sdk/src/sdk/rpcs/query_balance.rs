@@ -1,14 +1,11 @@
-#[cfg(target_arch = "wasm32")]
-use crate::types::global_state_identifier::GlobalStateIdentifier;
-use crate::types::purse_identifier::PurseIdentifier;
+use crate::types::{
+    global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
+};
 #[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
 use crate::{
     helpers::get_verbosity_or_default,
-    types::{
-        global_state_identifier::GlobalStateIdentifierInput, sdk_error::SdkError,
-        verbosity::Verbosity,
-    },
+    types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::cli::parse_purse_identifier;
@@ -72,7 +69,6 @@ pub struct QueryBalanceOptions {
     pub purse_identifier_as_string: Option<String>,
     pub purse_identifier: Option<PurseIdentifier>,
     pub verbosity: Option<Verbosity>,
-    pub global_state_identifier_as_string: Option<String>,
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -102,7 +98,6 @@ impl SDK {
         let QueryBalanceOptions {
             node_address,
             verbosity,
-            global_state_identifier_as_string,
             global_state_identifier,
             purse_identifier_as_string,
             purse_identifier,
@@ -111,19 +106,10 @@ impl SDK {
             maybe_block_id_as_string,
         } = options;
 
-        let maybe_global_state_identifier =
-            if let Some(global_state_identifier) = global_state_identifier {
-                Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
-                    global_state_identifier,
-                ))
-            } else {
-                global_state_identifier_as_string.map(GlobalStateIdentifierInput::String)
-            };
-
         let result = if let Some(hash) = state_root_hash {
             self.query_balance(
                 &node_address,
-                maybe_global_state_identifier,
+                global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 Some(hash.to_string()),
@@ -134,7 +120,7 @@ impl SDK {
         } else if let Some(hash) = state_root_hash_as_string {
             self.query_balance(
                 &node_address,
-                maybe_global_state_identifier,
+                global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 Some(hash.to_string()),
@@ -145,7 +131,7 @@ impl SDK {
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
             self.query_balance(
                 &node_address,
-                maybe_global_state_identifier,
+                global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 None,
@@ -156,7 +142,7 @@ impl SDK {
         } else {
             self.query_balance(
                 &node_address,
-                maybe_global_state_identifier,
+                global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 None,
@@ -181,7 +167,7 @@ impl SDK {
     pub async fn query_balance(
         &self,
         node_address: &str,
-        maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
+        maybe_global_state_identifier: Option<GlobalStateIdentifier>,
         purse_identifier_as_string: Option<String>,
         // TODO
         // purse_identifier: Option<_PurseIdentifier>, extract _PurseIdentifier from client ?
@@ -193,17 +179,14 @@ impl SDK {
         //log("query_balance!");
 
         let purse_identifier: PurseIdentifier = if let Some(purse_identifier) = purse_identifier {
-            purse_identifier.into()
+            purse_identifier
         } else if let Some(purse_id) = purse_identifier_as_string.clone() {
             parse_purse_identifier(&purse_id).unwrap().into()
         } else {
             return Err(SdkError::FailedToParsePurseIdentifier);
         };
 
-        if let Some(GlobalStateIdentifierInput::GlobalStateIdentifier(
-            maybe_global_state_identifier,
-        )) = maybe_global_state_identifier
-        {
+        if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 node_address,

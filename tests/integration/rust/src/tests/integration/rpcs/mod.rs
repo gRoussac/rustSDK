@@ -16,7 +16,7 @@ pub mod test_module {
         types::{
             block_identifier::BlockIdentifierInput, deploy_hash::DeployHash,
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams, digest::Digest,
-            global_state_identifier::GlobalStateIdentifierInput, public_key::PublicKey,
+            global_state_identifier::GlobalStateIdentifier, public_key::PublicKey,
         },
     };
     use std::thread;
@@ -277,9 +277,7 @@ pub mod test_module {
         assert!(!list_rpcs.result.name.is_empty());
     }
 
-    pub async fn test_query_balance(
-        maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
-    ) {
+    pub async fn test_query_balance(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
         let query_balance = create_test_sdk()
             .query_balance(
                 &CONFIG.node_address,
@@ -297,8 +295,9 @@ pub mod test_module {
     }
 
     pub async fn test_query_global_state(
-        maybe_global_state_identifier: Option<GlobalStateIdentifierInput>,
+        maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
+        thread::sleep(WAIT_TIME);
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             node_address: CONFIG.node_address.clone(),
             key: KeyIdentifierInput::String(DEFAULT_ACCOUNT_HASH.to_string()),
@@ -309,7 +308,7 @@ pub mod test_module {
             verbosity: CONFIG.verbosity,
         };
         let query_global_state = create_test_sdk().query_global_state(query_params).await;
-
+        thread::sleep(WAIT_TIME);
         let query_global_state = query_global_state.unwrap();
         assert!(!query_global_state.result.api_version.to_string().is_empty());
         assert!(!query_global_state
@@ -319,6 +318,7 @@ pub mod test_module {
             .unwrap()
             .inner_bytes()
             .is_empty());
+        thread::sleep(WAIT_TIME);
     }
 }
 
@@ -327,7 +327,8 @@ mod tests {
     use super::test_module::*;
     use crate::tests::{helpers::DEFAULT_BLOCK_HASH, integration_tests::test_module::WAIT_TIME};
     use casper_wasm_sdk::types::{
-        block_identifier::BlockIdentifierInput, global_state_identifier::GlobalStateIdentifierInput,
+        block_hash::BlockHash, block_identifier::BlockIdentifierInput,
+        global_state_identifier::GlobalStateIdentifier,
     };
     use std::thread;
     use tokio::test;
@@ -454,12 +455,33 @@ mod tests {
         thread::sleep(WAIT_TIME);
     }
     #[test]
-    pub async fn test_query_balance_test() {
+    pub async fn test_query_balance_test_with_block_identifier() {
         thread::sleep(WAIT_TIME);
-        let maybe_global_state_identifier = Some(GlobalStateIdentifierInput::String(
-            DEFAULT_BLOCK_HASH.to_string(),
+        let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
+            BlockHash::new(DEFAULT_BLOCK_HASH).unwrap(),
         ));
         test_query_balance(maybe_global_state_identifier).await;
+        thread::sleep(WAIT_TIME);
+    }
+    #[test]
+    pub async fn test_query_balance_test() {
+        thread::sleep(WAIT_TIME);
+        test_query_balance(None).await;
+        thread::sleep(WAIT_TIME);
+    }
+    #[test]
+    pub async fn test_query_global_state_test_with_block_identifier() {
+        thread::sleep(WAIT_TIME);
+        let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
+            BlockHash::new(DEFAULT_BLOCK_HASH).unwrap(),
+        ));
+        test_query_global_state(maybe_global_state_identifier).await;
+        thread::sleep(WAIT_TIME);
+    }
+    #[test]
+    pub async fn test_query_global_state_test() {
+        thread::sleep(WAIT_TIME);
+        test_query_global_state(None).await;
         thread::sleep(WAIT_TIME);
     }
 }

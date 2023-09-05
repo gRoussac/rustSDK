@@ -28,7 +28,6 @@ use wasm_bindgen::prelude::*;
 pub struct QueryContractDictOptions {
     pub node_address: String,
     // Not supported by get_dictionary_item
-    // pub global_state_identifier_as_string: Option<String>,
     // pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -57,7 +56,7 @@ impl SDK {
 
     #[wasm_bindgen(js_name = "query_contract_dict")]
     pub async fn query_contract_dict_js_alias(
-        &mut self,
+        &self,
         options: QueryContractDictOptions,
     ) -> Result<GetDictionaryItemResult, JsError> {
         let js_value_options = JsValue::from_serde::<QueryContractDictOptions>(&options);
@@ -73,7 +72,7 @@ impl SDK {
 
 impl SDK {
     pub async fn query_contract_dict(
-        &mut self,
+        &self,
         node_address: &str,
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
