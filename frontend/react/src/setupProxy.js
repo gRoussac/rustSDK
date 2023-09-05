@@ -5,7 +5,7 @@ module.exports = function (app) {
   app.use(
     '/rpc',
     createProxyMiddleware({
-      target: 'https://rpc.integration.casperlabs.io',
+      target: 'https://localhost:11101',
       changeOrigin: true,
     })
   );

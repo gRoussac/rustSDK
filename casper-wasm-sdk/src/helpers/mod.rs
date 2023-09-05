@@ -1,10 +1,13 @@
 use std::str::FromStr;
 
 use crate::debug::error;
+use crate::types::public_key::PublicKey;
 use crate::types::sdk_error::SdkError;
 use crate::types::verbosity::Verbosity;
 use casper_client::cli::JsonArg;
-use casper_types::{DeployBuilder, ErrorExt, SecretKey, TimeDiff, Timestamp};
+use casper_types::{
+    DeployBuilder, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey, TimeDiff, Timestamp,
+};
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -61,6 +64,19 @@ pub fn get_verbosity_or_default(verbosity: Option<Verbosity>) -> Verbosity {
 
 pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
     SecretKey::from_pem(secret_key)
+}
+
+pub fn public_key_from_private_key(secret_key: &str) -> Result<String, ErrorExt> {
+    let secret_key_from_pem = secret_key_from_pem(secret_key);
+    let public_key = match secret_key_from_pem {
+        Ok(secret_key) => CasperTypesPublicKey::from(&secret_key),
+        Err(err) => {
+            error(&format!("Error in public_key_from_private_key: {:?}", err));
+            return Err(err);
+        }
+    };
+    let public_key_test: PublicKey = public_key.into();
+    Ok(public_key_test.to_string())
 }
 
 pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {

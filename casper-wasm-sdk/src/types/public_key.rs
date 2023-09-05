@@ -1,5 +1,3 @@
-use std::fmt::{self, Display, Formatter};
-
 use crate::debug::error;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
@@ -7,6 +5,7 @@ use casper_types::{
 };
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -42,6 +41,14 @@ impl PublicKey {
     //to_account_hash
 }
 
+impl Display for PublicKey {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        let bytes = self.0.to_bytes().unwrap_or_default();
+        let hex_string = hex::encode(bytes);
+        write!(f, "{}", hex_string)
+    }
+}
+
 impl From<PublicKey> for _PublicKey {
     fn from(public_key: PublicKey) -> Self {
         public_key.0
@@ -51,12 +58,6 @@ impl From<PublicKey> for _PublicKey {
 impl From<_PublicKey> for PublicKey {
     fn from(public_key: _PublicKey) -> Self {
         PublicKey(public_key)
-    }
-}
-
-impl Display for PublicKey {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
-        write!(formatter, "{}", self.0)
     }
 }
 

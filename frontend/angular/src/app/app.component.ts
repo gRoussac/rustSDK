@@ -859,6 +859,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       text = text.trim();
       this.public_key = '';
       const public_key = privateToPublicKey(text);
+      console.log(public_key);
       if (public_key) {
         this.public_key = public_key;
         this.private_key = text;

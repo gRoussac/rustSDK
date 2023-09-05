@@ -15,17 +15,17 @@ impl GlobalStateIdentifier {
         global_state_identifier
     }
 
-    #[wasm_bindgen(js_name = fromBlockHash)]
+    #[wasm_bindgen(js_name = "fromBlockHash")]
     pub fn from_block_hash(block_hash: BlockHash) -> GlobalStateIdentifier {
         GlobalStateIdentifier(_GlobalStateIdentifier::BlockHash(block_hash.into()))
     }
 
-    #[wasm_bindgen(js_name = fromBlockHeight)]
+    #[wasm_bindgen(js_name = "fromBlockHeight")]
     pub fn from_block_height(block_height: u64) -> GlobalStateIdentifier {
         GlobalStateIdentifier(_GlobalStateIdentifier::BlockHeight(block_height))
     }
 
-    #[wasm_bindgen(js_name = fromStateRootHash)]
+    #[wasm_bindgen(js_name = "fromStateRootHash")]
     pub fn from_state_root_hash(state_root_hash: Digest) -> GlobalStateIdentifier {
         GlobalStateIdentifier(_GlobalStateIdentifier::StateRootHash(
             state_root_hash.into(),
@@ -48,10 +48,4 @@ impl From<_GlobalStateIdentifier> for GlobalStateIdentifier {
     fn from(identifier: _GlobalStateIdentifier) -> Self {
         GlobalStateIdentifier(identifier)
     }
-}
-
-#[derive(Debug, Clone)]
-pub enum GlobalStateIdentifierInput {
-    GlobalStateIdentifier(GlobalStateIdentifier),
-    String(String),
 }

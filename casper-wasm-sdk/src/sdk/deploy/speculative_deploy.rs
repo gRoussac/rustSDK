@@ -26,7 +26,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen(js_name = "speculative_deploy")]
     pub async fn speculative_deploy_js_alias(
-        &mut self,
+        &self,
         node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -57,7 +57,7 @@ impl SDK {
 
 impl SDK {
     pub async fn speculative_deploy(
-        &mut self,
+        &self,
         node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,

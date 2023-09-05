@@ -23,7 +23,7 @@ use wasm_bindgen::prelude::*;
 impl SDK {
     #[wasm_bindgen(js_name = "make_transfer")]
     pub fn make_transfer_js_alias(
-        &mut self,
+        &self,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
@@ -51,7 +51,7 @@ impl SDK {
 
 impl SDK {
     pub fn make_transfer(
-        &mut self,
+        &self,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
