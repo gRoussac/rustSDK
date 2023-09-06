@@ -45,7 +45,9 @@
         class="alert alert-success d-flex justify-content-between align-items-center"
         *ngIf="state_root_hash"
       >
-        <span>state root hash is {{ state_root_hash }}</span>
+        <span e2e-id="state_root_hash"
+          >state root hash is {{ state_root_hash }}</span
+        >
         <button class="btn me-0" (click)="get_state_root_hash()">
           Refresh
         </button>
