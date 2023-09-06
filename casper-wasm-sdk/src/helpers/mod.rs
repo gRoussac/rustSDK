@@ -119,7 +119,7 @@ where
     }
 }
 
-pub fn insert_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
+pub fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
     if js_sys::Object::instanceof(&js_value_arg) {
         let json_arg: Result<JsonArg, serde_json::Error> = js_value_arg.into_serde();
         let json_arg: Option<JsonArg> = match json_arg {
@@ -147,6 +147,21 @@ pub fn insert_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs
         let _ = casper_client::cli::insert_arg(&simple_arg, args);
     } else {
         error("Error converting to JsonArg or Simple Arg");
+    }
+    args
+}
+
+pub fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArgs {
+    match serde_json::from_str::<JsonArg>(&new_arg) {
+        Ok(json_arg) => {
+            if let Ok(named_arg) = NamedArg::try_from(json_arg.clone()) {
+                args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
+            }
+        }
+        Err(err) => {
+            error(&format!("Error deserializing JSON argument: {:?}", err));
+            let _ = casper_client::cli::insert_arg(&new_arg, args);
+        }
     }
     args
 }

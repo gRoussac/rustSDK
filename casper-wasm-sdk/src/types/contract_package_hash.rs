@@ -7,17 +7,16 @@ use wasm_bindgen::prelude::*;
 use crate::debug::error;
 
 #[wasm_bindgen]
+#[derive(Debug)]
 pub struct ContractPackageHash(_ContractPackageHash);
 
 #[wasm_bindgen]
 impl ContractPackageHash {
     #[wasm_bindgen(constructor)]
-    pub fn new(contract_package_hash_hex_str: &str) -> Result<ContractPackageHash, JsValue> {
-        let contract_package_hash =
-            _ContractPackageHash::from_formatted_str(contract_package_hash_hex_str)
-                .map_err(|err| error(&format!("Failed to parse ContractPackageHash: {:?}", err)))
-                .unwrap();
-        Ok(ContractPackageHash(contract_package_hash))
+    #[wasm_bindgen(js_name = "fromString")]
+    pub fn new(input: &str) -> Result<ContractPackageHash, JsValue> {
+        let prefixed_input = format!("contract-package-{}", input);
+        ContractPackageHash::from_formatted_str(&prefixed_input)
     }
 
     #[wasm_bindgen(js_name = "fromFormattedStr")]

@@ -6,16 +6,16 @@ use casper_types::{
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
+#[derive(Debug)]
 pub struct ContractHash(_ContractHash);
 
 #[wasm_bindgen]
 impl ContractHash {
     #[wasm_bindgen(constructor)]
-    pub fn new(contract_hash_hex_str: &str) -> Result<ContractHash, JsValue> {
-        let contract_hash = _ContractHash::from_formatted_str(contract_hash_hex_str)
-            .map_err(|err| error(&format!("Failed to parse ContractHash: {:?}", err)))
-            .unwrap();
-        Ok(ContractHash(contract_hash))
+    #[wasm_bindgen(js_name = "fromString")]
+    pub fn new(input: &str) -> Result<ContractHash, JsValue> {
+        let prefixed_input = format!("contract-{}", input);
+        ContractHash::from_formatted_str(&prefixed_input)
     }
 
     #[wasm_bindgen(js_name = "fromFormattedStr")]

@@ -11,14 +11,15 @@ use super::{
 use crate::{
     debug::error,
     helpers::{
-        get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
-        secret_key_from_pem,
+        get_current_timestamp, get_ttl_or_default, insert_arg, insert_js_value_arg,
+        parse_timestamp, parse_ttl, secret_key_from_pem,
     },
     make_deploy, make_transfer,
 };
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
-    bytesrepr::Bytes as _Bytes, Deploy as _Deploy, DeployBuilder, ExecutableDeployItem, Phase,
+    bytesrepr::{self, Bytes as _Bytes},
+    ApprovalsHash, Deploy as _Deploy, DeployBuilder, DeployFootprint, ExecutableDeployItem, Phase,
     RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
@@ -44,6 +45,7 @@ pub struct BuildParams {
 
 #[wasm_bindgen]
 impl Deploy {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
     pub fn new(deploy: JsValue) -> Deploy {
         let deploy: _Deploy = deploy
@@ -60,18 +62,25 @@ impl Deploy {
         deploy.into()
     }
 
-    // #[wasm_bindgen(js_name = "fromJson")] // Do not expose that for now, use new
-    // fn from_json(&self, deploy: JsValue) -> Deploy {
-    //     Self::new(deploy)
-    // }
-
     #[wasm_bindgen(js_name = "toJson")]
-    pub fn to_json(&self) -> JsValue {
+    pub fn to_json_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.0) {
             Ok(json) => json,
             Err(err) => {
                 error(&format!("Error serializing data to JSON: {:?}", err));
                 JsValue::null()
+            }
+        }
+    }
+
+    pub fn to_json(&self) -> Result<String, String> {
+        let result = serde_json::to_string(&self.0);
+        match result {
+            Ok(json) => Ok(json),
+            Err(err) => {
+                let err_msg = format!("Error serializing data to JSON: {:?}", err);
+                error(&err_msg);
+                Err(err_msg)
             }
         }
     }
@@ -82,24 +91,25 @@ impl Deploy {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> Deploy {
+    ) -> Result<Deploy, String> {
         make_deploy(deploy_params, session_params, payment_params)
             .map(Into::into)
-            .unwrap_or_else(|err| {
-                error(&format!("Error creating session deploy: {}", err));
-                Deploy::new(JsValue::null())
+            .map_err(|err| {
+                let err_msg = format!("Error creating session deploy: {}", err);
+                error(&err_msg);
+                err_msg
             })
     }
 
     // static context
     #[wasm_bindgen(js_name = "withTransfer")]
-    pub fn new_transfer(
+    pub fn with_transfer(
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Deploy {
+    ) -> Result<Deploy, String> {
         make_transfer(
             amount,
             target_account,
@@ -108,10 +118,7 @@ impl Deploy {
             payment_params,
         )
         .map(Into::into)
-        .unwrap_or_else(|err| {
-            error(&format!("Error creating transfer deploy: {}", err));
-            Deploy::new(JsValue::null())
-        })
+        .map_err(|err| format!("Error creating transfer deploy: {}", err))
     }
 
     #[wasm_bindgen(js_name = "withTTL")]
@@ -160,8 +167,12 @@ impl Deploy {
         })
     }
 
-    #[wasm_bindgen(js_name = "withEntryPoint")]
-    pub fn with_entrypoint(&self, entrypoint: &str, secret_key: Option<String>) -> Deploy {
+    #[wasm_bindgen(js_name = "withEntryPointName")]
+    pub fn with_entry_point_name(
+        &self,
+        entry_point_name: &str,
+        secret_key: Option<String>,
+    ) -> Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
 
@@ -170,7 +181,7 @@ impl Deploy {
             session: Some(modify_session(
                 session,
                 NewSessionParams {
-                    new_entry_point: Some(entrypoint.to_string()),
+                    new_entry_point: Some(entry_point_name.to_string()),
                     ..Default::default()
                 },
             )),
@@ -259,6 +270,8 @@ impl Deploy {
         })
     }
 
+    // Load payment from json
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "withPayment")]
     pub fn with_payment(&self, payment: JsValue, secret_key: Option<String>) -> Deploy {
         let payment_item_result = payment.into_serde();
@@ -276,6 +289,8 @@ impl Deploy {
         }
     }
 
+    // Load session from json
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "withSession")]
     pub fn with_session(&self, session: JsValue, secret_key: Option<String>) -> Deploy {
         let session_item_result = session.into_serde();
@@ -359,18 +374,9 @@ impl Deploy {
         deploy.into()
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "footprint")]
-    pub fn footprint(&self) -> JsValue {
-        let deploy: _Deploy = self.0.clone();
-        let footprint = match deploy.footprint() {
-            Ok(footprint) => footprint,
-            Err(err) => {
-                error(&format!("Error getting footprint: {:?}", err));
-                return JsValue::null();
-            }
-        };
-        match JsValue::from_serde(&footprint) {
+    pub fn footprint_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.footprint()) {
             Ok(json) => json,
             Err(err) => {
                 error(&format!("Error serializing footprint to JSON: {:?}", err));
@@ -379,18 +385,9 @@ impl Deploy {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "approvalsHash")]
-    pub fn compute_approvals_hash(&self) -> JsValue {
-        let deploy: _Deploy = self.0.clone();
-        let compute_approvals_hash = match deploy.compute_approvals_hash() {
-            Ok(approvals_hash) => approvals_hash,
-            Err(err) => {
-                error(&format!("Error computing approvals hash: {:?}", err));
-                return JsValue::null();
-            }
-        };
-        match JsValue::from_serde(&compute_approvals_hash) {
+    pub fn compute_approvals_hash_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.compute_approvals_hash()) {
             Ok(json) => json,
             Err(err) => {
                 error(&format!(
@@ -446,25 +443,40 @@ impl Deploy {
         self.0.clone().session().entry_point_name().to_string()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "paymentAmount")]
-    pub fn payment_amount(&self, conv_rate: u64) -> JsValue {
-        match JsValue::from_serde(&self.0.clone().session().payment_amount(conv_rate)) {
-            Ok(json) => json,
-            Err(err) => {
-                error(&format!(
-                    "Error serializing payment_amount to JSON: {:?}",
-                    err
-                ));
-                JsValue::null()
-            }
-        }
+    #[wasm_bindgen(js_name = "TTL")]
+    pub fn ttl(&self) -> String {
+        self.0.clone().header().ttl().to_string()
     }
 
-    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "Timestamp")]
+    pub fn timestamp(&self) -> String {
+        self.0.clone().header().timestamp().to_string()
+    }
+
+    #[wasm_bindgen(js_name = "chainName")]
+    pub fn chain_name(&self) -> String {
+        self.0.clone().header().chain_name().to_string()
+    }
+
+    #[wasm_bindgen(js_name = "account")]
+    pub fn account(&self) -> String {
+        let public_key: PublicKey = self.0.clone().header().account().clone().into();
+        public_key.to_string()
+    }
+
+    #[wasm_bindgen(js_name = "paymentAmount")]
+    pub fn payment_amount(&self, conv_rate: u64) -> String {
+        self.0
+            .clone()
+            .payment()
+            .payment_amount(conv_rate)
+            .unwrap()
+            .to_string()
+    }
+
     #[wasm_bindgen(js_name = "args")]
-    pub fn args(&self) -> JsValue {
-        match JsValue::from_serde(self.0.clone().session().args()) {
+    pub fn args_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.args()) {
             Ok(json) => json,
             Err(err) => {
                 error(&format!("Error serializing args to JSON: {:?}", err));
@@ -474,12 +486,16 @@ impl Deploy {
     }
 
     #[wasm_bindgen(js_name = "addArg")]
-    pub fn add_arg(&mut self, js_value_arg: JsValue, secret_key: Option<String>) -> Deploy {
+    pub fn add_arg_js_alias(
+        &mut self,
+        js_value_arg: JsValue,
+        secret_key: Option<String>,
+    ) -> Deploy {
         let deploy = self.0.clone();
         let session = deploy.session();
 
         let mut args = session.args().clone();
-        let new_args = insert_arg(&mut args, js_value_arg);
+        let new_args = insert_js_value_arg(&mut args, js_value_arg);
         let new_session = modify_session(
             session,
             NewSessionParams {
@@ -497,7 +513,48 @@ impl Deploy {
 }
 
 impl Deploy {
-    pub fn build(&self, deploy_params: BuildParams) -> Deploy {
+    pub fn args(&self) -> RuntimeArgs {
+        self.0.clone().session().args().clone()
+    }
+
+    pub fn add_arg(&mut self, new_value_arg: String, secret_key: Option<String>) -> Deploy {
+        let deploy = self.0.clone();
+        let session = deploy.session();
+
+        let mut args = session.args().clone();
+        let new_args = insert_arg(&mut args, new_value_arg);
+        let new_session = modify_session(
+            session,
+            NewSessionParams {
+                new_args: Some(new_args),
+                ..Default::default()
+            },
+        );
+
+        self.build(BuildParams {
+            secret_key,
+            session: Some(new_session),
+            ..Default::default()
+        })
+    }
+
+    pub fn footprint(&self) -> DeployFootprint {
+        let deploy: _Deploy = self.0.clone();
+        match deploy.footprint() {
+            Ok(footprint) => footprint,
+            Err(err) => {
+                error(&format!("Error getting footprint: {:?}", err));
+                deploy.footprint().unwrap()
+            }
+        }
+    }
+
+    pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
+        let deploy: _Deploy = self.0.clone();
+        deploy.compute_approvals_hash()
+    }
+
+    fn build(&self, deploy_params: BuildParams) -> Deploy {
         let BuildParams {
             secret_key,
             chain_name,
@@ -635,7 +692,7 @@ fn modify_session(
             args,
         } => ExecutableDeployItem::StoredVersionedContractByHash {
             hash: new_package_hash.unwrap_or((*hash).into()).into(),
-            version: Some(new_version.unwrap_or(version.unwrap())),
+            version: Some(new_version.unwrap_or(version.unwrap_or(1))),
             entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
             args: new_args.cloned().unwrap_or_else(|| args.clone()),
         },
@@ -646,7 +703,7 @@ fn modify_session(
             args,
         } => ExecutableDeployItem::StoredVersionedContractByName {
             name: new_name.unwrap_or_else(|| name.clone()),
-            version: Some(new_version.unwrap_or(version.unwrap())),
+            version: Some(new_version.unwrap_or(version.unwrap_or(1))),
             entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
             args: new_args.cloned().unwrap_or_else(|| args.clone()),
         },
