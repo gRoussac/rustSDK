@@ -1,119 +1,193 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::tests::helpers::{CHAIN_NAME, DEFAULT_SESSION_ACCOUNT, DEFAULT_TTL, TTL};
     use casper_wasm_sdk::{
         debug::{error, log},
-        helpers::hex_to_uint8_vec,
-        types::deploy_params::{
-            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-            session_str_params::SessionStrParams,
+        helpers::{
+            get_current_timestamp, get_gas_price_or_default, get_ttl_or_default, hex_to_string,
+            hex_to_uint8_vec, json_pretty_print, motes_to_cspr, parse_timestamp, parse_ttl,
+            public_key_from_private_key, secret_key_from_pem,
         },
+        types::verbosity::Verbosity,
     };
+    use chrono::DateTime;
     use std::time;
+
+    use crate::tests::helpers::{
+        create_test_sdk, CONFIG, DEFAULT_SESSION_ACCOUNT, DEFAULT_TEST_KEY, DEFAULT_TTL, TTL,
+    };
     // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static not working
     pub const WAIT_TIME: std::time::Duration = time::Duration::from_millis(2000);
 
-    pub async fn test_hex_to_uint8_vec() {
-        let test: Vec<u8> =
-            hex_to_uint8_vec("0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54");
+    pub fn test_error() {
+        error("bound error to std");
+    }
+
+    pub fn test_log() {
+        log("bound log to std");
+    }
+
+    pub fn test_hex_to_uint8_vec() {
+        let test: Vec<u8> = hex_to_uint8_vec(DEFAULT_SESSION_ACCOUNT);
         assert!(!test.is_empty());
         assert_eq!(test.len(), 33);
     }
 
-    pub async fn test_error() {
-        error("bound error to std");
-    }
-
-    pub async fn test_log() {
-        log("bound log to std");
-    }
-
-    pub async fn test_deploy_params() {
-        let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            None,
-            None,
-            Some(TTL.to_string()),
+    pub fn test_hex_to_string() {
+        let test: String = hex_to_string(
+            "5b70726f746f636f6c5d0a232050726f746f636f6c2076657273696f6e2e0a76657273696f6e",
         );
-        assert_eq!(deploy_params.chain_name().unwrap(), CHAIN_NAME);
-        assert_eq!(deploy_params.ttl().unwrap(), TTL);
-        assert_eq!(
-            deploy_params.session_account().unwrap(),
-            DEFAULT_SESSION_ACCOUNT
+        let expected = "[protocol]\n# Protocol version.\nversion";
+        assert!(!test.is_empty());
+        assert_eq!(test, expected);
+    }
+
+    pub fn test_motes_to_cspr() {
+        let cspr = motes_to_cspr("1000000000");
+        assert_eq!(cspr, "1");
+        let cspr = motes_to_cspr("2500000000");
+        assert_eq!(cspr, "2.50");
+        let cspr = motes_to_cspr("1111100000000");
+        assert_eq!(cspr, "1111.10");
+        let cspr = motes_to_cspr("2500000000000000000000000000");
+        assert_eq!(cspr, "2500000000000000000");
+        let cspr = motes_to_cspr("1000000000000250000000000000");
+        assert_eq!(cspr, "1000000000000250000");
+    }
+
+    pub fn test_public_key_from_private_key() {
+        let public_key = public_key_from_private_key(DEFAULT_TEST_KEY).unwrap();
+        assert_eq!(public_key, DEFAULT_SESSION_ACCOUNT);
+    }
+
+    pub fn test_secret_key_from_pem() {
+        let secret_key = secret_key_from_pem(DEFAULT_TEST_KEY).unwrap();
+        assert_eq!(secret_key.to_string(), "SecretKey::Ed25519");
+    }
+
+    pub fn test_get_current_timestamp() {
+        let current_timestamp = get_current_timestamp(None);
+        let parsed_timestamp = DateTime::parse_from_rfc3339(&current_timestamp);
+        assert!(parsed_timestamp.is_ok());
+        let current_timestamp = get_current_timestamp(Some(current_timestamp));
+        let parsed_timestamp = DateTime::parse_from_rfc3339(&current_timestamp);
+        assert!(parsed_timestamp.is_ok());
+    }
+
+    pub fn test_parse_timestamp() {
+        let current_timestamp = get_current_timestamp(None);
+        let parsed_timestamp = DateTime::parse_from_rfc3339(&current_timestamp);
+        assert!(parsed_timestamp.is_ok());
+        let parsed_timestamp = parse_timestamp(&current_timestamp);
+        assert!(parsed_timestamp.is_ok());
+        assert!(!parsed_timestamp.unwrap().to_string().is_empty());
+    }
+
+    pub fn test_get_ttl_or_default() {
+        let ttl = get_ttl_or_default(None);
+        assert_eq!(ttl, DEFAULT_TTL);
+        let ttl = get_ttl_or_default(Some(TTL));
+        assert_eq!(ttl, TTL);
+    }
+
+    pub fn test_parse_ttl() {
+        let ttl = parse_ttl(DEFAULT_TTL).unwrap();
+        assert_eq!(ttl.to_string(), DEFAULT_TTL);
+        let ttl = parse_ttl(TTL).unwrap();
+        assert_eq!(ttl.to_string(), TTL);
+    }
+
+    pub fn test_get_gas_price_or_default() {
+        let gas_price = get_gas_price_or_default(None);
+        assert_eq!(gas_price.to_string(), "1");
+        let gas_price = get_gas_price_or_default(Some(2));
+        assert_eq!(gas_price.to_string(), "2");
+    }
+
+    pub async fn test_get_json_pretty_print() {
+        let get_node_status = create_test_sdk()
+            .get_node_status(&CONFIG.node_address, CONFIG.verbosity)
+            .await;
+        let get_node_status = get_node_status.unwrap();
+        assert!(!get_node_status.result.api_version.to_string().is_empty());
+
+        // to_string
+        let print = json_pretty_print(
+            get_node_status.clone().result.block_sync,
+            Some(Verbosity::Low),
         );
-        assert_eq!(deploy_params.secret_key(), None);
-        assert!(deploy_params.timestamp().is_some());
-    }
+        let expected = r#"{"historical":null,"forward":null}"#;
+        assert_eq!(print, expected);
 
-    pub async fn test_deploy_params_defaults() {
-        let deploy_params = DeployStrParams::default();
-        deploy_params.set_chain_name(CHAIN_NAME);
-        deploy_params.set_session_account(DEFAULT_SESSION_ACCOUNT);
-
-        assert_eq!(deploy_params.chain_name().unwrap(), CHAIN_NAME);
-        assert_eq!(
-            deploy_params.session_account().unwrap(),
-            DEFAULT_SESSION_ACCOUNT
+        // casper_types::json_pretty_print
+        let print = json_pretty_print(
+            get_node_status.clone().result.block_sync,
+            Some(Verbosity::Medium),
         );
-        assert!(deploy_params.timestamp().is_none());
-        assert!(deploy_params.ttl().is_none());
+        let expected = "{\n  \"historical\": null,\n  \"forward\": null\n}";
+        assert_eq!(print, expected);
 
-        deploy_params.set_default_ttl();
-        deploy_params.set_default_timestamp();
-        assert!(deploy_params.timestamp().is_some());
-        assert_eq!(deploy_params.ttl().unwrap(), DEFAULT_TTL);
-    }
-
-    pub async fn test_session_params() {
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
-        let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        assert_eq!(session_params.session_hash().unwrap(), session_hash);
-        assert_eq!(session_params.session_entry_point().unwrap(), entrypoint);
-    }
-
-    pub async fn test_payment_params() {
-        let payment_amount = "5500000000";
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        assert_eq!(payment_params.payment_amount().unwrap(), payment_amount);
+        // serde_json::to_string_pretty
+        let print = json_pretty_print(
+            get_node_status.clone().result.block_sync,
+            Some(Verbosity::High),
+        );
+        let expected = "{\n  \"historical\": null,\n  \"forward\": null\n}";
+        assert_eq!(print, expected);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-    use tokio::test;
 
     #[test]
-    pub async fn test_hex_to_uint8_vec_test() {
-        test_hex_to_uint8_vec().await;
+    pub fn test_log_test() {
+        test_log();
     }
     #[test]
-    pub async fn test_error_test() {
-        test_error().await;
+    pub fn test_error_test() {
+        test_error();
     }
     #[test]
-    pub async fn test_log_test() {
-        test_log().await;
+    pub fn test_hex_to_uint8_vec_test() {
+        test_hex_to_uint8_vec();
     }
     #[test]
-    pub async fn test_deploy_params_test() {
-        test_deploy_params().await;
+    pub fn test_hex_to_string_test() {
+        test_hex_to_string();
     }
     #[test]
-    pub async fn test_deploy_params_defaults_test() {
-        test_deploy_params_defaults().await;
+    pub fn test_motes_to_cspr_test() {
+        test_motes_to_cspr();
     }
     #[test]
-    pub async fn test_session_params_test() {
-        test_session_params().await;
+    pub fn test_public_key_from_private_key_test() {
+        test_public_key_from_private_key();
     }
     #[test]
-    pub async fn test_payment_params_test() {
-        test_payment_params().await;
+    pub fn test_secret_key_from_pem_test() {
+        test_secret_key_from_pem();
+    }
+    #[test]
+    pub fn test_parse_timestamp_test() {
+        test_parse_timestamp();
+    }
+    #[test]
+    pub fn test_get_ttl_or_default_test() {
+        test_get_ttl_or_default();
+    }
+    #[test]
+    pub fn test_get_gas_price_or_default_test() {
+        test_get_gas_price_or_default();
+    }
+}
+
+#[cfg(test)]
+mod tests_async {
+    use super::test_module::*;
+    use tokio::test;
+    #[test]
+    pub async fn test_get_json_pretty_print_test() {
+        test_get_json_pretty_print().await;
     }
 }

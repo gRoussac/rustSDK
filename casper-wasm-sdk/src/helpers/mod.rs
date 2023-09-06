@@ -11,6 +11,7 @@ use casper_types::{
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
+use rust_decimal::prelude::*;
 use serde::Serialize;
 use wasm_bindgen::{JsCast, JsValue};
 
@@ -26,11 +27,11 @@ pub fn get_current_timestamp(timestamp: Option<String>) -> String {
     current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true)
 }
 
-pub fn get_ttl_or_default(ttl: Option<String>) -> String {
+pub fn get_ttl_or_default(ttl: Option<&str>) -> String {
     // TODO Fix ttl `humantime::parse_duration` with get_current_ttl(&ttl)
     // log(&format!("ttl {:?}", ttl));
     if let Some(ttl) = ttl {
-        ttl
+        ttl.to_string()
     } else {
         DeployBuilder::DEFAULT_TTL.to_string()
     }
@@ -54,7 +55,7 @@ pub fn get_gas_price_or_default(gas_price: Option<u64>) -> u64 {
     gas_price.unwrap_or(DeployBuilder::DEFAULT_GAS_PRICE)
 }
 
-pub fn get_str_or_default(opt_str: Option<&String>) -> &str {
+pub(crate) fn get_str_or_default(opt_str: Option<&String>) -> &str {
     opt_str.map(String::as_str).unwrap_or_default()
 }
 
@@ -93,6 +94,31 @@ pub fn hex_to_uint8_vec(hex_string: &str) -> Vec<u8> {
     bytes
 }
 
+pub fn hex_to_string(hex_string: &str) -> String {
+    match hex::decode(hex_string) {
+        Ok(bytes) => String::from_utf8_lossy(&bytes).to_string(),
+        Err(_) => hex_string.to_string(),
+    }
+}
+
+pub fn motes_to_cspr(motes: &str) -> String {
+    match Decimal::from_str(motes) {
+        Ok(motes_decimal) => {
+            let cspr_decimal = motes_decimal / Decimal::new(1_000_000_000, 0);
+            let formatted_cspr = cspr_decimal.to_string();
+            if formatted_cspr.ends_with(".00") {
+                formatted_cspr.replace(".00", "")
+            } else {
+                formatted_cspr
+            }
+        }
+        Err(_) => {
+            eprintln!("Failed to parse input as Decimal");
+            "Invalid input".to_string()
+        }
+    }
+}
+
 pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> String
 where
     T: Serialize,
@@ -119,7 +145,7 @@ where
     }
 }
 
-pub fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
+pub(crate) fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
     if js_sys::Object::instanceof(&js_value_arg) {
         let json_arg: Result<JsonArg, serde_json::Error> = js_value_arg.into_serde();
         let json_arg: Option<JsonArg> = match json_arg {
@@ -151,7 +177,7 @@ pub fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &Ru
     args
 }
 
-pub fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArgs {
+pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArgs {
     match serde_json::from_str::<JsonArg>(&new_arg) {
         Ok(json_arg) => {
             if let Ok(named_arg) = NamedArg::try_from(json_arg.clone()) {

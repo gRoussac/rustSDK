@@ -29,6 +29,10 @@ pub const DEFAULT_TARGET_ACCOUNT: &str =
 pub const DEFAULT_TEST_KEY: &str = "-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEIFQBgrG+PRSS0uehoYE15rjUP1J28UIjGWGvNpcsw+xU
 -----END PRIVATE KEY-----";
+pub const DEFAULT_DICT_UREF: &str =
+    "uref-386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530-007";
+pub const DEFAULT_DICT_KEY: &str =
+    "dictionary-74a0be85886de68de6dbbfbdbda326dcb8dced653adff0680e242830ede967bf";
 
 pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
     let root_path = Path::new("src/wasm/");

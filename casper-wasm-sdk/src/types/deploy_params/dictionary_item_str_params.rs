@@ -138,7 +138,7 @@ impl DictionaryItemStrParams {
     }
 
     #[wasm_bindgen(js_name = "setUref")]
-    pub fn set_uref(&mut self, seed_uref: &str, dictionary_item_key: String) {
+    pub fn set_uref(&mut self, seed_uref: &str, dictionary_item_key: &str) {
         self.uref = Some(URefVariant {
             seed_uref: OnceCell::new(),
             dictionary_item_key: OnceCell::new(),
@@ -152,18 +152,20 @@ impl DictionaryItemStrParams {
                 })
                 .unwrap();
             uref.seed_uref.set(seed_uref.to_string()).unwrap();
-            let _ = uref.dictionary_item_key.set(dictionary_item_key);
+            let _ = uref
+                .dictionary_item_key
+                .set(dictionary_item_key.to_string());
         }
     }
 
     #[wasm_bindgen(js_name = "setDictionary")]
-    pub fn set_dictionary(&mut self, value: String) {
+    pub fn set_dictionary(&mut self, value: &str) {
         self.dictionary = Some(DictionaryVariant {
             value: OnceCell::new(),
         });
 
         if let Some(dictionary) = &mut self.dictionary {
-            let _ = dictionary.value.set(value);
+            let _ = dictionary.value.set(value.to_string());
         }
     }
 
@@ -176,6 +178,24 @@ impl DictionaryItemStrParams {
 impl Default for DictionaryItemStrParams {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl DictionaryItemStrParams {
+    pub fn default() -> Self {
+        Self::new()
+    }
+    pub fn account_named_key(&self) -> Option<AccountNamedKey> {
+        self.account_named_key.clone()
+    }
+    pub fn contract_named_key(&self) -> Option<ContractNamedKey> {
+        self.contract_named_key.clone()
+    }
+    pub fn uref(&self) -> Option<URefVariant> {
+        self.uref.clone()
+    }
+    pub fn dictionary(&self) -> Option<DictionaryVariant> {
+        self.dictionary.clone()
     }
 }
 
