@@ -98,7 +98,7 @@ impl DeployStrParams {
             }
             self.ttl.set(ttl.to_string()).unwrap();
         } else {
-            let ttl = get_ttl_or_default(ttl);
+            let ttl = get_ttl_or_default(ttl.as_deref());
             self.ttl.set(ttl).unwrap();
         };
     }
