@@ -163,8 +163,7 @@ impl SessionStrParams {
             .iter()
             .map(|value| value.as_string().unwrap_or_default())
             .collect();
-        let args_simple = ArgsSimple::from(args);
-        self.session_args_simple.set(args_simple).unwrap();
+        self.set_session_args(args);
     }
 
     // Getter and setter for session_args_json field
@@ -228,6 +227,13 @@ impl SessionStrParams {
     #[wasm_bindgen(setter)]
     pub fn set_is_session_transfer(&self, is_session_transfer: bool) {
         self.is_session_transfer.set(is_session_transfer).unwrap();
+    }
+}
+
+impl SessionStrParams {
+    pub fn set_session_args(&mut self, session_args_simple: Vec<String>) {
+        let args_simple = ArgsSimple::from(session_args_simple);
+        self.session_args_simple.set(args_simple).unwrap();
     }
 }
 

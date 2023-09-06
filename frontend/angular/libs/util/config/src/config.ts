@@ -12,7 +12,7 @@ export const config: EnvironmentConfig = {
   block_identifier_hash: '372e4c83a6ca19c027d3daf4807ad8fc16b9f01411ef39d5e00888128bf4fd59',
   networks: {
     localhost: {
-      node_address: 'https://localhost:11101',
+      node_address: 'http://localhost:11101',
       chain_name: 'casper-net-1'
     },
     integration: {
