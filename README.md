@@ -13,16 +13,41 @@ curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 ```shell
 git clone --recurse-submodules https://github.com/casper-ecosystem/rustSDK.git
 
-// compiling the casper-client-rs is not required but just in case
-cd ./casper-client-rs
-cargo build
-
 cd ./casper-wasm-sdk
-rustup target add wasm32-unknown-unknown
-// app compilation will trigger sdk wasm compilation (in casper-client-rs will translate to wasm-pack build --target web --no-default-features --features sdk)
-wasm-pack build --target web
+make prepare
+make build
+```
 
-cd ./frontend
+# Frontend React example
+
+```
+cd ./frontend/react
 npm install
 npm start
+```
+
+# Frontend Angular example
+
+```
+cd ./frontend/angular
+npm install
+npm start
+npm build // build the app in ./frontend/angular/dist folder
+```
+
+# Desktop Node example
+
+```
+cd ./desktop/node
+npm install
+npm start
+```
+
+# Desktop Electron example (laoding Angular frontend)
+
+```
+cd ./desktop/electron
+npm install
+npm start
+npm build // build the app in ./desktop/electron/release folder
 ```
