@@ -36,20 +36,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 var casper_wasm_sdk = require('casper-wasm-sdk');
-var SDK = casper_wasm_sdk.SDK, privateToPublicKey = casper_wasm_sdk.privateToPublicKey, Verbosity = casper_wasm_sdk.Verbosity, GetPeersResult = casper_wasm_sdk.GetPeersResult;
+var SDK = casper_wasm_sdk.SDK, Verbosity = casper_wasm_sdk.Verbosity;
 var http = require('http');
-var sdk;
+var sdk = new SDK();
 var node_address = 'http://localhost:11101';
-setup();
 var server = http.createServer(function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var peers_object;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
-                return [4 /*yield*/, get_peers()];
+                return [4 /*yield*/, sdk.get_peers(node_address, Verbosity.High)];
             case 1:
-                peers_object = (_a.sent());
+                peers_object = _a.sent();
                 console.log(peers_object.peers);
                 console.log(peers_object.toJson());
                 res.end(JSON.stringify(peers_object.peers));
@@ -61,21 +60,3 @@ var PORT = process.env.PORT || 3000;
 server.listen(PORT, function () {
     console.log("Server is running on port ".concat(PORT));
 });
-function setup() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            sdk = new SDK();
-            return [2 /*return*/];
-        });
-    });
-}
-function get_peers() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, sdk.get_peers(node_address, Verbosity.High)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
-        });
-    });
-}
