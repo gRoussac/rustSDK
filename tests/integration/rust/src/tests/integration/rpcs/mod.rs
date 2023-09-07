@@ -342,7 +342,9 @@ mod tests {
     #[test]
     pub async fn test_get_account_test() {
         thread::sleep(WAIT_TIME);
-        test_get_peers().await;
+        let maybe_block_identifier =
+            Some(BlockIdentifierInput::String(DEFAULT_BLOCK_HASH.to_string()));
+        test_get_account(maybe_block_identifier).await;
         thread::sleep(WAIT_TIME);
     }
     // TODO Remove
