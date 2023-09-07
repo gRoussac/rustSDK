@@ -43,7 +43,7 @@ npm install
 npm start
 ```
 
-# Desktop Electron example (laoding Angular frontend)
+# Desktop Electron example (loading Angular frontend)
 
 ```
 cd ./desktop/electron
