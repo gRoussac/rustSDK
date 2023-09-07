@@ -8,6 +8,7 @@
   },
   "author": "casper",
   "license": "ISC",
+  "type": "module",
   "devDependencies": {
     "@types/jest": "^29.5.4",
     "@types/puppeteer": "^7.0.4",
@@ -18,6 +19,6 @@
   },
   "dependencies": {
     "puppeteer": "^21.1.1",
-    "puppeteer-electron": "^0.0.10"
+    "casper-wasm-sdk": "file:../../casper-wasm-sdk/pkg-nodejs"
   }
 }
