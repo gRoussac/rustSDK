@@ -1,4 +1,7 @@
-use crate::debug::error;
+use crate::{
+    debug::error,
+    types::{account_hash::AccountHash, purse_identifier::PurseIdentifier, uref::URef},
+};
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey,
@@ -33,12 +36,20 @@ impl PublicKey {
         PublicKey(public_key)
     }
 
+    #[wasm_bindgen(js_name = "toAccountHash")]
+    pub fn to_account_hash(&self) -> AccountHash {
+        AccountHash::from_public_key(self.0.clone().into())
+    }
+
+    #[wasm_bindgen(js_name = "toPurseUref")]
+    pub fn to_purse_uref(&self) -> URef {
+        PurseIdentifier::from_main_purse_under_public_key(self.0.clone().into()).into()
+    }
+
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
-    // TODO
-    //to_account_hash
 }
 
 impl Display for PublicKey {

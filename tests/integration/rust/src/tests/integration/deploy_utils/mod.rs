@@ -1,21 +1,20 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::tests::helpers::{
-        create_test_sdk, CHAIN_NAME, DEFAULT_SESSION_ACCOUNT, DEFAULT_TARGET_ACCOUNT,
-        DEFAULT_TEST_KEY, TTL,
-    };
+    use crate::config::{get_config, TestConfig, TTL};
+    use crate::tests::helpers::create_test_sdk;
     use casper_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
     };
 
     pub async fn test_make_deploy() {
+        let config: TestConfig = get_config().await;
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
         let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
+            &config.chain_name,
+            &config.account,
             None,
             None,
             Some(TTL.to_string()),
@@ -33,10 +32,11 @@ pub mod test_module {
     }
 
     pub async fn test_make_transfer() {
+        let config: TestConfig = get_config().await;
         let transfer_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
+            &config.chain_name,
+            &config.account,
             None,
             None,
             Some(TTL.to_string()),
@@ -46,7 +46,7 @@ pub mod test_module {
         let make_transfer = create_test_sdk()
             .make_transfer(
                 transfer_amount,
-                DEFAULT_TARGET_ACCOUNT,
+                &config.target_account,
                 None,
                 deploy_params,
                 payment_params,
@@ -57,12 +57,13 @@ pub mod test_module {
     }
 
     pub async fn test_sign_deploy() {
+        let config: TestConfig = get_config().await;
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
         let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
+            &config.chain_name,
+            &config.account,
             None,
             None,
             Some(TTL.to_string()),
@@ -75,7 +76,7 @@ pub mod test_module {
         let make_deploy = create_test_sdk()
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
-        let signed_deploy = create_test_sdk().sign_deploy(make_deploy, DEFAULT_TEST_KEY);
+        let signed_deploy = create_test_sdk().sign_deploy(make_deploy, &config.private_key);
         assert!(signed_deploy.is_valid());
     }
 }

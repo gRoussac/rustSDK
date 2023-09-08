@@ -10,3 +10,4 @@ casper-wasm-sdk = { path = "../../../casper-wasm-sdk" }
 tokio = { version = "1", features = ["full"] }
 once_cell = "*"
 chrono = "0.4"
+lazy_static = "*"

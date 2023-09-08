@@ -1,12 +1,8 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::tests::{
-        helpers::{
-            create_test_sdk, CONFIG, DEFAULT_ACCOUNT_HASH, DEFAULT_CONTRACT_HASH, DEFAULT_DEPLOY,
-            DEFAULT_PURSE_UREF, DEFAULT_SESSION_ACCOUNT,
-        },
-        integration_tests::test_module::WAIT_TIME,
-    };
+    use crate::config::{get_config, TestConfig, DEFAULT_CONTRACT_HASH, DEFAULT_DEPLOY};
+    use crate::tests::helpers::install_cep78_if_needed;
+    use crate::tests::{helpers::create_test_sdk, integration_tests::test_module::WAIT_TIME};
     use casper_wasm_sdk::{
         rpcs::{
             get_balance::GetBalanceInput,
@@ -22,8 +18,9 @@ pub mod test_module {
     use std::thread;
 
     pub async fn test_get_peers() {
+        let config: TestConfig = get_config().await;
         let peers = create_test_sdk()
-            .get_peers(&CONFIG.node_address, CONFIG.verbosity)
+            .get_peers(&config.node_address, config.verbosity)
             .await;
         let peers = peers.unwrap();
         assert!(!peers.result.api_version.to_string().is_empty());
@@ -31,13 +28,14 @@ pub mod test_module {
     }
 
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let public_key = PublicKey::new(DEFAULT_SESSION_ACCOUNT).unwrap();
+        let config: TestConfig = get_config().await;
+        let public_key = PublicKey::new(&config.account).unwrap();
         let get_account = create_test_sdk()
             .get_account(
-                &CONFIG.node_address,
+                &config.node_address,
                 public_key,
                 maybe_block_identifier,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         let get_account = get_account.unwrap();
@@ -51,11 +49,12 @@ pub mod test_module {
     }
 
     pub async fn test_get_auction_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config().await;
         let get_auction_info = create_test_sdk()
             .get_auction_info(
-                &CONFIG.node_address,
+                &config.node_address,
                 maybe_block_identifier,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         let get_auction_info = get_auction_info.unwrap();
@@ -69,8 +68,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_balance() {
+        let config: TestConfig = get_config().await;
         let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&CONFIG.node_address, None, None)
+            .get_state_root_hash(&config.node_address, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let state_root_hash: Digest = get_state_root_hash
@@ -79,14 +79,14 @@ pub mod test_module {
             .state_root_hash
             .unwrap()
             .into();
-        let purse_uref = GetBalanceInput::PurseUrefAsString(DEFAULT_PURSE_UREF.to_string());
+        let purse_uref = GetBalanceInput::PurseUrefAsString(config.purse_uref);
         thread::sleep(WAIT_TIME);
         let get_balance = create_test_sdk()
             .get_balance(
-                &CONFIG.node_address,
+                &config.node_address,
                 state_root_hash,
                 purse_uref,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         thread::sleep(WAIT_TIME);
@@ -96,11 +96,12 @@ pub mod test_module {
     }
 
     pub async fn test_get_block_transfers(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config().await;
         let get_block_transfers = create_test_sdk()
             .get_block_transfers(
-                &CONFIG.node_address,
+                &config.node_address,
                 maybe_block_identifier,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         thread::sleep(WAIT_TIME);
@@ -121,11 +122,12 @@ pub mod test_module {
     }
 
     pub async fn test_get_block(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config().await;
         let get_block = create_test_sdk()
             .get_block(
-                &CONFIG.node_address,
+                &config.node_address,
                 maybe_block_identifier,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         let get_block = get_block.unwrap();
@@ -134,8 +136,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_chainspec() {
+        let config: TestConfig = get_config().await;
         let get_chainspec = create_test_sdk()
-            .get_chainspec(&CONFIG.node_address, CONFIG.verbosity)
+            .get_chainspec(&config.node_address, config.verbosity)
             .await;
         thread::sleep(WAIT_TIME);
         let get_chainspec = get_chainspec.unwrap();
@@ -145,12 +148,13 @@ pub mod test_module {
     }
 
     pub async fn test_get_deploy() {
+        let config: TestConfig = get_config().await;
         let get_deploy = create_test_sdk()
             .get_deploy(
-                &CONFIG.node_address,
+                &config.node_address,
                 DeployHash::new(DEFAULT_DEPLOY).unwrap(),
                 Some(true),
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         let get_deploy = get_deploy.unwrap();
@@ -159,8 +163,10 @@ pub mod test_module {
     }
 
     pub async fn test_get_dictionary_item() {
+        let config: TestConfig = get_config().await;
+        install_cep78_if_needed(&config.account, &config.private_key).await;
         let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&CONFIG.node_address, None, None)
+            .get_state_root_hash(&config.node_address, None, None)
             .await;
         let state_root_hash: Digest = get_state_root_hash
             .unwrap()
@@ -177,10 +183,10 @@ pub mod test_module {
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk()
             .get_dictionary_item(
-                &CONFIG.node_address,
+                &config.node_address,
                 state_root_hash,
                 dictionary_item,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         thread::sleep(WAIT_TIME);
@@ -202,11 +208,12 @@ pub mod test_module {
 
     #[allow(deprecated)]
     pub async fn test_get_era_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config().await;
         let get_era_info = create_test_sdk()
             .get_era_info(
-                &CONFIG.node_address,
+                &config.node_address,
                 maybe_block_identifier,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         let get_era_info = get_era_info.unwrap();
@@ -217,11 +224,12 @@ pub mod test_module {
     }
 
     pub async fn test_get_era_summary(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config().await;
         let get_era_summary = create_test_sdk()
             .get_era_summary(
-                &CONFIG.node_address,
+                &config.node_address,
                 maybe_block_identifier,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         thread::sleep(WAIT_TIME);
@@ -237,8 +245,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_node_status() {
+        let config: TestConfig = get_config().await;
         let get_node_status = create_test_sdk()
-            .get_node_status(&CONFIG.node_address, CONFIG.verbosity)
+            .get_node_status(&config.node_address, config.verbosity)
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());
@@ -246,8 +255,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_state_root_hash() {
+        let config: TestConfig = get_config().await;
         let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&CONFIG.node_address, None, None)
+            .get_state_root_hash(&config.node_address, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let state_root_hash: Digest = get_state_root_hash
@@ -260,8 +270,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_validator_changes() {
+        let config: TestConfig = get_config().await;
         let validator_changes = create_test_sdk()
-            .get_validator_changes(&CONFIG.node_address, CONFIG.verbosity)
+            .get_validator_changes(&config.node_address, config.verbosity)
             .await;
         let validator_changes = validator_changes.unwrap();
         assert!(!validator_changes.result.api_version.to_string().is_empty());
@@ -269,8 +280,9 @@ pub mod test_module {
     }
 
     pub async fn test_list_rpcs() {
+        let config: TestConfig = get_config().await;
         let list_rpcs = create_test_sdk()
-            .list_rpcs(&CONFIG.node_address, CONFIG.verbosity)
+            .list_rpcs(&config.node_address, config.verbosity)
             .await;
         let list_rpcs = list_rpcs.unwrap();
         assert!(!list_rpcs.result.api_version.to_string().is_empty());
@@ -278,15 +290,16 @@ pub mod test_module {
     }
 
     pub async fn test_query_balance(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
+        let config: TestConfig = get_config().await;
         let query_balance = create_test_sdk()
             .query_balance(
-                &CONFIG.node_address,
+                &config.node_address,
                 maybe_global_state_identifier,
-                Some(DEFAULT_PURSE_UREF.to_string()),
+                Some(config.purse_uref),
                 None,
                 None,
                 None,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         let query_balance = query_balance.unwrap();
@@ -297,15 +310,17 @@ pub mod test_module {
     pub async fn test_query_global_state(
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
+        let config: TestConfig = get_config().await;
+        install_cep78_if_needed(&config.account, &config.private_key).await;
         thread::sleep(WAIT_TIME);
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            node_address: CONFIG.node_address.clone(),
-            key: KeyIdentifierInput::String(DEFAULT_ACCOUNT_HASH.to_string()),
+            node_address: config.node_address.clone(),
+            key: KeyIdentifierInput::String(config.account_hash),
             path: Some(PathIdentifierInput::String("my-key-name".to_string())),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            verbosity: CONFIG.verbosity,
+            verbosity: config.verbosity,
         };
         let query_global_state = create_test_sdk().query_global_state(query_params).await;
         thread::sleep(WAIT_TIME);
@@ -325,7 +340,10 @@ pub mod test_module {
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-    use crate::tests::{helpers::DEFAULT_BLOCK_HASH, integration_tests::test_module::WAIT_TIME};
+    use crate::{
+        config::{get_config, TestConfig},
+        tests::integration_tests::test_module::WAIT_TIME,
+    };
     use casper_wasm_sdk::types::{
         block_hash::BlockHash, block_identifier::BlockIdentifierInput,
         global_state_identifier::GlobalStateIdentifier,
@@ -341,9 +359,14 @@ mod tests {
     }
     #[test]
     pub async fn test_get_account_test() {
+        test_get_account(None).await;
         thread::sleep(WAIT_TIME);
-        let maybe_block_identifier =
-            Some(BlockIdentifierInput::String(DEFAULT_BLOCK_HASH.to_string()));
+    }
+    #[test]
+    pub async fn test_get_account_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
+        thread::sleep(WAIT_TIME);
+        let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_account(maybe_block_identifier).await;
         thread::sleep(WAIT_TIME);
     }
@@ -358,9 +381,9 @@ mod tests {
     #[should_panic]
     #[test]
     pub async fn test_get_auction_info_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
-        let maybe_block_identifier =
-            Some(BlockIdentifierInput::String(DEFAULT_BLOCK_HASH.to_string()));
+        let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_auction_info(maybe_block_identifier).await;
         thread::sleep(WAIT_TIME);
     }
@@ -378,9 +401,9 @@ mod tests {
     }
     #[test]
     pub async fn test_get_block_transfers_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
-        let maybe_block_identifier =
-            Some(BlockIdentifierInput::String(DEFAULT_BLOCK_HASH.to_string()));
+        let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_block_transfers(maybe_block_identifier).await;
         thread::sleep(WAIT_TIME);
     }
@@ -412,9 +435,9 @@ mod tests {
     }
     #[test]
     pub async fn test_get_era_info_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
-        let maybe_block_identifier =
-            Some(BlockIdentifierInput::String(DEFAULT_BLOCK_HASH.to_string()));
+        let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_era_info(maybe_block_identifier).await;
         thread::sleep(WAIT_TIME);
     }
@@ -426,9 +449,9 @@ mod tests {
     }
     #[test]
     pub async fn test_get_era_summary_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
-        let maybe_block_identifier =
-            Some(BlockIdentifierInput::String(DEFAULT_BLOCK_HASH.to_string()));
+        let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_era_summary(maybe_block_identifier).await;
         thread::sleep(WAIT_TIME);
     }
@@ -458,9 +481,10 @@ mod tests {
     }
     #[test]
     pub async fn test_query_balance_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
-            BlockHash::new(DEFAULT_BLOCK_HASH).unwrap(),
+            BlockHash::new(&config.block_hash).unwrap(),
         ));
         test_query_balance(maybe_global_state_identifier).await;
         thread::sleep(WAIT_TIME);
@@ -473,9 +497,10 @@ mod tests {
     }
     #[test]
     pub async fn test_query_global_state_test_with_block_identifier() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
-            BlockHash::new(DEFAULT_BLOCK_HASH).unwrap(),
+            BlockHash::new(&config.block_hash).unwrap(),
         ));
         test_query_global_state(maybe_global_state_identifier).await;
         thread::sleep(WAIT_TIME);

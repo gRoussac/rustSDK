@@ -9,7 +9,7 @@ pub(crate) use deploy_utils::*;
 pub(crate) mod contract;
 pub use contract::*;
 
-pub use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct SDK {}

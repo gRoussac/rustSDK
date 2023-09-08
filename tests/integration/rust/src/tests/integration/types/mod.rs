@@ -1,12 +1,10 @@
 #[allow(dead_code)]
 pub mod test_module_deploy {
-    use crate::tests::{
-        helpers::{
-            read_wasm_file, CHAIN_NAME, DEFAULT_SESSION_ACCOUNT, DEFAULT_TARGET_ACCOUNT,
-            DEFAULT_TEST_KEY, DEFAULT_TTL, TTL,
-        },
-        integration_tests::test_module::WAIT_TIME,
+    use crate::{
+        config::{get_config, TestConfig, DEFAULT_TTL, HELLO_CONTRACT, TTL},
+        tests::{helpers::read_wasm_file, integration_tests::test_module::WAIT_TIME},
     };
+
     use casper_wasm_sdk::{
         helpers::get_current_timestamp,
         types::{
@@ -19,13 +17,15 @@ pub mod test_module_deploy {
         },
         types::{deploy::Deploy, public_key::PublicKey},
     };
+
     use std::thread;
 
     pub async fn test_deploy_type() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -50,10 +50,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_transfer() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -63,7 +64,7 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
@@ -74,10 +75,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_ttl() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -94,16 +96,17 @@ pub mod test_module_deploy {
                 .unwrap();
         assert!(deploy.is_valid());
         assert_eq!(deploy.ttl(), TTL.to_string());
-        deploy = deploy.with_ttl(DEFAULT_TTL, Some(DEFAULT_TEST_KEY.to_string()));
+        deploy = deploy.with_ttl(DEFAULT_TTL, Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.ttl(), DEFAULT_TTL.to_string());
     }
 
     pub async fn test_deploy_type_with_timestamp() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -113,7 +116,7 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let mut deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
@@ -127,16 +130,17 @@ pub mod test_module_deploy {
 
         let current_timestamp = &get_current_timestamp(None)[..19];
         assert_ne!(deploy_timestamp, current_timestamp);
-        deploy = deploy.with_timestamp(current_timestamp, Some(DEFAULT_TEST_KEY.to_string()));
+        deploy = deploy.with_timestamp(current_timestamp, Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(&deploy.timestamp()[..19], current_timestamp);
     }
 
     pub async fn test_deploy_type_with_chain_name() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -146,24 +150,25 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let mut deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
         )
         .unwrap();
         assert!(deploy.is_valid());
-        assert_eq!(deploy.chain_name(), CHAIN_NAME);
-        deploy = deploy.with_chain_name("test", Some(DEFAULT_TEST_KEY.to_string()));
+        assert_eq!(deploy.chain_name(), config.chain_name);
+        deploy = deploy.with_chain_name("test", Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(&deploy.chain_name(), "test");
     }
 
     pub async fn test_deploy_type_with_account() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -173,24 +178,25 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let mut deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
         )
         .unwrap();
         assert!(deploy.is_valid());
-        assert_eq!(&deploy.account(), DEFAULT_SESSION_ACCOUNT);
-        deploy = deploy.with_account(PublicKey::new(DEFAULT_TARGET_ACCOUNT).unwrap(), None);
+        assert_eq!(&deploy.account(), &config.account);
+        deploy = deploy.with_account(PublicKey::new(&config.target_account).unwrap(), None);
         assert!(!deploy.is_valid());
-        assert_eq!(&deploy.account(), DEFAULT_TARGET_ACCOUNT);
+        assert_eq!(&deploy.account(), &config.target_account);
     }
 
     pub async fn test_deploy_type_with_entry_point_name() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -207,16 +213,17 @@ pub mod test_module_deploy {
                 .unwrap();
         assert!(deploy.is_valid());
         assert_eq!(&deploy.entry_point_name(), entrypoint);
-        deploy = deploy.with_entry_point_name("name", Some(DEFAULT_TEST_KEY.to_string()));
+        deploy = deploy.with_entry_point_name("name", Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(&deploy.entry_point_name(), "name");
     }
 
     pub async fn test_deploy_type_with_hash() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -237,7 +244,7 @@ pub mod test_module_deploy {
         let new_session_hash = "7b9f86fd244c604012002cde5961464bfd371539c5e6df4b42ada6108090421c";
         deploy = deploy.with_hash(
             ContractHash::new(new_session_hash).unwrap(),
-            Some(DEFAULT_TEST_KEY.to_string()),
+            Some(config.private_key.clone()),
         );
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract());
@@ -246,10 +253,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_by_name() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -273,10 +281,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_package_hash() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -299,7 +308,7 @@ pub mod test_module_deploy {
             "10631a7146f1a164fb4af24b71881704cccd9dc988e02f85cf332c8d9b88238a";
         deploy = deploy.with_package_hash(
             ContractPackageHash::new(new_session_package_hash).unwrap(),
-            Some(DEFAULT_TEST_KEY.to_string()),
+            Some(config.private_key.clone()),
         );
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract_package());
@@ -308,10 +317,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_module_bytes() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -329,7 +339,7 @@ pub mod test_module_deploy {
             .to_json()
             .unwrap()
             .contains("\"module_bytes\":\"00\""));
-        let file_path = "contract.wasm";
+        let file_path = HELLO_CONTRACT;
         let module_bytes = match read_wasm_file(file_path) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -337,7 +347,7 @@ pub mod test_module_deploy {
                 return;
             }
         };
-        deploy = deploy.with_module_bytes(module_bytes.into(), Some(DEFAULT_TEST_KEY.to_string()));
+        deploy = deploy.with_module_bytes(module_bytes.into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert!(deploy.is_module_bytes());
         assert!(!deploy
@@ -347,9 +357,10 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_secret_key() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
+            &config.chain_name,
+            &config.account,
             None,
             None,
             Some(TTL.to_string()),
@@ -360,23 +371,24 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let mut deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
         )
         .unwrap();
         assert!(!deploy.is_valid());
-        assert_eq!(&deploy.account(), DEFAULT_SESSION_ACCOUNT);
-        deploy = deploy.with_secret_key(Some(DEFAULT_TEST_KEY.to_string()));
+        assert_eq!(&deploy.account(), &config.account);
+        deploy = deploy.with_secret_key(Some(config.private_key.clone()));
         assert!(deploy.is_valid());
     }
 
     pub async fn test_deploy_type_with_standard_payment() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -401,11 +413,12 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_is_expired() {
+        let config: TestConfig = get_config().await;
         let old_timestamp = "2023-09-05T16:53:46";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             Some(old_timestamp.to_string()),
             Some(TTL.to_string()),
         );
@@ -415,7 +428,7 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let mut deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
@@ -429,7 +442,7 @@ pub mod test_module_deploy {
 
         let current_timestamp = &get_current_timestamp(None)[..19];
         assert_ne!(deploy_timestamp, current_timestamp);
-        deploy = deploy.with_timestamp(current_timestamp, Some(DEFAULT_TEST_KEY.to_string()));
+        deploy = deploy.with_timestamp(current_timestamp, Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert!(!deploy.timestamp().is_empty());
         assert!(!deploy.expired());
@@ -437,9 +450,10 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_sign() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
+            &config.chain_name,
+            &config.account,
             None,
             None,
             Some(TTL.to_string()),
@@ -450,7 +464,7 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let mut deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
@@ -459,18 +473,19 @@ pub mod test_module_deploy {
         assert!(!deploy.is_valid());
         assert!(deploy.has_valid_hash());
         let compute_approvals_hash = deploy.compute_approvals_hash();
-        assert_eq!(&deploy.account(), DEFAULT_SESSION_ACCOUNT);
-        deploy = deploy.sign(DEFAULT_TEST_KEY);
+        assert_eq!(&deploy.account(), &config.account);
+        deploy = deploy.sign(&config.private_key);
         assert!(deploy.is_valid());
         let new_compute_approvals_hash = deploy.compute_approvals_hash();
         assert_ne!(compute_approvals_hash, new_compute_approvals_hash);
     }
 
     pub async fn test_deploy_type_footprint() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -480,7 +495,7 @@ pub mod test_module_deploy {
         let transfer_amount = "5500000000";
         let deploy = Deploy::with_transfer(
             transfer_amount,
-            DEFAULT_TARGET_ACCOUNT,
+            &config.target_account,
             None,
             deploy_params,
             payment_params,
@@ -493,10 +508,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_empty_args() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -516,10 +532,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_args() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -545,10 +562,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_args_json() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -571,10 +589,11 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_add_arg() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -591,14 +610,11 @@ pub mod test_module_deploy {
                 .unwrap();
         assert!(deploy.is_valid());
         assert!(deploy.args().is_empty());
-        deploy = deploy.add_arg(
-            "test:bool='false".into(),
-            Some(DEFAULT_TEST_KEY.to_string()),
-        );
+        deploy = deploy.add_arg("test:bool='false".into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 1);
         let arg_json = r#"{"name": "joe", "type": "U256", "value": 1}"#; // No brackets only one arg
-        deploy = deploy.add_arg(arg_json.into(), Some(DEFAULT_TEST_KEY.to_string()));
+        deploy = deploy.add_arg(arg_json.into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 2);
     }

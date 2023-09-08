@@ -1,5 +1,9 @@
 #[allow(dead_code)]
 pub mod test_module {
+    use crate::{
+        config::{get_config, TestConfig, DEFAULT_TTL, TTL},
+        tests::helpers::create_test_sdk,
+    };
     use casper_wasm_sdk::{
         debug::{error, log},
         helpers::{
@@ -11,10 +15,6 @@ pub mod test_module {
     };
     use chrono::DateTime;
     use std::time;
-
-    use crate::tests::helpers::{
-        create_test_sdk, CONFIG, DEFAULT_SESSION_ACCOUNT, DEFAULT_TEST_KEY, DEFAULT_TTL, TTL,
-    };
     // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static not working
     pub const WAIT_TIME: std::time::Duration = time::Duration::from_millis(2000);
 
@@ -26,8 +26,9 @@ pub mod test_module {
         log("bound log to std");
     }
 
-    pub fn test_hex_to_uint8_vec() {
-        let test: Vec<u8> = hex_to_uint8_vec(DEFAULT_SESSION_ACCOUNT);
+    pub async fn test_hex_to_uint8_vec() {
+        let config: TestConfig = get_config().await;
+        let test: Vec<u8> = hex_to_uint8_vec(&config.account);
         assert!(!test.is_empty());
         assert_eq!(test.len(), 33);
     }
@@ -54,13 +55,15 @@ pub mod test_module {
         assert_eq!(cspr, "1000000000000250000");
     }
 
-    pub fn test_public_key_from_private_key() {
-        let public_key = public_key_from_private_key(DEFAULT_TEST_KEY).unwrap();
-        assert_eq!(public_key, DEFAULT_SESSION_ACCOUNT);
+    pub async fn test_public_key_from_private_key() {
+        let config: TestConfig = get_config().await;
+        let public_key = public_key_from_private_key(&config.private_key).unwrap();
+        assert_eq!(public_key, config.account);
     }
 
-    pub fn test_secret_key_from_pem() {
-        let secret_key = secret_key_from_pem(DEFAULT_TEST_KEY).unwrap();
+    pub async fn test_secret_key_from_pem() {
+        let config: TestConfig = get_config().await;
+        let secret_key = secret_key_from_pem(&config.private_key).unwrap();
         assert_eq!(secret_key.to_string(), "SecretKey::Ed25519");
     }
 
@@ -104,8 +107,9 @@ pub mod test_module {
     }
 
     pub async fn test_get_json_pretty_print() {
+        let config: TestConfig = get_config().await;
         let get_node_status = create_test_sdk()
-            .get_node_status(&CONFIG.node_address, CONFIG.verbosity)
+            .get_node_status(&config.node_address, config.verbosity)
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());
@@ -149,24 +153,12 @@ mod tests {
         test_error();
     }
     #[test]
-    pub fn test_hex_to_uint8_vec_test() {
-        test_hex_to_uint8_vec();
-    }
-    #[test]
     pub fn test_hex_to_string_test() {
         test_hex_to_string();
     }
     #[test]
     pub fn test_motes_to_cspr_test() {
         test_motes_to_cspr();
-    }
-    #[test]
-    pub fn test_public_key_from_private_key_test() {
-        test_public_key_from_private_key();
-    }
-    #[test]
-    pub fn test_secret_key_from_pem_test() {
-        test_secret_key_from_pem();
     }
     #[test]
     pub fn test_parse_timestamp_test() {
@@ -186,6 +178,19 @@ mod tests {
 mod tests_async {
     use super::test_module::*;
     use tokio::test;
+
+    #[test]
+    pub async fn test_hex_to_uint8_vec_test() {
+        test_hex_to_uint8_vec().await;
+    }
+    #[test]
+    pub async fn test_public_key_from_private_key_test() {
+        test_public_key_from_private_key().await;
+    }
+    #[test]
+    pub async fn test_secret_key_from_pem_test() {
+        test_secret_key_from_pem().await;
+    }
     #[test]
     pub async fn test_get_json_pretty_print_test() {
         test_get_json_pretty_print().await;
