@@ -1,13 +1,11 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use std::thread;
-
-    use crate::tests::{
-        helpers::{
-            create_test_sdk, read_wasm_file, CHAIN_NAME, CONFIG, DEFAULT_CONTRACT_HASH,
-            DEFAULT_SESSION_ACCOUNT, DEFAULT_TEST_KEY, TTL,
+    use crate::{
+        config::{get_config, TestConfig, DEFAULT_CONTRACT_HASH, HELLO_CONTRACT, TTL},
+        tests::{
+            helpers::{create_test_sdk, install_cep78_if_needed, read_wasm_file},
+            integration_tests::test_module::WAIT_TIME,
         },
-        integration_tests::test_module::WAIT_TIME,
     };
     use casper_wasm_sdk::{
         rpcs::{
@@ -24,15 +22,18 @@ pub mod test_module {
             global_state_identifier::GlobalStateIdentifier,
         },
     };
+    use std::thread;
 
     pub async fn test_call_entrypoint() {
+        let config: TestConfig = get_config().await;
+        install_cep78_if_needed(&config.account, &config.private_key).await;
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
         let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -43,7 +44,7 @@ pub mod test_module {
         payment_params.set_payment_amount(payment_amount);
         let test_call_entrypoint = create_test_sdk()
             .call_entrypoint(
-                &CONFIG.node_address,
+                &config.node_address,
                 deploy_params,
                 session_params,
                 payment_params,
@@ -66,8 +67,10 @@ pub mod test_module {
     }
 
     pub async fn test_query_contract_dict() {
+        let config: TestConfig = get_config().await;
+        install_cep78_if_needed(&config.account, &config.private_key).await;
         let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&CONFIG.node_address, None, None)
+            .get_state_root_hash(&config.node_address, None, None)
             .await;
         let state_root_hash: Digest = get_state_root_hash
             .unwrap()
@@ -84,10 +87,10 @@ pub mod test_module {
         let dictionary_item = DictionaryItemInput::Params(params);
         let query_contract_dict = create_test_sdk()
             .query_contract_dict(
-                &CONFIG.node_address,
+                &config.node_address,
                 state_root_hash,
                 dictionary_item,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         thread::sleep(WAIT_TIME);
@@ -108,14 +111,16 @@ pub mod test_module {
     }
 
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
+        let config: TestConfig = get_config().await;
+        install_cep78_if_needed(&config.account, &config.private_key).await;
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            node_address: CONFIG.node_address.clone(),
+            node_address: config.node_address.clone(),
             key: KeyIdentifierInput::String(DEFAULT_CONTRACT_HASH.to_string()),
             path: Some(PathIdentifierInput::String("installer".to_string())),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            verbosity: CONFIG.verbosity,
+            verbosity: config.verbosity,
         };
         let query_contract_key = create_test_sdk().query_contract_key(query_params).await;
 
@@ -132,17 +137,18 @@ pub mod test_module {
     }
 
     pub async fn test_install() {
+        let config: TestConfig = get_config().await;
         let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
         let session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
-        let file_path = "contract.wasm";
+        let file_path = HELLO_CONTRACT;
         let module_bytes = match read_wasm_file(file_path) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -154,7 +160,7 @@ pub mod test_module {
         payment_params.set_payment_amount(payment_amount);
         let install = create_test_sdk()
             .install(
-                &CONFIG.node_address,
+                &config.node_address,
                 deploy_params,
                 session_params,
                 payment_params,
@@ -179,7 +185,10 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::{helpers::DEFAULT_BLOCK_HASH, integration_tests::test_module::WAIT_TIME};
+    use crate::{
+        config::{get_config, TestConfig},
+        tests::integration_tests::test_module::WAIT_TIME,
+    };
 
     use super::test_module::*;
     use casper_wasm_sdk::types::{
@@ -202,9 +211,10 @@ mod tests {
     }
     #[test]
     pub async fn test_query_contract_key_test() {
+        let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
-            BlockHash::new(DEFAULT_BLOCK_HASH).unwrap(),
+            BlockHash::new(&config.block_hash).unwrap(),
         ));
         query_contract_key(maybe_global_state_identifier).await;
         thread::sleep(WAIT_TIME);

@@ -44,6 +44,11 @@ impl URef {
         ))
     }
 
+    #[wasm_bindgen(js_name = "toFormattedString")]
+    pub fn to_formatted_string(&self) -> String {
+        self.0.to_formatted_string()
+    }
+
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())

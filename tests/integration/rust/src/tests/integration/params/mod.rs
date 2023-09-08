@@ -1,42 +1,38 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::tests::helpers::{
-        CHAIN_NAME, DEFAULT_ACCOUNT_HASH, DEFAULT_CONTRACT_HASH, DEFAULT_DICT_KEY,
-        DEFAULT_DICT_UREF, DEFAULT_SESSION_ACCOUNT, DEFAULT_TTL, TTL,
+    use crate::config::{
+        get_config, TestConfig, DEFAULT_CONTRACT_HASH, DEFAULT_DICT_KEY, DEFAULT_DICT_UREF,
+        DEFAULT_TTL, TTL,
     };
     use casper_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, dictionary_item_str_params::DictionaryItemStrParams,
         payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
     };
 
-    pub fn test_deploy_params() {
+    pub async fn test_deploy_params() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
+            &config.chain_name,
+            &config.account,
             None,
             None,
             Some(TTL.to_string()),
         );
-        assert_eq!(deploy_params.chain_name().unwrap(), CHAIN_NAME);
+        assert_eq!(deploy_params.chain_name().unwrap(), config.chain_name);
         assert_eq!(deploy_params.ttl().unwrap(), TTL);
-        assert_eq!(
-            deploy_params.session_account().unwrap(),
-            DEFAULT_SESSION_ACCOUNT
-        );
+        assert_eq!(deploy_params.session_account().unwrap(), config.account);
         assert_eq!(deploy_params.secret_key(), None);
         assert!(deploy_params.timestamp().is_some());
     }
 
-    pub fn test_deploy_params_defaults() {
+    pub async fn test_deploy_params_defaults() {
+        let config: TestConfig = get_config().await;
         let deploy_params = DeployStrParams::default();
-        deploy_params.set_chain_name(CHAIN_NAME);
-        deploy_params.set_session_account(DEFAULT_SESSION_ACCOUNT);
+        deploy_params.set_chain_name(&config.chain_name);
+        deploy_params.set_session_account(&config.account);
 
-        assert_eq!(deploy_params.chain_name().unwrap(), CHAIN_NAME);
-        assert_eq!(
-            deploy_params.session_account().unwrap(),
-            DEFAULT_SESSION_ACCOUNT
-        );
+        assert_eq!(deploy_params.chain_name().unwrap(), config.chain_name);
+        assert_eq!(deploy_params.session_account().unwrap(), config.account);
         assert!(deploy_params.timestamp().is_none());
         assert!(deploy_params.ttl().is_none());
 
@@ -63,7 +59,8 @@ pub mod test_module {
         assert_eq!(payment_params.payment_amount().unwrap(), payment_amount);
     }
 
-    pub fn test_dictionary_item_params() {
+    pub async fn test_dictionary_item_params() {
+        let config: TestConfig = get_config().await;
         let mut dictionary_item_params = DictionaryItemStrParams::default();
         //  dictionary_item_params.
         assert!(dictionary_item_params.account_named_key().is_none());
@@ -71,7 +68,7 @@ pub mod test_module {
         assert!(dictionary_item_params.uref().is_none());
         assert!(dictionary_item_params.dictionary().is_none());
 
-        dictionary_item_params.set_account_named_key(DEFAULT_ACCOUNT_HASH, "dict", "key");
+        dictionary_item_params.set_account_named_key(&config.account_hash, "dict", "key");
         assert!(dictionary_item_params.account_named_key().is_some());
         dictionary_item_params.set_contract_named_key(DEFAULT_CONTRACT_HASH, "dict", "key");
         assert!(dictionary_item_params.contract_named_key().is_some());
@@ -85,15 +82,6 @@ pub mod test_module {
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-
-    #[test]
-    pub fn test_deploy_params_test() {
-        test_deploy_params();
-    }
-    #[test]
-    pub fn test_deploy_params_defaults_test() {
-        test_deploy_params_defaults();
-    }
     #[test]
     pub fn test_session_params_test() {
         test_session_params();
@@ -102,8 +90,23 @@ mod tests {
     pub fn test_payment_params_test() {
         test_payment_params();
     }
+}
+
+#[cfg(test)]
+mod tests_async {
+    use super::test_module::*;
+    use tokio::test;
     #[test]
-    pub fn test_dictionary_item_params_test() {
-        test_dictionary_item_params();
+    pub async fn test_deploy_params_test() {
+        test_deploy_params().await;
+    }
+    #[test]
+    pub async fn test_deploy_params_defaults_test() {
+        test_deploy_params_defaults().await;
+    }
+
+    #[test]
+    pub async fn test_dictionary_item_params_test() {
+        test_dictionary_item_params().await;
     }
 }

@@ -32,6 +32,17 @@ impl BlockHash {
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
+
+    #[wasm_bindgen(js_name = "toString")]
+    pub fn to_string_js_name(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl ToString for BlockHash {
+    fn to_string(&self) -> String {
+        hex::encode(self.0)
+    }
 }
 
 impl From<BlockHash> for _BlockHash {

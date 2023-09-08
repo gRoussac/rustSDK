@@ -1,22 +1,22 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::tests::helpers::{
-        create_test_sdk, CHAIN_NAME, CONFIG, DEFAULT_SESSION_ACCOUNT, DEFAULT_TARGET_ACCOUNT,
-        DEFAULT_TEST_KEY, TTL,
-    };
+    use crate::config::{get_config, TestConfig, TTL};
+    use crate::tests::helpers::{create_test_sdk, install_cep78_if_needed};
     use casper_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
     };
 
     pub async fn test_deploy() {
+        let config: TestConfig = get_config().await;
+        install_cep78_if_needed(&config.account, &config.private_key).await;
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
         let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -27,11 +27,11 @@ pub mod test_module {
         payment_params.set_payment_amount(payment_amount);
         let deploy = create_test_sdk()
             .deploy(
-                &CONFIG.node_address,
+                &config.node_address,
                 deploy_params,
                 session_params,
                 payment_params,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         assert!(!deploy
@@ -51,11 +51,12 @@ pub mod test_module {
     }
 
     pub async fn test_transfer() {
+        let config: TestConfig = get_config().await;
         let transfer_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -63,13 +64,13 @@ pub mod test_module {
         payment_params.set_payment_amount("10000");
         let transfer = create_test_sdk()
             .transfer(
-                &CONFIG.node_address,
+                &config.node_address,
                 transfer_amount,
-                DEFAULT_TARGET_ACCOUNT,
+                &config.target_account,
                 None,
                 deploy_params,
                 payment_params,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         assert!(!transfer
@@ -89,13 +90,14 @@ pub mod test_module {
     }
 
     pub async fn test_speculative_deploy() {
+        let config: TestConfig = get_config().await;
         let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
         let entrypoint = "decimals";
         let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -106,12 +108,12 @@ pub mod test_module {
         payment_params.set_payment_amount(payment_amount);
         let deploy = create_test_sdk()
             .speculative_deploy(
-                &CONFIG.node_address,
+                &config.node_address,
                 deploy_params,
                 session_params,
                 payment_params,
                 None,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         assert!(!deploy
@@ -132,11 +134,12 @@ pub mod test_module {
     }
 
     pub async fn test_speculative_transfer() {
+        let config: TestConfig = get_config().await;
         let transfer_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
-            CHAIN_NAME,
-            DEFAULT_SESSION_ACCOUNT,
-            Some(DEFAULT_TEST_KEY.to_string()),
+            &config.chain_name,
+            &config.account,
+            Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -144,14 +147,14 @@ pub mod test_module {
         payment_params.set_payment_amount("10000");
         let transfer = create_test_sdk()
             .speculative_transfer(
-                &CONFIG.node_address,
+                &config.node_address,
                 transfer_amount,
-                DEFAULT_TARGET_ACCOUNT,
+                &config.target_account,
                 None,
                 deploy_params,
                 payment_params,
                 None,
-                CONFIG.verbosity,
+                config.verbosity,
             )
             .await;
         assert!(!transfer

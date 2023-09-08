@@ -1,7 +1,7 @@
 #[cfg(target_arch = "wasm32")]
-use super::sign_deploy::Deploy;
-#[cfg(target_arch = "wasm32")]
 use crate::debug::error;
+#[cfg(target_arch = "wasm32")]
+use crate::types::deploy::Deploy;
 use crate::{
     types::{
         deploy_params::{
