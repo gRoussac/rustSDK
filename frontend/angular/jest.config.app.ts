@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'casper',
+  displayName: 'Casper Client',
   preset: './jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   coverageDirectory: './coverage/casper',

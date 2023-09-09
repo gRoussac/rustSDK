@@ -3,6 +3,8 @@ pub mod test_module {
     use crate::config::{get_config, TestConfig, DEFAULT_CONTRACT_HASH, DEFAULT_DEPLOY};
     use crate::tests::helpers::install_cep78_if_needed;
     use crate::tests::{helpers::create_test_sdk, integration_tests::test_module::WAIT_TIME};
+    use casper_wasm_sdk::types::account_hash::AccountHash;
+    use casper_wasm_sdk::types::account_identifier::AccountIdentifier;
     use casper_wasm_sdk::{
         rpcs::{
             get_balance::GetBalanceInput,
@@ -30,10 +32,38 @@ pub mod test_module {
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
         let public_key = PublicKey::new(&config.account).unwrap();
+        let account_identifier =
+            AccountIdentifier::from_account_account_under_public_key(public_key);
         let get_account = create_test_sdk()
             .get_account(
                 &config.node_address,
-                public_key,
+                Some(account_identifier),
+                None,
+                maybe_block_identifier,
+                config.verbosity,
+            )
+            .await;
+        let get_account = get_account.unwrap();
+        assert!(!get_account.result.api_version.to_string().is_empty());
+        assert!(!get_account
+            .result
+            .account
+            .account_hash()
+            .to_string()
+            .is_empty());
+    }
+
+    pub async fn test_get_account_with_account_hash(
+        maybe_block_identifier: Option<BlockIdentifierInput>,
+    ) {
+        let config: TestConfig = get_config().await;
+        let account_hash = AccountHash::new(&config.account_hash).unwrap();
+        let account_identifier = AccountIdentifier::from_account_under_account_hash(account_hash);
+        let get_account = create_test_sdk()
+            .get_account(
+                &config.node_address,
+                Some(account_identifier),
+                None,
                 maybe_block_identifier,
                 config.verbosity,
             )
@@ -132,7 +162,13 @@ pub mod test_module {
             .await;
         let get_block = get_block.unwrap();
         assert!(!get_block.result.api_version.to_string().is_empty());
-        assert!(!get_block.result.block.unwrap().hash.to_string().is_empty());
+        assert!(!get_block
+            .result
+            .block
+            .unwrap()
+            .hash()
+            .to_string()
+            .is_empty());
     }
 
     pub async fn test_get_chainspec() {
@@ -368,6 +404,11 @@ mod tests {
         thread::sleep(WAIT_TIME);
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_account(maybe_block_identifier).await;
+        thread::sleep(WAIT_TIME);
+    }
+    #[test]
+    pub async fn test_get_account_with_account_hash_test() {
+        test_get_account_with_account_hash(None).await;
         thread::sleep(WAIT_TIME);
     }
     // TODO Remove

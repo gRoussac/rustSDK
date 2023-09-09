@@ -1,13 +1,15 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
-use crate::types::public_key::PublicKey;
 use crate::{
+    debug::error,
     helpers::get_verbosity_or_default,
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
+        sdk_error::SdkError, verbosity::Verbosity,
+    },
     SDK,
 };
+use casper_client::cli::parse_account_identifier;
 use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
     rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,
@@ -67,9 +69,8 @@ impl GetAccountResult {
 #[wasm_bindgen(js_name = "getAccountOptions", getter_with_clone)]
 pub struct GetAccountOptions {
     pub node_address: String,
-    pub account_identifier: Option<String>,
-    pub public_key: Option<PublicKey>,
-    // account_hash: Option<AccountHash>, PR #99 Account identifier
+    pub account_identifier: Option<AccountIdentifier>,
+    pub account_identifier_as_string: Option<String>,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
     pub verbosity: Option<Verbosity>,
@@ -98,31 +99,11 @@ impl SDK {
         let GetAccountOptions {
             node_address,
             account_identifier,
-            public_key,
-            // account_hash,
+            account_identifier_as_string,
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
         } = options;
-        let public_key = if let Some(account_identifier) = account_identifier {
-            match PublicKey::new(&account_identifier) {
-                Ok(key) => key,
-                Err(err) => {
-                    let err = &format!(
-                        "Error: Failed to create PublicKey from account identifier {:?}",
-                        err
-                    );
-                    error(err);
-                    return Err(JsError::new(err));
-                }
-            }
-        } else if let Some(public_key) = public_key {
-            public_key
-        } else {
-            let err = "Error: Missing account identifier or public key";
-            error(err);
-            return Err(JsError::new(err));
-        };
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,
@@ -134,7 +115,8 @@ impl SDK {
         let result = self
             .get_account(
                 &node_address,
-                public_key.into(),
+                account_identifier,
+                account_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
             )
@@ -162,18 +144,35 @@ impl SDK {
     pub async fn get_account(
         &self,
         node_address: &str,
-        public_key: PublicKey,
+        account_identifier: Option<AccountIdentifier>,
+        account_identifier_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
         //log("get_account!");
+
+        let account_identifier = if let Some(account_identifier) = account_identifier {
+            account_identifier
+        } else if let Some(account_identifier_as_string) = account_identifier_as_string.clone() {
+            match parse_account_identifier(&account_identifier_as_string) {
+                Ok(parsed) => parsed.into(),
+                Err(err) => {
+                    error(&err.to_string());
+                    return Err(SdkError::FailedToParseAccountIdentifier);
+                }
+            }
+        } else {
+            let err = "Error: Missing account identifier";
+            error(err);
+            return Err(SdkError::FailedToParseAccountIdentifier);
+        };
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 node_address,
                 get_verbosity_or_default(verbosity).into(),
                 &maybe_block_id,
-                &public_key.to_string(),
+                &account_identifier.to_string(),
             )
             .await
             .map_err(SdkError::from)
@@ -191,7 +190,7 @@ impl SDK {
                 node_address,
                 get_verbosity_or_default(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
-                public_key.into(),
+                account_identifier.into(),
             )
             .await
             .map_err(SdkError::from)

@@ -107,7 +107,7 @@ impl SDK {
 
         self.speculative_exec(
             node_address,
-            deploy.unwrap(),
+            deploy.unwrap().into(),
             maybe_block_identifier,
             verbosity,
         )

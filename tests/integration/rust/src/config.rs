@@ -58,7 +58,7 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     let target_account = public_key_from_private_key(&private_key_target_account).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    let purse_uref = get_main_purse(DEFAULT_NODE_ADDRESS, public_key).await;
+    let purse_uref = get_main_purse(DEFAULT_NODE_ADDRESS, &account).await;
     // let _ = install_cep78(&account, &private_key).await;
     let config = TestConfig {
         node_address: DEFAULT_NODE_ADDRESS.to_string(),

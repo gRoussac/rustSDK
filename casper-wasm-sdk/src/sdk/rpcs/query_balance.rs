@@ -1,17 +1,15 @@
+#[cfg(target_arch = "wasm32")]
+use crate::types::digest::Digest;
 use crate::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
-#[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
 use crate::{
+    debug::error,
     helpers::get_verbosity_or_default,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
 use casper_client::cli::parse_purse_identifier;
-// TODO
-// extract _PurseIdentifier from client ?
-// use casper_client::rpcs::PurseIdentifier as _PurseIdentifier;
 use casper_client::{
     cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
     rpcs::results::QueryBalanceResult as _QueryBalanceResult, JsonRpcId, SuccessResponse,
@@ -169,8 +167,6 @@ impl SDK {
         node_address: &str,
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
         purse_identifier_as_string: Option<String>,
-        // TODO
-        // purse_identifier: Option<_PurseIdentifier>, extract _PurseIdentifier from client ?
         purse_identifier: Option<PurseIdentifier>,
         state_root_hash: Option<String>,
         maybe_block_id: Option<String>,
@@ -181,8 +177,16 @@ impl SDK {
         let purse_identifier: PurseIdentifier = if let Some(purse_identifier) = purse_identifier {
             purse_identifier
         } else if let Some(purse_id) = purse_identifier_as_string.clone() {
-            parse_purse_identifier(&purse_id).unwrap().into()
+            match parse_purse_identifier(&purse_id) {
+                Ok(parsed) => parsed.into(),
+                Err(err) => {
+                    error(&err.to_string());
+                    return Err(SdkError::FailedToParsePurseIdentifier);
+                }
+            }
         } else {
+            let err = "Error: Missing purse identifier";
+            error(err);
             return Err(SdkError::FailedToParsePurseIdentifier);
         };
 
