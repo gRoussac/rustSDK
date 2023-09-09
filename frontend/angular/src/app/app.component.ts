@@ -23,7 +23,7 @@ type network = {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  title = 'casper';
+  title = 'Casper client';
   state_root_hash!: string;
   peers!: PeerEntry[];
   networks!: network[];
@@ -172,12 +172,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   async get_node_status() {
     const get_node_status = await this.sdk.get_node_status(this.node_address, this.verbosity);
     get_node_status && (this.result = get_node_status.toJson());
+    return get_node_status;
   }
 
   async get_state_root_hash(no_mark_for_check?: boolean) {
     const options: getStateRootHashOptions = this.sdk.get_state_root_hash_options({
       node_address: this.node_address
     });
+    if (!options) {
+      return;
+    }
     const state_root_hash = await this.sdk.get_state_root_hash(options);
     this.state_root_hash = state_root_hash.state_root_hash_as_string;
     if (!no_mark_for_check) {
@@ -198,8 +202,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     const get_account_options = this.sdk.get_account_options({
       node_address: this.node_address,
       verbosity: this.verbosity,
+      account_identifier_as_string: account_identifier
     });
-    get_account_options.account_identifier = account_identifier;
+    if (!get_account_options) {
+      return;
+    }
     this.getIdentifieBlock(get_account_options);
     const get_account = await this.sdk.get_account(get_account_options);
     if (!account_identifier_param) {
@@ -789,7 +796,15 @@ export class AppComponent implements OnInit, AfterViewInit {
       ...network,
     }));
     const no_mark_for_check = true;
-    await this.get_state_root_hash(no_mark_for_check);
+    try {
+      const get_node_status = await this.get_node_status();
+      if (get_node_status) {
+        await this.get_state_root_hash(no_mark_for_check);
+        this.action = 'get_node_status';
+      }
+    } catch (error) {
+      console.error(error);
+    }
     this.changeDetectorRef.markForCheck();
   }
 

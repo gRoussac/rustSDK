@@ -4,7 +4,6 @@ use crate::debug::error;
 use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 use crate::{
     helpers::get_verbosity_or_default,
@@ -15,7 +14,6 @@ use casper_client::{
     rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
     speculative_exec as speculative_exec_lib, JsonRpcId, SuccessResponse,
 };
-use casper_types::Deploy as CasperTypesDeploy;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
@@ -148,7 +146,7 @@ impl SDK {
     pub async fn speculative_exec(
         &self,
         node_address: &str,
-        deploy: CasperTypesDeploy,
+        deploy: Deploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
@@ -167,7 +165,7 @@ impl SDK {
             node_address,
             maybe_block_identifier.map(Into::into),
             get_verbosity_or_default(verbosity).into(),
-            deploy,
+            deploy.into(),
         )
         .await
         .map_err(SdkError::from)

@@ -24,7 +24,8 @@ import init, {
   jsonPrettyPrint,
   privateToPublicKey,
   getTimestamp,
-  Bytes
+  Bytes,
+  AccountIdentifier
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
@@ -108,12 +109,12 @@ function App() {
       setBlock(chain_get_block?.block.hash);
       console.log('js chain_get_block', chain_get_block);
 
-      const public_key = new PublicKey(pubKey);
+      const account_identifier = new AccountIdentifier.fromPublicKey(pubKey);
       let state_get_account_info_options = sdk.get_account_options({
         node_address: host,
         verbosity: Verbosity.High,
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
-        public_key: public_key.toJson()
+        account_identifier: account_identifier.toJson()
       });
       const state_get_account_info = (await sdk.state_get_account_info(state_get_account_info_options)).toJson();
       console.log('js state_get_account_info', state_get_account_info);

@@ -3,6 +3,7 @@ use crate::{
     tests::integration_tests::test_module::WAIT_TIME,
 };
 use casper_wasm_sdk::types::{
+    account_identifier,
     block_hash::BlockHash,
     deploy_hash::DeployHash,
     deploy_params::{
@@ -52,21 +53,28 @@ pub fn read_pem_file(file_path: &str) -> Result<String, io::Error> {
 }
 
 pub async fn get_current_block_hash(node_address: &str) -> String {
-    let blokckhash: BlockHash = create_test_sdk()
+    let blokckhash = *create_test_sdk()
         .get_block(node_address, None, None)
         .await
         .unwrap()
         .result
         .block
         .unwrap()
-        .hash
-        .into();
+        .hash();
+
+    let blokckhash: BlockHash = blokckhash.into();
     blokckhash.to_string()
 }
 
-pub async fn get_main_purse(node_address: &str, public_key: PublicKey) -> String {
+pub async fn get_main_purse(node_address: &str, account_identifier_as_string: &str) -> String {
     let purse_uref: URef = create_test_sdk()
-        .get_account(node_address, public_key, None, None)
+        .get_account(
+            node_address,
+            None,
+            Some(account_identifier_as_string.to_owned()),
+            None,
+            None,
+        )
         .await
         .unwrap()
         .result

@@ -66,6 +66,9 @@ pub enum SdkError {
     #[error("Failed to parse purse identifier")]
     FailedToParsePurseIdentifier,
 
+    #[error("Failed to parse account identifier")]
+    FailedToParseAccountIdentifier,
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 
