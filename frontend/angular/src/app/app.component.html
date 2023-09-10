@@ -165,7 +165,7 @@
   <div class="row mt-3" *ngIf="peers && peers.length && action === 'get_peers'">
     <div class="col-xs-12">
       <div class="card">
-        <ul class="list-group list-group-flush">
+        <ul class="list-group list-group-flush" e2e-id="peers">
           <li class="list-group-item" *ngFor="let peer of peers; index as i">
             {{ peer | json }}
           </li>
@@ -307,7 +307,9 @@
             type="search"
             class="form-control form-control-xs"
             name="purse_identifier"
-            [value]="purse_identifier || ''"
+            [value]="
+              purse_identifier || main_purse || public_key || account_hash || ''
+            "
             placeholder="e.g. Public Key, AccountHash, Purse URef"
             id="purseIdentifierElt"
             #purseIdentifierElt
@@ -1006,7 +1008,13 @@
       </button>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="result && !result_text">
+  <div
+    class="row mt-3"
+    *ngIf="
+      result &&
+      !['put_deploy', 'sign_deploy', 'speculative_exec'].includes(action)
+    "
+  >
     <div class="col-xs-12">
       <div class="card">
         <div class="card-body" style="white-space: pre-wrap" e2e-id="result">
@@ -1015,7 +1023,7 @@
       </div>
     </div>
   </div>
-  <div class="row mt-3" *ngIf="!result && result_text">
+  <div class="row mt-3" *ngIf="result_text">
     <div class="col-xs-12">
       <div class="card">
         <div
