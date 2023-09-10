@@ -165,6 +165,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   async get_peers() {
     const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
     if (peers_result) {
+      this.cleanDisplay();
       this.peers = peers_result?.peers;
     }
   }
@@ -328,6 +329,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_chainspec() {
     const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
+    this.result = '';
     this.result_text = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
   }
 
@@ -413,7 +415,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(get_era_info_options);
     const get_era_info = await this.sdk.get_era_info(get_era_info_options);
-    get_era_info && (this.result = get_era_info.era_summary);
+    get_era_info && (this.result = get_era_info.toJson());
   }
 
   async get_era_summary() {
@@ -532,6 +534,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     if (result) {
       this.result = result.toJson();
+      this.deploy_json = jsonPrettyPrint(this.result, Verbosity.High);
     }
     return result;
   }
@@ -603,7 +606,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         payment_params,
       );
     }
-    result && (this.result = result.toJson());
+    if (result) {
+      this.result = result.toJson();
+      this.deploy_json = jsonPrettyPrint(this.result, Verbosity.High);
+    }
     return result;
   }
 
@@ -851,11 +857,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.deploy_json = '';
     this.result = '';
     this.result_text = '';
-    // this.deployJsonElt && (this.deployJsonElt.nativeElement.value = '');
+    this.peers = [];
+    //this.deployJsonElt && (this.deployJsonElt.nativeElement.value = '');
   }
 
   async selectAction($event: Event) {
     const action = ($event.target as HTMLInputElement).value;
+    this.result_text = '';
+    this.peers = [];
     await this.handleAction(action);
     this.changeDetectorRef.detectChanges();
   }
@@ -985,7 +994,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       if (session_hash) {
         session_params.session_hash = session_hash;
       } else if (session_name) {
-        session_params.session_hash = session_name;
+        session_params.session_name = session_name;
       }
     } else {
       if (session_hash) {
