@@ -352,7 +352,7 @@ pub mod test_module {
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             node_address: config.node_address.clone(),
             key: KeyIdentifierInput::String(config.account_hash),
-            path: Some(PathIdentifierInput::String("my-key-name".to_string())),
+            path: Some(PathIdentifierInput::String("key-name".to_string())),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,

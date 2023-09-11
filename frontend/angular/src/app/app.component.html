@@ -55,7 +55,7 @@
         <span e2e-id="state_root_hash"
           >state root hash is {{ state_root_hash }}</span
         >
-        <button class="btn me-0" (click)="get_state_root_hash()">
+        <button class="btn me-0" (click)="get_state_root_hash(true)">
           Refresh
         </button>
       </div>
@@ -186,7 +186,8 @@
         'speculative_deploy',
         'speculative_transfer',
         'query_balance',
-        'query_global_state'
+        'query_global_state',
+        'get_state_root_hash'
       ].includes(action)
     "
   >
@@ -270,7 +271,6 @@
             type="search"
             class="form-control form-control-xs"
             name="state_root_hash"
-            [value]="state_root_hash || ''"
             [placeholder]="state_root_hash"
             id="stateRootHashElt"
             #stateRootHashElt
@@ -946,7 +946,7 @@
               class="form-control form-control-xs"
               name="args_simple"
               [value]="args_simple || ''"
-              placeholder="e.g. joe:bool='true', bob:bool='false'"
+              placeholder="e.g. foo:Bool='true', bar:String='value'"
               id="argsSimpleElt"
               [disabled]="!!argsJsonElt.value"
               (change)="(true)"
@@ -954,7 +954,7 @@
               e2e-id="argsSimpleElt"
             />
             <label for="argsSimpleElt"
-              >e.g. joe:bool='true'", "bob:bool='false'</label
+              >e.g. foo:Bool='true', bar:String='value'</label
             >
           </div>
         </div>
@@ -966,14 +966,14 @@
               class="form-control form-control-xs"
               name="args_json"
               [value]="args_json || ''"
-              placeholder='e.g. [{ "name": "joe", "type": "U256", "value": 1 }]'
+              placeholder='e.g. [{ "name": "foo", "type": "U256", "value": 1 }]'
               [disabled]="!!argsSimpleElt.value"
               (change)="(true)"
               #argsJsonElt
               e2e-id="argsJsonElt"
             />
             <label for="argsJsonElt"
-              >e.g. [&#123; "name": "joe", "type": "U256", "value": 1
+              >e.g. [&#123; "name": "foo", "type": "U256", "value": 1
               &#125;]</label
             >
           </div>

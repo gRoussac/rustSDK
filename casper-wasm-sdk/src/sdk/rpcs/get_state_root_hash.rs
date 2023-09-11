@@ -73,8 +73,8 @@ impl GetStateRootHashResult {
 #[wasm_bindgen(js_name = "getStateRootHashOptions", getter_with_clone)]
 pub struct GetStateRootHashOptions {
     pub node_address: String,
-    pub block_id_as_string: Option<String>,
-    pub block_identifier: Option<BlockIdentifier>,
+    pub maybe_block_id_as_string: Option<String>,
+    pub maybe_block_identifier: Option<BlockIdentifier>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -100,16 +100,16 @@ impl SDK {
     ) -> Result<GetStateRootHashResult, JsError> {
         let GetStateRootHashOptions {
             node_address,
-            block_id_as_string,
-            block_identifier,
+            maybe_block_id_as_string,
+            maybe_block_identifier,
             verbosity,
         } = options;
-        let maybe_block_identifier = if let Some(maybe_block_identifier) = block_identifier {
+        let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,
             ))
         } else {
-            block_id_as_string.map(BlockIdentifierInput::String)
+            maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
 
         let result = self

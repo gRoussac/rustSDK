@@ -15,6 +15,7 @@ let sdk: typeof SDK;
 const node_address = 'http://localhost:11101';
 const app_address = 'http://localhost:4200';
 const chain_name = 'casper-net-1';
+let state_root_hash_default!: string;
 let private_key!: string;
 let account!: string;
 let account_hash!: string;
@@ -26,8 +27,11 @@ let transfer_amount = '2500000000';
 let entrypoint = 'mint';
 let contract_hello = 'hello.wasm';
 let contract_cep78 = 'cep78.wasm';
+let test_hello_key = 'test_hello_key';
+let message = 'Hello Casper';
+let deploy_hash = '';
 let args_simple =
-  "joe:bool='true',bob:bool='false'";
+  `key-name:String='${test_hello_key}',message:String='${message}'`;
 let args_json = `[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -71,8 +75,10 @@ describe('Angular App Tests', () => {
       const state_root_hash = await page.evaluate(() => {
         return document.querySelector('[e2e-id="state_root_hash"]')?.textContent;
       });
-      const pattern = /^state root hash is [0-9a-f]{64}$/i;
+      const pattern = /^state root hash is ([0-9a-f]{64})$/i;
       expect(state_root_hash).toMatch(pattern);
+      state_root_hash_default = (state_root_hash.match(pattern) || [])[1] || '';
+      expect(state_root_hash_default).toBeDefined();
     });
 
     it('should have action to get_node_status by default', async () => {
@@ -142,6 +148,61 @@ describe('Angular App Tests', () => {
       });
       const pattern = /^account hash is account-hash-[0-9a-f]{64}$/i;
       expect(account_hash).toMatch(pattern);
+    });
+  });
+
+  describe('Contract install', () => {
+    beforeAll(async () => {
+
+    });
+    beforeEach(async () => {
+      await page.reload();
+      await clear();
+      setPrivateKey();
+      await seletAction('install');
+      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await page.waitForSelector('[e2e-id="argsJsonElt"]');
+    });
+
+    it('should install hello contract', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      await setWasm(contract_hello);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      deploy = JSON.parse(deploy);
+      expect(deploy?.deploy_hash).toBeDefined();
+      deploy_hash = deploy.deploy_hash;
+    });
+  });
+
+  describe.skip('Rpc call get_deploy', () => {
+    beforeAll(async () => {
+      await seletAction('get_deploy');
+    });
+
+    beforeEach(async () => {
+      await clear();
+    });
+
+    it('should get_deploy', async () => {
+      await page.waitForSelector('[e2e-id="deployHashElt"]');
+      await clearInput('[e2e-id="deployHashElt"]');
+      await page.type('[e2e-id="deployHashElt"]', deploy_hash);
+      await submit();
+      await get_result();
     });
   });
 
@@ -321,25 +382,6 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Rpc call get_deploy', () => {
-    beforeAll(async () => {
-      await seletAction('get_deploy');
-    });
-
-    beforeEach(async () => {
-      await clear();
-    });
-
-    xit('should get_deploy', async () => {
-      await page.waitForSelector('[e2e-id="deployHashElt"]');
-      await clearInput('[e2e-id="deployHashElt"]');
-      const deploy = '';
-      await page.type('[e2e-id="deployHashElt"]', deploy);
-      await submit();
-      await get_result();
-    });
-  });
-
   describe('Rpc call get_era_info', () => {
     beforeAll(async () => {
       await seletAction('get_era_info');
@@ -493,6 +535,8 @@ describe('Angular App Tests', () => {
     });
 
     it('should query_balance with purse identifier', async () => {
+      console.log(state_root_hash_default);
+      await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
       await submit();
       await get_result();
     });
@@ -1084,37 +1128,6 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Contract install', () => {
-    beforeAll(async () => {
-
-    });
-    beforeEach(async () => {
-      await page.reload();
-      await clear();
-      setPrivateKey();
-      await seletAction('install');
-      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
-      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
-      await page.waitForSelector('[e2e-id="argsJsonElt"]');
-    });
-
-    it('should install hello contract', async () => {
-      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
-      await setWasm(contract_hello);
-      let make_deploy = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeUndefined();
-      await submit();
-      await page.waitForSelector('[e2e-id="result"]');
-      make_deploy = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(make_deploy).toBeDefined();
-    });
-  });
-
   afterAll(async () => {
     await browser.close();
     if (delete_key_at_root_after_test) {
@@ -1235,6 +1248,7 @@ async function setupFixtures() {
   if (!account_hash) {
     console.error('Missing account_hash');
   }
+  get_state_root_hash();
 }
 
 function readPEMFile(keyPath?: string, copy?: boolean): string {
@@ -1285,4 +1299,12 @@ async function get_block() {
   const block_result = await sdk.get_block(chain_get_block_options);
   block_hash = block_result?.block?.hash;
   block_height = block_result?.block?.header.height.toString();
+}
+
+async function get_state_root_hash() {
+  const get_state_root_hash_options: getBlockOptions = sdk.get_state_root_hash_options({
+    node_address
+  });
+  const get_state_root_hash_result = await sdk.get_state_root_hash(get_state_root_hash_options);
+  state_root_hash_default = get_state_root_hash_result?.state_root_hash;
 }
