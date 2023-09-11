@@ -546,8 +546,8 @@ pub mod test_module_deploy {
         session_params.set_session_hash(session_hash);
         session_params.set_session_entry_point(entrypoint);
         let args = Vec::from([
-            "joe:bool='true'".to_string(),
-            "bob:bool='false'".to_string(),
+            "foo:Bool='true'".to_string(),
+            "bar:String='value'".to_string(),
         ]);
         session_params.set_session_args(args.clone());
         let payment_amount = "5500000000";
@@ -575,7 +575,7 @@ pub mod test_module_deploy {
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(session_hash);
         session_params.set_session_entry_point(entrypoint);
-        let args_json = r#"[{"name": "joe", "type": "U256", "value": 1}]"#;
+        let args_json = r#"[{"name": "foo", "type": "U256", "value": 1}]"#;
         session_params.set_session_args_json(args_json);
         let payment_amount = "5500000000";
         let payment_params = PaymentStrParams::default();
@@ -613,7 +613,7 @@ pub mod test_module_deploy {
         deploy = deploy.add_arg("test:bool='false".into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 1);
-        let arg_json = r#"{"name": "joe", "type": "U256", "value": 1}"#; // No brackets only one arg
+        let arg_json = r#"{"name": "foo", "type": "U256", "value": 1}"#; // No brackets only one arg
         deploy = deploy.add_arg(arg_json.into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 2);

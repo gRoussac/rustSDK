@@ -1913,10 +1913,10 @@ export class getStateRootHashOptions {
   free(): void;
 /**
 */
-  block_id_as_string?: string;
+  maybe_block_id_as_string?: string;
 /**
 */
-  block_identifier?: BlockIdentifier;
+  maybe_block_identifier?: BlockIdentifier;
 /**
 */
   node_address: string;
@@ -2279,10 +2279,10 @@ export interface InitOutput {
   readonly __wbg_getstateroothashoptions_free: (a: number) => void;
   readonly __wbg_get_getstateroothashoptions_node_address: (a: number, b: number) => void;
   readonly __wbg_set_getstateroothashoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getstateroothashoptions_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getstateroothashoptions_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getstateroothashoptions_block_identifier: (a: number) => number;
-  readonly __wbg_set_getstateroothashoptions_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_getstateroothashoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getstateroothashoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getstateroothashoptions_maybe_block_identifier: (a: number) => number;
+  readonly __wbg_set_getstateroothashoptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_get_getstateroothashoptions_verbosity: (a: number) => number;
   readonly __wbg_set_getstateroothashoptions_verbosity: (a: number, b: number) => void;
   readonly sdk_get_state_root_hash_options: (a: number, b: number) => number;

@@ -1913,10 +1913,10 @@ export class getStateRootHashOptions {
   free(): void;
 /**
 */
-  block_id_as_string?: string;
+  maybe_block_id_as_string?: string;
 /**
 */
-  block_identifier?: BlockIdentifier;
+  maybe_block_identifier?: BlockIdentifier;
 /**
 */
   node_address: string;

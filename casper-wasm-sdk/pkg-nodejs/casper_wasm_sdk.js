@@ -6973,10 +6973,10 @@ class getStateRootHashOptions {
     /**
     * @returns {string | undefined}
     */
-    get block_id_as_string() {
+    get maybe_block_id_as_string() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.__wbg_get_getstateroothashoptions_block_id_as_string(retptr, this.__wbg_ptr);
+            wasm.__wbg_get_getstateroothashoptions_maybe_block_id_as_string(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             let v1;
@@ -6992,28 +6992,28 @@ class getStateRootHashOptions {
     /**
     * @param {string | undefined} arg0
     */
-    set block_id_as_string(arg0) {
+    set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getstateroothashoptions_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getstateroothashoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
     * @returns {BlockIdentifier | undefined}
     */
-    get block_identifier() {
-        const ret = wasm.__wbg_get_getstateroothashoptions_block_identifier(this.__wbg_ptr);
+    get maybe_block_identifier() {
+        const ret = wasm.__wbg_get_getstateroothashoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
     * @param {BlockIdentifier | undefined} arg0
     */
-    set block_identifier(arg0) {
+    set maybe_block_identifier(arg0) {
         let ptr0 = 0;
         if (!isLikeNone(arg0)) {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getstateroothashoptions_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getstateroothashoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
     * @returns {number | undefined}

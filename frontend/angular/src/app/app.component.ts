@@ -182,10 +182,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!options) {
       return;
     }
-    const state_root_hash = await this.sdk.get_state_root_hash(options);
-    this.state_root_hash = state_root_hash.state_root_hash_as_string;
     if (!no_mark_for_check) {
-      this.state_root_hash && (this.result = this.state_root_hash);
+      this.getIdentifieBlock(options);
+      const state_root_hash = await this.sdk.get_state_root_hash(options);
+      this.state_root_hash && (this.result = state_root_hash.state_root_hash_as_string);
+    } else {
+      const state_root_hash = await this.sdk.get_state_root_hash(options);
+      this.state_root_hash = state_root_hash.state_root_hash_as_string;
+      this.changeDetectorRef.markForCheck();
     }
   }
 

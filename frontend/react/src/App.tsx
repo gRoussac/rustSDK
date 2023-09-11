@@ -233,8 +233,8 @@ function App() {
       session_params.session_hash =
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
-      session_params.session_args_simple = ["joe:bool='true'", "bob:bool='false'"]; // session_args_simple or session_args_json but not both
-      //session_params.session_args_json = JSON.stringify([{ "name": "joe", "type": "U256", "value": 1 }]); // Arrary of objects as multiple args
+      session_params.session_args_simple = ["foo:Bool='true'", "bar:String='value'"]; // session_args_simple or session_args_json but not both
+      //session_params.session_args_json = JSON.stringify([{ "name": "foo", "type": "U256", "value": 1 }]); // Arrary of objects as multiple args
       console.log(session_params);
 
       payment_params = new PaymentStrParams();
@@ -278,7 +278,7 @@ function App() {
       session_params.session_hash =
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
-      session_params.session_args_json = JSON.stringify([{ "name": "joe", "type": "U256", "value": 1 }]); // Arrary of objects as multiple args
+      session_params.session_args_json = JSON.stringify([{ "name": "foo", "type": "U256", "value": 1 }]); // Arrary of objects as multiple args
       const make_deploy = sdk.make_deploy(
         deploy_params,
         session_params,
