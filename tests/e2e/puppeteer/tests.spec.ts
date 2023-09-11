@@ -561,7 +561,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should query_balance with purse identifier', async () => {
-      console.log(state_root_hash_default);
       await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
       await submit();
       await get_result();
@@ -764,7 +763,6 @@ describe('Angular App Tests', () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
       await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      console.log(args_json);
       await screen();
       await page.type('[e2e-id="argsJsonElt"]', args_json);
       await screen();
@@ -1306,7 +1304,6 @@ async function setPrivateKey() {
   await page.waitForSelector('[e2e-id="privateKeyElt"]');
   const elementHandle = await page.$('[e2e-id="privateKeyElt"]');
   const resolvedPath = path.resolve(__dirname, '../', keyName);
-  console.log(resolvedPath);
   if (fs.existsSync(resolvedPath)) {
     await elementHandle.uploadFile(resolvedPath);
   } else {
