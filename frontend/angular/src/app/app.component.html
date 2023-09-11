@@ -589,7 +589,7 @@
             name="finalized_approvals"
             [checked]="finalized_approvals"
             [value]="finalized_approvals || ''"
-            [id]="finalizedApprovalsElt"
+            id="finalizedApprovalsElt"
             #finalizedApprovalsElt
             e2e-id="finalizedApprovalsElt"
           />
@@ -629,7 +629,7 @@
             name="deploy_json"
             value="deploy_json"
             [innerHTML]="deploy_json || ''"
-            [id]="deployJsonElt"
+            id="deployJsonElt"
             #deployJsonElt
             e2e-id="deployJsonElt"
           >
@@ -806,6 +806,7 @@
             class="btn btn-light"
             (click)="resetWasmClick()"
             *ngIf="file_name"
+            e2e-id="wasmName"
           >
             {{ file_name }}
             <svg
@@ -837,7 +838,11 @@
           ].includes(action)
         "
       >
-        <ng-container *ngIf="action !== 'install' && !file_name">
+        <ng-container
+          *ngIf="
+            action !== 'install' && (!file_name || action === 'call_entrypoint')
+          "
+        >
           <div class="col-sm-7 mb-2">
             <label>Smart Contract hash or Package hash</label>
             <div class="form-floating">
@@ -849,7 +854,10 @@
                 placeholder="e.g. Contract Hash or Package Hash"
                 id="sessionHashElt"
                 (change)="(true)"
-                [disabled]="!!sessionNameElt.value || file_name"
+                [disabled]="
+                  !!sessionNameElt.value ||
+                  (file_name && action !== 'call_entrypoint')
+                "
                 #sessionHashElt
                 e2e-id="sessionHashElt"
               />
@@ -867,8 +875,8 @@
                 name="call_package"
                 [checked]="call_package"
                 [value]="call_package || ''"
-                [id]="callPackageElt"
-                [disabled]="file_name"
+                id="callPackageElt"
+                [disabled]="file_name && action !== 'call_entrypoint'"
                 #callPackageElt
                 e2e-id="callPackageElt"
               />
@@ -883,7 +891,7 @@
                 name="version"
                 [value]="version || ''"
                 placeholder="e.g.1, empty for last version"
-                [disabled]="file_name"
+                [disabled]="file_name && action !== 'call_entrypoint'"
                 id="versionElt"
                 #versionElt
                 e2e-id="versionElt"
@@ -901,7 +909,10 @@
                 [value]="session_name || ''"
                 placeholder="e.g. Counter"
                 id="sessionNameElt"
-                [disabled]="!!sessionHashElt.value || file_name"
+                [disabled]="
+                  !!sessionHashElt.value ||
+                  (file_name && action !== 'call_entrypoint')
+                "
                 (change)="(true)"
                 #sessionNameElt
                 e2e-id="sessionNameElt"
@@ -919,7 +930,7 @@
                 [value]="entry_point || ''"
                 placeholder="e.g. counter_inc"
                 id="entryPointElt"
-                [disabled]="file_name"
+                [disabled]="file_name && action !== 'call_entrypoint'"
                 #entryPointElt
                 e2e-id="entryPointElt"
               />
@@ -1008,29 +1019,14 @@
       </button>
     </div>
   </div>
-  <div
-    class="row mt-3"
-    *ngIf="
-      result &&
-      !['put_deploy', 'sign_deploy', 'speculative_exec'].includes(action)
-    "
-  >
-    <div class="col-xs-12">
-      <div class="card">
-        <div class="card-body" style="white-space: pre-wrap" e2e-id="result">
-          {{ result | json }}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row mt-3" *ngIf="result_text">
+  <div class="row mt-3" *ngIf="result">
     <div class="col-xs-12">
       <div class="card">
         <div
           class="card-body"
-          [innerHTML]="result_text"
           style="white-space: pre-wrap"
-          e2e-id="result_text"
+          e2e-id="result"
+          [innerHtml]="displayResult()"
         ></div>
       </div>
     </div>

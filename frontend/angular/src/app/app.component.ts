@@ -33,7 +33,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
   result!: string | object;
-  result_text!: string;
   verbosity = Verbosity.High;
   node_address = this.env['node_address'].toString();
   action!: string;
@@ -259,23 +258,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.public_key,
       this.private_key,
     );
-
-    const args_simple: [string] = this.argsSimpleElt && this.argsSimpleElt.nativeElement.value.toString()
-      .trim()
-      .split(',')
-      .map((item: string) => item.trim())
-      .filter((item: string) => item !== '');
-    const args_json: string = this.argsJsonElt && this.argsJsonElt.nativeElement.value.toString().trim();
-    const session_params = new SessionStrParams();
-    if (args_simple?.length) {
-      session_params.session_args_simple = args_simple;
-    }
-    else if (args_json) {
-      session_params.session_args_json = args_json;
-    }
-    if (!wasmBuffer || !this._wasm) {
-      return;
-    }
+    const session_params = this.get_session_params();
     const install = await this.sdk.install(
       this.node_address,
       deploy_params,
@@ -329,8 +312,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_chainspec() {
     const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
-    this.result = '';
-    this.result_text = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
+    this.result = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
   }
 
   async get_deploy() {
@@ -853,18 +835,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.file_name = '';
   }
 
+  displayResult() {
+    if (typeof this.result === 'string') {
+      return this.result;
+    } else {
+      return jsonPrettyPrint(this.result, this.verbosity);
+    }
+  }
+
   cleanDisplay() {
-    this.deploy_json = '';
+    // this.deploy_json = '';
     this.result = '';
-    this.result_text = '';
     this.peers = [];
     //this.deployJsonElt && (this.deployJsonElt.nativeElement.value = '');
   }
 
   async selectAction($event: Event) {
     const action = ($event.target as HTMLInputElement).value;
-    this.result_text = '';
-    this.peers = [];
+    this.cleanDisplay();
     await this.handleAction(action);
     this.changeDetectorRef.detectChanges();
   }
