@@ -27,13 +27,17 @@ let transfer_amount = '2500000000';
 let entrypoint = 'mint';
 let contract_hello = 'hello.wasm';
 let contract_cep78 = 'cep78.wasm';
+let payment_amount_contract_cep78 = '260000000000';
 let test_hello_key = 'test_hello_key';
+let contract_cep78_key = 'cep78_contract_hash_enhanced-nft-1';
+let contract_cep78_hash!: string;
 let message = 'Hello Casper';
+let collection_name = 'enhanced-nft-1';
 let deploy_hash = '';
 let args_simple =
   `key-name:String='${test_hello_key}',message:String='${message}'`;
 let args_json = `[
-{"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
+{"name": "collection_name", "type": "String", "value": "${collection_name}"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
 {"name": "total_token_supply", "type": "U64", "value": 10},
 {"name": "ownership_mode", "type": "U8", "value": 0},
@@ -169,6 +173,28 @@ describe('Angular App Tests', () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
       await page.type('[e2e-id="argsSimpleElt"]', args_simple);
       await setWasm(contract_hello);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      deploy = JSON.parse(deploy);
+      expect(deploy?.deploy_hash).toBeDefined();
+      deploy_hash = deploy.deploy_hash;
+    });
+
+    it('should install cep78 contract', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount_contract_cep78);
+      await page.type('[e2e-id="argsJsonElt"]', args_json);
+      await setWasm(contract_cep78);
       let deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
@@ -578,6 +604,93 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Rpc call query_global_state', () => {
+    beforeAll(async () => {
+      await page.waitForSelector('[e2e-id="publicKeyElt"]');
+      await clearInput('[e2e-id="publicKeyElt"]');
+      await page.type('[e2e-id="publicKeyElt"]', account);
+      await page.$eval('[e2e-id="publicKeyElt"]', (e: { blur: () => any; }) => e.blur());
+      await page.waitForSelector('[e2e-id="main_purse"]');
+      await seletAction('query_global_state');
+      await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await page.waitForSelector('[e2e-id="queryKeyElt"]');
+      await page.waitForSelector('[e2e-id="queryPathElt"]');
+      await page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+    });
+
+    beforeEach(async () => {
+      await clear();
+    });
+
+    it('should query_global_state with account key', async () => {
+      await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
+      await page.type('[e2e-id="queryKeyElt"]', account_hash);
+      await submit();
+      await get_result();
+    });
+
+    it('should query_global_state without state root hash', async () => {
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await page.type('[e2e-id="queryKeyElt"]', account_hash);
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await submit();
+      await get_result();
+    });
+
+    it('should query_global_state with block height', async () => {
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await page.type('[e2e-id="blockIdentifierHeightElt"]', block_height);
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await page.type('[e2e-id="queryKeyElt"]', account_hash);
+      await submit();
+      await get_result();
+    });
+
+    it('should query_global_state with block hash', async () => {
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
+      await page.type('[e2e-id="blockIdentifierHashElt"]', block_hash);
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await page.type('[e2e-id="queryKeyElt"]', account_hash);
+      await submit();
+      await get_result();
+    });
+
+    it(`should query_global_state with ${test_hello_key}`, async () => {
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await page.type('[e2e-id="queryPathElt"]', test_hello_key);
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await page.type('[e2e-id="queryKeyElt"]', account_hash);
+      await submit();
+      await get_result();
+    });
+
+    it(`should query_global_state with nft key`, async () => {
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await page.type('[e2e-id="queryKeyElt"]', account_hash);
+      await clearInput('[e2e-id="queryPathElt"]');
+      await page.type('[e2e-id="queryPathElt"]', contract_cep78_key + '/collection_name');
+      await submit();
+      await get_result();
+      let result = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      let stored_value = JSON.parse(result);
+      expect(stored_value?.CLValue.parsed).toEqual(collection_name);
+    });
+
+
+  });
+
   describe('Deploy util make_deploy', () => {
     beforeAll(async () => {
 
@@ -651,7 +764,10 @@ describe('Angular App Tests', () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
       await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      console.log(args_json);
+      await screen();
       await page.type('[e2e-id="argsJsonElt"]', args_json);
+      await screen();
       let make_deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
@@ -1306,5 +1422,5 @@ async function get_state_root_hash() {
     node_address
   });
   const get_state_root_hash_result = await sdk.get_state_root_hash(get_state_root_hash_options);
-  state_root_hash_default = get_state_root_hash_result?.state_root_hash;
+  state_root_hash_default = get_state_root_hash_result?.state_root_hash.toString();
 }
