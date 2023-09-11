@@ -23,7 +23,9 @@ let block_height!: string;
 let block_hash!: string;
 let payment_amount = '5500000000';
 let transfer_amount = '2500000000';
-let entrypoint = "mint";
+let entrypoint = 'mint';
+let contract_hello = 'hello.wasm';
+let contract_cep78 = 'cep78.wasm';
 let args_simple =
   "joe:bool='true',bob:bool='false'";
 let args_json = `[
@@ -50,12 +52,12 @@ describe('Angular App Tests', () => {
       width: 1920,
       height: 1080,
     });
-    page
-      .on('console', (message: { type: () => string; text: () => any; }) =>
-        console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
-      .on('pageerror', (message: any) => console.log(message))
-      .on('requestfailed', (request: { failure: () => { (): any; new(): any; errorText: any; }; url: () => any; }) =>
-        console.log(`${request.failure().errorText} ${request.url()}`));
+    // page
+    //   .on('console', (message: { type: () => string; text: () => any; }) =>
+    //     console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
+    //   .on('pageerror', (message: any) => console.log(message))
+    //   .on('requestfailed', (request: { failure: () => { (): any; new(): any; errorText: any; }; url: () => any; }) =>
+    //     console.log(`${request.failure().errorText} ${request.url()}`));
   });
 
   describe('Loading', () => {
@@ -311,15 +313,11 @@ describe('Angular App Tests', () => {
     });
     it('should get_chainspec', async () => {
       let result_text = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result_text"]')?.textContent;
+        return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(result_text).toBeUndefined();
       await submit();
-      await page.waitForSelector('[e2e-id="result_text"]');
-      const result = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result_text"]')?.textContent;
-      });
-      expect(result).toBeDefined();
+      await get_result();
     });
   });
 
@@ -659,6 +657,22 @@ describe('Angular App Tests', () => {
       });
       expect(make_deploy).toBeDefined();
     });
+
+    it('should make_deploy with module bytes', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      await setWasm(contract_hello);
+      let make_deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      make_deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_deploy).toBeDefined();
+    });
   });
 
   describe('Deploy util make_transfer', () => {
@@ -712,9 +726,6 @@ describe('Angular App Tests', () => {
 
   describe('Deploy util sign_deploy', () => {
     beforeAll(async () => {
-
-    });
-    beforeEach(async () => {
       await page.reload();
       await clear();
       await page.waitForSelector('[e2e-id="publicKeyElt"]');
@@ -751,25 +762,364 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
       });
       expect(signed_deploy).not.toContain(`"approvals": []`);
-      await screen();
     });
-
-
-
   });
 
-  xit('should load private key and set account', async () => {
-    const account_input = await page.evaluate(() => {
-      return (document.querySelector('[e2e-id="publicKeyElt"]') as HTMLInputElement).value;
+  describe('Deploy util put_deploy', () => {
+    beforeAll(async () => {
+      await page.reload();
+      await clear();
+      setPrivateKey();
+      await seletAction('make_transfer');
+      await page.waitForSelector('[e2e-id="transferAmountElt"]');
+      await page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
-    const pattern = /^[0-9a-f]{66}$/i;
-    expect(account_input).toMatch(pattern);
+
+    it('should put_deploy a transfer', async () => {
+      await page.type('[e2e-id="transferAmountElt"]', transfer_amount);
+      await page.type('[e2e-id="targetAccountElt"]', target);
+      let make_transfer = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transfer).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      make_transfer = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transfer).toBeDefined();
+      await seletAction('put_deploy');
+      const signed_deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
+      });
+      expect(signed_deploy).not.toContain(`"approvals": []`);
+      await submit();
+      await get_result();
+    });
+  });
+
+  describe.skip('Deploy deploy', () => {
+    beforeAll(async () => {
+
+    });
+    beforeEach(async () => {
+      await page.reload();
+      await clear();
+      setPrivateKey();
+      await seletAction('deploy');
+      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await page.waitForSelector('[e2e-id="sessionHashElt"]');
+      await page.waitForSelector('[e2e-id="entryPointElt"]');
+      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await page.waitForSelector('[e2e-id="argsJsonElt"]');
+    });
+    it('should deploy with contract hash', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+
+    it('should deploy with contract name', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.waitForSelector('[e2e-id="sessionNameElt"]');
+      await page.type('[e2e-id="sessionNameElt"]', "enhanced-nft-1");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+
+    it('should deploy with contract hash and args simple', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+
+    it('should deploy with contract hash and args json', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsJsonElt"]', args_json);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+
+    it('should deploy with package hash and args simple', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      await page.waitForSelector('[e2e-id="callPackageElt"]');
+      await page.click('[e2e-id="callPackageElt"]');
+      await page.waitForSelector('[e2e-id="versionElt"]');
+      await page.type('[e2e-id="versionElt"]', "1");
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+
+    it('should deploy without TTL', async () => {
+      await clearInput('[e2e-id="TTLElt"]');
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+
+    it('should deploy with module bytes', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      await setWasm(contract_hello);
+      let deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(deploy).toBeDefined();
+    });
+  });
+
+  describe('Deploy transfer', () => {
+    beforeAll(async () => {
+
+    });
+    beforeEach(async () => {
+      await page.reload();
+      await clear();
+      setPrivateKey();
+      await seletAction('transfer');
+      await page.waitForSelector('[e2e-id="transferAmountElt"]');
+      await page.waitForSelector('[e2e-id="targetAccountElt"]');
+    });
+
+    it('should transfer', async () => {
+      await page.type('[e2e-id="transferAmountElt"]', transfer_amount);
+      await page.type('[e2e-id="targetAccountElt"]', target);
+      let transfer = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transfer).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      transfer = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transfer).toBeDefined();
+    });
+
+    it('should transfer without TTL', async () => {
+      await clearInput('[e2e-id="TTLElt"]');
+      await page.type('[e2e-id="transferAmountElt"]', transfer_amount);
+      await page.type('[e2e-id="targetAccountElt"]', target);
+      let transfer = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transfer).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      transfer = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transfer).toBeDefined();
+    });
+  });
+
+  describe.skip('Contract call entry point', () => {
+    beforeAll(async () => {
+
+    });
+    beforeEach(async () => {
+      await page.reload();
+      await clear();
+      setPrivateKey();
+      await seletAction('call_entrypoint');
+      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await page.waitForSelector('[e2e-id="sessionHashElt"]');
+      await page.waitForSelector('[e2e-id="entryPointElt"]');
+      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await page.waitForSelector('[e2e-id="argsJsonElt"]');
+    });
+    it('should call entry point with contract hash', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract name', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.waitForSelector('[e2e-id="sessionNameElt"]');
+      await page.type('[e2e-id="sessionNameElt"]', "enhanced-nft-1");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract hash and args simple', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract hash and args json', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsJsonElt"]', args_json);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with package hash and args simple', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      await page.waitForSelector('[e2e-id="callPackageElt"]');
+      await page.click('[e2e-id="callPackageElt"]');
+      await page.waitForSelector('[e2e-id="versionElt"]');
+      await page.type('[e2e-id="versionElt"]', "1");
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+  });
+
+  describe('Contract install', () => {
+    beforeAll(async () => {
+
+    });
+    beforeEach(async () => {
+      await page.reload();
+      await clear();
+      setPrivateKey();
+      await seletAction('install');
+      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await page.waitForSelector('[e2e-id="argsJsonElt"]');
+    });
+
+    it('should install hello contract', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
+      await setWasm(contract_hello);
+      let make_deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_deploy).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      make_deploy = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_deploy).toBeDefined();
+    });
   });
 
   afterAll(async () => {
     await browser.close();
     if (delete_key_at_root_after_test) {
-      deleteFile(path.resolve(__dirname, keyName));
+      deleteFile(path.resolve(__dirname, '../', keyName));
+
     }
   });
 });
@@ -826,8 +1176,32 @@ async function seletAction(action: string) {
 async function setPrivateKey() {
   await page.waitForSelector('[e2e-id="privateKeyElt"]');
   const elementHandle = await page.$('[e2e-id="privateKeyElt"]');
-  await elementHandle.uploadFile(path.resolve(__dirname, keyName));
+  const resolvedPath = path.resolve(__dirname, '../', keyName);
+  console.log(resolvedPath);
+  if (fs.existsSync(resolvedPath)) {
+    await elementHandle.uploadFile(resolvedPath);
+  } else {
+    console.error(`File [resolvedPath} does not exist.`);
+  }
+  await page.waitForSelector('[e2e-id="publicKeyElt"]');
+  await page.waitForSelector('[e2e-id="main_purse"]');
+  await page.waitForSelector('[e2e-id="account_hash"]');
+}
 
+async function setWasm(file_name: string) {
+  await page.waitForSelector('[e2e-id="wasmElt"]');
+  const elementHandle = await page.$('[e2e-id="wasmElt"]');
+  const resolvedPath = path.resolve(__dirname, '../../wasm', file_name);
+  if (fs.existsSync(resolvedPath)) {
+    await elementHandle.uploadFile(resolvedPath);
+  } else {
+    console.error(`File [resolvedPath} does not exist.`);
+  }
+  await page.waitForSelector('[e2e-id="wasmName"]');
+  const name = await page.evaluate(() => {
+    return document.querySelector('[e2e-id="wasmName"]')?.textContent;
+  });
+  expect(name).toContain(file_name);
 }
 
 function delay(time: number | undefined) {
@@ -838,8 +1212,17 @@ function delay(time: number | undefined) {
 
 async function setupFixtures() {
   sdk = new SDK();
-  private_key = readPEMFile(`${keyPath}${keyName}`);
+
+  // User 1 as target for default account
+  let copy_key_to_root_folder = true;
+  private_key = readPEMFile(`${keyPath}${keyName}`, copy_key_to_root_folder);
   account = privateToPublicKey(private_key);
+
+  // User 2 as target for transfers etc
+  const keyPath_target = keyPath.replace('user-1', 'user-2');
+  const private_key_target = readPEMFile(`${keyPath_target}${keyName}`);
+  target = privateToPublicKey(private_key_target);
+
   if (!account) {
     console.error('Missing account');
   }
@@ -852,12 +1235,9 @@ async function setupFixtures() {
   if (!account_hash) {
     console.error('Missing account_hash');
   }
-  const keyPath_target = keyPath.replace('user-1', 'user-2');
-  const private_key_target = readPEMFile(`${keyPath_target}${keyName}`);
-  target = privateToPublicKey(private_key_target);
 }
 
-function readPEMFile(keyPath?: string): string {
+function readPEMFile(keyPath?: string, copy?: boolean): string {
   let pemFilePath = keyPath ? path.resolve(__dirname, keyPath) : null;
   delete_key_at_root_after_test = true;
   if (!pemFilePath || !fs.existsSync(pemFilePath)) {
@@ -866,8 +1246,10 @@ function readPEMFile(keyPath?: string): string {
   }
   try {
     const data = fs.readFileSync(pemFilePath, 'utf8');
-    const copyFilePath = path.resolve(__dirname, keyName);
-    copyFile(pemFilePath, copyFilePath);
+    if (copy) {
+      const copyFilePath = path.resolve(__dirname, '../', keyName);
+      copyFile(pemFilePath, copyFilePath);
+    }
     return data;
   } catch (error) {
     console.error('Error:', error);
