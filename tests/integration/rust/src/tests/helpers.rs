@@ -25,7 +25,7 @@ pub fn create_test_sdk() -> SDK {
 }
 
 pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
-    let root_path = Path::new("src/wasm/");
+    let root_path = Path::new("../../wasm/");
     let path = root_path.join(file_path);
     let mut file = File::open(path)?;
     let mut buffer = Vec::new();
