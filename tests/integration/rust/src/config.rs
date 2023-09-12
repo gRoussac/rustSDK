@@ -1,4 +1,6 @@
-use crate::tests::helpers::{get_current_block_hash, get_main_purse, install_cep78, read_pem_file};
+use crate::tests::helpers::{
+    get_current_block_hash, get_main_purse, install_cep78, install_cep78_if_needed, read_pem_file,
+};
 use casper_wasm_sdk::{
     helpers::public_key_from_private_key,
     types::{public_key::PublicKey, verbosity::Verbosity},
@@ -59,7 +61,7 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
     let purse_uref = get_main_purse(DEFAULT_NODE_ADDRESS, &account).await;
-    // let _ = install_cep78(&account, &private_key).await;
+    let _ = install_cep78_if_needed(&account, &private_key).await;
     let config = TestConfig {
         node_address: DEFAULT_NODE_ADDRESS.to_string(),
         verbosity: Some(Verbosity::High),

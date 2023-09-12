@@ -468,6 +468,15 @@ mod tests {
         test_get_dictionary_item().await;
         thread::sleep(WAIT_TIME);
     }
+
+    // TODO
+    // #[test]
+    // pub async fn test_get_dictionary_item_without_state_root_hash_test() {
+    //     thread::sleep(WAIT_TIME);
+    //     test_get_dictionary_item_without_state_root_hash().await;
+    //     thread::sleep(WAIT_TIME);
+    // }
+
     #[test]
     pub async fn test_get_era_info_test() {
         thread::sleep(WAIT_TIME);
