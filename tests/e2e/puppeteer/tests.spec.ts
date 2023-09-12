@@ -1,9 +1,7 @@
-import { PublicKey, error, getBlockOptions } from "../node_modules/casper-wasm-sdk/casper_wasm_sdk";
-
 const puppeteer = require('puppeteer');
 const { Browser, Page } = puppeteer;
 const casper_wasm_sdk = require('casper-wasm-sdk');
-const { SDK, privateToPublicKey, Verbosity } = casper_wasm_sdk;
+const { SDK, privateToPublicKey, PublicKey, Verbosity } = casper_wasm_sdk;
 const fs = require('fs');
 const path = require('path');
 const keyName = 'secret_key.pem';
@@ -27,7 +25,7 @@ let transfer_amount = '2500000000';
 let entrypoint = 'mint';
 let contract_hello = 'hello.wasm';
 let contract_cep78 = 'cep78.wasm';
-let payment_amount_contract_cep78 = '260000000000';
+let payment_amount_contract_cep78 = '300000000000';
 let test_hello_key = 'test_hello_key';
 let contract_cep78_key = 'cep78_contract_hash_enhanced-nft-1';
 let contract_cep78_hash!: string;
@@ -42,13 +40,12 @@ let args_json = `[
 {"name": "total_token_supply", "type": "U64", "value": 10},
 {"name": "ownership_mode", "type": "U8", "value": 0},
 {"name": "nft_kind", "type": "U8", "value": 1},
-{"name": "json_schema", "type": "String", "value": "nft-schema"},
 {"name": "allow_minting", "type": "Bool", "value": true},
 {"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
-{"name": "metadata_mutability", "type": "U8", "value": 1},
-{"name": "events_mode", "type": "U8", "value": 2}
+{"name": "metadata_mutability", "type": "U8", "value": 0},
+{"name": "events_mode", "type": "U8", "value": 1}
 ]`;
 
 describe('Angular App Tests', () => {
@@ -163,7 +160,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await page.reload();
       await clear();
-      setPrivateKey();
+      await setPrivateKey();
       await seletAction('install');
       await page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await page.waitForSelector('[e2e-id="argsSimpleElt"]');
@@ -215,6 +212,7 @@ describe('Angular App Tests', () => {
     });
   });
 
+  // TODO Remove skip
   describe.skip('Rpc call get_deploy', () => {
     beforeAll(async () => {
       await seletAction('get_deploy');
@@ -282,12 +280,13 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Rpc call get_auction_info', () => {
+  // TODO Remove skip
+  describe.skip('Rpc call get_auction_info', () => {
     beforeEach(async () => {
       await clear();
       await seletAction('get_auction_info');
     });
-    xit('should get_auction_info', async () => {
+    it('should get_auction_info', async () => {
       await submit();
       await get_result();
     });
@@ -339,7 +338,6 @@ describe('Angular App Tests', () => {
       await clear();
     });
     it('should get_block', async () => {
-
       await submit();
       await get_result();
     });
@@ -687,10 +685,13 @@ describe('Angular App Tests', () => {
       let result_json = JSON.parse(result);
       expect(result_json?.Account.named_keys).toBeDefined();
       let named_keys = result_json?.Account.named_keys as Array<{ name: string; key: string; }>;
+
       contract_cep78_hash = named_keys.find(key => key.name === contract_cep78_key)?.key || '';
+
       expect(contract_cep78_hash).toBeDefined();
       expect(contract_cep78_hash).toBeTruthy();
       await page.type('[e2e-id="queryPathElt"]', contract_cep78_key + '/collection_name');
+      await clear();
       await submit();
       await get_result();
       result = await page.evaluate(() => {
@@ -699,67 +700,145 @@ describe('Angular App Tests', () => {
       result_json = JSON.parse(result);
       expect(result_json?.CLValue.parsed).toEqual(collection_name);
     });
+  });
 
-    describe.skip('Rpc call get_dictionary_item', () => {
-      beforeAll(async () => {
-        await page.reload();
-        await seletAction('get_dictionary_item');
-        await page.waitForSelector('[e2e-id="stateRootHashElt"]');
-        await page.waitForSelector('[e2e-id="seedContractHashElt"]');
-        await page.waitForSelector('[e2e-id="seedNameElt"]');
-        await page.waitForSelector('[e2e-id="itemKeyElt"]');
-      });
-
-      beforeEach(async () => {
-        await clear();
-      });
-
-      it('should get_dictionary_item with contract hash', async () => {
-        await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
-        console.log(contract_cep78_hash);
-        await page.type('[e2e-id="seedContractHashElt"]', contract_cep78_hash);
-        await page.type('[e2e-id="seedNameElt"]', 'events');
-        await page.type('[e2e-id="seedContractHashElt"]', '0');
-        await submit();
-        await get_result();
-      });
-
-      it('should get_dictionary_item with contract hash without state root hash', async () => {
-        await clearInput('[e2e-id="stateRootHashElt"]');
-        await submit();
-        await get_result();
-      });
+  describe('Contract query_contract_key', () => {
+    beforeAll(async () => {
+      await get_state_root_hash(); // refresh state root hash before querying contract keys
+      await page.reload();
+      await clear();
+      await seletAction('query_contract_key');
+      await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await page.waitForSelector('[e2e-id="queryKeyElt"]');
+      await page.waitForSelector('[e2e-id="queryPathElt"]');
     });
 
-    describe('Contract query_contract_key', () => {
-      beforeAll(async () => {
-        await page.reload();
-        await seletAction('query_contract_key');
-        await screen();
-        await page.waitForSelector('[e2e-id="stateRootHashElt"]');
-        await page.waitForSelector('[e2e-id="queryKeyElt"]');
-        await page.waitForSelector('[e2e-id="queryPathElt"]');
-      });
+    beforeEach(async () => {
+      await clear();
+    });
 
-      beforeEach(async () => {
-        await clear();
-      });
+    it('should query_contract_key with contract hash', async () => {
+      await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
+      await page.type('[e2e-id="queryKeyElt"]', contract_cep78_hash);
+      await page.type('[e2e-id="queryPathElt"]', 'installer');
+      await submit();
+      await get_result();
+    });
 
-      it('should query_contract_key with contract hash', async () => {
-        await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
-        await screen();
-        await page.type('[e2e-id="queryKeyElt"]', contract_cep78_hash);
-        await page.type('[e2e-id="queryPathElt"]', 'installer');
-        await screen();
-        await submit();
-        await get_result();
-      });
+    it('should query_contract_key with contract hash without state root hash', async () => {
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await submit();
+      await get_result();
+    });
+  });
 
-      it('should query_contract_key with contract hash without state root hash', async () => {
-        await clearInput('[e2e-id="stateRootHashElt"]');
-        await submit();
-        await get_result();
+  describe('Contract call entry point', () => {
+    beforeAll(async () => {
+
+    });
+    beforeEach(async () => {
+      await page.reload();
+      await clear();
+      await setPrivateKey();
+      await seletAction('call_entrypoint');
+      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await page.waitForSelector('[e2e-id="sessionHashElt"]');
+      await page.waitForSelector('[e2e-id="entryPointElt"]');
+      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await page.waitForSelector('[e2e-id="argsJsonElt"]');
+    });
+    it('should call entry point with contract hash', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
       });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract name', async () => {
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.waitForSelector('[e2e-id="sessionNameElt"]');
+      await page.type('[e2e-id="sessionNameElt"]', contract_cep78_key);
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract hash and args simple', async () => {
+      let args_simple_mint =
+        `token_meta_data:String='test_meta_data',token_owner:Key='${account_hash}'`;
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple_mint);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract hash and args json', async () => {
+      let args_json_mint = `[{"name": "token_meta_data", "type": "String", "value": "test_meta_data_json"},
+      {"name": "token_owner", "type": "Key", "value": "${account_hash}"}]`;
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsJsonElt"]', args_json_mint);
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with package hash and args simple', async () => {
+      let args_simple_mint =
+        `token_meta_data:String='test_meta_data',token_owner:Key='${account_hash}'`;
+      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
+      await page.type('[e2e-id="entryPointElt"]', entrypoint);
+      await page.type('[e2e-id="argsSimpleElt"]', args_simple_mint);
+      await page.waitForSelector('[e2e-id="callPackageElt"]');
+      await page.click('[e2e-id="callPackageElt"]');
+      await page.waitForSelector('[e2e-id="versionElt"]');
+      await page.type('[e2e-id="versionElt"]', "1");
+      let call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await page.waitForSelector('[e2e-id="result"]');
+      call = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
     });
   });
 
@@ -784,7 +863,7 @@ describe('Angular App Tests', () => {
     });
     it('should make_deploy with contract hash', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       let make_deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
@@ -817,7 +896,7 @@ describe('Angular App Tests', () => {
 
     it('should make_deploy with contract hash and args simple', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       await page.type('[e2e-id="argsSimpleElt"]', args_simple);
       let make_deploy = await page.evaluate(() => {
@@ -834,11 +913,9 @@ describe('Angular App Tests', () => {
 
     it('should make_deploy with contract hash and args json', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      await screen();
       await page.type('[e2e-id="argsJsonElt"]', args_json);
-      await screen();
       let make_deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
@@ -853,7 +930,7 @@ describe('Angular App Tests', () => {
 
     it('should make_deploy with package hash and args simple', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       await page.type('[e2e-id="argsSimpleElt"]', args_simple);
       await page.waitForSelector('[e2e-id="callPackageElt"]');
@@ -875,7 +952,7 @@ describe('Angular App Tests', () => {
     it('should make_deploy without TTL', async () => {
       await clearInput('[e2e-id="TTLElt"]');
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       let make_deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
@@ -987,7 +1064,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
       });
       expect(unsigned_deploy).toContain(`"approvals": []`);
-      setPrivateKey();
+      await setPrivateKey();
       await sign();
       const signed_deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="deployJsonElt"]')?.textContent;
@@ -1000,7 +1077,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await page.reload();
       await clear();
-      setPrivateKey();
+      await setPrivateKey();
       await seletAction('make_transfer');
       await page.waitForSelector('[e2e-id="transferAmountElt"]');
       await page.waitForSelector('[e2e-id="targetAccountElt"]');
@@ -1029,14 +1106,14 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe.skip('Deploy deploy', () => {
+  describe('Deploy deploy', () => {
     beforeAll(async () => {
 
     });
     beforeEach(async () => {
       await page.reload();
       await clear();
-      setPrivateKey();
+      await setPrivateKey();
       await seletAction('deploy');
       await page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await page.waitForSelector('[e2e-id="sessionHashElt"]');
@@ -1046,7 +1123,7 @@ describe('Angular App Tests', () => {
     });
     it('should deploy with contract hash', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       let deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
@@ -1079,7 +1156,7 @@ describe('Angular App Tests', () => {
 
     it('should deploy with contract hash and args simple', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       await page.type('[e2e-id="argsSimpleElt"]', args_simple);
       let deploy = await page.evaluate(() => {
@@ -1096,7 +1173,7 @@ describe('Angular App Tests', () => {
 
     it('should deploy with contract hash and args json', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       await page.type('[e2e-id="argsJsonElt"]', args_json);
       let deploy = await page.evaluate(() => {
@@ -1113,7 +1190,7 @@ describe('Angular App Tests', () => {
 
     it('should deploy with package hash and args simple', async () => {
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       await page.type('[e2e-id="argsSimpleElt"]', args_simple);
       await page.waitForSelector('[e2e-id="callPackageElt"]');
@@ -1135,7 +1212,7 @@ describe('Angular App Tests', () => {
     it('should deploy without TTL', async () => {
       await clearInput('[e2e-id="TTLElt"]');
       await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
+      await page.type('[e2e-id="sessionHashElt"]', contract_cep78_hash);
       await page.type('[e2e-id="entryPointElt"]', entrypoint);
       let deploy = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
@@ -1173,7 +1250,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await page.reload();
       await clear();
-      setPrivateKey();
+      await setPrivateKey();
       await seletAction('transfer');
       await page.waitForSelector('[e2e-id="transferAmountElt"]');
       await page.waitForSelector('[e2e-id="targetAccountElt"]');
@@ -1211,120 +1288,52 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe.skip('Contract call entry point', () => {
+  describe('Rpc call get_dictionary_item', () => {
     beforeAll(async () => {
-
-    });
-    beforeEach(async () => {
       await page.reload();
+      await get_state_root_hash(); // refresh state root hash before querying contract dict
+      await seletAction('get_dictionary_item');
+      await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await page.waitForSelector('[e2e-id="seedContractHashElt"]');
+      await page.waitForSelector('[e2e-id="seedNameElt"]');
+      await page.waitForSelector('[e2e-id="itemKeyElt"]');
+    });
+
+    beforeEach(async () => {
       await clear();
-      setPrivateKey();
-      await seletAction('call_entrypoint');
-      await page.waitForSelector('[e2e-id="paymentAmountElt"]');
-      await page.waitForSelector('[e2e-id="sessionHashElt"]');
-      await page.waitForSelector('[e2e-id="entryPointElt"]');
-      await page.waitForSelector('[e2e-id="argsSimpleElt"]');
-      await page.waitForSelector('[e2e-id="argsJsonElt"]');
     });
-    it('should call entry point with contract hash', async () => {
-      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
-      await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      let call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeUndefined();
+    it('should get_dictionary_item with contract hash with state root hash', async () => {
+      await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
+      await page.waitForSelector('[e2e-id="seedContractHashElt"]');
+      await page.type('[e2e-id="seedContractHashElt"]', contract_cep78_hash);
+      await page.waitForSelector('[e2e-id="seedNameElt"]');
+      await page.type('[e2e-id="seedNameElt"]', 'events');
+      await page.waitForSelector('[e2e-id="itemKeyElt"]');
+      await page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
-      await page.waitForSelector('[e2e-id="result"]');
-      call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeDefined();
+      await get_result();
     });
 
-    it('should should call entry point with contract name', async () => {
-      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.waitForSelector('[e2e-id="sessionNameElt"]');
-      await page.type('[e2e-id="sessionNameElt"]', "enhanced-nft-1");
-      await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      let call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeUndefined();
+    it('should get_dictionary_item with contract hash without state root hash', async () => {
+      await clear();
+      await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="stateRootHashElt"]');
       await submit();
-      await page.waitForSelector('[e2e-id="result"]');
-      call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeDefined();
-    });
-
-    it('should should call entry point with contract hash and args simple', async () => {
-      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
-      await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
-      let call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeUndefined();
-      await submit();
-      await page.waitForSelector('[e2e-id="result"]');
-      call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeDefined();
-    });
-
-    it('should should call entry point with contract hash and args json', async () => {
-      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
-      await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      await page.type('[e2e-id="argsJsonElt"]', args_json);
-      let call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeUndefined();
-      await submit();
-      await page.waitForSelector('[e2e-id="result"]');
-      call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeDefined();
-    });
-
-    it('should should call entry point with package hash and args simple', async () => {
-      await page.type('[e2e-id="paymentAmountElt"]', payment_amount);
-      await page.type('[e2e-id="sessionHashElt"]', "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477");
-      await page.type('[e2e-id="entryPointElt"]', entrypoint);
-      await page.type('[e2e-id="argsSimpleElt"]', args_simple);
-      await page.waitForSelector('[e2e-id="callPackageElt"]');
-      await page.click('[e2e-id="callPackageElt"]');
-      await page.waitForSelector('[e2e-id="versionElt"]');
-      await page.type('[e2e-id="versionElt"]', "1");
-      let call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeUndefined();
-      await submit();
-      await page.waitForSelector('[e2e-id="result"]');
-      call = await page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(call).toBeDefined();
+      await get_result();
     });
   });
 
   afterAll(async () => {
-    await browser.close();
     if (delete_key_at_root_after_test) {
       deleteFile(path.resolve(__dirname, '../', keyName));
-
     }
+    // deleteFile(path.resolve(__dirname, '../', "test.png"));
+    await browser.close();
   });
 });
 
-async function screen() {
+async function screenshot() {
   await page.screenshot({ path: "test.png" });
 }
 
@@ -1343,7 +1352,6 @@ async function clearInput(id: string) {
     input.value = '';
   });
 }
-
 
 async function get_result() {
   await page.waitForSelector('[e2e-id="result"]');
@@ -1479,7 +1487,7 @@ function deleteFile(filePathToDelete: string) {
 }
 
 async function get_block() {
-  const chain_get_block_options: getBlockOptions = sdk.get_block_options({
+  const chain_get_block_options = sdk.get_block_options({
     node_address
   });
   const block_result = await sdk.get_block(chain_get_block_options);
@@ -1488,7 +1496,7 @@ async function get_block() {
 }
 
 async function get_state_root_hash() {
-  const get_state_root_hash_options: getBlockOptions = sdk.get_state_root_hash_options({
+  const get_state_root_hash_options = sdk.get_state_root_hash_options({
     node_address
   });
   const get_state_root_hash_result = await sdk.get_state_root_hash(get_state_root_hash_options);
