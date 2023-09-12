@@ -7979,10 +7979,6 @@ module.exports.__wbg_getvalidatorchangesresult_new = function(arg0) {
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_log_5698f14288623311 = function(arg0, arg1) {
-    console.log(getStringFromWasm0(arg0, arg1));
-};
-
 module.exports.__wbindgen_string_get = function(arg0, arg1) {
     const obj = getObject(arg1);
     const ret = typeof(obj) === 'string' ? obj : undefined;
@@ -8000,6 +7996,10 @@ module.exports.__wbindgen_cb_drop = function(arg0) {
     }
     const ret = false;
     return ret;
+};
+
+module.exports.__wbg_log_5698f14288623311 = function(arg0, arg1) {
+    console.log(getStringFromWasm0(arg0, arg1));
 };
 
 module.exports.__wbindgen_is_null = function(arg0) {

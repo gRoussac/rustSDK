@@ -103,7 +103,7 @@ impl SDK {
                 match result {
                     Ok(data) => Ok(data.result.into()),
                     Err(err) => {
-                        let err = &format!("qsdqsdError occurred: {:?}", err);
+                        let err = &format!("Error occurred with {:?}", err);
                         error(err);
                         Err(JsError::new(err))
                     }

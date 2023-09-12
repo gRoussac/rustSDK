@@ -15,7 +15,12 @@
     >
     <form class="form-inline">
       <div class="input-group">
-        <label class="input-group-text" for="selectActionElt">RPC</label>
+        <label
+          class="input-group-text"
+          for="selectActionElt"
+          for="selectNetworkElt"
+          >RPC</label
+        >
         <select
           id="selectNetworkElt"
           class="form-select form-control form-control-sm"
@@ -119,9 +124,7 @@
     </div>
     <div class="col-sm-6">
       <div class="input-group">
-        <label class="input-group-text" id="purseIdentifierElt">
-          Public Key</label
-        >
+        <label class="input-group-text" for="publicKeyElt"> Public Key</label>
         <input
           type="search"
           class="form-control form-control-xs"
@@ -193,7 +196,7 @@
   >
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-2 mb-2">
-        <label>Block Height </label>
+        <label for="blockIdentifierHeightElt">Block Height</label>
         <div class="form-floating">
           <input
             type="search"
@@ -211,7 +214,7 @@
         </div>
       </div>
       <div class="col-sm-6 mb-2">
-        <label>Block Hash </label>
+        <label for="blockIdentifierHashElt">Block Hash</label>
         <div class="form-floating">
           <input
             type="search"
@@ -230,7 +233,7 @@
       </div>
       <div class="col-sm-12 mb-2">
         <div class="col-sm-7" *ngIf="action === 'get_account'">
-          <label>Account identifier</label>
+          <label for="accountIdentifierElt">Account identifier</label>
           <div class="form-floating">
             <input
               type="search"
@@ -265,7 +268,7 @@
   >
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-7 mb-2">
-        <label>State Root Hash </label>
+        <label for="stateRootHashElt">State Root Hash </label>
         <div class="form-floating">
           <input
             type="search"
@@ -280,7 +283,7 @@
         </div>
       </div>
       <div class="col-sm-7 mb-2" *ngIf="action === 'get_balance'">
-        <label
+        <label for="purseUrefElt"
           >Purse Uref
           <!-- <span class="fw-light small"
               >({{ block_identifier_hash_default }})</span
@@ -301,7 +304,7 @@
         </div>
       </div>
       <div class="col-sm-7 mb-2" *ngIf="action === 'query_balance'">
-        <label>Purse Identifier </label>
+        <label for="purseIdentifierElt">Purse Identifier </label>
         <div class="form-floating">
           <input
             type="search"
@@ -393,7 +396,7 @@
             select_dict_identifier === 'newFromSeedUref'
           "
         >
-          <label>Dictionary Uref </label>
+          <label for="seedUrefElt">Dictionary Uref </label>
           <div class="form-floating">
             <input
               type="search"
@@ -415,7 +418,7 @@
             select_dict_identifier === 'newFromAccountInfo'
           "
         >
-          <label>Account Hash</label>
+          <label for="seedAccounttHashElt">Account Hash</label>
           <div class="form-floating">
             <input
               type="search"
@@ -437,7 +440,7 @@
             action === 'query_contract_dict'
           "
         >
-          <label>Contract Hash</label>
+          <label for="seedContractHashElt">Contract Hash</label>
           <div class="form-floating">
             <input
               type="search"
@@ -459,7 +462,7 @@
             select_dict_identifier === 'newFromDictionaryKey'
           "
         >
-          <label>Dictionary Key</label>
+          <label for="seedKeyElt">Dictionary Key</label>
           <div class="form-floating">
             <input
               type="search"
@@ -482,7 +485,7 @@
             ) || action === 'query_contract_dict'
           "
         >
-          <label>Dictionary Name</label>
+          <label for="seedNameElt">Dictionary Name</label>
           <div class="form-floating">
             <input
               type="search"
@@ -501,7 +504,7 @@
           class="col-sm-7 mb-2"
           *ngIf="select_dict_identifier !== 'newFromDictionaryKey'"
         >
-          <label>Dictionary Item key </label>
+          <label for="itemKeyElt">Dictionary Item key </label>
           <div class="form-floating">
             <input
               type="search"
@@ -521,7 +524,7 @@
         *ngIf="['query_global_state', 'query_contract_key'].includes(action)"
       >
         <div class="col-sm-7 mb-2">
-          <label>{{
+          <label for="queryKeyElt">{{
             action === 'query_global_state' ? 'Key' : 'Contract Hash'
           }}</label>
           <div class="form-floating">
@@ -547,7 +550,7 @@
           </div>
         </div>
         <div class="col-sm-7 mb-2">
-          <label>Path</label>
+          <label for="queryPathElt">Path</label>
           <div class="form-floating">
             <input
               type="search"
@@ -568,7 +571,7 @@
   <div class="row mt-3 d-flex align-items-end" *ngIf="action === 'get_deploy'">
     <form class="row align-items-end" (submit)="(false)">
       <div class="col-sm-6">
-        <label>Deploy Hash </label>
+        <label for="deployHashElt">Deploy Hash </label>
         <div class="form-floating">
           <input
             type="search"
@@ -584,7 +587,9 @@
         </div>
       </div>
       <div class="col-sm-2">
-        <label class="form-label">Finalized approvals</label>
+        <label for="finalizedApprovalsElt" class="form-label"
+          >Finalized approvals</label
+        >
         <div>
           <input
             type="checkbox"
@@ -740,7 +745,7 @@
           ].includes(action)
         "
       >
-        <label>TTL</label>
+        <label for="TTLElt">TTL</label>
         <div class="form-floating">
           <input
             type="search"
@@ -761,7 +766,7 @@
           ['make_transfer', 'transfer', 'speculative_transfer'].includes(action)
         "
       >
-        <label>Target Account</label>
+        <label for="targetAccountElt">Target Account</label>
         <div class="form-floating">
           <input
             type="search"
@@ -847,7 +852,9 @@
           "
         >
           <div class="col-sm-7 mb-2">
-            <label>Smart Contract hash or Package hash</label>
+            <label for="sessionHashElt"
+              >Smart Contract hash or Package hash</label
+            >
             <div class="form-floating">
               <input
                 type="search"
@@ -870,7 +877,7 @@
             </div>
           </div>
           <div class="col-sm-2">
-            <label class="form-label">Call Package</label>
+            <label for="callPackageElt" class="form-label">Call Package</label>
             <div>
               <input
                 type="checkbox"
@@ -886,7 +893,7 @@
             </div>
           </div>
           <div class="col-sm-3 mb-2">
-            <label>Version</label>
+            <label for="versionElt">Version</label>
             <div class="form-floating">
               <input
                 type="search"
@@ -903,7 +910,9 @@
             </div>
           </div>
           <div class="col-sm-7 mb-2">
-            <label>Smart Contract name or Package name</label>
+            <label for="sessionNameElt"
+              >Smart Contract name or Package name</label
+            >
             <div class="form-floating">
               <input
                 type="search"
@@ -924,7 +933,7 @@
             </div>
           </div>
           <div class="col-sm-5 mb-2">
-            <label>Entry point</label>
+            <label for="entryPointElt">Entry point</label>
             <div class="form-floating">
               <input
                 type="search"
@@ -942,7 +951,7 @@
           </div>
         </ng-container>
         <div class="col-sm-7 mb-2">
-          <label>Args</label>
+          <label for="argsSimpleElt">Args</label>
           <div class="form-floating">
             <input
               type="search"
@@ -962,7 +971,7 @@
           </div>
         </div>
         <div class="col-sm-7 mb-2">
-          <label>Args Json</label>
+          <label for="argsJsonElt">Args Json</label>
           <div class="form-floating">
             <input
               type="search"
@@ -1008,7 +1017,8 @@
     <div
       class="col-sm-1"
       *ngIf="
-        !['sign_deploy', 'put_deploy', 'speculative_exec'].includes(action)
+        !['sign_deploy', 'put_deploy', 'speculative_exec'].includes(action) &&
+        (result || peers.length)
       "
     >
       <button

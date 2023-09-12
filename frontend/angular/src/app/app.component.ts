@@ -162,10 +162,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_peers() {
-    const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
-    if (peers_result) {
-      this.cleanDisplay();
-      this.peers = peers_result?.peers;
+    try {
+      const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
+      if (peers_result) {
+        this.cleanDisplay();
+        this.peers = peers_result?.peers;
+      }
+    } catch (err) {
+      err && (this.result = err.toString());
     }
   }
 
@@ -236,13 +240,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_auction_info() {
-    const get_auction_info_options = this.sdk.get_auction_info_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity,
-    });
-    this.getIdentifieBlock(get_auction_info_options);
-    const get_auction_info = await this.sdk.get_auction_info(get_auction_info_options);
-    get_auction_info && (this.result = get_auction_info);
+    try {
+      const get_auction_info_options = this.sdk.get_auction_info_options({
+        node_address: this.node_address,
+        verbosity: this.verbosity,
+      });
+      this.getIdentifieBlock(get_auction_info_options);
+      const get_auction_info = await this.sdk.get_auction_info(get_auction_info_options);
+      get_auction_info && (this.result = get_auction_info);
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async install() {
@@ -263,13 +271,18 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.private_key,
     );
     const session_params = this.get_session_params();
-    const install = await this.sdk.install(
-      this.node_address,
-      deploy_params,
-      session_params,
-      payment_amount,
-    );
-    install && (this.result = install.toJson());
+    try {
+      const install = await this.sdk.install(
+        this.node_address,
+        deploy_params,
+        session_params,
+        payment_amount,
+      );
+      install && (this.result = install.toJson());
+    } catch (err) {
+      console.log(err);
+      err && (this.result = err.toString());
+    }
   }
 
   async get_balance() {
@@ -278,34 +291,47 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!purse_uref_as_string) {
       return;
     }
-    const get_balance_options = this.sdk.get_balance_options({
-      node_address: this.node_address,
-      state_root_hash_as_string: state_root_hash || '',
-      purse_uref_as_string,
-      verbosity: this.verbosity,
-    });
-    const get_balance = await this.sdk.get_balance(get_balance_options);
-    get_balance && (this.result = get_balance?.balance_value);
+    try {
+      const get_balance_options = this.sdk.get_balance_options({
+        node_address: this.node_address,
+        state_root_hash_as_string: state_root_hash || '',
+        purse_uref_as_string,
+        verbosity: this.verbosity,
+      });
+      const get_balance = await this.sdk.get_balance(get_balance_options);
+      get_balance && (this.result = get_balance?.balance_value);
+    } catch (err) {
+      console.log(err);
+      err && (this.result = err.toString());
+    }
   }
 
   async get_block_transfers() {
-    const get_block_transfers_options = this.sdk.get_block_transfers_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity
-    });
-    this.getIdentifieBlock(get_block_transfers_options);
-    const get_block_transfers = await this.sdk.get_block_transfers(get_block_transfers_options);
-    this.result = get_block_transfers.transfers;
+    try {
+      const get_block_transfers_options = this.sdk.get_block_transfers_options({
+        node_address: this.node_address,
+        verbosity: this.verbosity
+      });
+      this.getIdentifieBlock(get_block_transfers_options);
+      const get_block_transfers = await this.sdk.get_block_transfers(get_block_transfers_options);
+      this.result = get_block_transfers.transfers;
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async get_block() {
-    const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity
-    });
-    this.getIdentifieBlock(chain_get_block_options);
-    const chain_get_block = await this.sdk.get_block(chain_get_block_options);
-    this.result = chain_get_block.block;
+    try {
+      const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({
+        node_address: this.node_address,
+        verbosity: this.verbosity
+      });
+      this.getIdentifieBlock(chain_get_block_options);
+      const chain_get_block = await this.sdk.get_block(chain_get_block_options);
+      this.result = chain_get_block.block;
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async submitAction(action: string) {
@@ -315,8 +341,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_chainspec() {
-    const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
-    this.result = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
+    try {
+      const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
+      this.result = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async get_deploy() {
@@ -331,14 +361,19 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     get_deploy_options.deploy_hash = new DeployHash(deploy_hash_as_string);
     get_deploy_options.finalized_approvals = finalized_approvals;
-    const get_deploy = await this.sdk.get_deploy(get_deploy_options);
-    get_deploy && (this.result = get_deploy.toJson());
+    try {
+      const get_deploy = await this.sdk.get_deploy(get_deploy_options);
+      get_deploy && (this.result = get_deploy.toJson());
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async get_dictionary_item() {
     const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
     const item_key: string = this.itemKeyElt && this.itemKeyElt.nativeElement.value.toString().trim();
-    if (!item_key) {
+    const seed_key: string = this.seedKeyElt && this.seedKeyElt.nativeElement.value.toString().trim();
+    if (!item_key && !seed_key) {
       return;
     }
     const seed_uref: string = this.seedUrefElt && this.seedUrefElt.nativeElement.value.toString().trim();
@@ -350,7 +385,6 @@ export class AppComponent implements OnInit, AfterViewInit {
           item_key
         );
     } else {
-      const seed_key: string = this.seedKeyElt && this.seedKeyElt.nativeElement.value.toString().trim();
       if (seed_key && this.select_dict_identifier === 'newFromDictionaryKey') {
         dictionary_item_identifier =
           DictionaryItemIdentifier.newFromDictionaryKey(
@@ -390,8 +424,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       state_root_hash_as_string: state_root_hash || '',
     });
     get_dictionary_item_options.dictionary_item_identifier = dictionary_item_identifier;
-    const state_get_dictionary_item = await this.sdk.state_get_dictionary_item(get_dictionary_item_options);
-    state_get_dictionary_item && (this.result = state_get_dictionary_item.stored_value);
+    try {
+      const state_get_dictionary_item = await this.sdk.state_get_dictionary_item(get_dictionary_item_options);
+      state_get_dictionary_item && (this.result = state_get_dictionary_item.toJson());
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async get_era_info() {
@@ -400,8 +438,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       verbosity: this.verbosity
     });
     this.getIdentifieBlock(get_era_info_options);
-    const get_era_info = await this.sdk.get_era_info(get_era_info_options);
-    get_era_info && (this.result = get_era_info.toJson());
+    try {
+      const get_era_info = await this.sdk.get_era_info(get_era_info_options);
+      get_era_info && (this.result = get_era_info.toJson());
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async get_era_summary() {
@@ -410,18 +452,30 @@ export class AppComponent implements OnInit, AfterViewInit {
       verbosity: this.verbosity
     });
     this.getIdentifieBlock(get_era_summary_options);
-    const get_era_summary = await this.sdk.get_era_summary(get_era_summary_options);
-    this.result = get_era_summary.era_summary;
+    try {
+      const get_era_summary = await this.sdk.get_era_summary(get_era_summary_options);
+      this.result = get_era_summary.era_summary;
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async get_validator_changes() {
-    const get_validator_changes = await this.sdk.get_validator_changes(this.node_address, this.verbosity);
-    this.result = get_validator_changes.changes;
+    try {
+      const get_validator_changes = await this.sdk.get_validator_changes(this.node_address, this.verbosity);
+      this.result = get_validator_changes.changes;
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async list_rpcs() {
-    const list_rpcs = await this.sdk.list_rpcs(this.node_address, this.verbosity);
-    this.result = list_rpcs.toJson();
+    try {
+      const list_rpcs = await this.sdk.list_rpcs(this.node_address, this.verbosity);
+      this.result = list_rpcs.toJson();
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async query_balance() {
@@ -435,8 +489,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       verbosity: this.verbosity,
     });
     this.getGlobalIdentifier(query_balance_options);
-    const query_balance = await this.sdk.query_balance(query_balance_options);
-    query_balance && (this.result = query_balance.balance);
+    try {
+      const query_balance = await this.sdk.query_balance(query_balance_options);
+      query_balance && (this.result = query_balance.balance);
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async query_global_state() {
@@ -452,8 +510,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       verbosity: Verbosity.High,
     });
     this.getGlobalIdentifier(query_global_state_options);
-    const query_global_state = await this.sdk.query_global_state(query_global_state_options);
-    query_global_state && (this.result = query_global_state?.stored_value);
+    try {
+      const query_global_state = await this.sdk.query_global_state(query_global_state_options);
+      query_global_state && (this.result = query_global_state?.stored_value);
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async deploy(deploy_result = true, speculative?: boolean) {
@@ -717,13 +779,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!payment_amount) {
       return;
     }
-    const call_entrypoint = await this.sdk.call_entrypoint(
-      this.node_address,
-      deploy_params,
-      session_params,
-      payment_amount
-    );
-    call_entrypoint && (this.result = call_entrypoint.toJson());
+    try {
+      const call_entrypoint = await this.sdk.call_entrypoint(
+        this.node_address,
+        deploy_params,
+        session_params,
+        payment_amount
+      );
+      call_entrypoint && (this.result = call_entrypoint.toJson());
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async query_contract_dict() {
@@ -760,17 +826,21 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     // Here setter does take instance of DictionaryItemStrParams
     query_contract_dict_options.dictionary_item_params = dictionary_item_params;
-    const query_contract_dict = await this.sdk.query_contract_dict(query_contract_dict_options);
-    query_contract_dict && (this.result = query_contract_dict.toJson());
+    try {
+      const query_contract_dict = await this.sdk.query_contract_dict(query_contract_dict_options);
+      query_contract_dict && (this.result = query_contract_dict.toJson());
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async query_contract_key() {
     const state_root_hash: string = this.stateRootHashElt && this.stateRootHashElt.nativeElement.value.toString().trim();
-    const path_as_string: string = this.queryPathElt && this.queryPathElt.nativeElement.value.toString().trim().replace(/^\/+|\/+$/g, '');
     const key_as_string: string = this.queryKeyElt && this.queryKeyElt.nativeElement.value.toString().trim();
-    if (!key_as_string || !path_as_string) {
+    if (!key_as_string) {
       return;
     }
+    const path_as_string: string = this.queryPathElt && this.queryPathElt.nativeElement.value.toString().trim().replace(/^\/+|\/+$/g, '');
     const query_contract_key_options = this.sdk.query_contract_key_options({
       node_address: this.node_address,
       state_root_hash_as_string: state_root_hash || '',
@@ -778,8 +848,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       path_as_string,
       verbosity: Verbosity.High,
     });
-    const query_contract_key = await this.sdk.query_contract_key(query_contract_key_options);
-    query_contract_key && (this.result = query_contract_key?.stored_value);
+    try {
+      const query_contract_key = await this.sdk.query_contract_key(query_contract_key_options);
+      query_contract_key && (this.result = query_contract_key.toJson());
+    } catch (err) {
+      err && (this.result = err.toString());
+    }
   }
 
   async ngAfterViewInit() {
