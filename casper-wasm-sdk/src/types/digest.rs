@@ -135,16 +135,23 @@ impl From<&str> for Digest {
 
 pub trait ToDigest {
     fn to_digest(&self) -> Digest;
+    fn is_empty(&self) -> bool;
 }
 
 impl ToDigest for Digest {
     fn to_digest(&self) -> Digest {
         self.0.into()
     }
+    fn is_empty(&self) -> bool {
+        hex::encode(self.0).is_empty()
+    }
 }
 
 impl ToDigest for &str {
     fn to_digest(&self) -> Digest {
         Digest::from(*self)
+    }
+    fn is_empty(&self) -> bool {
+        self.trim().is_empty()
     }
 }

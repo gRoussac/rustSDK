@@ -358,7 +358,7 @@
                   value="newFromSeedUref"
                   [selected]="select_dict_identifier === 'newFromSeedUref'"
                 >
-                  From Seed Uref
+                  From Dictionary Uref
                 </option>
                 <option
                   value="newFromContractInfo"
@@ -393,7 +393,7 @@
             select_dict_identifier === 'newFromSeedUref'
           "
         >
-          <label>Seed Uref </label>
+          <label>Dictionary Uref </label>
           <div class="form-floating">
             <input
               type="search"
@@ -497,7 +497,10 @@
             <label for="seedNameElt">e.g. events</label>
           </div>
         </div>
-        <div class="col-sm-7 mb-2">
+        <div
+          class="col-sm-7 mb-2"
+          *ngIf="select_dict_identifier !== 'newFromDictionaryKey'"
+        >
           <label>Dictionary Item key </label>
           <div class="form-floating">
             <input

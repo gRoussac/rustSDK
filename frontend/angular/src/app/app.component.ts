@@ -280,7 +280,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     const get_balance_options = this.sdk.get_balance_options({
       node_address: this.node_address,
-      state_root_hash_as_string: state_root_hash || this.state_root_hash || '',
+      state_root_hash_as_string: state_root_hash || '',
       purse_uref_as_string,
       verbosity: this.verbosity,
     });
@@ -371,7 +371,7 @@ export class AppComponent implements OnInit, AfterViewInit {
               item_key
             );
         }
-        else if (seed_account_hash && this.select_dict_identifier === 'newFromContractInfo') {
+        else if (seed_account_hash && this.select_dict_identifier === 'newFromAccountInfo') {
           dictionary_item_identifier =
             DictionaryItemIdentifier.newFromAccountInfo(
               seed_account_hash,
@@ -387,7 +387,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const get_dictionary_item_options = this.sdk.get_dictionary_item_options({
       node_address: this.node_address,
       verbosity: this.verbosity,
-      state_root_hash_as_string: state_root_hash || this.state_root_hash || '',
+      state_root_hash_as_string: state_root_hash || '',
     });
     get_dictionary_item_options.dictionary_item_identifier = dictionary_item_identifier;
     const state_get_dictionary_item = await this.sdk.state_get_dictionary_item(get_dictionary_item_options);
@@ -755,7 +755,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const query_contract_dict_options = this.sdk.query_contract_dict_options({
       node_address: this.node_address,
       verbosity: this.verbosity,
-      state_root_hash_as_string: state_root_hash || this.state_root_hash || '',
+      state_root_hash_as_string: state_root_hash || '',
       // dictionary_item_identifier: dictionary_item_identifier.toJson() // you need to send JSON of the object, not the object or you need to use setter
     });
     // Here setter does take instance of DictionaryItemStrParams
@@ -773,7 +773,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     const query_contract_key_options = this.sdk.query_contract_key_options({
       node_address: this.node_address,
-      state_root_hash_as_string: state_root_hash || this.state_root_hash || '',
+      state_root_hash_as_string: state_root_hash || '',
       key_as_string,
       path_as_string,
       verbosity: Verbosity.High,

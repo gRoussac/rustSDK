@@ -1,4 +1,4 @@
-use crate::debug::error;
+use crate::debug::{error, log};
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
@@ -103,7 +103,7 @@ impl SDK {
                 match result {
                     Ok(data) => Ok(data.result.into()),
                     Err(err) => {
-                        let err = &format!("Error occurred: {:?}", err);
+                        let err = &format!("qsdqsdError occurred: {:?}", err);
                         error(err);
                         Err(JsError::new(err))
                     }
@@ -185,22 +185,32 @@ impl SDK {
         };
 
         let query_params = if let Some(hash) = state_root_hash {
+            let state_root_hash_str = hash.to_string();
             QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
                 maybe_global_state_identifier: global_state_identifier.clone(),
-                state_root_hash: Some(hash.to_string()),
+                state_root_hash: if state_root_hash_str.is_empty() {
+                    None
+                } else {
+                    Some(state_root_hash_str)
+                },
                 maybe_block_id: None,
                 verbosity,
             }
         } else if let Some(hash) = state_root_hash_as_string {
+            let state_root_hash_str = hash.to_string();
             QueryGlobalStateParams {
                 node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
                 maybe_global_state_identifier: global_state_identifier.clone(),
-                state_root_hash: Some(hash.to_string()),
+                state_root_hash: if state_root_hash_str.is_empty() {
+                    None
+                } else {
+                    Some(state_root_hash_str)
+                },
                 maybe_block_id: None,
                 verbosity,
             }
@@ -291,6 +301,7 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         } else if let Some(state_root_hash) = state_root_hash {
+            log(&state_root_hash);
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &node_address,
