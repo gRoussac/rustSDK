@@ -3,6 +3,7 @@ use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
 use crate::{
+    debug::log,
     helpers::get_verbosity_or_default,
     types::{digest::ToDigest, sdk_error::SdkError, uref::URef, verbosity::Verbosity},
     SDK,
@@ -157,28 +158,36 @@ impl SDK {
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
         //log("get_balance!");
+        let state_root_hash = if state_root_hash.is_empty() {
+            self.get_state_root_hash(node_address, None, None)
+                .await
+                .unwrap()
+                .result
+                .state_root_hash
+                .unwrap()
+                .into()
+        } else {
+            state_root_hash.to_digest()
+        };
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 node_address,
                 get_verbosity_or_default(verbosity).into(),
-                state_root_hash.to_digest().into(),
+                state_root_hash.into(),
                 purse_uref.into(),
             )
             .await
             .map_err(SdkError::from),
-            GetBalanceInput::PurseUrefAsString(purse_uref) => {
-                let state_root_hash_as_string: String = state_root_hash.to_digest().to_string();
-                get_balance_cli(
-                    &rand::thread_rng().gen::<i64>().to_string(),
-                    node_address,
-                    get_verbosity_or_default(verbosity).into(),
-                    &state_root_hash_as_string,
-                    &purse_uref,
-                )
-                .await
-                .map_err(SdkError::from)
-            }
+            GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
+                &rand::thread_rng().gen::<i64>().to_string(),
+                node_address,
+                get_verbosity_or_default(verbosity).into(),
+                &state_root_hash.to_string(),
+                &purse_uref,
+            )
+            .await
+            .map_err(SdkError::from),
         }
     }
 }

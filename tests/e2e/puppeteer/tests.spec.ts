@@ -47,7 +47,8 @@ let args_json = `[
 {"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
-{"name": "metadata_mutability", "type": "U8", "value": 1}
+{"name": "metadata_mutability", "type": "U8", "value": 1},
+{"name": "events_mode", "type": "U8", "value": 2}
 ]`;
 
 describe('Angular App Tests', () => {
@@ -605,6 +606,7 @@ describe('Angular App Tests', () => {
 
   describe('Rpc call query_global_state', () => {
     beforeAll(async () => {
+      await page.reload();
       await page.waitForSelector('[e2e-id="publicKeyElt"]');
       await clearInput('[e2e-id="publicKeyElt"]');
       await page.type('[e2e-id="publicKeyElt"]', account);
@@ -677,17 +679,88 @@ describe('Angular App Tests', () => {
       await clearInput('[e2e-id="queryKeyElt"]');
       await page.type('[e2e-id="queryKeyElt"]', account_hash);
       await clearInput('[e2e-id="queryPathElt"]');
-      await page.type('[e2e-id="queryPathElt"]', contract_cep78_key + '/collection_name');
       await submit();
       await get_result();
       let result = await page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
-      let stored_value = JSON.parse(result);
-      expect(stored_value?.CLValue.parsed).toEqual(collection_name);
+      let result_json = JSON.parse(result);
+      expect(result_json?.Account.named_keys).toBeDefined();
+      let named_keys = result_json?.Account.named_keys as Array<{ name: string; key: string; }>;
+      contract_cep78_hash = named_keys.find(key => key.name === contract_cep78_key)?.key || '';
+      expect(contract_cep78_hash).toBeDefined();
+      expect(contract_cep78_hash).toBeTruthy();
+      await page.type('[e2e-id="queryPathElt"]', contract_cep78_key + '/collection_name');
+      await submit();
+      await get_result();
+      result = await page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      result_json = JSON.parse(result);
+      expect(result_json?.CLValue.parsed).toEqual(collection_name);
     });
 
+    describe.skip('Rpc call get_dictionary_item', () => {
+      beforeAll(async () => {
+        await page.reload();
+        await seletAction('get_dictionary_item');
+        await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+        await page.waitForSelector('[e2e-id="seedContractHashElt"]');
+        await page.waitForSelector('[e2e-id="seedNameElt"]');
+        await page.waitForSelector('[e2e-id="itemKeyElt"]');
+      });
 
+      beforeEach(async () => {
+        await clear();
+      });
+
+      it('should get_dictionary_item with contract hash', async () => {
+        await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
+        console.log(contract_cep78_hash);
+        await page.type('[e2e-id="seedContractHashElt"]', contract_cep78_hash);
+        await page.type('[e2e-id="seedNameElt"]', 'events');
+        await page.type('[e2e-id="seedContractHashElt"]', '0');
+        await submit();
+        await get_result();
+      });
+
+      it('should get_dictionary_item with contract hash without state root hash', async () => {
+        await clearInput('[e2e-id="stateRootHashElt"]');
+        await submit();
+        await get_result();
+      });
+    });
+
+    describe('Contract query_contract_key', () => {
+      beforeAll(async () => {
+        await page.reload();
+        await seletAction('query_contract_key');
+        await screen();
+        await page.waitForSelector('[e2e-id="stateRootHashElt"]');
+        await page.waitForSelector('[e2e-id="queryKeyElt"]');
+        await page.waitForSelector('[e2e-id="queryPathElt"]');
+      });
+
+      beforeEach(async () => {
+        await clear();
+      });
+
+      it('should query_contract_key with contract hash', async () => {
+        await page.type('[e2e-id="stateRootHashElt"]', state_root_hash_default);
+        await screen();
+        await page.type('[e2e-id="queryKeyElt"]', contract_cep78_hash);
+        await page.type('[e2e-id="queryPathElt"]', 'installer');
+        await screen();
+        await submit();
+        await get_result();
+      });
+
+      it('should query_contract_key with contract hash without state root hash', async () => {
+        await clearInput('[e2e-id="stateRootHashElt"]');
+        await submit();
+        await get_result();
+      });
+    });
   });
 
   describe('Deploy util make_deploy', () => {

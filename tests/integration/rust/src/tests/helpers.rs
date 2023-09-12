@@ -117,10 +117,11 @@ pub async fn install_cep78(
         {"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
         {"name": "nft_metadata_kind", "type": "U8", "value": 2},
         {"name": "identifier_mode", "type": "U8", "value": 0},
-        {"name": "metadata_mutability", "type": "U8", "value": 1}
+        {"name": "metadata_mutability", "type": "U8", "value": 1},
+        {"name": "events_mode", "type": "U8", "value": 2}
         ]"#;
     session_params.set_session_args_json(args_json);
-    let payment_amount = "25500000000";
+    let payment_amount = "260000000000";
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount(payment_amount);
     let file_path = CEP78_CONTRACT;

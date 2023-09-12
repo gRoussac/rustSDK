@@ -167,10 +167,14 @@ impl SDK {
         dictionary_item: DictionaryItemInput,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
-        //log("state_get_dictionary_item!");
+        // log("state_get_dictionary_item!");
         match dictionary_item {
             DictionaryItemInput::Params(dictionary_item_params) => {
-                let state_root_hash_as_string: String = state_root_hash.to_digest().to_string();
+                let state_root_hash_as_string: String = if !state_root_hash.is_empty() {
+                    state_root_hash.to_digest().to_string()
+                } else {
+                    String::from("")
+                };
                 get_dictionary_item_cli(
                     &rand::thread_rng().gen::<i64>().to_string(),
                     node_address,
@@ -181,15 +185,29 @@ impl SDK {
                 .await
                 .map_err(SdkError::from)
             }
-            DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
-                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
-                get_verbosity_or_default(verbosity).into(),
-                state_root_hash.to_digest().into(),
-                dictionary_item_identifier.into(),
-            )
-            .await
-            .map_err(SdkError::from),
+            DictionaryItemInput::Identifier(dictionary_item_identifier) => {
+                let state_root_hash = if state_root_hash.is_empty() {
+                    self.get_state_root_hash(node_address, None, None)
+                        .await
+                        .unwrap()
+                        .result
+                        .state_root_hash
+                        .unwrap()
+                        .into()
+                } else {
+                    state_root_hash.to_digest()
+                };
+
+                get_dictionary_item_lib(
+                    JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                    node_address,
+                    get_verbosity_or_default(verbosity).into(),
+                    state_root_hash.into(),
+                    dictionary_item_identifier.into(),
+                )
+                .await
+                .map_err(SdkError::from)
+            }
         }
     }
 }
