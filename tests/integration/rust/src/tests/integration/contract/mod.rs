@@ -254,6 +254,13 @@ mod tests {
     use tokio::test;
 
     #[test]
+    pub async fn test_install_test() {
+        thread::sleep(WAIT_TIME);
+        test_install().await;
+        thread::sleep(WAIT_TIME);
+    }
+
+    #[test]
     pub async fn test_call_entrypoint_test() {
         thread::sleep(WAIT_TIME);
         test_call_entrypoint().await;
@@ -287,13 +294,6 @@ mod tests {
             BlockHash::new(&config.block_hash).unwrap(),
         ));
         query_contract_key(maybe_global_state_identifier).await;
-        thread::sleep(WAIT_TIME);
-    }
-
-    #[test]
-    pub async fn test_install_test() {
-        thread::sleep(WAIT_TIME);
-        test_install().await;
         thread::sleep(WAIT_TIME);
     }
 }
