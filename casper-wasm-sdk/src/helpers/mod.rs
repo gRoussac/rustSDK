@@ -5,15 +5,22 @@ use crate::types::public_key::PublicKey;
 use crate::types::sdk_error::SdkError;
 use crate::types::verbosity::Verbosity;
 use casper_client::cli::JsonArg;
+use casper_types::cl_value::cl_value_to_json as cl_value_to_json_from_casper_types;
 use casper_types::{
-    DeployBuilder, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey, TimeDiff, Timestamp,
+    CLValue, DeployBuilder, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey, TimeDiff,
+    Timestamp,
 };
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use rust_decimal::prelude::*;
 use serde::Serialize;
+use serde_json::Value;
 use wasm_bindgen::{JsCast, JsValue};
+
+pub fn cl_value_to_json(cl_value: &CLValue) -> Option<Value> {
+    cl_value_to_json_from_casper_types(cl_value)
+}
 
 pub fn get_current_timestamp(timestamp: Option<String>) -> String {
     let parsed_timestamp = timestamp.as_ref().and_then(|ts| ts.parse::<i64>().ok());

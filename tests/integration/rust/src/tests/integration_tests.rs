@@ -14,9 +14,6 @@ pub mod test_module {
         types::verbosity::Verbosity,
     };
     use chrono::DateTime;
-    use std::time;
-    // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static not working
-    pub const WAIT_TIME: std::time::Duration = time::Duration::from_millis(2000);
 
     pub fn test_error() {
         error("bound error to std");

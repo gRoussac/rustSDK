@@ -1,8 +1,11 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::config::{get_config, TestConfig, DEFAULT_CONTRACT_HASH, DEFAULT_DEPLOY};
-    use crate::tests::helpers::install_cep78_if_needed;
-    use crate::tests::{helpers::create_test_sdk, integration_tests::test_module::WAIT_TIME};
+    use crate::config::{
+        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DICTIONARY_ITEM_KEY,
+        DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE, WAIT_TIME,
+    };
+    use crate::tests::helpers::create_test_sdk;
+    use casper_wasm_sdk::helpers::cl_value_to_json;
     use casper_wasm_sdk::types::account_hash::AccountHash;
     use casper_wasm_sdk::types::account_identifier::AccountIdentifier;
     use casper_wasm_sdk::{
@@ -57,7 +60,7 @@ pub mod test_module {
         maybe_block_identifier: Option<BlockIdentifierInput>,
     ) {
         let config: TestConfig = get_config().await;
-        let account_hash = AccountHash::new(&config.account_hash).unwrap();
+        let account_hash = AccountHash::from_formatted_str(&config.account_hash).unwrap();
         let account_identifier = AccountIdentifier::from_account_under_account_hash(account_hash);
         let get_account = create_test_sdk()
             .get_account(
@@ -188,7 +191,7 @@ pub mod test_module {
         let get_deploy = create_test_sdk()
             .get_deploy(
                 &config.node_address,
-                DeployHash::new(DEFAULT_DEPLOY).unwrap(),
+                DeployHash::new(&config.deploy_hash).unwrap(),
                 Some(true),
                 config.verbosity,
             )
@@ -200,7 +203,6 @@ pub mod test_module {
 
     pub async fn test_get_dictionary_item() {
         let config: TestConfig = get_config().await;
-        install_cep78_if_needed(&config.account, &config.private_key).await;
         let get_state_root_hash = create_test_sdk()
             .get_state_root_hash(&config.node_address, None, None)
             .await;
@@ -212,10 +214,12 @@ pub mod test_module {
             .into();
         thread::sleep(WAIT_TIME);
 
-        let dictionary_name = "events";
-        let dictionary_item_key = "0";
         let mut params = DictionaryItemStrParams::new();
-        params.set_contract_named_key(DEFAULT_CONTRACT_HASH, dictionary_name, dictionary_item_key);
+        params.set_contract_named_key(
+            &config.contract_cep78_hash,
+            DICTIONARY_NAME,
+            DICTIONARY_ITEM_KEY,
+        );
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk()
             .get_dictionary_item(
@@ -347,12 +351,12 @@ pub mod test_module {
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
         let config: TestConfig = get_config().await;
-        install_cep78_if_needed(&config.account, &config.private_key).await;
+        let path = format!("{CONTRACT_CEP78_KEY}/collection_name");
         thread::sleep(WAIT_TIME);
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             node_address: config.node_address.clone(),
             key: KeyIdentifierInput::String(config.account_hash),
-            path: Some(PathIdentifierInput::String("key-name".to_string())),
+            path: Some(PathIdentifierInput::String(path)),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
@@ -370,16 +374,53 @@ pub mod test_module {
             .inner_bytes()
             .is_empty());
         thread::sleep(WAIT_TIME);
+        let cl_value = query_global_state
+            .result
+            .stored_value
+            .as_cl_value()
+            .unwrap();
+        assert_eq!(cl_value_to_json(cl_value).unwrap(), COLLECTION_NAME);
+    }
+
+    pub async fn test_query_global_state_key_from_account_hash(
+        maybe_global_state_identifier: Option<GlobalStateIdentifier>,
+    ) {
+        let config: TestConfig = get_config().await;
+        thread::sleep(WAIT_TIME);
+        let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
+            node_address: config.node_address.clone(),
+            key: KeyIdentifierInput::String(config.account_hash),
+            path: Some(PathIdentifierInput::String(TEST_HELLO_KEY.to_string())),
+            maybe_global_state_identifier,
+            state_root_hash: None,
+            maybe_block_id: None,
+            verbosity: config.verbosity,
+        };
+        let query_global_state = create_test_sdk().query_global_state(query_params).await;
+        thread::sleep(WAIT_TIME);
+        let query_global_state = query_global_state.unwrap();
+        assert!(!query_global_state.result.api_version.to_string().is_empty());
+        assert!(!query_global_state
+            .result
+            .stored_value
+            .as_cl_value()
+            .unwrap()
+            .inner_bytes()
+            .is_empty());
+        thread::sleep(WAIT_TIME);
+        let cl_value = query_global_state
+            .result
+            .stored_value
+            .as_cl_value()
+            .unwrap();
+        assert_eq!(cl_value_to_json(cl_value).unwrap(), TEST_HELLO_MESSAGE);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-    use crate::{
-        config::{get_config, TestConfig},
-        tests::integration_tests::test_module::WAIT_TIME,
-    };
+    use crate::config::{get_config, TestConfig, WAIT_TIME};
     use casper_wasm_sdk::types::{
         block_hash::BlockHash, block_identifier::BlockIdentifierInput,
         global_state_identifier::GlobalStateIdentifier,
@@ -543,6 +584,12 @@ mod tests {
     pub async fn test_query_balance_test() {
         thread::sleep(WAIT_TIME);
         test_query_balance(None).await;
+        thread::sleep(WAIT_TIME);
+    }
+    #[test]
+    pub async fn test_query_global_state_key_from_account_hash_test() {
+        thread::sleep(WAIT_TIME);
+        test_query_global_state_key_from_account_hash(None).await;
         thread::sleep(WAIT_TIME);
     }
     #[test]
