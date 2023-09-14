@@ -246,6 +246,35 @@ pub mod test_module {
         thread::sleep(WAIT_TIME);
     }
 
+    pub async fn test_get_dictionary_item_without_state_root_hash() {
+        let config: TestConfig = get_config().await;
+        let mut params = DictionaryItemStrParams::new();
+        params.set_contract_named_key(
+            &config.contract_cep78_hash,
+            DICTIONARY_NAME,
+            DICTIONARY_ITEM_KEY,
+        );
+        let dictionary_item = DictionaryItemInput::Params(params);
+        let get_dictionary_item = create_test_sdk()
+            .get_dictionary_item(&config.node_address, "", dictionary_item, config.verbosity)
+            .await;
+        thread::sleep(WAIT_TIME);
+        let get_dictionary_item = get_dictionary_item.unwrap();
+        assert!(!get_dictionary_item
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+        assert!(!get_dictionary_item
+            .result
+            .stored_value
+            .as_cl_value()
+            .unwrap()
+            .inner_bytes()
+            .is_empty());
+        thread::sleep(WAIT_TIME);
+    }
+
     #[allow(deprecated)]
     pub async fn test_get_era_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
@@ -258,9 +287,6 @@ pub mod test_module {
             .await;
         let get_era_info = get_era_info.unwrap();
         assert!(!get_era_info.result.api_version.to_string().is_empty());
-        // TODO Fix ?
-        // dbg!(get_era_info.result.era_summary);
-        //test with maybe_block_identifier
     }
 
     pub async fn test_get_era_summary(maybe_block_identifier: Option<BlockIdentifierInput>) {
@@ -509,15 +535,12 @@ mod tests {
         test_get_dictionary_item().await;
         thread::sleep(WAIT_TIME);
     }
-
-    // TODO
-    // #[test]
-    // pub async fn test_get_dictionary_item_without_state_root_hash_test() {
-    //     thread::sleep(WAIT_TIME);
-    //     test_get_dictionary_item_without_state_root_hash().await;
-    //     thread::sleep(WAIT_TIME);
-    // }
-
+    #[test]
+    pub async fn test_get_dictionary_item_without_state_root_hash_test() {
+        thread::sleep(WAIT_TIME);
+        test_get_dictionary_item_without_state_root_hash().await;
+        thread::sleep(WAIT_TIME);
+    }
     #[test]
     pub async fn test_get_era_info_test() {
         thread::sleep(WAIT_TIME);
