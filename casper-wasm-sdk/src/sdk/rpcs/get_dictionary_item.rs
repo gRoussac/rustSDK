@@ -1,5 +1,6 @@
 #[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
+use crate::debug::error;
+use crate::types::digest::Digest;
 use crate::{
     helpers::get_verbosity_or_default,
     types::{
@@ -173,7 +174,15 @@ impl SDK {
                 let state_root_hash_as_string: String = if !state_root_hash.is_empty() {
                     state_root_hash.to_digest().to_string()
                 } else {
-                    String::from("")
+                    let state_root_hash: Digest = self
+                        .get_state_root_hash(node_address, None, None)
+                        .await
+                        .unwrap()
+                        .result
+                        .state_root_hash
+                        .unwrap()
+                        .into();
+                    state_root_hash.to_string()
                 };
                 get_dictionary_item_cli(
                     &rand::thread_rng().gen::<i64>().to_string(),

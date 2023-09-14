@@ -21,10 +21,9 @@ export const contract_cep78 = 'cep78.wasm';
 export const payment_amount_contract_cep78 = '300000000000';
 export const test_hello_key = 'test_hello_key';
 export const contract_cep78_key = 'cep78_contract_hash_enhanced-nft-1';
-export const message = 'Hello Casper';
 export const collection_name = 'enhanced-nft-1';
 export const args_simple =
-  `key-name:String='${test_hello_key}',message:String='${message}'`;
+  `key-name:String='${test_hello_key}',message:String='Hello Casper'`;
 export const args_json = `[
 {"name": "collection_name", "type": "String", "value": "${collection_name}"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},

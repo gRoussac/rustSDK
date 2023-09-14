@@ -1,8 +1,12 @@
 #[allow(dead_code)]
 pub mod test_module_deploy {
     use crate::{
-        config::{get_config, TestConfig, DEFAULT_TTL, HELLO_CONTRACT, TTL},
-        tests::{helpers::read_wasm_file, integration_tests::test_module::WAIT_TIME},
+        config::{
+            get_config, TestConfig, ARGS_JSON, CONTRACT_CEP78_KEY, DEFAULT_TTL, ENTRYPOINT_MINT,
+            HELLO_CONTRACT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT, TTL,
+            WAIT_TIME,
+        },
+        tests::helpers::read_wasm_file,
     };
 
     use casper_wasm_sdk::{
@@ -29,14 +33,11 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -58,12 +59,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -83,14 +82,11 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -110,12 +106,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let mut deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -144,12 +138,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let mut deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -172,12 +164,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let mut deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -200,19 +190,16 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
         assert!(deploy.is_valid());
-        assert_eq!(&deploy.entry_point_name(), entrypoint);
+        assert_eq!(&deploy.entry_point_name(), ENTRYPOINT_MINT);
         deploy = deploy.with_entry_point_name("name", Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(&deploy.entry_point_name(), "name");
@@ -227,14 +214,11 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -248,7 +232,10 @@ pub mod test_module_deploy {
         );
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract());
-        assert!(!deploy.to_json().unwrap().contains(session_hash));
+        assert!(!deploy
+            .to_json()
+            .unwrap()
+            .contains(&config.contract_cep78_hash));
         assert!(deploy.to_json().unwrap().contains(new_session_hash));
     }
 
@@ -261,23 +248,17 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let entrypoint = "decimals";
-        let session_name = "test";
         let session_params = SessionStrParams::default();
-        session_params.set_session_entry_point(entrypoint);
-        session_params.set_session_name("test");
-        let payment_amount = "5500000000";
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
+        session_params.set_session_name(CONTRACT_CEP78_KEY);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract());
-        assert_eq!(
-            deploy.by_name().unwrap().to_string(),
-            session_name.to_string()
-        );
+        assert_eq!(deploy.by_name().unwrap().to_string(), CONTRACT_CEP78_KEY);
     }
 
     pub async fn test_deploy_type_with_package_hash() {
@@ -289,15 +270,11 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_package_hash =
-            "93d38a928e5a9a3030e60dc207b478a746a4369f5dbaf20f085fe4e19f4b12d2";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_package_hash(session_package_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_package_hash(&config.contract_cep78_package_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -312,7 +289,10 @@ pub mod test_module_deploy {
         );
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract_package());
-        assert!(!deploy.to_json().unwrap().contains(session_package_hash));
+        assert!(!deploy
+            .to_json()
+            .unwrap()
+            .contains(&config.contract_cep78_package_hash));
         assert!(deploy.to_json().unwrap().contains(new_session_package_hash));
     }
 
@@ -327,9 +307,8 @@ pub mod test_module_deploy {
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_bytes(Vec::from([0]).into());
-        let payment_amount = "5500000000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -365,12 +344,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let mut deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -392,21 +369,17 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_package_hash =
-            "93d38a928e5a9a3030e60dc207b478a746a4369f5dbaf20f085fe4e19f4b12d2";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_package_hash(session_package_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
         assert!(deploy.is_valid());
+        assert_eq!(deploy.payment_amount(1_u64).to_string(), PAYMENT_AMOUNT);
         let new_payment_amount = "1111111111";
-        assert_eq!(deploy.payment_amount(1_u64).to_string(), payment_amount);
         deploy = deploy.with_standard_payment(new_payment_amount, None);
         assert!(!deploy.is_valid());
         assert_eq!(deploy.payment_amount(1_u64).to_string(), new_payment_amount);
@@ -422,12 +395,10 @@ pub mod test_module_deploy {
             Some(old_timestamp.to_string()),
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let mut deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -458,12 +429,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let mut deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -489,12 +458,10 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let payment_amount = "10000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
-        let transfer_amount = "5500000000";
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let deploy = Deploy::with_transfer(
-            transfer_amount,
+            TRANSFER_AMOUNT,
             &config.target_account,
             None,
             deploy_params,
@@ -516,14 +483,11 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -540,19 +504,16 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let mut session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args = Vec::from([
             "foo:Bool='true'".to_string(),
             "bar:String='value'".to_string(),
         ]);
         session_params.set_session_args(args.clone());
-        let payment_amount = "5500000000";
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -570,22 +531,18 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let args_json = r#"[{"name": "foo", "type": "U256", "value": 1}]"#;
-        session_params.set_session_args_json(args_json);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
+        session_params.set_session_args_json(ARGS_JSON);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
         assert!(deploy.is_valid());
         assert!(!deploy.args().is_empty());
-        assert_eq!(deploy.args().len(), 1);
+        assert_eq!(deploy.args().len(), 11);
     }
 
     pub async fn test_deploy_type_add_arg() {
@@ -597,23 +554,20 @@ pub mod test_module_deploy {
             None,
             Some(TTL.to_string()),
         );
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
-        let payment_amount = "5500000000";
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
         assert!(deploy.is_valid());
         assert!(deploy.args().is_empty());
-        deploy = deploy.add_arg("test:bool='false".into(), Some(config.private_key.clone()));
+        deploy = deploy.add_arg("foo:bool='false".into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 1);
-        let arg_json = r#"{"name": "foo", "type": "U256", "value": 1}"#; // No brackets only one arg
+        let arg_json = r#"{"name": "bar", "type": "U256", "value": 1}"#; // No brackets only one arg
         deploy = deploy.add_arg(arg_json.into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 2);

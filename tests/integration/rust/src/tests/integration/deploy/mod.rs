@@ -1,7 +1,10 @@
 #[allow(dead_code)]
 pub mod test_module {
-    use crate::config::{get_config, TestConfig, TTL};
-    use crate::tests::helpers::{create_test_sdk, install_cep78_if_needed};
+    use crate::config::{
+        get_config, TestConfig, ENTRYPOINT_MINT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT,
+        TRANSFER_AMOUNT, TTL,
+    };
+    use crate::tests::helpers::create_test_sdk;
     use casper_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -9,10 +12,6 @@ pub mod test_module {
 
     pub async fn test_deploy() {
         let config: TestConfig = get_config().await;
-        install_cep78_if_needed(&config.account, &config.private_key).await;
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
-        let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -21,10 +20,10 @@ pub mod test_module {
             Some(TTL.to_string()),
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy = create_test_sdk()
             .deploy(
                 &config.node_address,
@@ -52,7 +51,7 @@ pub mod test_module {
 
     pub async fn test_transfer() {
         let config: TestConfig = get_config().await;
-        let transfer_amount = "5500000000";
+
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -61,11 +60,11 @@ pub mod test_module {
             Some(TTL.to_string()),
         );
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount("10000");
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let transfer = create_test_sdk()
             .transfer(
                 &config.node_address,
-                transfer_amount,
+                TRANSFER_AMOUNT,
                 &config.target_account,
                 None,
                 deploy_params,
@@ -91,9 +90,6 @@ pub mod test_module {
 
     pub async fn test_speculative_deploy() {
         let config: TestConfig = get_config().await;
-        let session_hash = "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477";
-        let entrypoint = "decimals";
-        let payment_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -102,10 +98,10 @@ pub mod test_module {
             Some(TTL.to_string()),
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(session_hash);
-        session_params.set_session_entry_point(entrypoint);
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy = create_test_sdk()
             .speculative_deploy(
                 &config.node_address,
@@ -135,7 +131,6 @@ pub mod test_module {
 
     pub async fn test_speculative_transfer() {
         let config: TestConfig = get_config().await;
-        let transfer_amount = "5500000000";
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -144,11 +139,11 @@ pub mod test_module {
             Some(TTL.to_string()),
         );
         let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount("10000");
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let transfer = create_test_sdk()
             .speculative_transfer(
                 &config.node_address,
-                transfer_amount,
+                TRANSFER_AMOUNT,
                 &config.target_account,
                 None,
                 deploy_params,
@@ -177,7 +172,8 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::integration_tests::test_module::WAIT_TIME;
+
+    use crate::config::WAIT_TIME;
 
     use super::test_module::*;
     use std::thread;
