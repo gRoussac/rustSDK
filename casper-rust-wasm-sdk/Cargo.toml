@@ -1,5 +1,5 @@
 [package]
-name = "casper-wasm-sdk"
+name = "casper-rust-wasm-sdk"
 version = "0.1.0"
 edition = "2021"
 description = "Casper Rust Wasm Web SDK"
@@ -42,7 +42,7 @@ name = "casper_wasm_sdk"
 path = "src/lib.rs"
 
 [[bin]]
-name = "casper_wasm_sdk"
+name = "casper_rust_wasm_sdk"
 path = "src/main.rs"
 doc = false
 
