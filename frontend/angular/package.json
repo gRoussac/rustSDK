@@ -22,7 +22,7 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0",
-    "casper-sdk": "file:../../casper-wasm-sdk/pkg"
+    "casper-sdk": "file:../../casper-rust-wasm-sdk/pkg"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~16.2.0",

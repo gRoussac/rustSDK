@@ -23,7 +23,7 @@
           "./src/favicon.ico",
           "./src/assets",
           {
-            "input": "../../casper-wasm-sdk/pkg",
+            "input": "../../casper-rust-wasm-sdk/pkg",
             "glob": "casper_wasm_sdk_bg.wasm",
             "output": "assets"
           }
