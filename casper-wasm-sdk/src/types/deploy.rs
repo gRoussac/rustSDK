@@ -19,8 +19,8 @@ use crate::{
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
-    ApprovalsHash, Deploy as _Deploy, DeployBuilder, DeployFootprint, ExecutableDeployItem, Phase,
-    RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
+    Deploy as _Deploy, DeployApprovalsHash, DeployBuilder, DeployFootprint, ExecutableDeployItem,
+    Phase, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
@@ -549,7 +549,7 @@ impl Deploy {
         }
     }
 
-    pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
+    pub fn compute_approvals_hash(&self) -> Result<DeployApprovalsHash, bytesrepr::Error> {
         let deploy: _Deploy = self.0.clone();
         deploy.compute_approvals_hash()
     }
