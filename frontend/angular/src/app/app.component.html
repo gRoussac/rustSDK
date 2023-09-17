@@ -73,7 +73,7 @@
     </div>
   </div>
   <form class="row align-items-start" (submit)="(false)">
-    <div class="col-sm-4">
+    <div class="col-sm-4 d-flex justify-content-between">
       <div class="input-group">
         <label class="input-group-text" for="selectActionElt">Action</label>
         <select
@@ -121,9 +121,18 @@
           </optgroup>
         </select>
       </div>
+      <button
+        *ngIf="!['sign_deploy'].includes(action)"
+        type="button"
+        class="btn btn-success ms-3"
+        (click)="submitAction(action)"
+        e2e-id="submit"
+      >
+        Go
+      </button>
     </div>
-    <div class="col-sm-6">
-      <div class="input-group">
+    <div class="col-sm-8 ps-0 d-flex justify-content-end">
+      <div class="input-group me-2">
         <label class="input-group-text" for="publicKeyElt"> Public Key</label>
         <input
           type="search"
@@ -137,45 +146,34 @@
           e2e-id="publicKeyElt"
         />
       </div>
-    </div>
-    <div class="col-sm-2 d-flex justify-content-end">
-      <input
-        class="visually-hidden"
-        name="private_key"
-        #privateKeyElt
-        type="file"
-        id="privateKeyElt"
-        (change)="onPemSelected($event)"
-        accept=".pem"
-        e2e-id="privateKeyElt"
-      />
-      <button
-        class="btn btn-secondary"
-        (click)="onPrivateKeyClick()"
-        *ngIf="!has_private_key"
-      >
-        Load Private Key
-      </button>
-      <button
-        class="btn btn-light"
-        (click)="onPrivateKeyClick()"
-        *ngIf="has_private_key"
-      >
-        Private Key Loaded
-      </button>
-    </div>
-  </form>
-  <div class="row mt-3" *ngIf="peers && peers.length && action === 'get_peers'">
-    <div class="col-xs-12">
-      <div class="card">
-        <ul class="list-group list-group-flush" e2e-id="peers">
-          <li class="list-group-item" *ngFor="let peer of peers; index as i">
-            {{ peer | json }}
-          </li>
-        </ul>
+      <div class="col-sm-2 d-flex justify-content-end ms-3">
+        <input
+          class="visually-hidden"
+          name="private_key"
+          #privateKeyElt
+          type="file"
+          id="privateKeyElt"
+          (change)="onPemSelected($event)"
+          accept=".pem"
+          e2e-id="privateKeyElt"
+        />
+        <button
+          class="btn btn-secondary"
+          (click)="onPrivateKeyClick()"
+          *ngIf="!has_private_key"
+        >
+          Load Private Key
+        </button>
+        <button
+          class="btn btn-light"
+          (click)="onPrivateKeyClick()"
+          *ngIf="has_private_key"
+        >
+          Private Key Loaded
+        </button>
       </div>
     </div>
-  </div>
+  </form>
   <div
     class="row mt-3 d-flex align-items-end"
     *ngIf="
@@ -993,18 +991,11 @@
       </div>
     </form>
   </div>
-  <div class="row d-flex mt-4 justify-content-start" *ngIf="action">
-    <div class="col-sm-1" *ngIf="!['sign_deploy'].includes(action)">
-      <button
-        type="button"
-        class="btn btn-success"
-        (click)="submitAction(action)"
-        e2e-id="submit"
-      >
-        Submit
-      </button>
-    </div>
-    <div class="col-sm-1" *ngIf="['sign_deploy'].includes(action)">
+  <div
+    class="row d-flex mt-4 justify-content-start"
+    *ngIf="['sign_deploy'].includes(action)"
+  >
+    <div class="col-sm-1">
       <button
         type="button"
         class="btn btn-warning"
@@ -1014,34 +1005,11 @@
         Sign
       </button>
     </div>
-    <div
-      class="col-sm-1"
-      *ngIf="
-        !['sign_deploy', 'put_deploy', 'speculative_exec'].includes(action) &&
-        (result || peers.length)
-      "
-    >
-      <button
-        class="btn btn-link"
-        type="reset"
-        value="clear"
-        (click)="cleanDisplay()"
-        e2e-id="clear"
-      >
-        Clear
-      </button>
-    </div>
   </div>
-  <div class="row mt-3" *ngIf="result">
-    <div class="col-xs-12">
-      <div class="card">
-        <div
-          class="card-body"
-          style="white-space: pre-wrap"
-          e2e-id="result"
-          [innerHtml]="displayResult()"
-        ></div>
-      </div>
-    </div>
-  </div>
+  <section *ngIf="error" class="mt-3" e2e-id="error">
+    <pre class="error alert alert-warning d-flex">{{ error }}</pre>
+  </section>
+  <section class="mt-3">
+    <comp-result></comp-result>
+  </section>
 </main>

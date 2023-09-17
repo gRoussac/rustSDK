@@ -1,9 +1,9 @@
 /* eslint-disable */
 export default {
-  displayName: 'util-services-wasm-wasm',
+  displayName: 'util-services-wasm',
   preset: '../../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../../../../coverage/libs/util/services/wasm/wasm',
+  coverageDirectory: '../../../../coverage/libs/util/services/wasm',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

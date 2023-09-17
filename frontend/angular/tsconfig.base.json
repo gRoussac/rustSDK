@@ -15,8 +15,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@util/wasm": ["libs/util/services/wasm/wasm/src/index.ts"],
-      "@util/config": ["libs/util/config/src/index.ts"]
+      "@components": ["libs/components/src/index.ts"],
+      "@util/config": ["libs/util/config/src/index.ts"],
+      "@util/hightlight-webworker": [
+        "libs/util/hihlight-webworker/src/index.ts"
+      ],
+      "@util/wasm": ["libs/util/services/wasm/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

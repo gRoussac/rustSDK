@@ -1,11 +1,13 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
 import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes, PeerEntry } from "casper-sdk";
+import { ResultComponent, ResultService } from '@components';
 
 const imports = [
   CommonModule,
+  ResultComponent
 ];
 
 type network = {
@@ -17,6 +19,7 @@ type network = {
 @Component({
   standalone: true,
   imports,
+  providers: [ResultService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -32,7 +35,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   sdk_contract_methods!: string[];
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
-  result!: string | object;
+  error!: string;
   verbosity = Verbosity.High;
   node_address = this.env['node_address'].toString();
   action!: string;
@@ -117,10 +120,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('selectNetworkElt') selectNetworkElt!: ElementRef;
 
   constructor(
-    // @Inject(DOCUMENT) private document: Document,
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
     @Inject(ENV) public readonly env: EnvironmentConfig,
+    private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
   }
@@ -164,18 +167,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   async get_peers() {
     try {
       const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
-      if (peers_result) {
-        this.cleanDisplay();
-        this.peers = peers_result?.peers;
-      }
+      peers_result && this.resultService.setResult(peers_result.toJson());
+      peers_result && (this.peers = peers_result.peers);
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
   async get_node_status() {
     const get_node_status = await this.sdk.get_node_status(this.node_address, this.verbosity);
-    get_node_status && (this.result = get_node_status.toJson());
+    get_node_status && this.resultService.setResult(get_node_status.toJson());
     return get_node_status;
   }
 
@@ -189,7 +190,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!no_mark_for_check) {
       this.getIdentifieBlock(options);
       const state_root_hash = await this.sdk.get_state_root_hash(options);
-      this.state_root_hash && (this.result = state_root_hash.state_root_hash_as_string);
+      this.state_root_hash && this.resultService.setResult(state_root_hash.toJson());
     } else {
       const state_root_hash = await this.sdk.get_state_root_hash(options);
       this.state_root_hash = state_root_hash.state_root_hash_as_string;
@@ -218,7 +219,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.getIdentifieBlock(get_account_options);
     const get_account = await this.sdk.get_account(get_account_options);
     if (!account_identifier_param) {
-      get_account && (this.result = get_account.account);
+      get_account && this.resultService.setResult(get_account.toJson());
     }
     return get_account;
   }
@@ -247,9 +248,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
       this.getIdentifieBlock(get_auction_info_options);
       const get_auction_info = await this.sdk.get_auction_info(get_auction_info_options);
-      get_auction_info && (this.result = get_auction_info);
+      get_auction_info && this.resultService.setResult(get_auction_info.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -278,10 +279,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         session_params,
         payment_amount,
       );
-      install && (this.result = install.toJson());
+      install && this.resultService.setResult(install.toJson());
     } catch (err) {
-      console.log(err);
-      err && (this.result = err.toString());
+      console.error(err);
+      err && (this.error = err.toString());
     }
   }
 
@@ -299,10 +300,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         verbosity: this.verbosity,
       });
       const get_balance = await this.sdk.get_balance(get_balance_options);
-      get_balance && (this.result = get_balance?.balance_value);
+      get_balance && this.resultService.setResult(get_balance.toJson());
     } catch (err) {
-      console.log(err);
-      err && (this.result = err.toString());
+      console.error(err);
+      err && (this.error = err.toString());
     }
   }
 
@@ -314,9 +315,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
       this.getIdentifieBlock(get_block_transfers_options);
       const get_block_transfers = await this.sdk.get_block_transfers(get_block_transfers_options);
-      this.result = get_block_transfers.transfers;
+      get_block_transfers && this.resultService.setResult(get_block_transfers.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -328,9 +329,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
       this.getIdentifieBlock(chain_get_block_options);
       const chain_get_block = await this.sdk.get_block(chain_get_block_options);
-      this.result = chain_get_block.block;
+      chain_get_block && this.resultService.setResult(chain_get_block.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -343,9 +344,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   async get_chainspec() {
     try {
       const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
-      this.result = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
+      const chain_spec = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
+      chain_spec && this.resultService.setResult(chain_spec);
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -363,9 +365,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     get_deploy_options.finalized_approvals = finalized_approvals;
     try {
       const get_deploy = await this.sdk.get_deploy(get_deploy_options);
-      get_deploy && (this.result = get_deploy.toJson());
+      get_deploy && this.resultService.setResult(get_deploy.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -426,9 +428,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     get_dictionary_item_options.dictionary_item_identifier = dictionary_item_identifier;
     try {
       const state_get_dictionary_item = await this.sdk.state_get_dictionary_item(get_dictionary_item_options);
-      state_get_dictionary_item && (this.result = state_get_dictionary_item.toJson());
+      state_get_dictionary_item && this.resultService.setResult(state_get_dictionary_item.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -440,9 +442,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.getIdentifieBlock(get_era_info_options);
     try {
       const get_era_info = await this.sdk.get_era_info(get_era_info_options);
-      get_era_info && (this.result = get_era_info.toJson());
+      get_era_info && this.resultService.setResult(get_era_info.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -454,27 +456,27 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.getIdentifieBlock(get_era_summary_options);
     try {
       const get_era_summary = await this.sdk.get_era_summary(get_era_summary_options);
-      this.result = get_era_summary.era_summary;
+      get_era_summary && this.resultService.setResult(get_era_summary.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
   async get_validator_changes() {
     try {
       const get_validator_changes = await this.sdk.get_validator_changes(this.node_address, this.verbosity);
-      this.result = get_validator_changes.changes;
+      get_validator_changes && this.resultService.setResult(get_validator_changes.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
   async list_rpcs() {
     try {
       const list_rpcs = await this.sdk.list_rpcs(this.node_address, this.verbosity);
-      this.result = list_rpcs.toJson();
+      list_rpcs && this.resultService.setResult(list_rpcs.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -491,9 +493,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.getGlobalIdentifier(query_balance_options);
     try {
       const query_balance = await this.sdk.query_balance(query_balance_options);
-      query_balance && (this.result = query_balance.balance);
+      query_balance && this.resultService.setResult(query_balance.balance);
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -512,9 +514,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.getGlobalIdentifier(query_global_state_options);
     try {
       const query_global_state = await this.sdk.query_global_state(query_global_state_options);
-      query_global_state && (this.result = query_global_state?.stored_value);
+      query_global_state && this.resultService.setResult(query_global_state.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -573,16 +575,16 @@ export class AppComponent implements OnInit, AfterViewInit {
         payment_params,
       );
     } else {
-      result = await this.sdk.make_deploy(
+      result = this.sdk.make_deploy(
         deploy_params,
         session_params,
         payment_params,
       );
     }
-
     if (result) {
-      this.result = result.toJson();
-      this.deploy_json = jsonPrettyPrint(this.result, Verbosity.High);
+      const result_json = result.toJson();
+      this.deploy_json = jsonPrettyPrint(result_json, Verbosity.High);
+      this.deploy_json && this.resultService.setResult(result_json);
     }
     return result;
   }
@@ -655,8 +657,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       );
     }
     if (result) {
-      this.result = result.toJson();
-      this.deploy_json = jsonPrettyPrint(this.result, Verbosity.High);
+      const result_json = result.toJson();
+      this.deploy_json = jsonPrettyPrint(result_json, Verbosity.High);
+      this.deploy_json && this.resultService.setResult(result_json);
     }
     return result;
   }
@@ -685,7 +688,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       signed_deploy,
       this.verbosity
     );
-    put_deploy && (this.result = put_deploy.toJson());
+    put_deploy && this.resultService.setResult(put_deploy.toJson());
     return put_deploy;
   }
 
@@ -710,7 +713,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.getIdentifieBlock(speculative_exec_options);
     const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
-    speculative_exec && (this.result = speculative_exec.toJson());
+    speculative_exec && this.resultService.setResult(speculative_exec.toJson());
     return speculative_exec;
   }
 
@@ -786,9 +789,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         session_params,
         payment_amount
       );
-      call_entrypoint && (this.result = call_entrypoint.toJson());
+      call_entrypoint && this.resultService.setResult(call_entrypoint.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -828,9 +831,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     query_contract_dict_options.dictionary_item_params = dictionary_item_params;
     try {
       const query_contract_dict = await this.sdk.query_contract_dict(query_contract_dict_options);
-      query_contract_dict && (this.result = query_contract_dict.toJson());
+      query_contract_dict && this.resultService.setResult(query_contract_dict.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -850,9 +853,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     try {
       const query_contract_key = await this.sdk.query_contract_key(query_contract_key_options);
-      query_contract_key && (this.result = query_contract_key.toJson());
+      query_contract_key && this.resultService.setResult(query_contract_key.toJson());
     } catch (err) {
-      err && (this.result = err.toString());
+      err && (this.error = err.toString());
     }
   }
 
@@ -913,24 +916,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.file_name = '';
   }
 
-  displayResult() {
-    if (typeof this.result === 'string') {
-      return this.result;
-    } else {
-      return jsonPrettyPrint(this.result, this.verbosity);
-    }
-  }
-
-  cleanDisplay() {
-    // this.deploy_json = '';
-    this.result = '';
-    this.peers = [];
-    //this.deployJsonElt && (this.deployJsonElt.nativeElement.value = '');
+  cleanResult() {
+    this.error = '';
+    this.resultService.setResult('');
   }
 
   async selectAction($event: Event) {
+    this.cleanResult();
     const action = ($event.target as HTMLInputElement).value;
-    this.cleanDisplay();
     await this.handleAction(action);
     this.changeDetectorRef.detectChanges();
   }
@@ -1083,6 +1076,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     const address = peer.address.split(':');
     const new_address = ['http://', address.shift(), ':', '7777'].join('');
     return (new_address);
+  }
+
+  async copy(value: string) {
+    this.resultService.copyClipboard(value);
   }
 
 }
