@@ -1,7 +1,9 @@
 .form-floating > label {
   color: lightgrey;
 }
-svg {
-  height: 24px;
-  width: 24px;
+.error {
+  display: block;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
