@@ -83,13 +83,12 @@ function App() {
       await fetchWasm();
     };
     // console.log(wasm);
-    const sdk = new SDK();
+    const sdk = new SDK(host);
     setSdk(sdk);
     console.log(sdk);
 
     try {
       let get_state_root_hash_options = sdk.get_state_root_hash_options({
-        node_address: host,
         verbosity: Verbosity.Low
       });
       const chain_get_state_root_hash = (await sdk.chain_get_state_root_hash(get_state_root_hash_options));
@@ -101,7 +100,6 @@ function App() {
       );
       console.log(chain_get_state_root_hash);
       let chain_get_block_options = sdk.get_block_options({
-        node_address: host,
         verbosity: Verbosity.High,
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height)
       });
@@ -110,7 +108,6 @@ function App() {
       console.log('js chain_get_block', chain_get_block);
       const account_identifier = new AccountIdentifier(pubKey);
       let state_get_account_info_options = sdk.get_account_options({
-        node_address: host,
         verbosity: Verbosity.High,
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
         account_identifier: account_identifier.toJson()
@@ -135,7 +132,6 @@ function App() {
         );
 
       let get_dictionary_item_options = sdk.get_dictionary_item_options({
-        node_address: host,
         state_root_hash_as_string: chain_get_state_root_hash?.state_root_hash_as_string,
         //state_root_hash: stateRootHashDigest.toJson(),
         dictionary_item_identifier: dictionary_item_identifier.toJson(),
@@ -151,7 +147,6 @@ function App() {
       console.log(chain_get_state_root_hash?.state_root_hash);
       stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
       let state_get_balance_options = sdk.get_balance_options({
-        node_address: host,
         state_root_hash: stateRootHashDigest.toJson(),
         purse_uref: new URef(
           'b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e',
@@ -174,7 +169,6 @@ function App() {
       );
       console.log(key);
       let query_global_state_options = sdk.query_global_state_options({
-        node_address: host,
         global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
           new Digest(chain_get_state_root_hash?.state_root_hash_as_string)
         ).toJson(),
@@ -326,8 +320,8 @@ function App() {
       let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);
       const account_put_deploy = (await sdk.account_put_deploy(
-        host,
         signed_deploy,
+        undefined,
         Verbosity.High,
       )).toJson();
       console.log('js account_put_deploy', account_put_deploy);
@@ -339,7 +333,6 @@ function App() {
 
       let finalized_approvals = true;
       let get_deploy_options = sdk.get_deploy_options({
-        node_address: host,
         deploy_hash: new DeployHash(
           //'397acea5a765565c7d11839f2d30bf07a8e7740350467d3a358f596835645445' // random deploy
           account_put_deploy?.deploy_hash
@@ -347,9 +340,9 @@ function App() {
         finalized_approvals: finalized_approvals,
         verbosity: Verbosity.High,
       });
-      // const info_get_deploy = await sdk.get_deploy(get_deploy_options);
-      // console.log('js info_get_deploy', info_get_deploy);
-      // setInfo_get_deploy(info_get_deploy?.api_version);
+      const info_get_deploy = await sdk.get_deploy(get_deploy_options);
+      console.log('js info_get_deploy', info_get_deploy);
+      setInfo_get_deploy(info_get_deploy?.api_version);
 
       // test call entry point
       session_account = privateToPublicKey(secret_key);
@@ -368,7 +361,6 @@ function App() {
       // payment_params.payment_amount = '5500000000';
       // console.log(payment_params);
       let test_call_entrypoint = (await sdk.call_entrypoint(
-        host,
         deploy_params,
         session_params,
         '5500000000'
@@ -407,7 +399,6 @@ function App() {
     if (wasm) {
       session_params.session_bytes = Bytes.fromUint8Array(wasm);
       let test_install = await sdkInstance.install(
-        host,
         deploy_params,
         session_params,
         '500000000'

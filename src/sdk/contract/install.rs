@@ -18,15 +18,15 @@ impl SDK {
     #[wasm_bindgen(js_name = "install")]
     pub async fn install_js_alias(
         &self,
-        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
+        node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
         let result = self
-            .install(node_address, deploy_params, session_params, payment_params)
+            .install(deploy_params, session_params, payment_params, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -42,10 +42,10 @@ impl SDK {
 impl SDK {
     pub async fn install(
         &self,
-        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("install!");
         let deploy = make_deploy(

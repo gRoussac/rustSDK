@@ -30,7 +30,6 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_transfer")]
     pub async fn speculative_transfer_js_alias(
         &self,
-        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
@@ -38,6 +37,7 @@ impl SDK {
         payment_params: PaymentStrParams,
         maybe_block_id_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifier>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -49,13 +49,13 @@ impl SDK {
         };
         let result = self
             .speculative_transfer(
-                node_address,
                 amount,
                 target_account,
                 transfer_id,
                 deploy_params,
                 payment_params,
                 maybe_block_identifier,
+                node_address,
                 verbosity,
             )
             .await;
@@ -74,13 +74,13 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn speculative_transfer(
         &self,
-        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifierInput>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_transfer!");

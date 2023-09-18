@@ -18,16 +18,16 @@ impl SDK {
     #[wasm_bindgen(js_name = "call_entrypoint")]
     pub async fn call_entrypoint_js_alias(
         &self,
-        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
+        node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
 
         let result = self
-            .call_entrypoint(node_address, deploy_params, session_params, payment_params)
+            .call_entrypoint(deploy_params, session_params, payment_params, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -43,10 +43,10 @@ impl SDK {
 impl SDK {
     pub async fn call_entrypoint(
         &self,
-        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("call_entrypoint!");
         let deploy = make_deploy(
