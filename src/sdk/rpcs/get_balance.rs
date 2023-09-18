@@ -64,11 +64,11 @@ impl GetBalanceResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getBalanceOptions", getter_with_clone)]
 pub struct GetBalanceOptions {
-    pub node_address: String,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub purse_uref_as_string: Option<String>,
     pub purse_uref: Option<URef>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -93,11 +93,11 @@ impl SDK {
         options: GetBalanceOptions,
     ) -> Result<GetBalanceResult, JsError> {
         let GetBalanceOptions {
-            node_address,
             state_root_hash_as_string,
             state_root_hash,
             purse_uref_as_string,
             purse_uref,
+            node_address,
             verbosity,
         } = options;
 
@@ -112,11 +112,11 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_balance(&node_address, hash, purse_uref, verbosity)
+            self.get_balance(hash, purse_uref, node_address, verbosity)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
             // Todo check state root hash validity here _Digest::LENGTH
-            self.get_balance(&node_address, hash.as_str(), purse_uref, verbosity)
+            self.get_balance(hash.as_str(), purse_uref, node_address, verbosity)
                 .await
         } else {
             let err = "Error: Missing state_root_hash";
@@ -151,14 +151,14 @@ pub enum GetBalanceInput {
 impl SDK {
     pub async fn get_balance(
         &self,
-        node_address: &str,
         state_root_hash: impl ToDigest,
         purse_uref: GetBalanceInput,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
         //log("get_balance!");
         let state_root_hash = if state_root_hash.is_empty() {
-            self.get_state_root_hash(node_address, None, None)
+            self.get_state_root_hash(None, None, None)
                 .await
                 .unwrap()
                 .result
@@ -171,7 +171,7 @@ impl SDK {
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 state_root_hash.into(),
                 purse_uref.into(),
@@ -180,7 +180,7 @@ impl SDK {
             .map_err(SdkError::from),
             GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 &state_root_hash.to_string(),
                 &purse_uref,

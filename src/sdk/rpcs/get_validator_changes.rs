@@ -56,7 +56,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_validator_changes")]
     pub async fn get_validator_changes_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<GetValidatorChangesResult, JsError> {
         let result = self.get_validator_changes(node_address, verbosity).await;
@@ -74,13 +74,13 @@ impl SDK {
 impl SDK {
     pub async fn get_validator_changes(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetValidatorChangesResult>, Error> {
         //log("get_validator_changes!");
         get_validator_changes(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &self.get_node_address(node_address),
             get_verbosity_or_default(verbosity).into(),
         )
         .await

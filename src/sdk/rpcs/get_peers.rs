@@ -77,12 +77,9 @@ impl SDK {
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetPeersResult>, Error> {
         //log("get_peers!");
-        let node_address = node_address
-            .or_else(|| self.node_address.as_ref().cloned())
-            .unwrap_or_default();
         get_peers(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &node_address,
+            &self.get_node_address(node_address),
             get_verbosity_or_default(verbosity).into(),
         )
         .await

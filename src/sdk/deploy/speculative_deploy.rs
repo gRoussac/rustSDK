@@ -27,7 +27,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_deploy")]
     pub async fn speculative_deploy_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
@@ -58,7 +58,7 @@ impl SDK {
 impl SDK {
     pub async fn speculative_deploy(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
@@ -84,9 +84,9 @@ impl SDK {
             maybe_block_identifier.map(BlockIdentifierInput::BlockIdentifier);
 
         self.speculative_exec(
-            node_address,
             deploy.unwrap().into(),
             maybe_block_identifier,
+            node_address,
             verbosity,
         )
         .await

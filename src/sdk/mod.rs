@@ -29,3 +29,13 @@ impl SDK {
         SDK { node_address }
     }
 }
+
+impl SDK {
+    pub fn get_node_address(&self, node_address: Option<String>) -> String {
+        node_address
+            .as_ref()
+            .cloned()
+            .or_else(|| self.node_address.as_ref().map(String::to_owned))
+            .unwrap_or_default()
+    }
+}

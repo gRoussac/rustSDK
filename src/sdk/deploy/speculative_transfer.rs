@@ -30,7 +30,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_transfer")]
     pub async fn speculative_transfer_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
@@ -74,7 +74,7 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn speculative_transfer(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
@@ -106,9 +106,9 @@ impl SDK {
         }
 
         self.speculative_exec(
-            node_address,
             deploy.unwrap().into(),
             maybe_block_identifier,
+            node_address,
             verbosity,
         )
         .await

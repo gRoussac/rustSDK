@@ -60,9 +60,9 @@ impl GetBlockResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getBlockOptions", getter_with_clone)]
 pub struct GetBlockOptions {
-    pub node_address: String,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -87,9 +87,9 @@ impl SDK {
         options: GetBlockOptions,
     ) -> Result<GetBlockResult, JsError> {
         let GetBlockOptions {
-            node_address,
             maybe_block_id_as_string,
             maybe_block_identifier,
+            node_address,
             verbosity,
         } = options;
 
@@ -102,7 +102,7 @@ impl SDK {
         };
 
         let result = self
-            .get_block(&node_address, maybe_block_identifier, verbosity)
+            .get_block(maybe_block_identifier, node_address, verbosity)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -126,8 +126,8 @@ impl SDK {
 impl SDK {
     pub async fn get_block(
         &self,
-        node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetBlockResult>, SdkError> {
         //log("get_block!");
@@ -135,7 +135,7 @@ impl SDK {
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_block_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 &maybe_block_id,
             )
@@ -152,7 +152,7 @@ impl SDK {
                 };
             get_block_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
             )

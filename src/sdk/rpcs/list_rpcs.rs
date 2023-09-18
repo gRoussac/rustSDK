@@ -60,7 +60,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "list_rpcs")]
     pub async fn list_rpcs_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<ListRpcsResult, JsError> {
         let result = self.list_rpcs(node_address, verbosity).await;
@@ -78,13 +78,13 @@ impl SDK {
 impl SDK {
     pub async fn list_rpcs(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_ListRpcsResult>, Error> {
         //log("list_rpcs!");
         list_rpcs(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &self.get_node_address(node_address),
             get_verbosity_or_default(verbosity).into(),
         )
         .await

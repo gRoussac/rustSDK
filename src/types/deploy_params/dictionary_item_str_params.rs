@@ -182,9 +182,6 @@ impl Default for DictionaryItemStrParams {
 }
 
 impl DictionaryItemStrParams {
-    pub fn default() -> Self {
-        Self::new()
-    }
     pub fn account_named_key(&self) -> Option<AccountNamedKey> {
         self.account_named_key.clone()
     }

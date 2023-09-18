@@ -62,10 +62,10 @@ impl GetDeployResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getDeployOptions", getter_with_clone)]
 pub struct GetDeployOptions {
-    pub node_address: String,
     pub deploy_hash_as_string: Option<String>,
     pub deploy_hash: Option<DeployHash>,
     pub finalized_approvals: Option<bool>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -96,10 +96,10 @@ impl SDK {
         options: GetDeployOptions,
     ) -> Result<GetDeployResult, JsError> {
         let GetDeployOptions {
-            node_address,
             deploy_hash_as_string,
             deploy_hash,
             finalized_approvals,
+            node_address,
             verbosity,
         } = options;
         let err_msg = "Error: Missing deploy hash as string or deploy hash".to_string();
@@ -125,7 +125,7 @@ impl SDK {
         };
 
         let result = self
-            .get_deploy(&node_address, deploy_hash, finalized_approvals, verbosity)
+            .get_deploy(deploy_hash, finalized_approvals, node_address, verbosity)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -149,15 +149,15 @@ impl SDK {
 impl SDK {
     pub async fn get_deploy(
         &self,
-        node_address: &str,
         deploy_hash: DeployHash,
         finalized_approvals: Option<bool>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
         //log("get_deploy!");
         get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &self.get_node_address(node_address),
             get_verbosity_or_default(verbosity).into(),
             deploy_hash.into(),
             finalized_approvals.unwrap_or_default(),
