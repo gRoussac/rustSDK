@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "puppeteer": "^21.1.1",
-    "casper-wasm-sdk": "file:../../casper-wasm-sdk/pkg-nodejs",
+    "casper-rust-wasm-sdk": "file:../../../pkg-nodejs",
     "dotenv": "^16.3.1"
   }
 }
