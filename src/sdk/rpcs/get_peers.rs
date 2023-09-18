@@ -55,7 +55,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_peers")]
     pub async fn get_peers_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<GetPeersResult, JsError> {
         let result = self.get_peers(node_address, verbosity).await;
@@ -73,13 +73,16 @@ impl SDK {
 impl SDK {
     pub async fn get_peers(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetPeersResult>, Error> {
         //log("get_peers!");
+        let node_address = node_address
+            .or_else(|| self.node_address.as_ref().cloned())
+            .unwrap_or_default();
         get_peers(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &node_address,
             get_verbosity_or_default(verbosity).into(),
         )
         .await

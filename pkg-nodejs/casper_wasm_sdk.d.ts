@@ -1300,6 +1300,32 @@ export class QueryGlobalStateResult {
 export class SDK {
   free(): void;
 /**
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @returns {Deploy}
+*/
+  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
+/**
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @returns {Deploy}
+*/
+  make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
+/**
+* @param {Deploy} deploy
+* @param {string} secret_key
+* @returns {Deploy}
+*/
+  sign_deploy(deploy: Deploy, secret_key: string): Deploy;
+/**
+* @param {string | undefined} node_address
+*/
+  constructor(node_address?: string);
+/**
 * @param {string} node_address
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
@@ -1308,19 +1334,6 @@ export class SDK {
 * @returns {Promise<PutDeployResult>}
 */
   deploy(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: number): Promise<PutDeployResult>;
-/**
-* @param {string} node_address
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {string | undefined} maybe_block_id_as_string
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @param {number | undefined} verbosity
-* @returns {Promise<SpeculativeExecResult>}
-*/
-  speculative_transfer(node_address: string, amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: number): Promise<SpeculativeExecResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
@@ -1394,27 +1407,6 @@ export class SDK {
 */
   speculative_exec(options: getSpeculativeExecOptions): Promise<SpeculativeExecResult>;
 /**
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @returns {Deploy}
-*/
-  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
-/**
-* @param {Deploy} deploy
-* @param {string} secret_key
-* @returns {Deploy}
-*/
-  sign_deploy(deploy: Deploy, secret_key: string): Deploy;
-/**
-* @param {string} node_address
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {string} payment_amount
-* @returns {Promise<PutDeployResult>}
-*/
-  install(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string): Promise<PutDeployResult>;
-/**
 * @param {any} options
 * @returns {queryContractDictOptions}
 */
@@ -1434,17 +1426,6 @@ export class SDK {
 * @returns {Promise<QueryGlobalStateResult>}
 */
   query_contract_key(options: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
-/**
-* @param {string} node_address
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {number | undefined} verbosity
-* @returns {Promise<PutDeployResult>}
-*/
-  transfer(node_address: string, amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: number): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getDeployOptions}
@@ -1479,21 +1460,23 @@ export class SDK {
 * @param {string} node_address
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @param {BlockIdentifier | undefined} maybe_block_identifier
-* @param {number | undefined} verbosity
-* @returns {Promise<SpeculativeExecResult>}
+* @param {string} payment_amount
+* @returns {Promise<PutDeployResult>}
 */
-  speculative_deploy(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_identifier?: BlockIdentifier, verbosity?: number): Promise<SpeculativeExecResult>;
+  install(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string): Promise<PutDeployResult>;
 /**
+* @param {string} node_address
 * @param {string} amount
 * @param {string} target_account
 * @param {string | undefined} transfer_id
 * @param {DeployStrParams} deploy_params
 * @param {PaymentStrParams} payment_params
-* @returns {Deploy}
+* @param {string | undefined} maybe_block_id_as_string
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @param {number | undefined} verbosity
+* @returns {Promise<SpeculativeExecResult>}
 */
-  make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
+  speculative_transfer(node_address: string, amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: number): Promise<SpeculativeExecResult>;
 /**
 * @param {string} node_address
 * @param {DeployStrParams} deploy_params
@@ -1503,8 +1486,16 @@ export class SDK {
 */
   call_entrypoint(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string): Promise<PutDeployResult>;
 /**
+* @param {string} node_address
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {number | undefined} verbosity
+* @returns {Promise<PutDeployResult>}
 */
-  constructor();
+  transfer(node_address: string, amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: number): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getAuctionInfoOptions}
@@ -1562,31 +1553,17 @@ export class SDK {
 */
   get_node_status(node_address: string, verbosity?: number): Promise<GetNodeStatusResult>;
 /**
-* @param {string} node_address
+* @param {string | undefined} node_address
 * @param {number | undefined} verbosity
 * @returns {Promise<GetPeersResult>}
 */
-  get_peers(node_address: string, verbosity?: number): Promise<GetPeersResult>;
+  get_peers(node_address?: string, verbosity?: number): Promise<GetPeersResult>;
 /**
 * @param {string} node_address
 * @param {number | undefined} verbosity
 * @returns {Promise<ListRpcsResult>}
 */
   list_rpcs(node_address: string, verbosity?: number): Promise<ListRpcsResult>;
-/**
-* @param {string} node_address
-* @param {Deploy} deploy
-* @param {number | undefined} verbosity
-* @returns {Promise<PutDeployResult>}
-*/
-  put_deploy(node_address: string, deploy: Deploy, verbosity?: number): Promise<PutDeployResult>;
-/**
-* @param {string} node_address
-* @param {Deploy} deploy
-* @param {number | undefined} verbosity
-* @returns {Promise<PutDeployResult>}
-*/
-  account_put_deploy(node_address: string, deploy: Deploy, verbosity?: number): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {queryBalanceOptions}
@@ -1607,6 +1584,30 @@ export class SDK {
 * @returns {Promise<QueryGlobalStateResult>}
 */
   query_global_state(options: queryGlobalStateOptions): Promise<QueryGlobalStateResult>;
+/**
+* @param {string} node_address
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @param {BlockIdentifier | undefined} maybe_block_identifier
+* @param {number | undefined} verbosity
+* @returns {Promise<SpeculativeExecResult>}
+*/
+  speculative_deploy(node_address: string, deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_identifier?: BlockIdentifier, verbosity?: number): Promise<SpeculativeExecResult>;
+/**
+* @param {string} node_address
+* @param {Deploy} deploy
+* @param {number | undefined} verbosity
+* @returns {Promise<PutDeployResult>}
+*/
+  put_deploy(node_address: string, deploy: Deploy, verbosity?: number): Promise<PutDeployResult>;
+/**
+* @param {string} node_address
+* @param {Deploy} deploy
+* @param {number | undefined} verbosity
+* @returns {Promise<PutDeployResult>}
+*/
+  account_put_deploy(node_address: string, deploy: Deploy, verbosity?: number): Promise<PutDeployResult>;
 }
 /**
 */
