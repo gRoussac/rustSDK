@@ -3,7 +3,7 @@ use crate::config::{
     ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT, PAYMENT_AMOUNT_CONTRACT_CEP78,
     PRIVATE_KEY_NAME,
 };
-use casper_wasm_sdk::{
+use casper_rust_wasm_sdk::{
     rpcs::query_global_state::QueryGlobalStateParams,
     types::{
         block_hash::BlockHash,
@@ -15,7 +15,7 @@ use casper_wasm_sdk::{
         uref::URef,
     },
 };
-use casper_wasm_sdk::{
+use casper_rust_wasm_sdk::{
     rpcs::{get_dictionary_item::DictionaryItemInput, query_global_state::KeyIdentifierInput},
     types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
     SDK,

@@ -26,7 +26,7 @@ import init, {
   getTimestamp,
   Bytes,
   AccountIdentifier
-} from 'casper-rust-wasm-sdk';
+} from 'casper-sdk';
 
 const host = 'http://localhost:3000';
 const block_identifier_height_default = BigInt(1);

@@ -5,7 +5,7 @@ pub mod test_module {
         get_config, TestConfig, DEFAULT_TTL, DICTIONARY_ITEM_KEY, DICTIONARY_NAME, ENTRYPOINT_MINT,
         PAYMENT_AMOUNT, TTL,
     };
-    use casper_wasm_sdk::types::deploy_params::{
+    use casper_rust_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, dictionary_item_str_params::DictionaryItemStrParams,
         payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
     };

@@ -2,7 +2,7 @@ use crate::tests::helpers::{
     get_block, get_contract_cep78_hash_keys, get_dictionnary_key, get_dictionnary_uref,
     get_main_purse, install_cep78_if_needed, mint_nft, read_pem_file,
 };
-use casper_wasm_sdk::{
+use casper_rust_wasm_sdk::{
     helpers::public_key_from_private_key,
     types::{public_key::PublicKey, verbosity::Verbosity},
 };

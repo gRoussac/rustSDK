@@ -7,7 +7,7 @@ pub mod test_module {
         },
         tests::helpers::{create_test_sdk, get_dictionnary_key, read_wasm_file},
     };
-    use casper_wasm_sdk::{
+    use casper_rust_wasm_sdk::{
         rpcs::{
             get_dictionary_item::DictionaryItemInput,
             query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
@@ -247,7 +247,7 @@ mod tests {
     use crate::config::{get_config, TestConfig, WAIT_TIME};
 
     use super::test_module::*;
-    use casper_wasm_sdk::types::{
+    use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, global_state_identifier::GlobalStateIdentifier,
     };
     use std::thread;

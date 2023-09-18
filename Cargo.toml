@@ -38,7 +38,7 @@ rust_decimal = "1.10"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "casper_wasm_sdk"
+name = "casper_rust_wasm_sdk"
 path = "src/lib.rs"
 
 [[bin]]

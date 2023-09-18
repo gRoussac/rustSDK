@@ -8,11 +8,11 @@
     "url": "https://github.com/casper-ecosystem/rustSDK"
   },
   "files": [
-    "casper_wasm_sdk_bg.wasm",
-    "casper_wasm_sdk.js",
-    "casper_wasm_sdk.d.ts"
+    "casper_rust_wasm_sdk_bg.wasm",
+    "casper_rust_wasm_sdk.js",
+    "casper_rust_wasm_sdk.d.ts"
   ],
-  "main": "casper_wasm_sdk.js",
+  "main": "casper_rust_wasm_sdk.js",
   "homepage": "https://casperlabs.io",
-  "types": "casper_wasm_sdk.d.ts"
+  "types": "casper_rust_wasm_sdk.d.ts"
 }
