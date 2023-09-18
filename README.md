@@ -1,17 +1,32 @@
-# rustSDK
+# Casper Rust/Wasm SDK
 
-Casper Labs Rust SDK
+The Rust/Wasm SDK allows developers to interact with the Casper Blockchain using Rust or TypeScript. This page covers different examples of using the SDK.
 
-# Install wasm pack
+# Install
+
+### Rust Project
+
+Add the sdk as dependency of your project
+
+```toml
+casper-wasm-sdk = { version = "0.1.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
+```
+
+#### Usage
+
+```
+use casper_wasm_sdk::{...}
+```
+
+### Typescript Project
+
+#### Install wasm pack
 
 ```shell
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 ```
 
-# Install
-
 ```
-cd ./casper-wasm-sdk
 make prepare
 make build
 ```
@@ -19,7 +34,7 @@ make build
 # Frontend React example
 
 ```
-cd ./frontend/react
+cd ./examples/frontend/react
 npm install
 npm start
 
@@ -28,7 +43,7 @@ npm start
 # Frontend Angular example
 
 ```
-cd ./frontend/angular
+cd ./examples/frontend/angular
 npm install
 npm start
 npm build // build the app in ./frontend/angular/dist folder
@@ -38,7 +53,7 @@ npm build // build the app in ./frontend/angular/dist folder
 # Desktop Node example
 
 ```
-cd ./desktop/node
+cd ./examples/desktop/node
 npm install
 npm start
 
@@ -47,7 +62,7 @@ npm start
 # Desktop Electron example (loading Angular frontend)
 
 ```
-cd ./desktop/electron
+cd ./examples/desktop/electron
 npm install
 npm start
 npm build // build the app in ./desktop/electron/release folder
