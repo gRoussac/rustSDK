@@ -5,7 +5,7 @@ pub mod test_module {
         TRANSFER_AMOUNT, TTL,
     };
     use crate::tests::helpers::create_test_sdk;
-    use casper_wasm_sdk::types::deploy_params::{
+    use casper_rust_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
     };

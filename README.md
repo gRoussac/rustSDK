@@ -15,7 +15,7 @@ casper-rust-wasm-sdk = { version = "0.1.0", git = "https://github.com/casper-eco
 #### Usage
 
 ```rust
-use casper_wasm_sdk::{SDK, ...};
+use casper_rust_wasm_sdk::{SDK, ...};
 
 let sdk = SDK::new();
 ```
@@ -46,10 +46,10 @@ This folders will contain a wasm binary, a JS wrapper file, typescript types def
 ```shell
 $ tree pkg
 pkg
-├── casper_wasm_sdk_bg.wasm
-├── casper_wasm_sdk_bg.wasm.d.ts
-├── casper_wasm_sdk.d.ts
-├── casper_wasm_sdk.js
+├── casper_rust_wasm_sdk_bg.wasm
+├── casper_rust_wasm_sdk_bg.wasm.d.ts
+├── casper_rust_wasm_sdk.d.ts
+├── casper_rust_wasm_sdk.js
 ├── LICENSE
 ├── package.json
 └── README.md
@@ -63,7 +63,7 @@ pkg
 {
   "name": "my-react-app",
   "dependencies": {
-    "casper-rust-wasm-sdk": "file:pkg", // [TODO] Npm package
+    "casper-sdk": "file:pkg", // [TODO] Npm package
     ...
 }
 ```
@@ -74,7 +74,7 @@ The React app needs to load the wasm file through a dedicated `init()` method
 import init, {
   SDK,
   ...
-} from 'casper-rust-wasm-sdk';
+} from 'casper-sdk';
 
 function App() {
   const [wasm, setWasm] = useState(false);

@@ -5,10 +5,10 @@ pub mod test_module {
         DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE, WAIT_TIME,
     };
     use crate::tests::helpers::create_test_sdk;
-    use casper_wasm_sdk::helpers::cl_value_to_json;
-    use casper_wasm_sdk::types::account_hash::AccountHash;
-    use casper_wasm_sdk::types::account_identifier::AccountIdentifier;
-    use casper_wasm_sdk::{
+    use casper_rust_wasm_sdk::helpers::cl_value_to_json;
+    use casper_rust_wasm_sdk::types::account_hash::AccountHash;
+    use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
+    use casper_rust_wasm_sdk::{
         rpcs::{
             get_balance::GetBalanceInput,
             get_dictionary_item::DictionaryItemInput,
@@ -447,7 +447,7 @@ pub mod test_module {
 mod tests {
     use super::test_module::*;
     use crate::config::{get_config, TestConfig, WAIT_TIME};
-    use casper_wasm_sdk::types::{
+    use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, block_identifier::BlockIdentifierInput,
         global_state_identifier::GlobalStateIdentifier,
     };

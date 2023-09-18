@@ -1,5 +1,5 @@
-const casper_wasm_sdk = require('casper-rust-wasm-sdk');
-const { SDK } = casper_wasm_sdk;
+const casper_rust_wasm_sdk = require('casper-sdk');
+const { SDK } = casper_rust_wasm_sdk;
 const http = require('http');
 
 const node_address = 'http://localhost:11101';

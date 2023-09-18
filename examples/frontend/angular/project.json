@@ -25,7 +25,7 @@
           "./src/assets",
           {
             "input": "../../../pkg",
-            "glob": "casper_wasm_sdk_bg.wasm",
+            "glob": "casper_rust_wasm_sdk_bg.wasm",
             "output": "assets"
           }
         ],

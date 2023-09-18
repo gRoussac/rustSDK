@@ -9,7 +9,7 @@ pub mod test_module_deploy {
         tests::helpers::read_wasm_file,
     };
 
-    use casper_wasm_sdk::{
+    use casper_rust_wasm_sdk::{
         helpers::get_current_timestamp,
         types::{
             contract_hash::ContractHash,

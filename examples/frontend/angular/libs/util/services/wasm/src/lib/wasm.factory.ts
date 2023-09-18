@@ -4,7 +4,7 @@ import init, { SDK } from "casper-sdk";
 export const SDK_TOKEN = new InjectionToken<SDK>('SDK');
 
 export const fetchWasmFactory = async (): Promise<SDK> => {
-  const wasm = await init('assets/casper_wasm_sdk_bg.wasm');
+  const wasm = await init('assets/casper_rust_wasm_sdk_bg.wasm');
   return wasm && new SDK();
 };
 

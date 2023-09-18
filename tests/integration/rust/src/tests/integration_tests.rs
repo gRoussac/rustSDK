@@ -4,7 +4,7 @@ pub mod test_module {
         config::{get_config, TestConfig, DEFAULT_TTL, TTL},
         tests::helpers::create_test_sdk,
     };
-    use casper_wasm_sdk::{
+    use casper_rust_wasm_sdk::{
         debug::{error, log},
         helpers::{
             get_current_timestamp, get_gas_price_or_default, get_ttl_or_default, hex_to_string,
