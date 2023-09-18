@@ -1,4 +1,4 @@
-const casper_wasm_sdk = require('casper-wasm-sdk');
+const casper_wasm_sdk = require('casper-rust-wasm-sdk');
 const { SDK, Verbosity } = casper_wasm_sdk;
 const http = require('http');
 

@@ -5,7 +5,7 @@ import * as config from './config';
 
 const { Browser, Page } = puppeteer;
 
-const casper_wasm_sdk = require('casper-wasm-sdk');
+const casper_wasm_sdk = require('casper-rust-wasm-sdk');
 const { SDK, privateToPublicKey, PublicKey } = casper_wasm_sdk;
 
 export const variables = {

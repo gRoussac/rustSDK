@@ -9,6 +9,6 @@
     "types": ["jest", "node", "puppeteer"]
   },
   "paths": {
-    "casper-wasm-sdk": ["../../casper-wasm-sdk/pkg"]
+    "casper-rust-wasm-sdk": ["../../../pkg"]
   }
 }
