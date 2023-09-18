@@ -29,7 +29,7 @@ import init, {
 } from 'casper-wasm-sdk';
 
 const host = 'http://localhost:3000';
-const block_identifier_height_default = BigInt(1958541);
+const block_identifier_height_default = BigInt(1);
 const pubKey_default =
   '0115c9b40c06ff99b0cbadf1140b061b5dbf92103e66a6330fbcc7768f5219c1ce';
 const secret_key = `-----BEGIN PRIVATE KEY-----
@@ -108,8 +108,7 @@ function App() {
       const chain_get_block = await sdk.chain_get_block(chain_get_block_options);
       setBlock(chain_get_block?.block.hash);
       console.log('js chain_get_block', chain_get_block);
-
-      const account_identifier = new AccountIdentifier.fromPublicKey(pubKey);
+      const account_identifier = new AccountIdentifier(pubKey);
       let state_get_account_info_options = sdk.get_account_options({
         node_address: host,
         verbosity: Verbosity.High,
@@ -406,12 +405,12 @@ function App() {
       return;
     }
     if (wasm) {
+      session_params.session_bytes = Bytes.fromUint8Array(wasm);
       let test_install = await sdkInstance.install(
         host,
         deploy_params,
         session_params,
-        '500000000',
-        wasm
+        '500000000'
       );
       console.log(test_install);
     } else {
