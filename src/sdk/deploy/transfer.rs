@@ -26,22 +26,22 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer_js_alias(
         &self,
-        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
             .transfer(
-                node_address,
                 amount,
                 target_account,
                 transfer_id,
                 deploy_params,
                 payment_params,
+                node_address,
                 verbosity,
             )
             .await;
@@ -60,12 +60,12 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer(
         &self,
-        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("transfer!");

@@ -27,20 +27,20 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_deploy")]
     pub async fn speculative_deploy_js_alias(
         &self,
-        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifier>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let result = self
             .speculative_deploy(
-                node_address,
                 deploy_params,
                 session_params,
                 payment_params,
                 maybe_block_identifier,
+                node_address,
                 verbosity,
             )
             .await;
@@ -58,11 +58,11 @@ impl SDK {
 impl SDK {
     pub async fn speculative_deploy(
         &self,
-        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifier>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_deploy!");
