@@ -56,7 +56,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_chainspec")]
     pub async fn get_chainspec_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<GetChainspecResult, JsError> {
         let result = self.get_chainspec(node_address, verbosity).await;
@@ -74,13 +74,13 @@ impl SDK {
 impl SDK {
     pub async fn get_chainspec(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetChainspecResult>, Error> {
         //log("get_chainspec!");
         get_chainspec(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &self.get_node_address(node_address),
             get_verbosity_or_default(verbosity).into(),
         )
         .await

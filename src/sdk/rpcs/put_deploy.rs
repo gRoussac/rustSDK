@@ -16,12 +16,12 @@ impl SDK {
     #[wasm_bindgen(js_name = "put_deploy")]
     pub async fn put_deploy_js_alias(
         &self,
-        node_address: &str,
         deploy: Deploy,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
-            .put_deploy(node_address, deploy.into(), verbosity)
+            .put_deploy(deploy.into(), node_address, verbosity)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -36,11 +36,11 @@ impl SDK {
     #[wasm_bindgen(js_name = "account_put_deploy")]
     pub async fn account_put_deploy_js_alias(
         &self,
-        node_address: &str,
         deploy: Deploy,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<PutDeployResult, JsError> {
-        self.put_deploy_js_alias(node_address, deploy, verbosity)
+        self.put_deploy_js_alias(deploy, node_address, verbosity)
             .await
     }
 }
@@ -48,14 +48,14 @@ impl SDK {
 impl SDK {
     pub async fn put_deploy(
         &self,
-        node_address: &str,
         deploy: Deploy,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_PutDeployResult>, Error> {
         //log("account_put_deploy!");
         put_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &self.get_node_address(node_address),
             get_verbosity_or_default(verbosity).into(),
             deploy.into(),
         )

@@ -18,7 +18,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "call_entrypoint")]
     pub async fn call_entrypoint_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
@@ -43,7 +43,7 @@ impl SDK {
 impl SDK {
     pub async fn call_entrypoint(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
@@ -70,7 +70,7 @@ impl SDK {
         //     deploy = deploy.sign(&secret_key);
         // }
 
-        self.put_deploy(node_address, deploy.unwrap().into(), None)
+        self.put_deploy(deploy.unwrap().into(), node_address, None)
             .await
             .map_err(SdkError::from)
     }

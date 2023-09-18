@@ -65,7 +65,6 @@ impl QueryGlobalStateResult {
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
 pub struct QueryGlobalStateOptions {
-    pub node_address: String,
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -74,6 +73,7 @@ pub struct QueryGlobalStateOptions {
     pub key: Option<Key>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -132,12 +132,12 @@ pub enum PathIdentifierInput {
 
 #[derive(Debug)]
 pub struct QueryGlobalStateParams {
-    pub node_address: String,
     pub key: KeyIdentifierInput,
     pub path: Option<PathIdentifierInput>,
     pub maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash: Option<String>,
     pub maybe_block_id: Option<String>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -147,8 +147,6 @@ impl SDK {
         options: QueryGlobalStateOptions,
     ) -> Result<QueryGlobalStateParams, SdkError> {
         let QueryGlobalStateOptions {
-            node_address,
-            verbosity,
             global_state_identifier,
             state_root_hash_as_string,
             state_root_hash,
@@ -157,6 +155,8 @@ impl SDK {
             key,
             path_as_string,
             path,
+            node_address,
+            verbosity,
         } = options;
 
         let key = if let Some(key) = key {
@@ -187,7 +187,6 @@ impl SDK {
         let query_params = if let Some(hash) = state_root_hash {
             let state_root_hash_str = hash.to_string();
             QueryGlobalStateParams {
-                node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
                 maybe_global_state_identifier: global_state_identifier.clone(),
@@ -197,12 +196,12 @@ impl SDK {
                     Some(state_root_hash_str)
                 },
                 maybe_block_id: None,
+                node_address,
                 verbosity,
             }
         } else if let Some(hash) = state_root_hash_as_string {
             let state_root_hash_str = hash.to_string();
             QueryGlobalStateParams {
-                node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
                 maybe_global_state_identifier: global_state_identifier.clone(),
@@ -212,26 +211,27 @@ impl SDK {
                     Some(state_root_hash_str)
                 },
                 maybe_block_id: None,
+                node_address,
                 verbosity,
             }
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
             QueryGlobalStateParams {
-                node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
                 maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: None,
                 maybe_block_id: Some(maybe_block_id_as_string),
+                node_address,
                 verbosity,
             }
         } else {
             QueryGlobalStateParams {
-                node_address: node_address.to_owned(),
                 key: key.unwrap(),
                 path: maybe_path.clone(),
                 maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: None,
                 maybe_block_id: None,
+                node_address,
                 verbosity,
             }
         };
@@ -245,12 +245,12 @@ impl SDK {
         //log("query_global_state!");
 
         let QueryGlobalStateParams {
-            node_address,
             key,
             path,
             maybe_global_state_identifier,
             state_root_hash,
             maybe_block_id,
+            node_address,
             verbosity,
         } = query_params;
 
@@ -288,7 +288,7 @@ impl SDK {
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_global_state_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 maybe_global_state_identifier.into(),
                 key.unwrap().into(),
@@ -304,7 +304,7 @@ impl SDK {
             log(&state_root_hash);
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 "",
                 &state_root_hash,
@@ -316,7 +316,7 @@ impl SDK {
         } else if let Some(maybe_block_id) = maybe_block_id {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 &maybe_block_id,
                 "",
@@ -327,7 +327,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else {
             let state_root_hash: Digest = self
-                .get_state_root_hash(&node_address, None, None)
+                .get_state_root_hash(None, None, None)
                 .await
                 .unwrap()
                 .result
@@ -336,7 +336,7 @@ impl SDK {
                 .into();
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 "",
                 &state_root_hash.to_string(),

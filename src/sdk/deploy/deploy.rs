@@ -66,18 +66,18 @@ impl SDK {
     #[wasm_bindgen(js_name = "deploy")]
     pub async fn deploy_js_alias(
         &self,
-        node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
             .deploy(
-                node_address,
                 deploy_params,
                 session_params,
                 payment_params,
+                node_address,
                 verbosity,
             )
             .await;
@@ -95,10 +95,10 @@ impl SDK {
 impl SDK {
     pub async fn deploy(
         &self,
-        node_address: &str,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("deploy!");
@@ -116,7 +116,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(node_address, deploy.unwrap().into(), verbosity)
+        self.put_deploy(deploy.unwrap().into(), node_address, verbosity)
             .await
             .map_err(SdkError::from)
     }

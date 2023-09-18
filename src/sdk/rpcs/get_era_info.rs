@@ -61,9 +61,9 @@ impl GetEraInfoResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getEraInfoOptions", getter_with_clone)]
 pub struct GetEraInfoOptions {
-    pub node_address: String,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -85,9 +85,9 @@ impl SDK {
         options: GetEraInfoOptions,
     ) -> Result<GetEraInfoResult, JsError> {
         let GetEraInfoOptions {
-            node_address,
             maybe_block_id_as_string,
             maybe_block_identifier,
+            node_address,
             verbosity,
         } = options;
 
@@ -99,7 +99,7 @@ impl SDK {
             maybe_block_id_as_string.map(BlockIdentifierInput::String)
         };
         let result = self
-            .get_era_info(&node_address, maybe_block_identifier, verbosity)
+            .get_era_info(maybe_block_identifier, node_address, verbosity)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -117,8 +117,8 @@ impl SDK {
     #[allow(deprecated)]
     pub async fn get_era_info(
         &self,
-        node_address: &str,
         maybe_block_identifier: Option<BlockIdentifierInput>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetEraInfoResult>, SdkError> {
         //log("get_era_info!");
@@ -126,7 +126,7 @@ impl SDK {
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_era_info_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 &maybe_block_id,
             )
@@ -143,7 +143,7 @@ impl SDK {
                 };
             get_era_info_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
             )

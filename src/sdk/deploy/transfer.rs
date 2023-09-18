@@ -26,7 +26,7 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer_js_alias(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
@@ -60,7 +60,7 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer(
         &self,
-        node_address: &str,
+        node_address: Option<String>,
         amount: &str,
         target_account: &str,
         transfer_id: Option<String>,
@@ -90,7 +90,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(node_address, deploy.unwrap().into(), verbosity)
+        self.put_deploy(deploy.unwrap().into(), node_address, verbosity)
             .await
             .map_err(SdkError::from)
     }

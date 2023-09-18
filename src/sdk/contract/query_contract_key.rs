@@ -22,7 +22,6 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "queryContractKeyOptions", getter_with_clone)]
 pub struct QueryContractKeyOptions {
-    pub node_address: String,
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
@@ -33,6 +32,7 @@ pub struct QueryContractKeyOptions {
     pub contract_key: Option<Key>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 

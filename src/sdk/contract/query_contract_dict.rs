@@ -26,13 +26,13 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "queryContractDictOptions", getter_with_clone)]
 pub struct QueryContractDictOptions {
-    pub node_address: String,
     // Not supported by get_dictionary_item
     // pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub dictionary_item_params: Option<DictionaryItemStrParams>,
     pub dictionary_item_identifier: Option<DictionaryItemIdentifier>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -73,13 +73,13 @@ impl SDK {
 impl SDK {
     pub async fn query_contract_dict(
         &self,
-        node_address: &str,
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("query_contract_dict!");
-        self.get_dictionary_item(node_address, state_root_hash, dictionary_item, verbosity)
+        self.get_dictionary_item(state_root_hash, dictionary_item, node_address, verbosity)
             .await
             .map_err(SdkError::from)
     }

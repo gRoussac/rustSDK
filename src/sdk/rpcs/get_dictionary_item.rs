@@ -78,11 +78,11 @@ impl GetDictionaryItemResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getDictionaryItemOptions", getter_with_clone)]
 pub struct GetDictionaryItemOptions {
-    pub node_address: String,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub dictionary_item_params: Option<DictionaryItemStrParams>,
     pub dictionary_item_identifier: Option<DictionaryItemIdentifier>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -107,11 +107,11 @@ impl SDK {
         options: GetDictionaryItemOptions,
     ) -> Result<GetDictionaryItemResult, JsError> {
         let GetDictionaryItemOptions {
-            node_address,
             state_root_hash_as_string,
             state_root_hash,
             dictionary_item_params,
             dictionary_item_identifier,
+            node_address,
             verbosity,
         } = options;
 
@@ -126,10 +126,10 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_dictionary_item(&node_address, hash, dictionary_item, verbosity)
+            self.get_dictionary_item(hash, dictionary_item, node_address, verbosity)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            self.get_dictionary_item(&node_address, hash.as_str(), dictionary_item, verbosity)
+            self.get_dictionary_item(hash.as_str(), dictionary_item, node_address, verbosity)
                 .await
         } else {
             let err = "Error: Missing state_root_hash";
@@ -163,9 +163,9 @@ pub enum DictionaryItemInput {
 impl SDK {
     pub async fn get_dictionary_item(
         &self,
-        node_address: &str,
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("state_get_dictionary_item!");
@@ -175,7 +175,7 @@ impl SDK {
                     state_root_hash.to_digest().to_string()
                 } else {
                     let state_root_hash: Digest = self
-                        .get_state_root_hash(node_address, None, None)
+                        .get_state_root_hash(None, None, None)
                         .await
                         .unwrap()
                         .result
@@ -186,7 +186,7 @@ impl SDK {
                 };
                 get_dictionary_item_cli(
                     &rand::thread_rng().gen::<i64>().to_string(),
-                    node_address,
+                    &self.get_node_address(node_address),
                     get_verbosity_or_default(verbosity).into(),
                     &state_root_hash_as_string,
                     dictionary_item_str_params_to_casper_client(&dictionary_item_params),
@@ -196,7 +196,7 @@ impl SDK {
             }
             DictionaryItemInput::Identifier(dictionary_item_identifier) => {
                 let state_root_hash = if state_root_hash.is_empty() {
-                    self.get_state_root_hash(node_address, None, None)
+                    self.get_state_root_hash(None, None, None)
                         .await
                         .unwrap()
                         .result
@@ -209,7 +209,7 @@ impl SDK {
 
                 get_dictionary_item_lib(
                     JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                    node_address,
+                    &self.get_node_address(node_address),
                     get_verbosity_or_default(verbosity).into(),
                     state_root_hash.into(),
                     dictionary_item_identifier.into(),

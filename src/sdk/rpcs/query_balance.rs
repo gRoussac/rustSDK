@@ -63,14 +63,14 @@ impl QueryBalanceResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "queryBalanceOptions", getter_with_clone)]
 pub struct QueryBalanceOptions {
-    pub node_address: String,
     pub purse_identifier_as_string: Option<String>,
     pub purse_identifier: Option<PurseIdentifier>,
-    pub verbosity: Option<Verbosity>,
     pub global_state_identifier: Option<GlobalStateIdentifier>,
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub maybe_block_id_as_string: Option<String>,
+    pub node_address: Option<String>,
+    pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -94,57 +94,57 @@ impl SDK {
         options: QueryBalanceOptions,
     ) -> Result<QueryBalanceResult, JsError> {
         let QueryBalanceOptions {
-            node_address,
-            verbosity,
             global_state_identifier,
             purse_identifier_as_string,
             purse_identifier,
             state_root_hash_as_string,
             state_root_hash,
             maybe_block_id_as_string,
+            node_address,
+            verbosity,
         } = options;
 
         let result = if let Some(hash) = state_root_hash {
             self.query_balance(
-                &node_address,
                 global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 Some(hash.to_string()),
                 None,
+                node_address,
                 verbosity,
             )
             .await
         } else if let Some(hash) = state_root_hash_as_string {
             self.query_balance(
-                &node_address,
                 global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 Some(hash.to_string()),
                 None,
+                node_address,
                 verbosity,
             )
             .await
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
             self.query_balance(
-                &node_address,
                 global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 None,
                 Some(maybe_block_id_as_string),
+                node_address,
                 verbosity,
             )
             .await
         } else {
             self.query_balance(
-                &node_address,
                 global_state_identifier,
                 purse_identifier_as_string,
                 purse_identifier.into(),
                 None,
                 None,
+                node_address,
                 verbosity,
             )
             .await
@@ -164,12 +164,12 @@ impl SDK {
     #[allow(clippy::too_many_arguments)]
     pub async fn query_balance(
         &self,
-        node_address: &str,
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
         purse_identifier_as_string: Option<String>,
         purse_identifier: Option<PurseIdentifier>,
         state_root_hash: Option<String>,
         maybe_block_id: Option<String>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_QueryBalanceResult>, SdkError> {
         //log("query_balance!");
@@ -193,7 +193,7 @@ impl SDK {
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 Some(maybe_global_state_identifier.into()),
                 purse_identifier.into(),
@@ -203,7 +203,7 @@ impl SDK {
         } else if maybe_global_state_identifier.is_none() {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 None,
                 purse_identifier.into(),
@@ -213,7 +213,7 @@ impl SDK {
         } else if let Some(state_root_hash) = state_root_hash {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 "",
                 &state_root_hash,
@@ -224,7 +224,7 @@ impl SDK {
         } else {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                node_address,
+                &self.get_node_address(node_address),
                 get_verbosity_or_default(verbosity).into(),
                 &maybe_block_id.unwrap_or_default(),
                 "",

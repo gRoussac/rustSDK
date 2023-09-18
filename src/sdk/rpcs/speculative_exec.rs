@@ -68,11 +68,11 @@ impl SpeculativeExecResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getSpeculativeExecOptions", getter_with_clone)]
 pub struct GetSpeculativeExecOptions {
-    pub node_address: String,
     pub deploy_as_string: Option<String>,
     pub deploy: Option<Deploy>,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -97,11 +97,11 @@ impl SDK {
         options: GetSpeculativeExecOptions,
     ) -> Result<SpeculativeExecResult, JsError> {
         let GetSpeculativeExecOptions {
-            node_address,
             deploy_as_string,
             deploy,
             maybe_block_id_as_string,
             maybe_block_identifier,
+            node_address,
             verbosity,
         } = options;
 
@@ -125,9 +125,9 @@ impl SDK {
 
         let result = self
             .speculative_exec(
-                &node_address,
                 deploy.into(),
                 maybe_block_identifier,
+                node_address,
                 verbosity,
             )
             .await;
@@ -145,9 +145,9 @@ impl SDK {
 impl SDK {
     pub async fn speculative_exec(
         &self,
-        node_address: &str,
         deploy: Deploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
+        node_address: Option<String>,
         verbosity: Option<Verbosity>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         //log("speculative_exec!");
@@ -162,7 +162,7 @@ impl SDK {
             };
         speculative_exec_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            node_address,
+            &self.get_node_address(node_address),
             maybe_block_identifier.map(Into::into),
             get_verbosity_or_default(verbosity).into(),
             deploy.into(),
