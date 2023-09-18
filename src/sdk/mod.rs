@@ -12,18 +12,20 @@ pub use contract::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub struct SDK {}
+pub struct SDK {
+    node_address: Option<String>,
+}
 
 impl Default for SDK {
     fn default() -> Self {
-        Self::new()
+        Self::new(None)
     }
 }
 
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
-        SDK {}
+    pub fn new(node_address: Option<String>) -> Self {
+        SDK { node_address }
     }
 }
