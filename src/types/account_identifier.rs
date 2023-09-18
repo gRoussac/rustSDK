@@ -1,5 +1,6 @@
 use super::{account_hash::AccountHash, public_key::PublicKey};
 use casper_client::rpcs::AccountIdentifier as _AccountIdentifier;
+use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -10,6 +11,21 @@ pub struct AccountIdentifier(_AccountIdentifier);
 #[wasm_bindgen]
 impl AccountIdentifier {
     #[wasm_bindgen(constructor)]
+    pub fn new(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
+        Self::from_formatted_str(formatted_str)
+    }
+
+    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    pub fn from_formatted_str(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
+        if formatted_str.contains("account-hash") {
+            let account_hash = AccountHash::from_formatted_str(formatted_str)?;
+            Ok(Self::from_account_under_account_hash(account_hash))
+        } else {
+            let public_key = PublicKey::new(formatted_str)?;
+            Ok(Self::from_account_account_under_public_key(public_key))
+        }
+    }
+
     #[wasm_bindgen(js_name = "fromPublicKey")]
     pub fn from_account_account_under_public_key(key: PublicKey) -> Self {
         AccountIdentifier(_AccountIdentifier::PublicKey(key.into()))
@@ -18,6 +34,11 @@ impl AccountIdentifier {
     #[wasm_bindgen(js_name = "fromAccountHash")]
     pub fn from_account_under_account_hash(account_hash: AccountHash) -> Self {
         AccountIdentifier(_AccountIdentifier::AccountHash(account_hash.into()))
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> JsValue {
+        JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 }
 

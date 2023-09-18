@@ -1,11 +1,11 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function (app) {
-  console.log('hello');
   app.use(
     '/rpc',
     createProxyMiddleware({
-      target: 'https://rpc.integration.casperlabs.io',
+      // target: 'https://rpc.integration.casperlabs.io',
+      target: 'http://127.0.0.1:11101',
       changeOrigin: true,
     })
   );
