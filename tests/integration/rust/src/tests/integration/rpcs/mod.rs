@@ -24,9 +24,7 @@ pub mod test_module {
 
     pub async fn test_get_peers() {
         let config: TestConfig = get_config().await;
-        let peers = create_test_sdk()
-            .get_peers(&config.node_address, config.verbosity)
-            .await;
+        let peers = create_test_sdk(Some(config)).get_peers(None, None).await;
         let peers = peers.unwrap();
         assert!(!peers.result.api_version.to_string().is_empty());
         assert!(!peers.result.peers.is_empty());
@@ -37,13 +35,13 @@ pub mod test_module {
         let public_key = PublicKey::new(&config.account).unwrap();
         let account_identifier =
             AccountIdentifier::from_account_account_under_public_key(public_key);
-        let get_account = create_test_sdk()
+        let get_account = create_test_sdk(Some(config))
             .get_account(
-                &config.node_address,
                 Some(account_identifier),
                 None,
                 maybe_block_identifier,
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         let get_account = get_account.unwrap();
@@ -62,13 +60,13 @@ pub mod test_module {
         let config: TestConfig = get_config().await;
         let account_hash = AccountHash::from_formatted_str(&config.account_hash).unwrap();
         let account_identifier = AccountIdentifier::from_account_under_account_hash(account_hash);
-        let get_account = create_test_sdk()
+        let get_account = create_test_sdk(Some(config))
             .get_account(
-                &config.node_address,
                 Some(account_identifier),
                 None,
                 maybe_block_identifier,
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         let get_account = get_account.unwrap();
@@ -83,12 +81,8 @@ pub mod test_module {
 
     pub async fn test_get_auction_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
-        let get_auction_info = create_test_sdk()
-            .get_auction_info(
-                &config.node_address,
-                maybe_block_identifier,
-                config.verbosity,
-            )
+        let get_auction_info = create_test_sdk(Some(config))
+            .get_auction_info(maybe_block_identifier, None, None)
             .await;
         let get_auction_info = get_auction_info.unwrap();
         assert!(!get_auction_info.result.api_version.to_string().is_empty());
@@ -102,8 +96,8 @@ pub mod test_module {
 
     pub async fn test_get_balance() {
         let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&config.node_address, None, None)
+        let get_state_root_hash = create_test_sdk(Some(config.clone()))
+            .get_state_root_hash(None, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let state_root_hash: Digest = get_state_root_hash
@@ -112,15 +106,10 @@ pub mod test_module {
             .state_root_hash
             .unwrap()
             .into();
-        let purse_uref = GetBalanceInput::PurseUrefAsString(config.purse_uref);
+        let purse_uref = GetBalanceInput::PurseUrefAsString(config.to_owned().purse_uref);
         thread::sleep(WAIT_TIME);
-        let get_balance = create_test_sdk()
-            .get_balance(
-                &config.node_address,
-                state_root_hash,
-                purse_uref,
-                config.verbosity,
-            )
+        let get_balance = create_test_sdk(Some(config))
+            .get_balance(state_root_hash, purse_uref, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let get_balance = get_balance.unwrap();
@@ -130,12 +119,8 @@ pub mod test_module {
 
     pub async fn test_get_block_transfers(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
-        let get_block_transfers = create_test_sdk()
-            .get_block_transfers(
-                &config.node_address,
-                maybe_block_identifier,
-                config.verbosity,
-            )
+        let get_block_transfers = create_test_sdk(Some(config))
+            .get_block_transfers(maybe_block_identifier, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let get_block_transfers = get_block_transfers.unwrap();
@@ -156,12 +141,8 @@ pub mod test_module {
 
     pub async fn test_get_block(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
-        let get_block = create_test_sdk()
-            .get_block(
-                &config.node_address,
-                maybe_block_identifier,
-                config.verbosity,
-            )
+        let get_block = create_test_sdk(Some(config))
+            .get_block(maybe_block_identifier, None, None)
             .await;
         let get_block = get_block.unwrap();
         assert!(!get_block.result.api_version.to_string().is_empty());
@@ -176,8 +157,8 @@ pub mod test_module {
 
     pub async fn test_get_chainspec() {
         let config: TestConfig = get_config().await;
-        let get_chainspec = create_test_sdk()
-            .get_chainspec(&config.node_address, config.verbosity)
+        let get_chainspec = create_test_sdk(Some(config))
+            .get_chainspec(None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let get_chainspec = get_chainspec.unwrap();
@@ -188,12 +169,12 @@ pub mod test_module {
 
     pub async fn test_get_deploy() {
         let config: TestConfig = get_config().await;
-        let get_deploy = create_test_sdk()
+        let get_deploy = create_test_sdk(Some(config.clone()))
             .get_deploy(
-                &config.node_address,
                 DeployHash::new(&config.deploy_hash).unwrap(),
                 Some(true),
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         let get_deploy = get_deploy.unwrap();
@@ -203,8 +184,8 @@ pub mod test_module {
 
     pub async fn test_get_dictionary_item() {
         let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&config.node_address, None, None)
+        let get_state_root_hash = create_test_sdk(Some(config.clone()))
+            .get_state_root_hash(None, None, None)
             .await;
         let state_root_hash: Digest = get_state_root_hash
             .unwrap()
@@ -221,13 +202,8 @@ pub mod test_module {
             DICTIONARY_ITEM_KEY,
         );
         let dictionary_item = DictionaryItemInput::Params(params);
-        let get_dictionary_item = create_test_sdk()
-            .get_dictionary_item(
-                &config.node_address,
-                state_root_hash,
-                dictionary_item,
-                config.verbosity,
-            )
+        let get_dictionary_item = create_test_sdk(Some(config))
+            .get_dictionary_item(state_root_hash, dictionary_item, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let get_dictionary_item = get_dictionary_item.unwrap();
@@ -255,8 +231,8 @@ pub mod test_module {
             DICTIONARY_ITEM_KEY,
         );
         let dictionary_item = DictionaryItemInput::Params(params);
-        let get_dictionary_item = create_test_sdk()
-            .get_dictionary_item(&config.node_address, "", dictionary_item, config.verbosity)
+        let get_dictionary_item = create_test_sdk(Some(config))
+            .get_dictionary_item("", dictionary_item, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let get_dictionary_item = get_dictionary_item.unwrap();
@@ -278,12 +254,8 @@ pub mod test_module {
     #[allow(deprecated)]
     pub async fn test_get_era_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
-        let get_era_info = create_test_sdk()
-            .get_era_info(
-                &config.node_address,
-                maybe_block_identifier,
-                config.verbosity,
-            )
+        let get_era_info = create_test_sdk(Some(config))
+            .get_era_info(maybe_block_identifier, None, None)
             .await;
         let get_era_info = get_era_info.unwrap();
         assert!(!get_era_info.result.api_version.to_string().is_empty());
@@ -291,12 +263,8 @@ pub mod test_module {
 
     pub async fn test_get_era_summary(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config().await;
-        let get_era_summary = create_test_sdk()
-            .get_era_summary(
-                &config.node_address,
-                maybe_block_identifier,
-                config.verbosity,
-            )
+        let get_era_summary = create_test_sdk(Some(config))
+            .get_era_summary(maybe_block_identifier, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let get_era_summary = get_era_summary.unwrap();
@@ -312,8 +280,8 @@ pub mod test_module {
 
     pub async fn test_get_node_status() {
         let config: TestConfig = get_config().await;
-        let get_node_status = create_test_sdk()
-            .get_node_status(&config.node_address, config.verbosity)
+        let get_node_status = create_test_sdk(Some(config))
+            .get_node_status(None, None)
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());
@@ -322,8 +290,8 @@ pub mod test_module {
 
     pub async fn test_get_state_root_hash() {
         let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&config.node_address, None, None)
+        let get_state_root_hash = create_test_sdk(Some(config))
+            .get_state_root_hash(None, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let state_root_hash: Digest = get_state_root_hash
@@ -337,8 +305,8 @@ pub mod test_module {
 
     pub async fn test_get_validator_changes() {
         let config: TestConfig = get_config().await;
-        let validator_changes = create_test_sdk()
-            .get_validator_changes(&config.node_address, config.verbosity)
+        let validator_changes = create_test_sdk(Some(config))
+            .get_validator_changes(None, None)
             .await;
         let validator_changes = validator_changes.unwrap();
         assert!(!validator_changes.result.api_version.to_string().is_empty());
@@ -347,9 +315,7 @@ pub mod test_module {
 
     pub async fn test_list_rpcs() {
         let config: TestConfig = get_config().await;
-        let list_rpcs = create_test_sdk()
-            .list_rpcs(&config.node_address, config.verbosity)
-            .await;
+        let list_rpcs = create_test_sdk(Some(config)).list_rpcs(None, None).await;
         let list_rpcs = list_rpcs.unwrap();
         assert!(!list_rpcs.result.api_version.to_string().is_empty());
         assert!(!list_rpcs.result.name.is_empty());
@@ -357,15 +323,15 @@ pub mod test_module {
 
     pub async fn test_query_balance(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
         let config: TestConfig = get_config().await;
-        let query_balance = create_test_sdk()
+        let query_balance = create_test_sdk(Some(config.clone()))
             .query_balance(
-                &config.node_address,
                 maybe_global_state_identifier,
                 Some(config.purse_uref),
                 None,
                 None,
                 None,
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         let query_balance = query_balance.unwrap();
@@ -380,15 +346,17 @@ pub mod test_module {
         let path = format!("{CONTRACT_CEP78_KEY}/collection_name");
         thread::sleep(WAIT_TIME);
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            node_address: config.node_address.clone(),
-            key: KeyIdentifierInput::String(config.account_hash),
+            key: KeyIdentifierInput::String(config.to_owned().account_hash),
             path: Some(PathIdentifierInput::String(path)),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            verbosity: config.verbosity,
+            node_address: None,
+            verbosity: None,
         };
-        let query_global_state = create_test_sdk().query_global_state(query_params).await;
+        let query_global_state = create_test_sdk(Some(config.clone()))
+            .query_global_state(query_params)
+            .await;
         thread::sleep(WAIT_TIME);
         let query_global_state = query_global_state.unwrap();
         assert!(!query_global_state.result.api_version.to_string().is_empty());
@@ -414,15 +382,17 @@ pub mod test_module {
         let config: TestConfig = get_config().await;
         thread::sleep(WAIT_TIME);
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            node_address: config.node_address.clone(),
-            key: KeyIdentifierInput::String(config.account_hash),
+            key: KeyIdentifierInput::String(config.to_owned().account_hash),
             path: Some(PathIdentifierInput::String(TEST_HELLO_KEY.to_string())),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            verbosity: config.verbosity,
+            node_address: config.node_address.to_owned(),
+            verbosity: config.verbosity.to_owned(),
         };
-        let query_global_state = create_test_sdk().query_global_state(query_params).await;
+        let query_global_state = create_test_sdk(Some(config.clone()))
+            .query_global_state(query_params)
+            .await;
         thread::sleep(WAIT_TIME);
         let query_global_state = query_global_state.unwrap();
         assert!(!query_global_state.result.api_version.to_string().is_empty());

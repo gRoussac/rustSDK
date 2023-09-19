@@ -24,7 +24,7 @@ pub mod test_module {
         session_params.set_session_entry_point(ENTRYPOINT_DECIMALS);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let make_deploy = create_test_sdk()
+        let make_deploy = create_test_sdk(Some(config))
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
         assert!(!make_deploy.hash().to_string().is_empty());
@@ -45,7 +45,7 @@ pub mod test_module {
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
-        let make_transfer = create_test_sdk()
+        let make_transfer = create_test_sdk(Some(config.clone()))
             .make_transfer(
                 TRANSFER_AMOUNT,
                 &config.target_account,
@@ -72,10 +72,11 @@ pub mod test_module {
         session_params.set_session_entry_point(ENTRYPOINT_DECIMALS);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let make_deploy = create_test_sdk()
+        let make_deploy = create_test_sdk(Some(config.clone()))
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
-        let signed_deploy = create_test_sdk().sign_deploy(make_deploy, &config.private_key);
+        let signed_deploy = create_test_sdk(Some(config.clone()))
+            .sign_deploy(make_deploy, &config.to_owned().private_key);
         assert!(signed_deploy.is_valid());
     }
 }

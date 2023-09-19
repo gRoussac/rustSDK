@@ -105,8 +105,8 @@ pub mod test_module {
 
     pub async fn test_get_json_pretty_print() {
         let config: TestConfig = get_config().await;
-        let get_node_status = create_test_sdk()
-            .get_node_status(&config.node_address, config.verbosity)
+        let get_node_status = create_test_sdk(Some(config))
+            .get_node_status(None, None)
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());

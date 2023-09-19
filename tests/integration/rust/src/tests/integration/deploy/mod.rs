@@ -24,14 +24,8 @@ pub mod test_module {
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let deploy = create_test_sdk()
-            .deploy(
-                &config.node_address,
-                deploy_params,
-                session_params,
-                payment_params,
-                config.verbosity,
-            )
+        let deploy = create_test_sdk(Some(config))
+            .deploy(deploy_params, session_params, payment_params, None, None)
             .await;
         assert!(!deploy
             .as_ref()
@@ -61,15 +55,15 @@ pub mod test_module {
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
-        let transfer = create_test_sdk()
+        let transfer = create_test_sdk(Some(config.clone()))
             .transfer(
-                &config.node_address,
                 TRANSFER_AMOUNT,
                 &config.target_account,
                 None,
                 deploy_params,
                 payment_params,
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         assert!(!transfer
@@ -102,14 +96,14 @@ pub mod test_module {
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let deploy = create_test_sdk()
+        let deploy = create_test_sdk(Some(config))
             .speculative_deploy(
-                &config.node_address,
                 deploy_params,
                 session_params,
                 payment_params,
                 None,
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         assert!(!deploy
@@ -140,16 +134,16 @@ pub mod test_module {
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
-        let transfer = create_test_sdk()
+        let transfer = create_test_sdk(Some(config.clone()))
             .speculative_transfer(
-                &config.node_address,
                 TRANSFER_AMOUNT,
                 &config.target_account,
                 None,
                 deploy_params,
                 payment_params,
                 None,
-                config.verbosity,
+                None,
+                None,
             )
             .await;
         assert!(!transfer

@@ -1,6 +1,6 @@
 use crate::config::{
-    ARGS_JSON, CEP78_CONTRACT, CHAIN_NAME, CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS, DEPLOY_TIME,
-    ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT, PAYMENT_AMOUNT_CONTRACT_CEP78,
+    TestConfig, ARGS_JSON, CEP78_CONTRACT, CHAIN_NAME, CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS,
+    DEPLOY_TIME, ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT, PAYMENT_AMOUNT_CONTRACT_CEP78,
     PRIVATE_KEY_NAME,
 };
 use casper_rust_wasm_sdk::{
@@ -27,8 +27,11 @@ use std::process;
 use std::{fs::File, thread};
 use tokio::sync::Mutex;
 
-pub fn create_test_sdk() -> SDK {
-    SDK::new()
+pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
+    match config {
+        Some(config) => SDK::new(config.node_address, config.verbosity),
+        None => SDK::new(None, None),
+    }
 }
 
 pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
@@ -60,8 +63,8 @@ pub fn read_pem_file(file_path: &str) -> Result<String, io::Error> {
 }
 
 pub async fn get_block() -> (String, String) {
-    let get_block = create_test_sdk()
-        .get_block(DEFAULT_NODE_ADDRESS, None, None)
+    let get_block = create_test_sdk(None)
+        .get_block(None, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
         .await;
     match get_block {
         Err(err) => {
@@ -78,13 +81,13 @@ pub async fn get_block() -> (String, String) {
 }
 
 pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
-    let purse_uref: URef = create_test_sdk()
+    let purse_uref: URef = create_test_sdk(None)
         .get_account(
-            DEFAULT_NODE_ADDRESS,
             None,
             Some(account_identifier_as_string.to_owned()),
             None,
             None,
+            Some(DEFAULT_NODE_ADDRESS.to_string()),
         )
         .await
         .unwrap()
@@ -97,15 +100,15 @@ pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
 
 pub async fn get_contract_cep78_hash_keys(account_hash: &str) -> (String, String) {
     let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-        node_address: DEFAULT_NODE_ADDRESS.to_string(),
         key: KeyIdentifierInput::String(account_hash.to_string()),
         path: None,
         maybe_global_state_identifier: None,
         state_root_hash: None,
         maybe_block_id: None,
+        node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
         verbosity: None,
     };
-    let query_global_state = create_test_sdk().query_global_state(query_params).await;
+    let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
     let query_global_state_result = query_global_state.unwrap();
     let account = query_global_state_result
         .result
@@ -156,12 +159,12 @@ pub async fn mint_nft(
     session_params.set_session_args(args);
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount(PAYMENT_AMOUNT);
-    let test_call_entrypoint = create_test_sdk()
+    let test_call_entrypoint = create_test_sdk(None)
         .call_entrypoint(
-            DEFAULT_NODE_ADDRESS,
             deploy_params,
             session_params,
             payment_params,
+            Some(DEFAULT_NODE_ADDRESS.to_string()),
         )
         .await;
     assert!(!test_call_entrypoint
@@ -188,12 +191,12 @@ pub async fn get_dictionnary_key(
     let mut params = DictionaryItemStrParams::new();
     params.set_contract_named_key(contract_hash, dictionary_name, dictionary_item_key);
     let dictionary_item = DictionaryItemInput::Params(params);
-    let get_dictionary_item = create_test_sdk()
+    let get_dictionary_item = create_test_sdk(None)
         .get_dictionary_item(
-            DEFAULT_NODE_ADDRESS,
             get_state_root_hash.unwrap_or_default(),
             dictionary_item,
             None,
+            Some(DEFAULT_NODE_ADDRESS.to_string()),
         )
         .await;
     let get_dictionary_item = get_dictionary_item.unwrap();
@@ -220,15 +223,15 @@ pub async fn get_dictionnary_key(
 pub async fn get_dictionnary_uref(_contract_hash: &str, _dictionary_name: &str) -> String {
     "uref-386f3d77417ac76f7c0b8d5ea8764cb42de8e529a091da8e96e5f3c88f17e530-007".to_string()
     // let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-    //     node_address: DEFAULT_NODE_ADDRESS.to_string(),
     //     key: KeyIdentifierInput::String(contract_hash.to_string()),
     //     path: None,
     //     maybe_global_state_identifier: None,
     //     state_root_hash: None,
     //     maybe_block_id: None,
+    //     node_address: None,
     //     verbosity: None,
     // };
-    // let query_global_state = create_test_sdk().query_global_state(query_params).await;
+    // let query_global_state = create_test_sdk(Some(config)).query_global_state(query_params).await;
     // let query_global_state_result = query_global_state.unwrap();
     // let account = query_global_state_result
     //     .result
@@ -277,13 +280,13 @@ pub async fn install_cep78(
         }
     };
     session_params.set_session_bytes(module_bytes.into());
-    let sdk = create_test_sdk();
+    let sdk = create_test_sdk(None);
     let install = sdk
         .install(
-            DEFAULT_NODE_ADDRESS,
             deploy_params,
             session_params,
             payment_params,
+            Some(DEFAULT_NODE_ADDRESS.to_string()),
         )
         .await;
     assert!(!install
@@ -302,7 +305,7 @@ pub async fn install_cep78(
 
     //dbg!(deploy_hash_as_string.clone());
     // let get_deploy = sdk
-    //     .get_deploy(DEFAULT_NODE_ADDRESS, deploy_hash, Some(true), None)
+    //     .get_deploy(deploy_hash, Some(true), None, Some(DEFAULT_NODE_ADDRESS.to_string()))
     //     .await;
     // let get_deploy = get_deploy.unwrap();
     // assert!(!get_deploy.result.api_version.to_string().is_empty());
