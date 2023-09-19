@@ -2,7 +2,6 @@ use crate::debug::{error, log};
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
-    helpers::get_verbosity_or_default,
     types::{key::Key, path::Path, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -95,7 +94,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "query_global_state")]
     pub async fn query_global_state_js_alias(
         &self,
-        options: QueryGlobalStateOptions,
+        options: Option<QueryGlobalStateOptions>,
     ) -> Result<QueryGlobalStateResult, JsError> {
         match self.query_global_state_js_alias_params(options) {
             Ok(params) => {
@@ -144,7 +143,7 @@ pub struct QueryGlobalStateParams {
 impl SDK {
     pub fn query_global_state_js_alias_params(
         &self,
-        options: QueryGlobalStateOptions,
+        options: Option<QueryGlobalStateOptions>,
     ) -> Result<QueryGlobalStateParams, SdkError> {
         let QueryGlobalStateOptions {
             global_state_identifier,
@@ -155,9 +154,9 @@ impl SDK {
             key,
             path_as_string,
             path,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
 
         let key = if let Some(key) = key {
             Some(KeyIdentifierInput::Key(key))
@@ -196,8 +195,8 @@ impl SDK {
                     Some(state_root_hash_str)
                 },
                 maybe_block_id: None,
-                node_address,
                 verbosity,
+                node_address,
             }
         } else if let Some(hash) = state_root_hash_as_string {
             let state_root_hash_str = hash.to_string();
@@ -211,8 +210,8 @@ impl SDK {
                     Some(state_root_hash_str)
                 },
                 maybe_block_id: None,
-                node_address,
                 verbosity,
+                node_address,
             }
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
             QueryGlobalStateParams {
@@ -221,8 +220,8 @@ impl SDK {
                 maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: None,
                 maybe_block_id: Some(maybe_block_id_as_string),
-                node_address,
                 verbosity,
+                node_address,
             }
         } else {
             QueryGlobalStateParams {
@@ -231,8 +230,8 @@ impl SDK {
                 maybe_global_state_identifier: global_state_identifier.clone(),
                 state_root_hash: None,
                 maybe_block_id: None,
-                node_address,
                 verbosity,
+                node_address,
             }
         };
         Ok(query_params)
@@ -250,8 +249,8 @@ impl SDK {
             maybe_global_state_identifier,
             state_root_hash,
             maybe_block_id,
-            node_address,
             verbosity,
+            node_address,
         } = query_params;
 
         let key = match key {
@@ -289,7 +288,7 @@ impl SDK {
             query_global_state_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 maybe_global_state_identifier.into(),
                 key.unwrap().into(),
                 match path {
@@ -305,7 +304,7 @@ impl SDK {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 "",
                 &state_root_hash,
                 &key.unwrap().to_formatted_string(),
@@ -317,7 +316,7 @@ impl SDK {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
                 "",
                 &key.unwrap().to_formatted_string(),
@@ -337,7 +336,7 @@ impl SDK {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 "",
                 &state_root_hash.to_string(),
                 &key.unwrap().to_formatted_string(),

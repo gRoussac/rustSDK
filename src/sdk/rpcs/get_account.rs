@@ -2,7 +2,6 @@
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     debug::error,
-    helpers::get_verbosity_or_default,
     types::{
         account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
         sdk_error::SdkError, verbosity::Verbosity,
@@ -94,16 +93,16 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_account")]
     pub async fn get_account_js_alias(
         &self,
-        options: GetAccountOptions,
+        options: Option<GetAccountOptions>,
     ) -> Result<GetAccountResult, JsError> {
         let GetAccountOptions {
             account_identifier,
             account_identifier_as_string,
             maybe_block_id_as_string,
             maybe_block_identifier,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,
@@ -117,8 +116,8 @@ impl SDK {
                 account_identifier,
                 account_identifier_as_string,
                 maybe_block_identifier,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await;
         match result {
@@ -134,7 +133,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "state_get_account_info")]
     pub async fn state_get_account_info_js_alias(
         &self,
-        options: GetAccountOptions,
+        options: Option<GetAccountOptions>,
     ) -> Result<GetAccountResult, JsError> {
         self.get_account_js_alias(options).await
     }
@@ -146,8 +145,8 @@ impl SDK {
         account_identifier: Option<AccountIdentifier>,
         account_identifier_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifierInput>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
         //log("get_account!");
 
@@ -170,7 +169,7 @@ impl SDK {
             get_account_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
                 &account_identifier.to_string(),
             )
@@ -188,7 +187,7 @@ impl SDK {
             get_account_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
                 account_identifier.into(),
             )

@@ -54,16 +54,17 @@ impl SDK {
     #[wasm_bindgen(js_name = "query_contract_key")]
     pub async fn query_contract_key_js_alias(
         &self,
-        options: QueryContractKeyOptions,
+        options: Option<QueryContractKeyOptions>,
     ) -> Result<QueryGlobalStateResult, JsError> {
-        let js_value_options = JsValue::from_serde::<QueryContractKeyOptions>(&options);
+        let js_value_options =
+            JsValue::from_serde::<QueryContractKeyOptions>(&options.unwrap_or_default());
         if let Err(err) = js_value_options {
             let err = &format!("Error serializing options:  {:?}", err);
             error(err);
             return Err(JsError::new(err));
         }
         let options = self.query_global_state_options(js_value_options.unwrap());
-        self.query_global_state_js_alias(options).await
+        self.query_global_state_js_alias(Some(options)).await
     }
 }
 

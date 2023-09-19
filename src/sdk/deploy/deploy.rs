@@ -69,16 +69,16 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
             .deploy(
                 deploy_params,
                 session_params,
                 payment_params,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await;
         match result {
@@ -98,8 +98,8 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("deploy!");
         let deploy = make_deploy(
@@ -116,7 +116,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(deploy.unwrap().into(), node_address, verbosity)
+        self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
             .await
             .map_err(SdkError::from)
     }

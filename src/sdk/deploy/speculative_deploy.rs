@@ -31,8 +31,8 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifier>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let result = self
             .speculative_deploy(
@@ -40,8 +40,8 @@ impl SDK {
                 session_params,
                 payment_params,
                 maybe_block_identifier,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await;
         match result {
@@ -62,8 +62,8 @@ impl SDK {
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifier>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_deploy!");
         let deploy = make_deploy(
@@ -86,8 +86,8 @@ impl SDK {
         self.speculative_exec(
             deploy.unwrap().into(),
             maybe_block_identifier,
-            node_address,
             verbosity,
+            node_address,
         )
         .await
         .map_err(SdkError::from)

@@ -57,16 +57,17 @@ impl SDK {
     #[wasm_bindgen(js_name = "query_contract_dict")]
     pub async fn query_contract_dict_js_alias(
         &self,
-        options: QueryContractDictOptions,
+        options: Option<QueryContractDictOptions>,
     ) -> Result<GetDictionaryItemResult, JsError> {
-        let js_value_options = JsValue::from_serde::<QueryContractDictOptions>(&options);
+        let js_value_options =
+            JsValue::from_serde::<QueryContractDictOptions>(&options.unwrap_or_default());
         if let Err(err) = js_value_options {
             let err = &format!("Error serializing options: {:?}", err);
             error(err);
             return Err(JsError::new(err));
         }
         let options = self.get_dictionary_item_options(js_value_options.unwrap());
-        self.get_dictionary_item_js_alias(options).await
+        self.get_dictionary_item_js_alias(Some(options)).await
     }
 }
 
@@ -75,11 +76,11 @@ impl SDK {
         &self,
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("query_contract_dict!");
-        self.get_dictionary_item(state_root_hash, dictionary_item, node_address, verbosity)
+        self.get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
             .await
             .map_err(SdkError::from)
     }

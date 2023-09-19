@@ -3,7 +3,7 @@ use crate::types::deploy::Deploy;
 use crate::types::deploy_hash::DeployHash;
 #[cfg(target_arch = "wasm32")]
 use crate::{debug::error, types::digest::Digest};
-use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
     SuccessResponse,
@@ -93,15 +93,16 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_deploy")]
     pub async fn get_deploy_js_alias(
         &self,
-        options: GetDeployOptions,
+        options: Option<GetDeployOptions>,
     ) -> Result<GetDeployResult, JsError> {
         let GetDeployOptions {
             deploy_hash_as_string,
             deploy_hash,
             finalized_approvals,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
+
         let err_msg = "Error: Missing deploy hash as string or deploy hash".to_string();
         let deploy_hash = if let Some(deploy_hash_as_string) = deploy_hash_as_string {
             let hash = Digest::new(&deploy_hash_as_string);
@@ -125,7 +126,7 @@ impl SDK {
         };
 
         let result = self
-            .get_deploy(deploy_hash, finalized_approvals, node_address, verbosity)
+            .get_deploy(deploy_hash, finalized_approvals, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -140,7 +141,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "info_get_deploy")]
     pub async fn info_get_deploy_js_alias(
         &self,
-        options: GetDeployOptions,
+        options: Option<GetDeployOptions>,
     ) -> Result<GetDeployResult, JsError> {
         self.get_deploy_js_alias(options).await
     }
@@ -151,14 +152,14 @@ impl SDK {
         &self,
         deploy_hash: DeployHash,
         finalized_approvals: Option<bool>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDeployResult>, Error> {
         //log("get_deploy!");
         get_deploy(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
-            get_verbosity_or_default(verbosity).into(),
+            self.get_verbosity(verbosity).into(),
             deploy_hash.into(),
             finalized_approvals.unwrap_or_default(),
         )

@@ -1,6 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
-use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     list_rpcs, rpcs::results::ListRpcsResult as _ListRpcsResult, Error, JsonRpcId, SuccessResponse,
 };
@@ -60,10 +60,10 @@ impl SDK {
     #[wasm_bindgen(js_name = "list_rpcs")]
     pub async fn list_rpcs_js_alias(
         &self,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<ListRpcsResult, JsError> {
-        let result = self.list_rpcs(node_address, verbosity).await;
+        let result = self.list_rpcs(verbosity, node_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -78,14 +78,14 @@ impl SDK {
 impl SDK {
     pub async fn list_rpcs(
         &self,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_ListRpcsResult>, Error> {
         //log("list_rpcs!");
         list_rpcs(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
-            get_verbosity_or_default(verbosity).into(),
+            self.get_verbosity(verbosity).into(),
         )
         .await
     }

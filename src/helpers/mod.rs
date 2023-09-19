@@ -66,10 +66,6 @@ pub(crate) fn get_str_or_default(opt_str: Option<&String>) -> &str {
     opt_str.map(String::as_str).unwrap_or_default()
 }
 
-pub fn get_verbosity_or_default(verbosity: Option<Verbosity>) -> Verbosity {
-    verbosity.unwrap_or(Verbosity::Low)
-}
-
 pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
     SecretKey::from_pem(secret_key)
 }
