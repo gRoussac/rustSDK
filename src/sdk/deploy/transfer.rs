@@ -31,8 +31,8 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
             .transfer(
@@ -41,8 +41,8 @@ impl SDK {
                 transfer_id,
                 deploy_params,
                 payment_params,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await;
         match result {
@@ -65,8 +65,8 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
@@ -90,7 +90,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.put_deploy(deploy.unwrap().into(), node_address, verbosity)
+        self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
             .await
             .map_err(SdkError::from)
     }

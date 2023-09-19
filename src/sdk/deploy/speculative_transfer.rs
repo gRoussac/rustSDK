@@ -37,8 +37,8 @@ impl SDK {
         payment_params: PaymentStrParams,
         maybe_block_id_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifier>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
@@ -55,8 +55,8 @@ impl SDK {
                 deploy_params,
                 payment_params,
                 maybe_block_identifier,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await;
         match result {
@@ -80,8 +80,8 @@ impl SDK {
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         maybe_block_identifier: Option<BlockIdentifierInput>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         // log("speculative_transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
@@ -108,8 +108,8 @@ impl SDK {
         self.speculative_exec(
             deploy.unwrap().into(),
             maybe_block_identifier,
-            node_address,
             verbosity,
+            node_address,
         )
         .await
         .map_err(SdkError::from)

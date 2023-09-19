@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
-import { SDK_TOKEN } from '@util/wasm';
+import { SDK_TOKEN, WasmModule } from '@util/wasm';
 import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes, PeerEntry } from "casper-sdk";
 import { ResultComponent, ResultService } from '@components';
 
 const imports = [
   CommonModule,
-  ResultComponent
+  ResultComponent,
+  WasmModule
 ];
 
 type network = {
@@ -132,7 +133,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     console.info(this.sdk);
     this.sdk_methods = Object.getOwnPropertyNames(Object.getPrototypeOf(this.sdk))
       .filter(name => typeof (this.sdk as any)[name] === 'function')
-      .filter(name => !['free', 'constructor', '__destroy_into_raw'].includes(name))
+      .filter(name => !['free', 'constructor', '__destroy_into_raw', 'getNodeAddress', 'setNodeAddress', 'getVerbosity', 'setVerbosity'].includes(name))
       .filter(name => !name.endsWith('_options'))
       .filter(name => !name.startsWith('chain_'))
       .filter(name => !name.startsWith('state_'))
@@ -162,11 +163,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.network = network;
     this.chain_name = network.chain_name;
     this.node_address = network.node_address;
+    this.sdk.setNodeAddress(this.node_address);
   }
 
   async get_peers() {
     try {
-      const peers_result = await this.sdk.get_peers(this.node_address, this.verbosity);
+      const peers_result = await this.sdk.get_peers();
       peers_result && this.resultService.setResult(peers_result.toJson());
       peers_result && (this.peers = peers_result.peers);
     } catch (err) {
@@ -175,15 +177,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_node_status() {
-    const get_node_status = await this.sdk.get_node_status(this.node_address, this.verbosity);
+    const get_node_status = await this.sdk.get_node_status();
     get_node_status && this.resultService.setResult(get_node_status.toJson());
     return get_node_status;
   }
 
   async get_state_root_hash(no_mark_for_check?: boolean) {
-    const options: getStateRootHashOptions = this.sdk.get_state_root_hash_options({
-      node_address: this.node_address
-    });
+    const options: getStateRootHashOptions = this.sdk.get_state_root_hash_options({});
     if (!options) {
       return;
     }
@@ -209,8 +209,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const get_account_options = this.sdk.get_account_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity,
       account_identifier_as_string: account_identifier
     });
     if (!get_account_options) {
@@ -242,10 +240,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_auction_info() {
     try {
-      const get_auction_info_options = this.sdk.get_auction_info_options({
-        node_address: this.node_address,
-        verbosity: this.verbosity,
-      });
+      const get_auction_info_options = this.sdk.get_auction_info_options({});
       this.getIdentifieBlock(get_auction_info_options);
       const get_auction_info = await this.sdk.get_auction_info(get_auction_info_options);
       get_auction_info && this.resultService.setResult(get_auction_info.toJson());
@@ -274,7 +269,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     const session_params = this.get_session_params();
     try {
       const install = await this.sdk.install(
-        this.node_address,
         deploy_params,
         session_params,
         payment_amount,
@@ -294,10 +288,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     try {
       const get_balance_options = this.sdk.get_balance_options({
-        node_address: this.node_address,
         state_root_hash_as_string: state_root_hash || '',
         purse_uref_as_string,
-        verbosity: this.verbosity,
       });
       const get_balance = await this.sdk.get_balance(get_balance_options);
       get_balance && this.resultService.setResult(get_balance.toJson());
@@ -309,10 +301,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_block_transfers() {
     try {
-      const get_block_transfers_options = this.sdk.get_block_transfers_options({
-        node_address: this.node_address,
-        verbosity: this.verbosity
-      });
+      const get_block_transfers_options = this.sdk.get_block_transfers_options({});
       this.getIdentifieBlock(get_block_transfers_options);
       const get_block_transfers = await this.sdk.get_block_transfers(get_block_transfers_options);
       get_block_transfers && this.resultService.setResult(get_block_transfers.toJson());
@@ -323,10 +312,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_block() {
     try {
-      const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({
-        node_address: this.node_address,
-        verbosity: this.verbosity
-      });
+      const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({});
       this.getIdentifieBlock(chain_get_block_options);
       const chain_get_block = await this.sdk.get_block(chain_get_block_options);
       chain_get_block && this.resultService.setResult(chain_get_block.toJson());
@@ -343,7 +329,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_chainspec() {
     try {
-      const get_chainspec = await this.sdk.get_chainspec(this.node_address, this.verbosity);
+      const get_chainspec = await this.sdk.get_chainspec();
       const chain_spec = hexToString(get_chainspec?.chainspec_bytes.chainspec_bytes);
       chain_spec && this.resultService.setResult(chain_spec);
     } catch (err) {
@@ -357,10 +343,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!deploy_hash_as_string) {
       return;
     }
-    const get_deploy_options = this.sdk.get_deploy_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity,
-    });
+    const get_deploy_options = this.sdk.get_deploy_options({});
     get_deploy_options.deploy_hash = new DeployHash(deploy_hash_as_string);
     get_deploy_options.finalized_approvals = finalized_approvals;
     try {
@@ -421,8 +404,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const get_dictionary_item_options = this.sdk.get_dictionary_item_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity,
       state_root_hash_as_string: state_root_hash || '',
     });
     get_dictionary_item_options.dictionary_item_identifier = dictionary_item_identifier;
@@ -435,10 +416,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_era_info() {
-    const get_era_info_options = this.sdk.get_era_info_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity
-    });
+    const get_era_info_options = this.sdk.get_era_info_options({});
     this.getIdentifieBlock(get_era_info_options);
     try {
       const get_era_info = await this.sdk.get_era_info(get_era_info_options);
@@ -449,10 +427,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async get_era_summary() {
-    const get_era_summary_options = this.sdk.get_era_summary_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity
-    });
+    const get_era_summary_options = this.sdk.get_era_summary_options({});
     this.getIdentifieBlock(get_era_summary_options);
     try {
       const get_era_summary = await this.sdk.get_era_summary(get_era_summary_options);
@@ -464,7 +439,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async get_validator_changes() {
     try {
-      const get_validator_changes = await this.sdk.get_validator_changes(this.node_address, this.verbosity);
+      const get_validator_changes = await this.sdk.get_validator_changes();
       get_validator_changes && this.resultService.setResult(get_validator_changes.toJson());
     } catch (err) {
       err && (this.error = err.toString());
@@ -473,7 +448,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async list_rpcs() {
     try {
-      const list_rpcs = await this.sdk.list_rpcs(this.node_address, this.verbosity);
+      const list_rpcs = await this.sdk.list_rpcs();
       list_rpcs && this.resultService.setResult(list_rpcs.toJson());
     } catch (err) {
       err && (this.error = err.toString());
@@ -486,9 +461,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const query_balance_options = this.sdk.query_balance_options({
-      node_address: this.node_address,
-      purse_identifier_as_string,
-      verbosity: this.verbosity,
+      purse_identifier_as_string
     });
     this.getGlobalIdentifier(query_balance_options);
     try {
@@ -506,10 +479,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const query_global_state_options = this.sdk.query_global_state_options({
-      node_address: this.node_address,
       key_as_string,
       path_as_string,
-      verbosity: Verbosity.High,
     });
     this.getGlobalIdentifier(query_global_state_options);
     try {
@@ -559,7 +530,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.getIdentifieBlock(maybe_block_options);
       const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
       result = await this.sdk.speculative_deploy(
-        this.node_address,
         deploy_params,
         session_params,
         payment_params,
@@ -569,7 +539,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     else if (deploy_result) {
       result = await this.sdk.deploy(
-        this.node_address,
         deploy_params,
         session_params,
         payment_params,
@@ -583,7 +552,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     if (result) {
       const result_json = result.toJson();
-      this.deploy_json = jsonPrettyPrint(result_json, Verbosity.High);
+      this.deploy_json = jsonPrettyPrint(result_json, this.verbosity);
       this.deploy_json && this.resultService.setResult(result_json);
     }
     return result;
@@ -628,7 +597,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.getIdentifieBlock(maybe_block_options);
       const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
       result = await this.sdk.speculative_transfer(
-        this.node_address,
         transfer_amount,
         target_account,
         undefined, // transfer_id
@@ -640,7 +608,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     else if (deploy_result) {
       result = await this.sdk.transfer(
-        this.node_address,
         transfer_amount,
         target_account,
         undefined, // transfer_id
@@ -658,7 +625,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     if (result) {
       const result_json = result.toJson();
-      this.deploy_json = jsonPrettyPrint(result_json, Verbosity.High);
+      this.deploy_json = jsonPrettyPrint(result_json, this.verbosity);
       this.deploy_json && this.resultService.setResult(result_json);
     }
     return result;
@@ -684,9 +651,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // all approvals are valid signatures of the deploy hash
 
     const put_deploy = await this.sdk.put_deploy(
-      this.node_address,
       signed_deploy,
-      this.verbosity
     );
     put_deploy && this.resultService.setResult(put_deploy.toJson());
     return put_deploy;
@@ -707,8 +672,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const speculative_exec_options = this.sdk.speculative_exec_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity,
       deploy: signed_deploy.toJson()
     });
     this.getIdentifieBlock(speculative_exec_options);
@@ -742,7 +705,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     signed_deploy = signed_deploy.sign(this.private_key);
-    this.deploy_json = jsonPrettyPrint(signed_deploy.toJson(), Verbosity.High);
+    this.deploy_json = jsonPrettyPrint(signed_deploy.toJson(), this.verbosity);
     this.deployJsonElt.nativeElement.value = this.deploy_json;
   }
 
@@ -784,7 +747,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     try {
       const call_entrypoint = await this.sdk.call_entrypoint(
-        this.node_address,
         deploy_params,
         session_params,
         payment_amount
@@ -822,8 +784,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       return;
     }
     const query_contract_dict_options = this.sdk.query_contract_dict_options({
-      node_address: this.node_address,
-      verbosity: this.verbosity,
       state_root_hash_as_string: state_root_hash || '',
       // dictionary_item_identifier: dictionary_item_identifier.toJson() // you need to send JSON of the object, not the object or you need to use setter
     });
@@ -845,11 +805,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     const path_as_string: string = this.queryPathElt && this.queryPathElt.nativeElement.value.toString().trim().replace(/^\/+|\/+$/g, '');
     const query_contract_key_options = this.sdk.query_contract_key_options({
-      node_address: this.node_address,
       state_root_hash_as_string: state_root_hash || '',
       key_as_string,
       path_as_string,
-      verbosity: Verbosity.High,
     });
     try {
       const query_contract_key = await this.sdk.query_contract_key(query_contract_key_options);
@@ -888,7 +846,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       text = text.trim();
       try {
         const deploy_json = JSON.parse(text);
-        this.deploy_json = jsonPrettyPrint(new Deploy(deploy_json).toJson(), Verbosity.High);
+        this.deploy_json = jsonPrettyPrint(new Deploy(deploy_json).toJson(), this.verbosity);
       } catch {
         console.error("Error parsing deploy");
       }

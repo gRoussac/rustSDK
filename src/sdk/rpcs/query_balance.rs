@@ -5,7 +5,6 @@ use crate::types::{
 };
 use crate::{
     debug::error,
-    helpers::get_verbosity_or_default,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -91,7 +90,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "query_balance")]
     pub async fn query_balance_js_alias(
         &self,
-        options: QueryBalanceOptions,
+        options: Option<QueryBalanceOptions>,
     ) -> Result<QueryBalanceResult, JsError> {
         let QueryBalanceOptions {
             global_state_identifier,
@@ -100,9 +99,9 @@ impl SDK {
             state_root_hash_as_string,
             state_root_hash,
             maybe_block_id_as_string,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
 
         let result = if let Some(hash) = state_root_hash {
             self.query_balance(
@@ -111,8 +110,8 @@ impl SDK {
                 purse_identifier.into(),
                 Some(hash.to_string()),
                 None,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await
         } else if let Some(hash) = state_root_hash_as_string {
@@ -122,8 +121,8 @@ impl SDK {
                 purse_identifier.into(),
                 Some(hash.to_string()),
                 None,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await
         } else if let Some(maybe_block_id_as_string) = maybe_block_id_as_string {
@@ -133,8 +132,8 @@ impl SDK {
                 purse_identifier.into(),
                 None,
                 Some(maybe_block_id_as_string),
-                node_address,
                 verbosity,
+                node_address,
             )
             .await
         } else {
@@ -144,8 +143,8 @@ impl SDK {
                 purse_identifier.into(),
                 None,
                 None,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await
         };
@@ -169,8 +168,8 @@ impl SDK {
         purse_identifier: Option<PurseIdentifier>,
         state_root_hash: Option<String>,
         maybe_block_id: Option<String>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_QueryBalanceResult>, SdkError> {
         //log("query_balance!");
 
@@ -194,7 +193,7 @@ impl SDK {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 Some(maybe_global_state_identifier.into()),
                 purse_identifier.into(),
             )
@@ -204,7 +203,7 @@ impl SDK {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 None,
                 purse_identifier.into(),
             )
@@ -214,7 +213,7 @@ impl SDK {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 "",
                 &state_root_hash,
                 &purse_identifier.to_string(),
@@ -225,7 +224,7 @@ impl SDK {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 &maybe_block_id.unwrap_or_default(),
                 "",
                 &purse_identifier.to_string(),

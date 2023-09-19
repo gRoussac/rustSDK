@@ -70,7 +70,7 @@ impl SDK {
         //     deploy = deploy.sign(&secret_key);
         // }
 
-        self.put_deploy(deploy.unwrap().into(), node_address, None)
+        self.put_deploy(deploy.unwrap().into(), None, node_address)
             .await
             .map_err(SdkError::from)
     }

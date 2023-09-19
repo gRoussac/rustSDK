@@ -3,7 +3,7 @@ use crate::{
     debug::error,
     types::{digest::Digest, public_key::PublicKey},
 };
-use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, Error, JsonRpcId,
     SuccessResponse,
@@ -120,10 +120,10 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_node_status")]
     pub async fn get_node_status_js_alias(
         &self,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<GetNodeStatusResult, JsError> {
-        let result = self.get_node_status(node_address, verbosity).await;
+        let result = self.get_node_status(verbosity, node_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -138,14 +138,14 @@ impl SDK {
 impl SDK {
     pub async fn get_node_status(
         &self,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetNodeStatusResult>, Error> {
         //log("get_node_status!");
         get_node_status(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
-            get_verbosity_or_default(verbosity).into(),
+            self.get_verbosity(verbosity).into(),
         )
         .await
     }

@@ -1,6 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
-use crate::{helpers::get_verbosity_or_default, types::verbosity::Verbosity, SDK};
+use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult as _GetValidatorChangesResult,
     Error, JsonRpcId, SuccessResponse,
@@ -56,10 +56,10 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_validator_changes")]
     pub async fn get_validator_changes_js_alias(
         &self,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<GetValidatorChangesResult, JsError> {
-        let result = self.get_validator_changes(node_address, verbosity).await;
+        let result = self.get_validator_changes(verbosity, node_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -74,14 +74,14 @@ impl SDK {
 impl SDK {
     pub async fn get_validator_changes(
         &self,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetValidatorChangesResult>, Error> {
         //log("get_validator_changes!");
         get_validator_changes(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
-            get_verbosity_or_default(verbosity).into(),
+            self.get_verbosity(verbosity).into(),
         )
         .await
     }

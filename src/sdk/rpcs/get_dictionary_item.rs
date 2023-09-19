@@ -2,7 +2,6 @@
 use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::{
-    helpers::get_verbosity_or_default,
     types::{
         deploy_params::dictionary_item_str_params::{
             dictionary_item_str_params_to_casper_client, DictionaryItemStrParams,
@@ -104,16 +103,16 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_dictionary_item")]
     pub async fn get_dictionary_item_js_alias(
         &self,
-        options: GetDictionaryItemOptions,
+        options: Option<GetDictionaryItemOptions>,
     ) -> Result<GetDictionaryItemResult, JsError> {
         let GetDictionaryItemOptions {
             state_root_hash_as_string,
             state_root_hash,
             dictionary_item_params,
             dictionary_item_identifier,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
 
         let dictionary_item = if let Some(identifier) = dictionary_item_identifier {
             DictionaryItemInput::Identifier(identifier)
@@ -126,10 +125,10 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_dictionary_item(hash, dictionary_item, node_address, verbosity)
+            self.get_dictionary_item(hash, dictionary_item, verbosity, node_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            self.get_dictionary_item(hash.as_str(), dictionary_item, node_address, verbosity)
+            self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, node_address)
                 .await
         } else {
             let err = "Error: Missing state_root_hash";
@@ -149,7 +148,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
         &self,
-        options: GetDictionaryItemOptions,
+        options: Option<GetDictionaryItemOptions>,
     ) -> Result<GetDictionaryItemResult, JsError> {
         self.get_dictionary_item_js_alias(options).await
     }
@@ -165,8 +164,8 @@ impl SDK {
         &self,
         state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("state_get_dictionary_item!");
         match dictionary_item {
@@ -187,7 +186,7 @@ impl SDK {
                 get_dictionary_item_cli(
                     &rand::thread_rng().gen::<i64>().to_string(),
                     &self.get_node_address(node_address),
-                    get_verbosity_or_default(verbosity).into(),
+                    self.get_verbosity(verbosity).into(),
                     &state_root_hash_as_string,
                     dictionary_item_str_params_to_casper_client(&dictionary_item_params),
                 )
@@ -210,7 +209,7 @@ impl SDK {
                 get_dictionary_item_lib(
                     JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                     &self.get_node_address(node_address),
-                    get_verbosity_or_default(verbosity).into(),
+                    self.get_verbosity(verbosity).into(),
                     state_root_hash.into(),
                     dictionary_item_identifier.into(),
                 )

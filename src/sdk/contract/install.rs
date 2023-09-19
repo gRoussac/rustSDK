@@ -60,7 +60,7 @@ impl SDK {
             error(&err_msg);
             return Err(SdkError::from(err));
         }
-        self.put_deploy(deploy.unwrap().into(), node_address, None)
+        self.put_deploy(deploy.unwrap().into(), None, node_address)
             .await
             .map_err(SdkError::from)
     }

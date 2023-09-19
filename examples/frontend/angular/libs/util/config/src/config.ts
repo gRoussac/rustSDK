@@ -2,9 +2,8 @@ export type EnvironmentConfig = {
   [key: string]: string | object;
 };
 export const config: EnvironmentConfig = {
-  path_sep: '/',
-  gas_price: '1',
-  gas_fee: '1500000000',
+  wasm_asset_path: 'assets/casper_rust_wasm_sdk_bg.wasm',
+  verbosity: 'High',
   minimum_transfer: '2500000000',
   TTL: '30m',
   gas_fee_transfer: '10000',

@@ -5,7 +5,6 @@ use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -92,14 +91,14 @@ impl SDK {
     #[wasm_bindgen(js_name = "get_block_transfers")]
     pub async fn get_block_transfers_js_alias(
         &self,
-        options: GetBlockTransfersOptions,
+        options: Option<GetBlockTransfersOptions>,
     ) -> Result<GetBlockTransfersResult, JsError> {
         let GetBlockTransfersOptions {
             maybe_block_id_as_string,
             maybe_block_identifier,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
@@ -110,7 +109,7 @@ impl SDK {
         };
 
         let result = self
-            .get_block_transfers(maybe_block_identifier, node_address, verbosity)
+            .get_block_transfers(maybe_block_identifier, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -127,8 +126,8 @@ impl SDK {
     pub async fn get_block_transfers(
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetBlockTransfersResult>, SdkError> {
         //log("get_block_transfers!");
 
@@ -136,7 +135,7 @@ impl SDK {
             get_block_transfers_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
             )
             .await
@@ -153,7 +152,7 @@ impl SDK {
             get_block_transfers_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
-                get_verbosity_or_default(verbosity).into(),
+                self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
             )
             .await

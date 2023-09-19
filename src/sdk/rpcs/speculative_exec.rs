@@ -6,7 +6,6 @@ use crate::types::block_hash::BlockHash;
 use crate::types::block_identifier::BlockIdentifier;
 use crate::types::deploy::Deploy;
 use crate::{
-    helpers::get_verbosity_or_default,
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -94,16 +93,16 @@ impl SDK {
     #[wasm_bindgen(js_name = "speculative_exec")]
     pub async fn speculative_exec_js_alias(
         &self,
-        options: GetSpeculativeExecOptions,
+        options: Option<GetSpeculativeExecOptions>,
     ) -> Result<SpeculativeExecResult, JsError> {
         let GetSpeculativeExecOptions {
             deploy_as_string,
             deploy,
             maybe_block_id_as_string,
             maybe_block_identifier,
-            node_address,
             verbosity,
-        } = options;
+            node_address,
+        } = options.unwrap_or_default();
 
         let deploy = if let Some(deploy_as_string) = deploy_as_string {
             Deploy::new(deploy_as_string.into())
@@ -127,8 +126,8 @@ impl SDK {
             .speculative_exec(
                 deploy.into(),
                 maybe_block_identifier,
-                node_address,
                 verbosity,
+                node_address,
             )
             .await;
         match result {
@@ -147,8 +146,8 @@ impl SDK {
         &self,
         deploy: Deploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
-        node_address: Option<String>,
         verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
         //log("speculative_exec!");
 
@@ -164,7 +163,7 @@ impl SDK {
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
             maybe_block_identifier.map(Into::into),
-            get_verbosity_or_default(verbosity).into(),
+            self.get_verbosity(verbosity).into(),
             deploy.into(),
         )
         .await
