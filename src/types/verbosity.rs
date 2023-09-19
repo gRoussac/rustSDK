@@ -2,7 +2,7 @@ use casper_client::Verbosity as _Verbosity;
 use serde::{Deserialize, Deserializer, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Serialize, Clone, Copy)]
+#[derive(Debug, Serialize, Clone, Copy, PartialEq)]
 #[wasm_bindgen]
 pub enum Verbosity {
     Low = 0,

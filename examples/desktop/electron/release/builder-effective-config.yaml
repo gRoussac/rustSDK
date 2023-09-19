@@ -5,13 +5,17 @@ appId: com.example.myapp
 productName: Casper
 win:
   target: nsis
+  icon: favicon.png
 linux:
   category: Network
+  icon: favicon.png
 mac:
   category: Network
+  icon: favicon.png
 files:
   - filter:
       - index.js
+      - favicon.png
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
