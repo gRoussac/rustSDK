@@ -3,8 +3,8 @@
 The Rust/Wasm SDK allows developers to interact with the Casper Blockchain using Rust or TypeScript.
 You can use the Casper Rust/Wasm SDK in two ways.
 
-- In a <strong>Rust application</strong> by importing the sdk crate.
-- In a <strong>Typescript application</strong> by importing the sdk Wasm file and the Typescript interfaces.
+- In a <strong>Rust application</strong> by importing the SDK crate.
+- In a <strong>Typescript application</strong> by importing the SDK Wasm file and the Typescript interfaces.
 
 This page covers different examples of using the SDK.
 
@@ -12,7 +12,8 @@ This page covers different examples of using the SDK.
 
 <details>
   <summary><strong><code>Rust Project</code></strong></summary>
-<br>
+
+## Rust Project
 
 Add the sdk as dependency of your project
 
@@ -22,7 +23,7 @@ Add the sdk as dependency of your project
 casper-rust-wasm-sdk = { version = "0.1.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
 ```
 
-### Usage
+## Usage
 
 > main.rs
 
@@ -39,7 +40,8 @@ let sdk = SDK::new(
 
 <details>
   <summary><strong><code>Typescript Project</code></strong></summary>
-<br>
+
+## Typescript Project
 
 You can directly use the content of the [pkg folder](https://github.com/casper-ecosystem/rustSDK/tree/dev/pkg) for a browser project or [pkg-nodejs](https://github.com/casper-ecosystem/rustSDK/tree/dev/pkg-nodejs) for a Node project.
 
@@ -74,11 +76,12 @@ pkg
 └── README.md
 ```
 
-### Usage
+## Usage
 
 <details>
   <summary><strong><code>React</code></strong></summary>
-<br>
+
+## Web React
 
 > package.json
 
@@ -96,7 +99,7 @@ The React app needs to load the wasm file through a dedicated `init()` method as
 
 > App.tsx
 
-```js
+```ts
 import init, {
   SDK,
   Verbosity,
@@ -129,7 +132,7 @@ function App() {
 
 #### Frontend React example
 
-You can look at a very basic example of usage in the [React demo app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/react/src/App.tsx)
+You can look at a very basic example of usage in the [React example app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/react/src/App.tsx)
 
 ```shell
 $ cd ./examples/frontend/react
@@ -140,7 +143,8 @@ $ npm start
 </details>
 <details>
   <summary><strong><code>Angular</code></strong></summary>
-<br>
+
+## Web Angular
 
 > package.json
 
@@ -183,7 +187,7 @@ export const fetchWasmFactory = async (
 
 > wasm.module.ts
 
-```js
+```ts
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SDK_TOKEN, fetchWasmFactory, provideSafeAsync } from './wasm.factory';
@@ -197,7 +201,7 @@ const providers = provideSafeAsync(SDK_TOKEN, fetchWasmFactory);
 export class WasmModule {}
 ```
 
-You can look at a basic example of factory usage in the [Angular demo app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts)
+You can look at a basic example of factory usage in the [Angular example app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts)
 
 Add the sdk wasm file to assets of your project with path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`, Angular will then copy the file from `pkg` in `assets` on build making it available for the fetch wasm factory.
 
@@ -216,7 +220,7 @@ Add the sdk wasm file to assets of your project with path parameter being ` wasm
 
 #### Frontend Angular example
 
-You can look at a more advanced example of usage in the [Angular demo app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/angular/src/app/app.component.ts)
+You can look at a more advanced example of usage in the [Angular example app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/angular/src/app/app.component.ts)
 
 ```shell
 $ cd ./examples/frontend/angular
@@ -229,9 +233,38 @@ $ npm build
 
 <details>
   <summary><strong><code>Node</code></strong></summary>
-<br>
 
-# Desktop Node example
+## Desktop Node
+
+> package.json
+
+```json
+{
+  "name": "my-node-app",
+  "dependencies": {
+    // This path is relative
+    "casper-sdk": "file:pkg-nodejs", // [TODO] Npm package
+    ...
+}
+```
+
+The Node app loads the SDK with `require()`. You can find more details about building the sdk for [Node with wasm-pack](https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs)
+Note that this method requires a version of Node.js with WebAssembly support, which is currently Node 8 and above.
+
+> index.ts
+
+```ts
+const casper_rust_wasm_sdk = require('casper-sdk');
+const { SDK } = casper_rust_wasm_sdk;
+
+const node_address = 'https://rpc.integration.casperlabs.io';
+let sdk: typeof SDK = new SDK(node_address);
+console.log(sdk);
+```
+
+#### Desktop Node example
+
+You can look at a very basic example of usage in the [Node example app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/desktop/node/index.ts)
 
 ```shell
 $ cd ./examples/desktop/node
@@ -247,7 +280,9 @@ $ npm start
 
 <br>
 
-# Desktop Electron example app (loading Angular frontend)
+# Desktop Electron demo app
+
+This Electron based demo app loads the Angular example build.
 
 ```shell
 $ cd ./examples/desktop/electron
