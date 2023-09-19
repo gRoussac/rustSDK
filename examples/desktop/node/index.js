@@ -35,8 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-var casper_wasm_sdk = require('casper-rust-wasm-sdk');
-var SDK = casper_wasm_sdk.SDK;
+var casper_rust_wasm_sdk = require('casper-sdk');
+var SDK = casper_rust_wasm_sdk.SDK;
 var http = require('http');
 var node_address = 'http://localhost:11101';
 var sdk = new SDK(node_address);
