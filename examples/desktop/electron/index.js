@@ -12,6 +12,7 @@ function createWindow() {
       nodeIntegration: true,
       webSecurity: false,
     },
+    icon: path.join(__dirname, 'favicon.png'),
   });
 
   win.loadURL(

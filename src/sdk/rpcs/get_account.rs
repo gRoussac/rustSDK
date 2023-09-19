@@ -103,6 +103,7 @@ impl SDK {
             verbosity,
             node_address,
         } = options.unwrap_or_default();
+
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
             Some(BlockIdentifierInput::BlockIdentifier(
                 maybe_block_identifier,

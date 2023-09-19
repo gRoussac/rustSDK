@@ -15,6 +15,20 @@ pub mod test_module {
     };
     use chrono::DateTime;
 
+    pub async fn test_global_node_address_and_verboosity() {
+        let sdk = create_test_sdk(None);
+        assert_eq!(sdk.get_node_address(None), "".to_string());
+        assert_eq!(sdk.get_verbosity(None), Verbosity::Low);
+        let config: TestConfig = get_config().await;
+        let mut sdk = create_test_sdk(Some(config.clone()));
+        assert_eq!(sdk.get_node_address(None), config.node_address.unwrap());
+        assert_eq!(sdk.get_verbosity(None), config.verbosity.unwrap());
+        let _ = sdk.set_node_address(Some("test".to_string()));
+        assert_eq!(sdk.get_node_address(None), "test".to_string());
+        let _ = sdk.set_verbosity(Some(Verbosity::Medium));
+        assert_eq!(sdk.get_verbosity(None), Verbosity::Medium);
+    }
+
     pub fn test_error() {
         error("bound error to std");
     }
@@ -176,6 +190,10 @@ mod tests_async {
     use super::test_module::*;
     use tokio::test;
 
+    #[test]
+    pub async fn test_global_node_address_and_verboosity_test() {
+        test_global_node_address_and_verboosity().await;
+    }
     #[test]
     pub async fn test_hex_to_uint8_vec_test() {
         test_hex_to_uint8_vec().await;

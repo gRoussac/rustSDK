@@ -4,6 +4,7 @@ x64:
     - '!build{,/**/*}'
     - '!release{,/**/*}'
     - index.js
+    - favicon.png
     - package.json
     - '!**/*.{iml,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,suo,xproj,cc,d.ts,mk,a,o,forge-meta,pdb}'
     - '!**/._*'
@@ -16,6 +17,7 @@ x64:
       - '!build{,/**/*}'
       - '!release{,/**/*}'
       - index.js
+      - favicon.png
       - package.json
       - '!**/*.{iml,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,suo,xproj,cc,d.ts,mk,a,o,forge-meta,pdb}'
       - '!**/._*'
@@ -27,12 +29,14 @@ x64:
   nodeModuleFilePatterns:
     - '**/*'
     - index.js
+    - favicon.png
     - - '**/*'
       - index.js
+      - favicon.png
 nsis:
   script: |-
-    !include "/media/WINKING/opt2/casper/rustSDK/desktop/electron/node_modules/app-builder-lib/templates/nsis/include/StdUtils.nsh"
-    !addincludedir "/media/WINKING/opt2/casper/rustSDK/desktop/electron/node_modules/app-builder-lib/templates/nsis/include"
+    !include "/media/WINKING/opt2/casper/rustSDK/examples/desktop/electron/node_modules/app-builder-lib/templates/nsis/include/StdUtils.nsh"
+    !addincludedir "/media/WINKING/opt2/casper/rustSDK/examples/desktop/electron/node_modules/app-builder-lib/templates/nsis/include"
     !macro _isUpdated _a _b _t _f
       ${StdUtils.TestParameter} $R9 "updated"
       StrCmp "$R9" "true" `${_t}` `${_f}`
@@ -105,7 +109,7 @@ nsis:
     !macroend
 
     !addplugindir /x86-unicode "/home/greg/.cache/electron-builder/nsis/nsis-resources-3.4.1/plugins/x86-unicode"
-    !include "/tmp/t-kSsDLz/0-messages.nsh"
+    !include "/tmp/t-JJXVf7/0-messages.nsh"
 
     Var newStartMenuLink
     Var oldStartMenuLink

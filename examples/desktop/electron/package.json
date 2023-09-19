@@ -22,16 +22,20 @@
       "output": "release"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "favicon.png"
     },
     "linux": {
-      "category": "Network"
+      "category": "Network",
+      "icon": "favicon.png"
     },
     "mac": {
-      "category": "Network"
+      "category": "Network",
+      "icon": "favicon.png"
     },
     "files": [
-      "index.js"
+      "index.js",
+      "favicon.png"
     ],
     "extraFiles": [
       {
