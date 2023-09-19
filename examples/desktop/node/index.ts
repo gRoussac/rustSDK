@@ -2,7 +2,7 @@ const casper_rust_wasm_sdk = require('casper-sdk');
 const { SDK } = casper_rust_wasm_sdk;
 const http = require('http');
 
-const node_address = 'http://localhost:11101';
+const node_address = 'https://rpc.integration.casperlabs.io';
 let sdk: typeof SDK = new SDK(node_address);
 
 const server = http.createServer(async (req, res) => {

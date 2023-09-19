@@ -38,7 +38,7 @@ var _this = this;
 var casper_rust_wasm_sdk = require('casper-sdk');
 var SDK = casper_rust_wasm_sdk.SDK;
 var http = require('http');
-var node_address = 'http://localhost:11101';
+var node_address = 'https://rpc.integration.casperlabs.io';
 var sdk = new SDK(node_address);
 var server = http.createServer(function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var peers_object, peers_as_json;
