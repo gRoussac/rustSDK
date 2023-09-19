@@ -1,26 +1,45 @@
 # Casper Rust/Wasm SDK
 
-The Rust/Wasm SDK allows developers to interact with the Casper Blockchain using Rust or TypeScript. This page covers different examples of using the SDK.
+The Rust/Wasm SDK allows developers to interact with the Casper Blockchain using Rust or TypeScript.
+You can use the Casper Rust/Wasm SDK in two ways.
 
-# Install
+- In a <strong>Rust application</strong> by importing the sdk crate.
+- In a <strong>Typescript application</strong> by importing the sdk Wasm file and the Typescript interfaces.
 
-### - Rust Project
+This page covers different examples of using the SDK.
+
+## Install
+
+<details>
+  <summary><strong><code>Rust Project</code></strong></summary>
+<br>
 
 Add the sdk as dependency of your project
+
+> Cargo.toml
 
 ```toml
 casper-rust-wasm-sdk = { version = "0.1.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
 ```
 
-#### Usage
+### Usage
+
+> main.rs
 
 ```rust
-use casper_rust_wasm_sdk::{SDK, ...};
+use casper_rust_wasm_sdk::{SDK, Verbosity};
 
-let sdk = SDK::new();
+let sdk = SDK::new(
+  Some("https://rpc.testnet.casperlabs.io".to_string()),
+  Some(Verbosity.High)
+);
 ```
 
-### - Typescript Project
+</details>
+
+<details>
+  <summary><strong><code>Typescript Project</code></strong></summary>
+<br>
 
 You can directly use the content of the [pkg folder](https://github.com/casper-ecosystem/rustSDK/tree/dev/pkg) for a browser project or [pkg-nodejs](https://github.com/casper-ecosystem/rustSDK/tree/dev/pkg-nodejs) for a Node project.
 
@@ -28,7 +47,7 @@ Or you can use the [TODO][npm package](https://todo)
 
 #### Build package with wasm pack
 
-If you want to compile the wasm package from Rust
+If you want to compile the wasm package from Rust you might need to install wasm-pack for ease of use.
 
 ```shell
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -39,7 +58,7 @@ $ make prepare
 $ make build
 ```
 
-will create a `pkg` and `pkg-nodejs` cointaining the typescript interfaces. You can find more details about building the with wasm-pack in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
+will create a `pkg` and `pkg-nodejs` cointaining the typescript interfaces. You can find more details about building the sdk for javascript with wasm-pack in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
 
 This folders will contain a wasm binary, a JS wrapper file, typescript types definitions, and a package.json file that you can load in your proper project.
 
@@ -55,26 +74,36 @@ pkg
 └── README.md
 ```
 
-#### Usage
+### Usage
 
-> React
+<details>
+  <summary><strong><code>React</code></strong></summary>
+<br>
+
+> package.json
 
 ```json
 {
   "name": "my-react-app",
   "dependencies": {
+    // This path is relative
     "casper-sdk": "file:pkg", // [TODO] Npm package
     ...
 }
 ```
 
-The React app needs to load the wasm file through a dedicated `init()` method
+The React app needs to load the wasm file through a dedicated `init()` method as per this example
+
+> App.tsx
 
 ```js
 import init, {
   SDK,
-  ...
+  Verbosity,
 } from 'casper-sdk';
+
+const node_address = 'https://rpc.testnet.casperlabs.io';
+const verbosity = Verbosity.High;
 
 function App() {
   const [wasm, setWasm] = useState(false);
@@ -92,7 +121,7 @@ function App() {
     await fetchWasm();
   };
 
-  const sdk = new SDK();
+  const sdk = new SDK(node_address, verbosity);
   console.log(sdk);
   ...
 }
@@ -108,17 +137,86 @@ $ npm install
 $ npm start
 ```
 
-#### Usage
+</details>
+<details>
+  <summary><strong><code>Angular</code></strong></summary>
+<br>
 
-> Angular
+> package.json
 
-The Angular app needs to load the wasm file through a dedicated `init()` method. You can import it into a component but it is advised to import it through a service.
+```json
+{
+  "name": "my-angular-app",
+  "dependencies": {
+    // This path is relative
+    "casper-sdk": "file:pkg", // [TODO] Npm package
+    ...
+}
+```
+
+The Angular app needs to load the wasm file through a dedicated `init()` method as per this example. You can import it into a component through a service but it is advised to import it through a factory with the injection token [APP_INITIALIZER](https://angular.io/api/core/APP_INITIALIZER).
+
+> wasm.factory.ts
 
 ```js
+import init, { SDK, Verbosity } from "casper-sdk";
 
+export const SDK_TOKEN = new InjectionToken<SDK>('SDK');
+export const WASM_ASSET_PATH = new InjectionToken<string>('wasm_asset_path');
+export const NODE_ADDRESS = new InjectionToken<string>('node_address');
+export const VERBOSITY = new InjectionToken<Verbosity>('verbosity');
+
+type Params = {
+  wasm_asset_path: string,
+  node_address: string;
+  verbosity: Verbosity;
+};
+
+export const fetchWasmFactory = async (
+  params: Params
+): Promise<SDK> => {
+    const wasm = await init(params.wasm_asset_path);
+    return new SDK(params.node_address, params.verbosity);
+  };
+};
+```
+
+> wasm.module.ts
+
+```js
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SDK_TOKEN, fetchWasmFactory, provideSafeAsync } from './wasm.factory';
+
+const providers = provideSafeAsync(SDK_TOKEN, fetchWasmFactory);
+
+@NgModule({
+  imports: [CommonModule],
+  providers,
+})
+export class WasmModule {}
+```
+
+You can look at a basic example of factory usage in the [Angular demo app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/angular/libs/util/services/wasm/src/lib/wasm.factory.ts)
+
+Add the sdk wasm file to assets of your project with path parameter being ` wasm_asset_path:'assets/casper_rust_wasm_sdk_bg.wasm'`, Angular will then copy the file from `pkg` in `assets` on build making it available for the fetch wasm factory.
+
+> project.json
+
+```json
+"assets": [
+  ...,
+  {
+    "input": "pkg",
+    "glob": "casper_rust_wasm_sdk_bg.wasm",
+    "output": "assets"
+  }
+]
 ```
 
 #### Frontend Angular example
+
+You can look at a more advanced example of usage in the [Angular demo app](https://github.com/casper-ecosystem/rustSDK/blob/dev/examples/frontend/angular/src/app/app.component.ts)
 
 ```shell
 $ cd ./examples/frontend/angular
@@ -126,6 +224,12 @@ $ npm install
 $ npm start
 $ npm build
 ```
+
+</details>
+
+<details>
+  <summary><strong><code>Node</code></strong></summary>
+<br>
 
 # Desktop Node example
 
@@ -135,15 +239,19 @@ $ npm install
 $ npm start
 ```
 
-# Desktop Electron example (loading Angular frontend)
+</details>
+
+</details>
+
+## Usage
+
+<br>
+
+# Desktop Electron example app (loading Angular frontend)
 
 ```shell
 $ cd ./examples/desktop/electron
 $ npm install
 $ npm start
 $ npm build
-```
-
-```
-
 ```
