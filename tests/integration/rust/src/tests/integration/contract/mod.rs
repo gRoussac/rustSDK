@@ -39,13 +39,8 @@ pub mod test_module {
         session_params.set_session_args_json(ARGS_JSON);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let test_call_entrypoint = create_test_sdk()
-            .call_entrypoint(
-                &config.node_address,
-                deploy_params,
-                session_params,
-                payment_params,
-            )
+        let test_call_entrypoint = create_test_sdk(Some(config))
+            .call_entrypoint(deploy_params, session_params, payment_params, None)
             .await;
         assert!(!test_call_entrypoint
             .as_ref()
@@ -65,8 +60,8 @@ pub mod test_module {
 
     pub async fn test_query_contract_dict() {
         let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&config.node_address, None, None)
+        let get_state_root_hash = create_test_sdk(Some(config.clone()))
+            .get_state_root_hash(None, None, None)
             .await;
         let state_root_hash_digest: Digest = get_state_root_hash
             .unwrap()
@@ -89,8 +84,8 @@ pub mod test_module {
 
     pub async fn test_query_contract_dict_with_dictionary_key() {
         let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&config.node_address, None, None)
+        let get_state_root_hash = create_test_sdk(Some(config.clone()))
+            .get_state_root_hash(None, None, None)
             .await;
         let state_root_hash: Digest = get_state_root_hash
             .unwrap()
@@ -103,13 +98,8 @@ pub mod test_module {
         let mut params = DictionaryItemStrParams::new();
         params.set_dictionary(&config.dictionary_key);
         let dictionary_item = DictionaryItemInput::Params(params);
-        let query_contract_dict = create_test_sdk()
-            .query_contract_dict(
-                &config.node_address,
-                state_root_hash,
-                dictionary_item,
-                config.verbosity,
-            )
+        let query_contract_dict = create_test_sdk(Some(config))
+            .query_contract_dict(state_root_hash, dictionary_item, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let query_contract_dict = query_contract_dict.unwrap();
@@ -130,8 +120,8 @@ pub mod test_module {
 
     pub async fn test_query_contract_dict_with_dictionary_uref() {
         let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk()
-            .get_state_root_hash(&config.node_address, None, None)
+        let get_state_root_hash = create_test_sdk(Some(config.clone()))
+            .get_state_root_hash(None, None, None)
             .await;
         let state_root_hash: Digest = get_state_root_hash
             .unwrap()
@@ -144,13 +134,8 @@ pub mod test_module {
         let mut params = DictionaryItemStrParams::new();
         params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
         let dictionary_item = DictionaryItemInput::Params(params);
-        let query_contract_dict = create_test_sdk()
-            .query_contract_dict(
-                &config.node_address,
-                state_root_hash,
-                dictionary_item,
-                config.verbosity,
-            )
+        let query_contract_dict = create_test_sdk(Some(config))
+            .query_contract_dict(state_root_hash, dictionary_item, None, None)
             .await;
         thread::sleep(WAIT_TIME);
         let query_contract_dict = query_contract_dict.unwrap();
@@ -172,15 +157,17 @@ pub mod test_module {
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
         let config: TestConfig = get_config().await;
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            node_address: config.node_address.clone(),
-            key: KeyIdentifierInput::String(config.contract_cep78_hash),
+            key: KeyIdentifierInput::String(config.to_owned().contract_cep78_hash),
             path: Some(PathIdentifierInput::String("installer".to_string())),
             maybe_global_state_identifier,
             state_root_hash: None,
             maybe_block_id: None,
-            verbosity: config.verbosity,
+            node_address: config.to_owned().node_address,
+            verbosity: config.to_owned().verbosity,
         };
-        let query_contract_key = create_test_sdk().query_contract_key(query_params).await;
+        let query_contract_key = create_test_sdk(Some(config))
+            .query_contract_key(query_params)
+            .await;
 
         let query_contract_key = query_contract_key.unwrap();
         assert!(!query_contract_key.result.api_version.to_string().is_empty());
@@ -217,13 +204,8 @@ pub mod test_module {
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let install = create_test_sdk()
-            .install(
-                &config.node_address,
-                deploy_params,
-                session_params,
-                payment_params,
-            )
+        let install = create_test_sdk(Some(config))
+            .install(deploy_params, session_params, payment_params, None)
             .await;
         assert!(!install
             .as_ref()

@@ -57,7 +57,7 @@ pub const ARGS_JSON: &str = r#"[
 
 #[derive(Clone, Debug)]
 pub struct TestConfig {
-    pub node_address: String,
+    pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
     pub chain_name: String,
     pub private_key: String,
@@ -113,7 +113,7 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     .await;
     let dictionary_uref = get_dictionnary_uref(&contract_cep78_hash, DICTIONARY_NAME).await;
     let config = TestConfig {
-        node_address: DEFAULT_NODE_ADDRESS.to_string(),
+        node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
         verbosity: Some(Verbosity::High),
         account,
         private_key,
