@@ -88,10 +88,8 @@ function App() {
     console.log(sdk);
 
     try {
-      let get_state_root_hash_options = sdk.get_state_root_hash_options({
-        verbosity: Verbosity.Low
-      });
-      const chain_get_state_root_hash = (await sdk.chain_get_state_root_hash(get_state_root_hash_options));
+      // get_state_root_hash
+      const chain_get_state_root_hash = await sdk.chain_get_state_root_hash();
       console.log(chain_get_state_root_hash);
       setHash(chain_get_state_root_hash?.state_root_hash_as_string);
       console.log(
@@ -99,16 +97,18 @@ function App() {
         chain_get_state_root_hash?.state_root_hash_as_string
       );
       console.log(chain_get_state_root_hash);
+
+      // get_block
       let chain_get_block_options = sdk.get_block_options({
-        verbosity: Verbosity.High,
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height)
       });
       const chain_get_block = await sdk.chain_get_block(chain_get_block_options);
       setBlock(chain_get_block?.block.hash);
       console.log('js chain_get_block', chain_get_block);
+
+      // get_account_info
       const account_identifier = new AccountIdentifier(pubKey);
       let state_get_account_info_options = sdk.get_account_options({
-        verbosity: Verbosity.High,
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
         account_identifier: account_identifier.toJson()
       });
@@ -122,8 +122,8 @@ function App() {
         state_get_account_info?.account.main_purse
       );
 
+      // state_get_dictionary_item
       let stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
-
       console.log(stateRootHashDigest);
       console.log(stateRootHashDigest.toJson());
       const dictionary_item_identifier =
@@ -135,14 +135,15 @@ function App() {
         state_root_hash_as_string: chain_get_state_root_hash?.state_root_hash_as_string,
         //state_root_hash: stateRootHashDigest.toJson(),
         dictionary_item_identifier: dictionary_item_identifier.toJson(),
-        //  verbosity: Verbosity.High
       });
       console.log(get_dictionary_item_options);
       const state_get_dictionary_item = (await sdk.state_get_dictionary_item(get_dictionary_item_options)).toJson();
-
       setState_get_dictionary_item(
         state_get_dictionary_item?.stored_value.CLValue.parsed
       );
+
+
+      // get_balance
       console.log('js state_get_dictionary_item', state_get_dictionary_item);
       console.log(chain_get_state_root_hash?.state_root_hash);
       stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
@@ -153,13 +154,13 @@ function App() {
           AccessRights.READ_ADD_WRITE()
         ).toJson(),
         //purse_uref_as_string: 'uref-b1d24c7a1502d70d8cf1ad632c5f703e5f3be0622583a00e47cad08a59025d2e-007',
-        verbosity: Verbosity.High,
       });
       const state_get_balance = (await sdk.state_get_balance(state_get_balance_options)).toJson();
       console.log('js state_get_balance', state_get_balance);
       setState_get_balance(state_get_balance?.balance_value);
 
 
+      // query_global_state
       let path = new Path('');
       let key = Key.fromURef(
         new URef(
@@ -175,7 +176,6 @@ function App() {
         key: key.toJson(),
         //path_as_string: path.toString(),
         path: path.toJson(),
-        verbosity: Verbosity.High,
       });
       console.log(query_global_state_options);
       const query_global_state = (await sdk.query_global_state(query_global_state_options)).toJson();
@@ -184,6 +184,8 @@ function App() {
         query_global_state?.stored_value.CLValue.parsed
       );
 
+
+      // make_transfer
       let session_account =
         privateToPublicKey(secret_key);
       const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
@@ -215,6 +217,8 @@ function App() {
       setMake_transfer(jsonPrettyPrint(make_transfer));
       console.log(jsonPrettyPrint(make_transfer, Verbosity.Medium));
 
+
+      // test deploy type and static builders
       deploy_params = new DeployStrParams(
         chain_name,
         session_account
@@ -260,7 +264,7 @@ function App() {
       );
       console.log(test_transfer);
 
-
+      // make_deploy
       payment_params = new PaymentStrParams();
       payment_params.payment_amount = '5500000000';
       deploy_params = new DeployStrParams(
@@ -295,6 +299,7 @@ function App() {
       console.log(deploy_signed);
       console.assert(deploy_signed.approvals.length === 2); // Deploy has two approvals
 
+      // sign_deploy
       deploy_to_sign = new Deploy(JSON.parse(deployAsString));
       deploy_to_sign = deploy_to_sign.addArg("test:bool='false"); // Deploy was modified has no approvals anymore
       deploy_to_sign = deploy_to_sign.addArg({ "name": "name_of_my_key", "type": "U256", "value": 1 }); // No arrary as one arg
@@ -317,12 +322,13 @@ function App() {
       console.assert(deploy_signed.toJson().approvals.length === 1); // Deploy should have one approval
       console.log('make_deploy ApprovalsHash after', deploy_signed.approvalsHash());
 
+
+      // put_deploy
       let signed_deploy = new Deploy(make_transfer); // or make_deploy
       console.log(signed_deploy);
       const account_put_deploy = (await sdk.account_put_deploy(
         signed_deploy,
         undefined,
-        Verbosity.High,
       )).toJson();
       console.log('js account_put_deploy', account_put_deploy);
       setAccount_put_deploy(account_put_deploy?.deploy_hash);
@@ -331,6 +337,7 @@ function App() {
         return;
       }
 
+      // get_deploy
       let finalized_approvals = true;
       let get_deploy_options = sdk.get_deploy_options({
         deploy_hash: new DeployHash(
@@ -338,13 +345,12 @@ function App() {
           account_put_deploy?.deploy_hash
         ).toJson(),
         finalized_approvals: finalized_approvals,
-        verbosity: Verbosity.High,
       });
       const info_get_deploy = await sdk.get_deploy(get_deploy_options);
       console.log('js info_get_deploy', info_get_deploy);
       setInfo_get_deploy(info_get_deploy?.api_version);
 
-      // test call entry point
+      // call entry point
       session_account = privateToPublicKey(secret_key);
       deploy_params = new DeployStrParams(
         chain_name,
@@ -372,6 +378,7 @@ function App() {
     }
   };
 
+  // install
   const onFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile || !(sdk instanceof SDK)) {
