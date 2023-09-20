@@ -343,9 +343,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!deploy_hash_as_string) {
       return;
     }
-    const get_deploy_options = this.sdk.get_deploy_options({});
-    get_deploy_options.deploy_hash = new DeployHash(deploy_hash_as_string);
-    get_deploy_options.finalized_approvals = finalized_approvals;
+    const get_deploy_options = this.sdk.get_deploy_options({
+      deploy_hash_as_string,
+      finalized_approvals
+    });
     try {
       const get_deploy = await this.sdk.get_deploy(get_deploy_options);
       get_deploy && this.resultService.setResult(get_deploy.toJson());
