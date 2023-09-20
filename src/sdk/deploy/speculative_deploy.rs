@@ -24,6 +24,20 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// This function allows executing a deploy speculatively.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - Deployment parameters for the deploy.
+    /// * `session_params` - Session parameters for the deploy.
+    /// * `payment_params` - Payment parameters for the deploy.
+    /// * `maybe_block_identifier` - Optional block identifier.
+    /// * `verbosity` - Optional verbosity level.
+    /// * `node_address` - Optional node address.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "speculative_deploy")]
     pub async fn speculative_deploy_js_alias(
         &self,
@@ -56,6 +70,20 @@ impl SDK {
 }
 
 impl SDK {
+    /// This function allows executing a deploy speculatively.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - Deployment parameters for the deploy.
+    /// * `session_params` - Session parameters for the deploy.
+    /// * `payment_params` - Payment parameters for the deploy.
+    /// * `maybe_block_identifier` - Optional block identifier.
+    /// * `verbosity` - Optional verbosity level.
+    /// * `node_address` - Optional node address.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SuccessResponse<SpeculativeExecResult>` or a `SdkError` in case of an error.
     pub async fn speculative_deploy(
         &self,
         deploy_params: DeployStrParams,

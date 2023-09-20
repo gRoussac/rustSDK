@@ -39,6 +39,7 @@ pub struct QueryContractDictOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Deserialize query_contract_dict_options from a JavaScript object.
     #[wasm_bindgen(js_name = "query_contract_dict_options")]
     pub fn query_contract_dict_state_options(&self, options: JsValue) -> QueryContractDictOptions {
         let options_result = options.into_serde::<QueryContractDictOptions>();
@@ -54,6 +55,7 @@ impl SDK {
         }
     }
 
+    /// JavaScript alias for query_contract_dict with deserialized options.
     #[wasm_bindgen(js_name = "query_contract_dict")]
     pub async fn query_contract_dict_js_alias(
         &self,
@@ -72,6 +74,18 @@ impl SDK {
 }
 
 impl SDK {
+    /// Query a contract dictionary item.
+    ///
+    /// # Arguments
+    ///
+    /// * `state_root_hash` - State root hash.
+    /// * `dictionary_item` - Dictionary item input.
+    /// * `verbosity` - Optional verbosity level.
+    /// * `node_address` - Optional node address.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SuccessResponse<GetDictionaryItemResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_dict(
         &self,
         state_root_hash: impl ToDigest,

@@ -12,9 +12,26 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// A set of functions for installing smart contracts on the blockchain.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Installs a smart contract with the specified parameters and returns the result.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - The deploy parameters.
+    /// * `session_params` - The session parameters.
+    /// * `payment_amount` - The payment amount as a string.
+    /// * `node_address` - An optional node address to send the request to.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the installation.
     #[wasm_bindgen(js_name = "install")]
     pub async fn install_js_alias(
         &self,
@@ -39,7 +56,24 @@ impl SDK {
     }
 }
 
+/// A set of functions for installing smart contracts on the blockchain.
 impl SDK {
+    /// Installs a smart contract with the specified parameters and returns the result.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - The deploy parameters.
+    /// * `session_params` - The session parameters.
+    /// * `payment_params` - The payment parameters.
+    /// * `node_address` - An optional node address to send the request to.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `PutDeployResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the installation.
     pub async fn install(
         &self,
         deploy_params: DeployStrParams,

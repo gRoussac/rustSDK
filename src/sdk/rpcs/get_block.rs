@@ -18,8 +18,9 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the GetBlockResult
 #[cfg(target_arch = "wasm32")]
-#[derive(Debug, Deserialize, Clone, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[wasm_bindgen]
 pub struct GetBlockResult(_GetBlockResult);
 
@@ -29,6 +30,7 @@ impl From<GetBlockResult> for _GetBlockResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetBlockResult> for GetBlockResult {
     fn from(result: _GetBlockResult) -> Self {
@@ -39,22 +41,26 @@ impl From<_GetBlockResult> for GetBlockResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBlockResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the block information as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn block(&self) -> JsValue {
         JsValue::from_serde(&self.0.block).unwrap()
     }
 
+    /// Converts the GetBlockResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_block` method.
 #[derive(Debug, Deserialize, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getBlockOptions", getter_with_clone)]
@@ -68,6 +74,15 @@ pub struct GetBlockOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses block options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing block options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed block options as a `GetBlockOptions` struct.
     #[wasm_bindgen(js_name = "get_block_options")]
     pub fn get_block_options(&self, options: JsValue) -> GetBlockOptions {
         let options_result = options.into_serde::<GetBlockOptions>();
@@ -80,6 +95,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves block information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_block")]
     pub async fn get_block_js_alias(
         &self,
@@ -113,6 +141,19 @@ impl SDK {
         }
     }
 
+    /// Alias for the `get_block` method to maintain compatibility.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "chain_get_block")]
     pub async fn chain_get_block_js_alias(
         &self,
@@ -123,6 +164,21 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves block information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` specifying the block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for the retrieval.
+    /// * `node_address` - An optional node address to target for retrieval.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBlockResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_block(
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,

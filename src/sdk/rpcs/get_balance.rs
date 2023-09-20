@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the GetBalanceResult
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -29,36 +30,43 @@ impl From<GetBalanceResult> for _GetBalanceResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetBalanceResult> for GetBalanceResult {
     fn from(result: _GetBalanceResult) -> Self {
         GetBalanceResult(result)
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBalanceResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the balance value as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn balance_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.balance_value).unwrap()
     }
 
+    /// Gets the Merkle proof as a string.
     #[wasm_bindgen(getter)]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
+    /// Converts the GetBalanceResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_balance` method.
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getBalanceOptions", getter_with_clone)]
@@ -74,6 +82,15 @@ pub struct GetBalanceOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses balance options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing balance options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed balance options as a `GetBalanceOptions` struct.
     #[wasm_bindgen(js_name = "get_balance_options")]
     pub fn get_balance_options(&self, options: JsValue) -> GetBalanceOptions {
         let options_result = options.into_serde::<GetBalanceOptions>();
@@ -86,6 +103,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves balance information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_balance")]
     pub async fn get_balance_js_alias(
         &self,
@@ -132,6 +162,15 @@ impl SDK {
         }
     }
 
+    /// Alias for `get_balance_js_alias`.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "state_get_balance")]
     pub async fn state_get_balance_js_alias(
         &self,
@@ -141,6 +180,7 @@ impl SDK {
     }
 }
 
+/// Enum representing different ways to specify the purse uref.
 #[derive(Debug, Clone)]
 pub enum GetBalanceInput {
     PurseUref(URef),
@@ -148,6 +188,22 @@ pub enum GetBalanceInput {
 }
 
 impl SDK {
+    /// Retrieves balance information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `state_root_hash` - The state root hash to query for balance information.
+    /// * `purse_uref` - The purse uref specifying the purse for which to retrieve the balance.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBalanceResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_balance(
         &self,
         state_root_hash: impl ToDigest,

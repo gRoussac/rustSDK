@@ -39,6 +39,7 @@ pub struct QueryContractKeyOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Deserialize query_contract_key_options from a JavaScript object.
     #[wasm_bindgen(js_name = "query_contract_key_options")]
     pub fn query_contract_key_state_options(&self, options: JsValue) -> QueryContractKeyOptions {
         let options_result = options.into_serde::<QueryContractKeyOptions>();
@@ -51,6 +52,7 @@ impl SDK {
         }
     }
 
+    /// JavaScript alias for query_contract_key with deserialized options.
     #[wasm_bindgen(js_name = "query_contract_key")]
     pub async fn query_contract_key_js_alias(
         &self,
@@ -69,6 +71,15 @@ impl SDK {
 }
 
 impl SDK {
+    /// Query a contract key.
+    ///
+    /// # Arguments
+    ///
+    /// * `query_params` - Query global state parameters.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SuccessResponse<QueryGlobalStateResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_key(
         &self,
         query_params: QueryGlobalStateParams,

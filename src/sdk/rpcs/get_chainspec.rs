@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// A struct representing the result of the `get_chainspec` function.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -24,6 +25,7 @@ impl From<GetChainspecResult> for _GetChainspecResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetChainspecResult> for GetChainspecResult {
     fn from(result: _GetChainspecResult) -> Self {
@@ -31,28 +33,43 @@ impl From<_GetChainspecResult> for GetChainspecResult {
     }
 }
 
+/// Implementations for the `GetChainspecResult` struct.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetChainspecResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the chainspec bytes as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn chainspec_bytes(&self) -> JsValue {
         JsValue::from_serde(&self.0.chainspec_bytes).unwrap()
     }
 
+    /// Converts the `GetChainspecResult` to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Implementations for the `SDK` struct.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Asynchronously retrieves the chainspec.
+    ///
+    /// # Arguments
+    ///
+    /// * `verbosity` - An optional `Verbosity` parameter.
+    /// * `node_address` - An optional node address as a string.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "get_chainspec")]
     pub async fn get_chainspec_js_alias(
         &self,
@@ -71,7 +88,18 @@ impl SDK {
     }
 }
 
+/// Implementations for the `SDK` struct.
 impl SDK {
+    /// Asynchronously retrieves the chainspec.
+    ///
+    /// # Arguments
+    ///
+    /// * `verbosity` - An optional `Verbosity` parameter.
+    /// * `node_address` - An optional node address as a string.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetChainspecResult` or a `SdkError` in case of an error.
     pub async fn get_chainspec(
         &self,
         verbosity: Option<Verbosity>,

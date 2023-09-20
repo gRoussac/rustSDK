@@ -25,63 +25,63 @@
 
 // #[wasm_bindgen]
 // impl CLValue {
-    // #[wasm_bindgen(constructor)]
-    // pub fn new(cl_type: CLType, bytes: Bytes) -> Self {
-    //     CLValue { cl_type, bytes }
-    // }
+// #[wasm_bindgen(constructor)]
+// pub fn new(cl_type: CLType, bytes: Bytes) -> Self {
+//     CLValue { cl_type, bytes }
+// }
 
-    // pub fn Bool(value: bool) -> Result<CLValue, JsValue> {
-    //     let cl_value = _CLValue::from_t(value)
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
-    //     Ok(cl_value.into())
-    // }
+// pub fn Bool(value: bool) -> Result<CLValue, JsValue> {
+//     let cl_value = _CLValue::from_t(value)
+//         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
+//     Ok(cl_value.into())
+// }
 
-    // pub fn I32(value: i32) -> Result<CLValue, JsValue> {
-    //     let cl_value = _CLValue::from_t(value)
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
-    //     let bytes = cl_value
-    //         .into_bytes()
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
-    //     Ok(CLValue::new(CLType::I32(), bytes.into()))
-    // }
+// pub fn I32(value: i32) -> Result<CLValue, JsValue> {
+//     let cl_value = _CLValue::from_t(value)
+//         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
+//     let bytes = cl_value
+//         .into_bytes()
+//         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
+//     Ok(CLValue::new(CLType::I32(), bytes.into()))
+// }
 
-    // pub fn U32(value: u32) -> Result<CLValue, JsValue> {
-    //     let cl_value = _CLValue::from_t(value)
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
-    //     let bytes = cl_value
-    //         .into_bytes()
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
-    //     Ok(CLValue::new(CLType::U32(), bytes.into()))
-    // }
+// pub fn U32(value: u32) -> Result<CLValue, JsValue> {
+//     let cl_value = _CLValue::from_t(value)
+//         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
+//     let bytes = cl_value
+//         .into_bytes()
+//         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
+//     Ok(CLValue::new(CLType::U32(), bytes.into()))
+// }
 
-    // pub fn U64(value: u64) -> Result<CLValue, JsValue> {
-    //     let cl_value = _CLValue::from_t(value)
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
-    //     let bytes = cl_value
-    //         .into_bytes()
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
-    //     Ok(CLValue::new(CLType::U64(), bytes.into()))
-    // }
+// pub fn U64(value: u64) -> Result<CLValue, JsValue> {
+//     let cl_value = _CLValue::from_t(value)
+//         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
+//     let bytes = cl_value
+//         .into_bytes()
+//         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
+//     Ok(CLValue::new(CLType::U64(), bytes.into()))
+// }
 
-    // pub fn U128(value: JsValue) -> Result<CLValue, JsValue> {
-    //     // Deserialize JsValue into u128
-    //     let value_as_u128: U128 = value
-    //         .into_serde()
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to deserialize u128: {:?}", err)))?;
+// pub fn U128(value: JsValue) -> Result<CLValue, JsValue> {
+//     // Deserialize JsValue into u128
+//     let value_as_u128: U128 = value
+//         .into_serde()
+//         .map_err(|err| JsValue::from_str(&format!("Failed to deserialize u128: {:?}", err)))?;
 
-    //     // Create _CLValue from the u128
-    //     let cl_value = _CLValue::from_t(value_as_u128)
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
+//     // Create _CLValue from the u128
+//     let cl_value = _CLValue::from_t(value_as_u128)
+//         .map_err(|err| JsValue::from_str(&format!("Failed to create CLValue: {:?}", err)))?;
 
-    //     // Serialize _CLValue into bytes
-    //     let bytes = cl_value
-    //         .into_bytes()
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
+//     // Serialize _CLValue into bytes
+//     let bytes = cl_value
+//         .into_bytes()
+//         .map_err(|err| JsValue::from_str(&format!("Failed to serialize CLValue: {:?}", err)))?;
 
-    //     // Create CLValue with u128 CLType and bytes
-    //     Ok(CLValue::new(CLType::U128(), bytes.into()))
-    // }
-}
+//     // Create CLValue with u128 CLType and bytes
+//     Ok(CLValue::new(CLType::U128(), bytes.into()))
+// }
+// }
 
 // impl From<CLValue> for _CLValue {
 //     fn from(cl_value: CLValue) -> Self {

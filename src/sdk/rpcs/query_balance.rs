@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the QueryBalanceResult
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -32,6 +33,7 @@ impl From<QueryBalanceResult> for _QueryBalanceResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_QueryBalanceResult> for QueryBalanceResult {
     fn from(result: _QueryBalanceResult) -> Self {
@@ -42,22 +44,26 @@ impl From<_QueryBalanceResult> for QueryBalanceResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl QueryBalanceResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the balance as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn balance(&self) -> JsValue {
         JsValue::from_serde(&self.0.balance).unwrap()
     }
 
+    /// Converts the QueryBalanceResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `query_balance` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "queryBalanceOptions", getter_with_clone)]
@@ -75,6 +81,15 @@ pub struct QueryBalanceOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses query balance options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing query balance options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed query balance options as a `QueryBalanceOptions` struct.
     #[wasm_bindgen(js_name = "query_balance_options")]
     pub fn query_balance_options(&self, options: JsValue) -> QueryBalanceOptions {
         let options_result = options.into_serde::<QueryBalanceOptions>();
@@ -87,6 +102,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves balance information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `QueryBalanceOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `QueryBalanceResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "query_balance")]
     pub async fn query_balance_js_alias(
         &self,
@@ -160,7 +188,25 @@ impl SDK {
 }
 
 impl SDK {
-    #[allow(clippy::too_many_arguments)]
+    /// Retrieves balance information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `maybe_global_state_identifier` - An optional `GlobalStateIdentifier` for specifying global state.
+    /// * `purse_identifier_as_string` - An optional string representing a purse identifier.
+    /// * `purse_identifier` - An optional `PurseIdentifier`.
+    /// * `state_root_hash` - An optional string representing a state root hash.
+    /// * `maybe_block_id` - An optional string representing a block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SuccessResponse<_QueryBalanceResult>` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn query_balance(
         &self,
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,

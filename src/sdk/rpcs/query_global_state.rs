@@ -16,6 +16,7 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the QueryGlobalStateResult
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct QueryGlobalStateResult(_QueryGlobalStateResult);
@@ -35,32 +36,38 @@ impl From<_QueryGlobalStateResult> for QueryGlobalStateResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl QueryGlobalStateResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the block header as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn block_header(&self) -> JsValue {
         JsValue::from_serde(&self.0.block_header).unwrap()
     }
 
+    /// Gets the stored value as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn stored_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.stored_value).unwrap()
     }
 
+    /// Gets the Merkle proof as a string.
     #[wasm_bindgen(getter)]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
+    /// Converts the QueryGlobalStateResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `query_global_state` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(js_name = "queryGlobalStateOptions", getter_with_clone)]
 pub struct QueryGlobalStateOptions {
@@ -79,6 +86,15 @@ pub struct QueryGlobalStateOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses query global state options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing query global state options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed query global state options as a `QueryGlobalStateOptions` struct.
     #[wasm_bindgen(js_name = "query_global_state_options")]
     pub fn query_global_state_options(&self, options: JsValue) -> QueryGlobalStateOptions {
         let options_result = options.into_serde::<QueryGlobalStateOptions>();
@@ -91,6 +107,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves global state information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `QueryGlobalStateOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `QueryGlobalStateResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "query_global_state")]
     pub async fn query_global_state_js_alias(
         &self,
@@ -117,18 +146,21 @@ impl SDK {
     }
 }
 
+/// Enum to represent input for KeyIdentifier.
 #[derive(Debug, Clone)]
 pub enum KeyIdentifierInput {
     Key(Key),
     String(String),
 }
 
+/// Enum to represent input for PathIdentifier.
 #[derive(Debug, Clone)]
 pub enum PathIdentifierInput {
     Path(Path),
     String(String),
 }
 
+/// Struct to store parameters for querying global state.
 #[derive(Debug)]
 pub struct QueryGlobalStateParams {
     pub key: KeyIdentifierInput,
@@ -141,6 +173,15 @@ pub struct QueryGlobalStateParams {
 }
 
 impl SDK {
+    /// Builds parameters for querying global state based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `QueryGlobalStateOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `QueryGlobalStateParams` struct or a `SdkError` in case of an error.
     pub fn query_global_state_js_alias_params(
         &self,
         options: Option<QueryGlobalStateOptions>,
@@ -237,6 +278,15 @@ impl SDK {
         Ok(query_params)
     }
 
+    /// Retrieves global state information based on the provided parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `query_params` - A `QueryGlobalStateParams` struct containing query parameters.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SuccessResponse<_QueryGlobalStateResult>` or a `SdkError` in case of an error.
     pub async fn query_global_state(
         &self,
         query_params: QueryGlobalStateParams,

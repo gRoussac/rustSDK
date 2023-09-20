@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the GetBlockTransfersResult
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -32,6 +33,7 @@ impl From<GetBlockTransfersResult> for _GetBlockTransfersResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetBlockTransfersResult> for GetBlockTransfersResult {
     fn from(result: _GetBlockTransfersResult) -> Self {
@@ -42,27 +44,32 @@ impl From<_GetBlockTransfersResult> for GetBlockTransfersResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBlockTransfersResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the block hash as an Option<BlockHash>.
     #[wasm_bindgen(getter)]
     pub fn block_hash(&self) -> Option<BlockHash> {
         self.0.block_hash.map(Into::into)
     }
 
+    /// Gets the transfers as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn transfers(&self) -> JsValue {
         JsValue::from_serde(&self.0.transfers).unwrap()
     }
 
+    /// Converts the GetBlockTransfersResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_block_transfers` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getBlockTransfersOptions", getter_with_clone)]
@@ -76,6 +83,15 @@ pub struct GetBlockTransfersOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses block transfers options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing block transfers options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed block transfers options as a `GetBlockTransfersOptions` struct.
     #[wasm_bindgen(js_name = "get_block_transfers_options")]
     pub fn get_block_transfers_options(&self, options: JsValue) -> GetBlockTransfersOptions {
         let options_result = options.into_serde::<GetBlockTransfersOptions>();
@@ -88,6 +104,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves block transfers information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_block_transfers")]
     pub async fn get_block_transfers_js_alias(
         &self,
@@ -123,6 +152,21 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves block transfers information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` specifying the block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetBlockTransfersResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_block_transfers(
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,

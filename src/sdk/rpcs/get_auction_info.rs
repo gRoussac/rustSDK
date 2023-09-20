@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the GetAuctionInfoResult
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -29,31 +30,37 @@ impl From<GetAuctionInfoResult> for _GetAuctionInfoResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetAuctionInfoResult> for GetAuctionInfoResult {
     fn from(result: _GetAuctionInfoResult) -> Self {
         GetAuctionInfoResult(result)
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetAuctionInfoResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the auction state as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn auction_state(&self) -> JsValue {
         JsValue::from_serde(&self.0.auction_state).unwrap()
     }
 
+    /// Converts the GetAuctionInfoResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_auction_info` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getAuctionInfoOptions", getter_with_clone)]
@@ -67,6 +74,15 @@ pub struct GetAuctionInfoOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses auction info options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing auction info options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed auction info options as a `GetAuctionInfoOptions` struct.
     #[wasm_bindgen(js_name = "get_auction_info_options")]
     pub fn get_auction_info_options(&self, options: JsValue) -> GetAuctionInfoOptions {
         let options_result = options.into_serde::<GetAuctionInfoOptions>();
@@ -79,6 +95,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves auction information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_auction_info")]
     pub async fn get_auction_info_js_alias(
         &self,
@@ -114,6 +143,21 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves auction information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetAuctionInfoResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_auction_info(
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,

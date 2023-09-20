@@ -12,9 +12,26 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// A set of functions for working with smart contract entry points.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Calls a smart contract entry point with the specified parameters and returns the result.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - The deploy parameters.
+    /// * `session_params` - The session parameters.
+    /// * `payment_amount` - The payment amount as a string.
+    /// * `node_address` - An optional node address to send the request to.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the call.
     #[wasm_bindgen(js_name = "call_entrypoint")]
     pub async fn call_entrypoint_js_alias(
         &self,
@@ -40,7 +57,24 @@ impl SDK {
     }
 }
 
+/// A set of functions for working with smart contract entry points.
 impl SDK {
+    /// Calls a smart contract entry point with the specified parameters and returns the result.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - The deploy parameters.
+    /// * `session_params` - The session parameters.
+    /// * `payment_params` - The payment parameters.
+    /// * `node_address` - An optional node address to send the request to.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `PutDeployResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the call.
     pub async fn call_entrypoint(
         &self,
         deploy_params: DeployStrParams,
@@ -62,13 +96,6 @@ impl SDK {
             error(&err_msg);
             return Err(SdkError::from(err));
         }
-
-        // let mut deploy: Deploy = deploy.unwrap().into();
-        // let build_params = BuildParams::default();
-        // deploy.build(build_params);
-        // if let Some(secret_key) = secret_key {
-        //     deploy = deploy.sign(&secret_key);
-        // }
 
         self.put_deploy(deploy.unwrap().into(), None, node_address)
             .await
