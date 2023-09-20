@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// Wrapper struct for the `GetValidatorChangesResult` from casper_client.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -24,6 +25,7 @@ impl From<GetValidatorChangesResult> for _GetValidatorChangesResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetValidatorChangesResult> for GetValidatorChangesResult {
     fn from(result: _GetValidatorChangesResult) -> Self {
@@ -34,25 +36,43 @@ impl From<_GetValidatorChangesResult> for GetValidatorChangesResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetValidatorChangesResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the validator changes as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn changes(&self) -> JsValue {
         JsValue::from_serde(&self.0.changes).unwrap()
     }
 
+    /// Converts the GetValidatorChangesResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// SDK methods for working with validator changes.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Retrieves validator changes using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_validator_changes")]
     pub async fn get_validator_changes_js_alias(
         &self,
@@ -72,6 +92,20 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves validator changes based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetValidatorChangesResult` or an `Error` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `Error` if there is an error during the retrieval process.
     pub async fn get_validator_changes(
         &self,
         verbosity: Option<Verbosity>,

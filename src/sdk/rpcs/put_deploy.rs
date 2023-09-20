@@ -10,9 +10,25 @@ use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// SDK methods for putting a deploy.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Puts a deploy using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy` - The `Deploy` object to be sent.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the deploy process.
     #[wasm_bindgen(js_name = "put_deploy")]
     pub async fn put_deploy_js_alias(
         &self,
@@ -33,6 +49,9 @@ impl SDK {
         }
     }
 
+    /// Alias for `put_deploy_js_alias`.
+    ///
+    /// This function provides an alternative name for `put_deploy_js_alias`.
     #[wasm_bindgen(js_name = "account_put_deploy")]
     pub async fn account_put_deploy_js_alias(
         &self,
@@ -46,6 +65,21 @@ impl SDK {
 }
 
 impl SDK {
+    /// Puts a deploy based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy` - The `Deploy` object to be sent.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `PutDeployResult` or an `Error` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `Error` if there is an error during the deploy process.
     pub async fn put_deploy(
         &self,
         deploy: Deploy,

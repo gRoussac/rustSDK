@@ -23,9 +23,27 @@ use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// SDK functions related to speculative transfers.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Alias for speculative transfer.
+    ///
+    /// # Arguments
+    ///
+    /// * `amount` - The amount to transfer.
+    /// * `target_account` - The target account.
+    /// * `transfer_id` - An optional transfer ID (defaults to a random number).
+    /// * `deploy_params` - The deployment parameters.
+    /// * `payment_params` - The payment parameters.
+    /// * `maybe_block_id_as_string` - An optional block ID as a string.
+    /// * `maybe_block_identifier` - An optional block identifier.
+    /// * `verbosity` - The verbosity level for logging (optional).
+    /// * `node_address` - The address of the node to connect to (optional).
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
     #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(js_name = "speculative_transfer")]
     pub async fn speculative_transfer_js_alias(
@@ -70,7 +88,24 @@ impl SDK {
     }
 }
 
+/// SDK functions related to speculative transfers.
 impl SDK {
+    /// Perform a speculative transfer.
+    ///
+    /// # Arguments
+    ///
+    /// * `amount` - The amount to transfer.
+    /// * `target_account` - The target account.
+    /// * `transfer_id` - An optional transfer ID (defaults to a random number).
+    /// * `deploy_params` - The deployment parameters.
+    /// * `payment_params` - The payment parameters.
+    /// * `maybe_block_identifier` - An optional block identifier.
+    /// * `verbosity` - The verbosity level for logging (optional).
+    /// * `node_address` - The address of the node to connect to (optional).
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the result of the speculative transfer or a `SdkError` in case of an error.
     #[allow(clippy::too_many_arguments)]
     pub async fn speculative_transfer(
         &self,

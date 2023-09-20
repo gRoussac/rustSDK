@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// Wrapper struct for the `ListRpcsResult` from casper_client.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -23,6 +24,7 @@ impl From<ListRpcsResult> for _ListRpcsResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_ListRpcsResult> for ListRpcsResult {
     fn from(result: _ListRpcsResult) -> Self {
@@ -33,30 +35,49 @@ impl From<_ListRpcsResult> for ListRpcsResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl ListRpcsResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the name of the RPC.
     #[wasm_bindgen(getter)]
     pub fn name(&self) -> String {
         self.0.name.clone()
     }
 
+    /// Gets the schema of the RPC as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn schema(&self) -> JsValue {
         JsValue::from_serde(&self.0.schema).unwrap()
     }
 
+    /// Converts the ListRpcsResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// SDK methods for listing available RPCs.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Lists available RPCs using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the listing process.
     #[wasm_bindgen(js_name = "list_rpcs")]
     pub async fn list_rpcs_js_alias(
         &self,
@@ -76,6 +97,20 @@ impl SDK {
 }
 
 impl SDK {
+    /// Lists available RPCs based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `ListRpcsResult` or an `Error` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `Error` if there is an error during the listing process.
     pub async fn list_rpcs(
         &self,
         verbosity: Option<Verbosity>,

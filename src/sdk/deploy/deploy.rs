@@ -23,11 +23,13 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to represent the result of a deploy.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct PutDeployResult(_PutDeployResult);
 
+// Implement conversions between PutDeployResult and _PutDeployResult.
 #[cfg(target_arch = "wasm32")]
 impl From<PutDeployResult> for _PutDeployResult {
     fn from(result: PutDeployResult) -> Self {
@@ -41,6 +43,7 @@ impl From<_PutDeployResult> for PutDeployResult {
     }
 }
 
+// Implement JavaScript bindings for PutDeployResult.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl PutDeployResult {
@@ -54,6 +57,7 @@ impl PutDeployResult {
         self.0.deploy_hash.into()
     }
 
+    // Convert PutDeployResult to a JavaScript object.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
@@ -63,6 +67,7 @@ impl PutDeployResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    // JavaScript alias for deploy with deserialized parameters.
     #[wasm_bindgen(js_name = "deploy")]
     pub async fn deploy_js_alias(
         &self,
@@ -93,6 +98,7 @@ impl SDK {
 }
 
 impl SDK {
+    // Perform a deploy operation.
     pub async fn deploy(
         &self,
         deploy_params: DeployStrParams,
@@ -116,6 +122,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
+        // Send the deploy to the network and handle any errors.
         self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
             .await
             .map_err(SdkError::from)

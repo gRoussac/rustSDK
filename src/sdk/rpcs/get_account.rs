@@ -21,17 +21,20 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define the GetAccountResult struct to wrap the result from Casper's RPC call
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct GetAccountResult(_GetAccountResult);
 
+// Implement conversions between GetAccountResult and _GetAccountResult
 #[cfg(target_arch = "wasm32")]
 impl From<GetAccountResult> for _GetAccountResult {
     fn from(result: GetAccountResult) -> Self {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetAccountResult> for GetAccountResult {
     fn from(result: _GetAccountResult) -> Self {
@@ -42,6 +45,7 @@ impl From<_GetAccountResult> for GetAccountResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetAccountResult {
+    // Define getters for various fields of GetAccountResult
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
@@ -63,6 +67,7 @@ impl GetAccountResult {
     }
 }
 
+// Define options for the `get_account` function
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getAccountOptions", getter_with_clone)]
@@ -78,6 +83,7 @@ pub struct GetAccountOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    // Deserialize options for `get_account` from a JavaScript object
     #[wasm_bindgen(js_name = "get_account_options")]
     pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {
         let options_result = options.into_serde::<GetAccountOptions>();
@@ -90,6 +96,7 @@ impl SDK {
         }
     }
 
+    // JavaScript alias for `get_account` function
     #[wasm_bindgen(js_name = "get_account")]
     pub async fn get_account_js_alias(
         &self,
@@ -131,6 +138,7 @@ impl SDK {
         }
     }
 
+    // JavaScript alias for `get_account_js_alias`
     #[wasm_bindgen(js_name = "state_get_account_info")]
     pub async fn state_get_account_info_js_alias(
         &self,
@@ -141,6 +149,23 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves account information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `account_identifier` - An optional `AccountIdentifier` for specifying the account identifier.
+    /// * `account_identifier_as_string` - An optional string representing the account identifier.
+    /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `SuccessResponse<_GetAccountResult>` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_account(
         &self,
         account_identifier: Option<AccountIdentifier>,
@@ -149,8 +174,6 @@ impl SDK {
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
-        //log("get_account!");
-
         let account_identifier = if let Some(account_identifier) = account_identifier {
             account_identifier
         } else if let Some(account_identifier_as_string) = account_identifier_as_string.clone() {

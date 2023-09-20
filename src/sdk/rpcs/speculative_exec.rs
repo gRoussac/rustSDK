@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// Represents the result of a speculative execution.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -32,6 +33,7 @@ impl From<SpeculativeExecResult> for _SpeculativeExecResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_SpeculativeExecResult> for SpeculativeExecResult {
     fn from(result: _SpeculativeExecResult) -> Self {
@@ -42,42 +44,59 @@ impl From<_SpeculativeExecResult> for SpeculativeExecResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SpeculativeExecResult {
+    /// Get the API version of the result.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Get the block hash.
     #[wasm_bindgen(getter)]
     pub fn block_hash(&self) -> BlockHash {
         self.0.block_hash.into()
     }
 
+    /// Get the execution result.
     #[wasm_bindgen(getter)]
     pub fn execution_result(&self) -> JsValue {
         JsValue::from_serde(&self.0.execution_result).unwrap()
     }
 
+    /// Convert the result to JSON format.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for speculative execution.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getSpeculativeExecOptions", getter_with_clone)]
 pub struct GetSpeculativeExecOptions {
+    /// The deploy as a JSON string.
     pub deploy_as_string: Option<String>,
+
+    /// The deploy to execute.
     pub deploy: Option<Deploy>,
+
+    /// The block identifier as a string.
     pub maybe_block_id_as_string: Option<String>,
+
+    /// The block identifier.
     pub maybe_block_identifier: Option<BlockIdentifier>,
+
+    /// The node address.
     pub node_address: Option<String>,
+
+    /// The verbosity level for logging.
     pub verbosity: Option<Verbosity>,
 }
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Get options for speculative execution from a JavaScript value.
     #[wasm_bindgen(js_name = "speculative_exec_options")]
     pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecOptions {
         let options_result = options.into_serde::<GetSpeculativeExecOptions>();
@@ -90,6 +109,15 @@ impl SDK {
         }
     }
 
+    /// Alias for speculative execution.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - The options for speculative execution.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "speculative_exec")]
     pub async fn speculative_exec_js_alias(
         &self,
@@ -142,6 +170,18 @@ impl SDK {
 }
 
 impl SDK {
+    /// Perform speculative execution.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy` - The deploy to execute.
+    /// * `maybe_block_identifier` - The block identifier.
+    /// * `verbosity` - The verbosity level for logging.
+    /// * `node_address` - The address of the node to connect to.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the result of the speculative execution or a `SdkError` in case of an error.
     pub async fn speculative_exec(
         &self,
         deploy: Deploy,

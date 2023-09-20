@@ -58,7 +58,7 @@ curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
 ```shell
 $ make prepare
-$ make build
+$ make pack
 ```
 
 will create a `pkg` and `pkg-nodejs` cointaining the typescript interfaces. You can find more details about building the sdk for javascript with wasm-pack in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
@@ -438,42 +438,74 @@ You can download an alpha version of the app illustrating the sdk here :
 
 </details>
 
-<hr>
+---
 
-## API
+<br>
+
+## Rust API
+
+- [Full item list](docs/api-rust/casper_rust_wasm_sdk/all.html)
+
+### SDK
+
+- [SDK Struct and methods](docs/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
 
 ### RPC
 
-- [TODO](docs/API/.md)
+- [RPC List](docs/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
 
 ### Deploy Params
 
-- [TODO](docs/API/.md)
+- [Params and Args simple](docs/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
 
 ### Deploy
 
-- [TODO](docs/API/.md)
-
-### Deploy Utils
-
-- [TODO](docs/API/.md)
+- [Deploy Type and static builder](docs/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
 ### Types
 
-- [TODO](docs/API/.md)
+- [Current exposed types](docs/api-rust/casper_rust_wasm_sdk/types/index.html)
 
-### Helpers
+### Helpers functions
 
-- [TODO](docs/API/.md)
+- [Rust helpers](docs/api-rust/casper_rust_wasm_sdk/helpers/index.html)
+
+## Typescript API
+
+- [Full item list](docs/api-wasm/index.html)
+
+### SDK
+
+- [SDK Struct and methods](docs/api-wasm/classes/SDK.html)
+
+### RPC Methods
+
+- [RPC List](docs/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+
+### Deploy Params
+
+- [Params and Args simple](docs/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+
+### Deploy
+
+- [Deploy Type and static builder](docs/api-wasm/classes/Deploy.html)
+
+### Types
+
+- [Current exposed types](docs/api-wasm/modules.html)
+
+### Helpers functions
+
+- [TS helpers](docs/api-wasm/modules.html)
 
 ## Testing
 
 Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at root of tests of in
 `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (so levels higher than the test). This path can be changed in configuration.
 
-- [Rust Integration tests](tests/integration/rust/) can be run with `cargo test`, [configure config](tests/integration/rust/src/config.rs)
+- [Rust Integration tests](tests/integration/rust/) can be run with `cargo test` [configured in config](tests/integration/rust/src/config.rs)
 
-- [Jest/Puppeteer E2E tests](tests/e2e/) can be run with `npm test`, [configure with .env](tests/e2e/.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
+- [Jest/Puppeteer E2E tests](tests/e2e/) can be run with `npm test` [configured with .env](tests/e2e/.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
 
 - Unit tests [TODO]
 

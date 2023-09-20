@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// Wrapper struct for the `GetEraSummaryResult` from casper_client.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -29,6 +30,7 @@ impl From<GetEraSummaryResult> for _GetEraSummaryResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetEraSummaryResult> for GetEraSummaryResult {
     fn from(result: _GetEraSummaryResult) -> Self {
@@ -39,22 +41,26 @@ impl From<_GetEraSummaryResult> for GetEraSummaryResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetEraSummaryResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the era summary as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn era_summary(&self) -> JsValue {
         JsValue::from_serde(&self.0.era_summary).unwrap()
     }
 
+    /// Converts the GetEraSummaryResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_era_summary` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getEraSummaryOptions", getter_with_clone)]
@@ -68,6 +74,15 @@ pub struct GetEraSummaryOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses era summary options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing era summary options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed era summary options as a `GetEraSummaryOptions` struct.
     #[wasm_bindgen(js_name = "get_era_summary_options")]
     pub fn get_era_summary_options(&self, options: JsValue) -> GetEraSummaryOptions {
         let options_result = options.into_serde::<GetEraSummaryOptions>();
@@ -80,6 +95,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves era summary information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_era_summary")]
     pub async fn get_era_summary_js_alias(
         &self,
@@ -115,6 +143,21 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves era summary information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetEraSummaryResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_era_summary(
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,

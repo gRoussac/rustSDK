@@ -18,9 +18,23 @@ use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// Exposes the `make_transfer` function to JavaScript with an alias.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Alias for `make_transfer`.
+    ///
+    /// # Arguments
+    ///
+    /// * `amount` - The transfer amount.
+    /// * `target_account` - The target account.
+    /// * `transfer_id` - Optional transfer identifier.
+    /// * `deploy_params` - The deploy parameters.
+    /// * `payment_params` - The payment parameters.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "make_transfer")]
     pub fn make_transfer_js_alias(
         &self,
@@ -50,6 +64,19 @@ impl SDK {
 }
 
 impl SDK {
+    /// Creates a transfer deploy with the provided parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `amount` - The transfer amount.
+    /// * `target_account` - The target account.
+    /// * `transfer_id` - Optional transfer identifier.
+    /// * `deploy_params` - The deploy parameters.
+    /// * `payment_params` - The payment parameters.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the created `Deploy` or a `SdkError` in case of an error.
     pub fn make_transfer(
         &self,
         amount: &str,
@@ -70,6 +97,7 @@ impl SDK {
     }
 }
 
+/// Internal function to create a transfer deploy.
 pub(crate) fn make_transfer(
     amount: &str,
     target_account: &str,

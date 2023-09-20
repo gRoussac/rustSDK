@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the GetDeployResult
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -38,26 +39,31 @@ impl From<_GetDeployResult> for GetDeployResult {
 #[wasm_bindgen]
 impl GetDeployResult {
     #[wasm_bindgen(getter)]
+    /// Gets the API version as a JavaScript value.
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
     #[wasm_bindgen(getter)]
+    /// Gets the deploy information.
     pub fn deploy(&self) -> Deploy {
         self.0.deploy.clone().into()
     }
 
     #[wasm_bindgen(getter)]
+    /// Gets the execution info as a JavaScript value.
     pub fn execution_info(&self) -> JsValue {
         JsValue::from_serde(&self.0.execution_info).unwrap()
     }
 
     #[wasm_bindgen(js_name = "toJson")]
+    /// Converts the result to a JSON JavaScript value.
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_deploy` method.
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getDeployOptions", getter_with_clone)]
@@ -72,6 +78,15 @@ pub struct GetDeployOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses deploy options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing deploy options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed deploy options as a `GetDeployOptions` struct.
     #[wasm_bindgen(js_name = "get_deploy_options")]
     pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
         let options_result = options.into_serde::<GetDeployOptions>();
@@ -90,6 +105,15 @@ impl SDK {
         }
     }
 
+    /// Retrieves deploy information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetDeployOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetDeployResult` or an error.
     #[wasm_bindgen(js_name = "get_deploy")]
     pub async fn get_deploy_js_alias(
         &self,
@@ -138,6 +162,7 @@ impl SDK {
         }
     }
 
+    /// Retrieves deploy information using the provided options, alias for `get_deploy_js_alias`.
     #[wasm_bindgen(js_name = "info_get_deploy")]
     pub async fn info_get_deploy_js_alias(
         &self,
@@ -148,6 +173,18 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves deploy information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_hash` - The deploy hash.
+    /// * `finalized_approvals` - An optional boolean indicating finalized approvals.
+    /// * `verbosity` - An optional verbosity level.
+    /// * `node_address` - An optional node address.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetDeployResult` or an error.
     pub async fn get_deploy(
         &self,
         deploy_hash: DeployHash,

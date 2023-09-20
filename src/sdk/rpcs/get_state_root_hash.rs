@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+/// Wrapper struct for the `GetStateRootHashResult` from casper_client.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -32,6 +33,7 @@ impl From<GetStateRootHashResult> for _GetStateRootHashResult {
         result.0
     }
 }
+
 #[cfg(target_arch = "wasm32")]
 impl From<_GetStateRootHashResult> for GetStateRootHashResult {
     fn from(result: _GetStateRootHashResult) -> Self {
@@ -42,16 +44,19 @@ impl From<_GetStateRootHashResult> for GetStateRootHashResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetStateRootHashResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the state root hash as an Option<Digest>.
     #[wasm_bindgen(getter)]
     pub fn state_root_hash(&self) -> Option<Digest> {
         self.0.state_root_hash.map(Into::into)
     }
 
+    /// Gets the state root hash as a String.
     #[wasm_bindgen(getter)]
     pub fn state_root_hash_as_string(&self) -> String {
         self.0
@@ -61,12 +66,14 @@ impl GetStateRootHashResult {
             .unwrap_or_default()
     }
 
+    /// Converts the GetStateRootHashResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_state_root_hash` method.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getStateRootHashOptions", getter_with_clone)]
@@ -80,6 +87,15 @@ pub struct GetStateRootHashOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses state root hash options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing state root hash options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed state root hash options as a `GetStateRootHashOptions` struct.
     #[wasm_bindgen(js_name = "get_state_root_hash_options")]
     pub fn get_state_root_hash_options(&self, options: JsValue) -> GetStateRootHashOptions {
         let options_result = options.into_serde::<GetStateRootHashOptions>();
@@ -92,6 +108,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves state root hash information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_state_root_hash")]
     pub async fn get_state_root_hash_js_alias(
         &self,
@@ -125,6 +154,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves state root hash information using the provided options (alias for `get_state_root_hash_js_alias`).
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "chain_get_state_root_hash")]
     pub async fn chain_get_state_root_hash_js_alias(
         &self,
@@ -135,6 +177,21 @@ impl SDK {
 }
 
 impl SDK {
+    /// Retrieves state root hash information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetStateRootHashResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_state_root_hash(
         &self,
         maybe_block_identifier: Option<BlockIdentifierInput>,
@@ -142,6 +199,7 @@ impl SDK {
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetStateRootHashResult>, SdkError> {
         //log("get_state_root_hash!");
+
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_state_root_hash_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),

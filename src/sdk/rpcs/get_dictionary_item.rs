@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+// Define a struct to wrap the GetDictionaryItemResult
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
@@ -47,32 +48,38 @@ impl From<_GetDictionaryItemResult> for GetDictionaryItemResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetDictionaryItemResult {
+    /// Gets the API version as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the dictionary key as a String.
     #[wasm_bindgen(getter)]
     pub fn dictionary_key(&self) -> String {
         self.0.dictionary_key.clone()
     }
 
+    /// Gets the stored value as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn stored_value(&self) -> JsValue {
         JsValue::from_serde(&self.0.stored_value).unwrap()
     }
 
+    /// Gets the merkle proof as a String.
     #[wasm_bindgen(getter)]
     pub fn merkle_proof(&self) -> String {
         self.0.merkle_proof.clone()
     }
 
+    /// Converts the GetDictionaryItemResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
     }
 }
 
+/// Options for the `get_dictionary_item` method.
 #[derive(Default, Debug, Deserialize, Clone, Serialize)]
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "getDictionaryItemOptions", getter_with_clone)]
@@ -88,6 +95,15 @@ pub struct GetDictionaryItemOptions {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
+    /// Parses dictionary item options from a JsValue.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - A JsValue containing dictionary item options to be parsed.
+    ///
+    /// # Returns
+    ///
+    /// Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
     #[wasm_bindgen(js_name = "get_dictionary_item_options")]
     pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
         let options_result = options.into_serde::<GetDictionaryItemOptions>();
@@ -100,6 +116,19 @@ impl SDK {
         }
     }
 
+    /// Retrieves dictionary item information using the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "get_dictionary_item")]
     pub async fn get_dictionary_item_js_alias(
         &self,
@@ -145,6 +174,7 @@ impl SDK {
         }
     }
 
+    /// Alias for `get_dictionary_item_js_alias` for backward compatibility.
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
         &self,
@@ -160,6 +190,22 @@ pub enum DictionaryItemInput {
 }
 
 impl SDK {
+    /// Retrieves dictionary item information based on the provided options.
+    ///
+    /// # Arguments
+    ///
+    /// * `state_root_hash` - A `ToDigest` implementation for specifying the state root hash.
+    /// * `dictionary_item` - A `DictionaryItemInput` enum specifying the dictionary item to retrieve.
+    /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+    /// * `node_address` - An optional string specifying the node address to use for the request.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetDictionaryItemResult` or a `SdkError` in case of an error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_dictionary_item(
         &self,
         state_root_hash: impl ToDigest,

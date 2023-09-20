@@ -33,7 +33,7 @@ use wasm_bindgen::prelude::*;
 pub struct Deploy(_Deploy);
 
 #[derive(Default)]
-pub struct BuildParams {
+struct BuildParams {
     secret_key: Option<String>,
     chain_name: Option<String>,
     ttl: Option<TimeDiff>,
