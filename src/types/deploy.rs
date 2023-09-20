@@ -448,7 +448,7 @@ impl Deploy {
         self.0.clone().header().ttl().to_string()
     }
 
-    #[wasm_bindgen(js_name = "Timestamp")]
+    #[wasm_bindgen(js_name = "timestamp")]
     pub fn timestamp(&self) -> String {
         self.0.clone().header().timestamp().to_string()
     }

@@ -160,29 +160,29 @@
 //     }
 // }
 
-// // impl casper_types::CLTyped for CLType {
-// //     fn cl_type() -> casper_types::CLType {
-// //         casper_types::CLType::from(_CLValue::from_t(self.0).unwrap())
-// //     }
-// // }
+// impl casper_types::CLTyped for CLType {
+//     fn cl_type() -> casper_types::CLType {
+//         casper_types::CLType::from(_CLValue::from_t(self.0).unwrap())
+//     }
+// }
 
-// // impl ToBytes for CLType {
-// //     fn to_bytes(&self) -> Result<Vec<u8>, bytesrepr::Error> {
-// //         self.0.to_bytes()
-// //     }
+// impl ToBytes for CLType {
+//     fn to_bytes(&self) -> Result<Vec<u8>, bytesrepr::Error> {
+//         self.0.to_bytes()
+//     }
 
-// //     fn serialized_length(&self) -> usize {
-// //         self.0.serialized_length()
-// //     }
+//     fn serialized_length(&self) -> usize {
+//         self.0.serialized_length()
+//     }
 
-// //     fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
-// //         self.0.write_bytes(bytes)
-// //     }
-// // }
+//     fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
+//         self.0.write_bytes(bytes)
+//     }
+// }
 
-// // impl FromBytes for CLType {
-// //     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), ByteSerializationError> {
-// //         let (cl_enum, remainder) = CLTypeEnum::from_bytes(bytes)?;
-// //         Ok((CLType(cl_enum), remainder))
-// //     }
-// // }
+// impl FromBytes for CLType {
+//     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), ByteSerializationError> {
+//         let (cl_enum, remainder) = CLTypeEnum::from_bytes(bytes)?;
+//         Ok((CLType(cl_enum), remainder))
+//     }
+// }
