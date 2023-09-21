@@ -444,31 +444,31 @@ You can download an alpha version of the app illustrating the sdk here :
 
 ## Rust API
 
-- [Full item list](docs/api-rust/casper_rust_wasm_sdk/all.html)
+- [Full item list](docs/api-rust/all.html)
 
 ### SDK
 
-- [SDK Struct and methods](docs/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
+- [SDK Struct and methods](docs/api-rust/struct.SDK.html)
 
 ### RPC
 
-- [RPC List](docs/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [RPC List](docs/api-rust/rpcs/index.html)
 
 ### Deploy Params
 
-- [Params and Args simple](docs/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [Params and Args simple](docs/api-rust/types/deploy_params/index.html)
 
 ### Deploy
 
-- [Deploy Type and static builder](docs/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
+- [Deploy Type and static builder](docs/api-rust/types/deploy/struct.Deploy.html)
 
 ### Types
 
-- [Current exposed types](docs/api-rust/casper_rust_wasm_sdk/types/index.html)
+- [Current exposed types](docs/api-rust/types/index.html)
 
 ### Helpers functions
 
-- [Rust helpers](docs/api-rust/casper_rust_wasm_sdk/helpers/index.html)
+- [Rust helpers](docs/api-rust/helpers/index.html)
 
 ## Typescript API
 
@@ -480,11 +480,11 @@ You can download an alpha version of the app illustrating the sdk here :
 
 ### RPC Methods
 
-- [RPC List](docs/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [RPC List](docs/api-rust/rpcs/index.html)
 
 ### Deploy Params
 
-- [Params and Args simple](docs/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [Params and Args simple](docs/api-rust/types/deploy_params/index.html)
 
 ### Deploy
 

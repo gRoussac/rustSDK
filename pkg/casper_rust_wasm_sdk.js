@@ -4372,6 +4372,7 @@ export class PutDeployResult {
         wasm.__wbg_putdeployresult_free(ptr);
     }
     /**
+    * Gets the API version as a JavaScript value.
     * @returns {any}
     */
     get api_version() {
@@ -4379,6 +4380,7 @@ export class PutDeployResult {
         return takeObject(ret);
     }
     /**
+    * Gets the deploy hash associated with this result.
     * @returns {DeployHash}
     */
     get deploy_hash() {
@@ -4386,6 +4388,7 @@ export class PutDeployResult {
         return DeployHash.__wrap(ret);
     }
     /**
+    * Converts PutDeployResult to a JavaScript object.
     * @returns {any}
     */
     toJson() {
@@ -5677,6 +5680,19 @@ export class SDK {
         return takeObject(ret);
     }
     /**
+    * JavaScript alias for deploying with deserialized parameters.
+    *
+    * # Arguments
+    *
+    * * `deploy_params` - Deploy parameters.
+    * * `session_params` - Session parameters.
+    * * `payment_params` - Payment parameters.
+    * * `verbosity` - An optional verbosity level.
+    * * `node_address` - An optional node address.
+    *
+    * # Returns
+    *
+    * A result containing PutDeployResult or a JsError.
     * @param {DeployStrParams} deploy_params
     * @param {SessionStrParams} session_params
     * @param {PaymentStrParams} payment_params
@@ -6118,7 +6134,6 @@ export class SessionStrParams {
     }
 }
 /**
-* Represents the result of a speculative execution.
 */
 export class SpeculativeExecResult {
 
