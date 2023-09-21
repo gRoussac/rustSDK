@@ -1367,13 +1367,16 @@ export class PurseIdentifier {
 export class PutDeployResult {
   free(): void;
 /**
+* Converts PutDeployResult to a JavaScript object.
 * @returns {any}
 */
   toJson(): any;
 /**
+* Gets the API version as a JavaScript value.
 */
   readonly api_version: any;
 /**
+* Gets the deploy hash associated with this result.
 */
   readonly deploy_hash: DeployHash;
 }
@@ -2152,6 +2155,19 @@ export class SDK {
 */
   query_global_state(options?: queryGlobalStateOptions): Promise<QueryGlobalStateResult>;
 /**
+* JavaScript alias for deploying with deserialized parameters.
+*
+* # Arguments
+*
+* * `deploy_params` - Deploy parameters.
+* * `session_params` - Session parameters.
+* * `payment_params` - Payment parameters.
+* * `verbosity` - An optional verbosity level.
+* * `node_address` - An optional node address.
+*
+* # Returns
+*
+* A result containing PutDeployResult or a JsError.
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
@@ -2270,7 +2286,6 @@ export class SessionStrParams {
   session_version: string;
 }
 /**
-* Represents the result of a speculative execution.
 */
 export class SpeculativeExecResult {
   free(): void;

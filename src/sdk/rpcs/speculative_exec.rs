@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-/// Represents the result of a speculative execution.
+// Define a struct to wrap the result of a speculative execution.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]

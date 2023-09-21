@@ -43,7 +43,7 @@
 <a id="md:build-package-with-wasm-pack" class="tsd-anchor"></a><h4><a href="#md:build-package-with-wasm-pack">Build package with wasm pack</a></h4><p>If you want to compile the wasm package from Rust you might need to install wasm-pack for ease of use.</p>
 <pre><code class="language-shell"><span class="hl-5">curl</span><span class="hl-1"> </span><span class="hl-2">https://rustwasm.github.io/wasm-pack/installer/init.sh</span><span class="hl-1"> </span><span class="hl-3">-sSf</span><span class="hl-1"> | </span><span class="hl-5">sh</span>
 </code><button>Copy</button></pre>
-<pre><code class="language-shell"><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">make</span><span class="hl-1"> </span><span class="hl-2">prepare</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">make</span><span class="hl-1"> </span><span class="hl-2">build</span>
+<pre><code class="language-shell"><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">make</span><span class="hl-1"> </span><span class="hl-2">prepare</span><br/><span class="hl-5">$</span><span class="hl-1"> </span><span class="hl-2">make</span><span class="hl-1"> </span><span class="hl-2">pack</span>
 </code><button>Copy</button></pre>
 <p>will create a <code>pkg</code> and <code>pkg-nodejs</code> cointaining the typescript interfaces. You can find more details about building the sdk for javascript with wasm-pack in the <a href="https://rustwasm.github.io/docs/wasm-pack/commands/build.html">wasm-pack documention</a>.</p>
 <p>This folders will contain a wasm binary, a JS wrapper file, typescript types definitions, and a package.json file that you can load in your proper project.</p>
@@ -188,25 +188,25 @@ You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a
 <br>
 
 <a id="md:rust-api" class="tsd-anchor"></a><h2><a href="#md:rust-api">Rust API</a></h2><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/all.html">Full item list</a></li>
+<li><a href="docs/api-rust/all.html">Full item list</a></li>
 </ul>
 <a id="md:sdk" class="tsd-anchor"></a><h3><a href="#md:sdk">SDK</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/struct.SDK.html">SDK Struct and methods</a></li>
+<li><a href="docs/api-rust/struct.SDK.html">SDK Struct and methods</a></li>
 </ul>
 <a id="md:rpc" class="tsd-anchor"></a><h3><a href="#md:rpc">RPC</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/rpcs/index.html">RPC List</a></li>
+<li><a href="docs/api-rust/rpcs/index.html">RPC List</a></li>
 </ul>
 <a id="md:deploy-params" class="tsd-anchor"></a><h3><a href="#md:deploy-params">Deploy Params</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html">Params and Args simple</a></li>
+<li><a href="docs/api-rust/types/deploy_params/index.html">Params and Args simple</a></li>
 </ul>
 <a id="md:deploy" class="tsd-anchor"></a><h3><a href="#md:deploy">Deploy</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html">Deploy Type and static builder</a></li>
+<li><a href="docs/api-rust/types/deploy/struct.Deploy.html">Deploy Type and static builder</a></li>
 </ul>
 <a id="md:types" class="tsd-anchor"></a><h3><a href="#md:types">Types</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/types/index.html">Current exposed types</a></li>
+<li><a href="docs/api-rust/types/index.html">Current exposed types</a></li>
 </ul>
 <a id="md:helpers-functions" class="tsd-anchor"></a><h3><a href="#md:helpers-functions">Helpers functions</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/helpers/index.html">Rust helpers</a></li>
+<li><a href="docs/api-rust/helpers/index.html">Rust helpers</a></li>
 </ul>
 <a id="md:typescript-api" class="tsd-anchor"></a><h2><a href="#md:typescript-api">Typescript API</a></h2><ul>
 <li><a href="docs/api-wasm/index.html">Full item list</a></li>
@@ -215,10 +215,10 @@ You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a
 <li><a href="docs/api-wasm/classes/SDK.html">SDK Struct and methods</a></li>
 </ul>
 <a id="md:rpc-methods" class="tsd-anchor"></a><h3><a href="#md:rpc-methods">RPC Methods</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/rpcs/index.html">RPC List</a></li>
+<li><a href="docs/api-rust/rpcs/index.html">RPC List</a></li>
 </ul>
 <a id="md:deploy-params-1" class="tsd-anchor"></a><h3><a href="#md:deploy-params-1">Deploy Params</a></h3><ul>
-<li><a href="docs/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html">Params and Args simple</a></li>
+<li><a href="docs/api-rust/types/deploy_params/index.html">Params and Args simple</a></li>
 </ul>
 <a id="md:deploy-1" class="tsd-anchor"></a><h3><a href="#md:deploy-1">Deploy</a></h3><ul>
 <li><a href="docs/api-wasm/classes/Deploy.html">Deploy Type and static builder</a></li>
@@ -227,7 +227,7 @@ You can find all rpc methods on the [RPC page](docs/API/.md). Here you can see a
 <li><a href="docs/api-wasm/modules.html">Current exposed types</a></li>
 </ul>
 <a id="md:helpers-functions-1" class="tsd-anchor"></a><h3><a href="#md:helpers-functions-1">Helpers functions</a></h3><ul>
-<li><a href="docs/api-wasm/modules.html">Rust helpers</a></li>
+<li><a href="docs/api-wasm/modules.html">TS helpers</a></li>
 </ul>
 <a id="md:testing" class="tsd-anchor"></a><h2><a href="#md:testing">Testing</a></h2><p>Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a <code>secret_key.pem</code> is either at root of tests of in
 <code>./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/</code> from the root (so levels higher than the test). This path can be changed in configuration.</p>

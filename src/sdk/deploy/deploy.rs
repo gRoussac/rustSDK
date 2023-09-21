@@ -23,13 +23,13 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-// Define a struct to represent the result of a deploy.
+// Define a struct to wrap the result of a deploy.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct PutDeployResult(_PutDeployResult);
 
-// Implement conversions between PutDeployResult and _PutDeployResult.
+/// Implement conversions between PutDeployResult and _PutDeployResult.
 #[cfg(target_arch = "wasm32")]
 impl From<PutDeployResult> for _PutDeployResult {
     fn from(result: PutDeployResult) -> Self {
@@ -43,21 +43,23 @@ impl From<_PutDeployResult> for PutDeployResult {
     }
 }
 
-// Implement JavaScript bindings for PutDeployResult.
+/// Implement JavaScript bindings for PutDeployResult.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl PutDeployResult {
+    /// Gets the API version as a JavaScript value.
     #[wasm_bindgen(getter)]
     pub fn api_version(&self) -> JsValue {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
+    /// Gets the deploy hash associated with this result.
     #[wasm_bindgen(getter)]
     pub fn deploy_hash(&self) -> DeployHash {
         self.0.deploy_hash.into()
     }
 
-    // Convert PutDeployResult to a JavaScript object.
+    /// Converts PutDeployResult to a JavaScript object.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(&self.0).unwrap_or(JsValue::null())
@@ -67,7 +69,19 @@ impl PutDeployResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    // JavaScript alias for deploy with deserialized parameters.
+    /// JavaScript alias for deploying with deserialized parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - Deploy parameters.
+    /// * `session_params` - Session parameters.
+    /// * `payment_params` - Payment parameters.
+    /// * `verbosity` - An optional verbosity level.
+    /// * `node_address` - An optional node address.
+    ///
+    /// # Returns
+    ///
+    /// A result containing PutDeployResult or a JsError.
     #[wasm_bindgen(js_name = "deploy")]
     pub async fn deploy_js_alias(
         &self,
@@ -98,7 +112,19 @@ impl SDK {
 }
 
 impl SDK {
-    // Perform a deploy operation.
+    /// Perform a deploy operation.
+    ///
+    /// # Arguments
+    ///
+    /// * `deploy_params` - Deploy parameters.
+    /// * `session_params` - Session parameters.
+    /// * `payment_params` - Payment parameters.
+    /// * `verbosity` - An optional verbosity level.
+    /// * `node_address` - An optional node address.
+    ///
+    /// # Returns
+    ///
+    /// A result containing a SuccessResponse or an SdkError.
     pub async fn deploy(
         &self,
         deploy_params: DeployStrParams,
