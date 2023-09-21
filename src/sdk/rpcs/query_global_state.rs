@@ -350,7 +350,6 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         } else if let Some(state_root_hash) = state_root_hash {
-            log(&state_root_hash);
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),

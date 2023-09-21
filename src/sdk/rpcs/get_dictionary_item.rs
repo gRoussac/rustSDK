@@ -21,6 +21,7 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
+
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
@@ -251,7 +252,6 @@ impl SDK {
                 } else {
                     state_root_hash.to_digest()
                 };
-
                 get_dictionary_item_lib(
                     JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                     &self.get_node_address(node_address),
