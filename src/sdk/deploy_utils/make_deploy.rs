@@ -22,7 +22,7 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// Alias for `make_deploy`.
+    /// JS Alias for `make_deploy`.
     ///
     /// # Arguments
     ///

@@ -19,11 +19,10 @@ use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-/// SDK functions related to transfers.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// Alias for transferring funds.
+    /// JS Alias for transferring funds.
     ///
     /// # Arguments
     ///
@@ -72,7 +71,6 @@ impl SDK {
     }
 }
 
-/// SDK functions related to transfers.
 impl SDK {
     /// Perform a transfer of funds.
     ///

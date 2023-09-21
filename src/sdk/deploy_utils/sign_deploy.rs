@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// Alias for `sign_deploy`.
+    /// JS Alias for `sign_deploy`.
     ///
     /// # Arguments
     ///

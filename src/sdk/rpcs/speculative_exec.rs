@@ -109,7 +109,7 @@ impl SDK {
         }
     }
 
-    /// Alias for speculative execution.
+    /// JS Alias for speculative execution.
     ///
     /// # Arguments
     ///

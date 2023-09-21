@@ -162,7 +162,7 @@ impl SDK {
         }
     }
 
-    /// Alias for `get_balance_js_alias`.
+    /// JS Alias for `get_balance_js_alias`.
     ///
     /// # Arguments
     ///
