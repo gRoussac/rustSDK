@@ -165,7 +165,6 @@ impl SDK {
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetEraSummaryResult>, SdkError> {
         //log("get_era_summary!");
-
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_era_summary_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
