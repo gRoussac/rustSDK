@@ -141,7 +141,7 @@ impl SDK {
         }
     }
 
-    /// Alias for the `get_block` method to maintain compatibility.
+    /// JS Alias for the `get_block` method to maintain compatibility.
     ///
     /// # Arguments
     ///

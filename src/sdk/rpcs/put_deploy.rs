@@ -49,7 +49,7 @@ impl SDK {
         }
     }
 
-    /// Alias for `put_deploy_js_alias`.
+    /// JS Alias for `put_deploy_js_alias`.
     ///
     /// This function provides an alternative name for `put_deploy_js_alias`.
     #[wasm_bindgen(js_name = "account_put_deploy")]

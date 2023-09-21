@@ -23,11 +23,10 @@ use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-/// SDK functions related to speculative transfers.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// Alias for speculative transfer.
+    /// JS Alias for speculative transfer.
     ///
     /// # Arguments
     ///
@@ -88,7 +87,6 @@ impl SDK {
     }
 }
 
-/// SDK functions related to speculative transfers.
 impl SDK {
     /// Perform a speculative transfer.
     ///

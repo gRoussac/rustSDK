@@ -175,7 +175,7 @@ impl SDK {
         }
     }
 
-    /// Alias for `get_dictionary_item_js_alias` for backward compatibility.
+    /// JS Alias for `get_dictionary_item_js_alias`
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     pub async fn state_get_dictionary_item_js_alias(
         &self,
