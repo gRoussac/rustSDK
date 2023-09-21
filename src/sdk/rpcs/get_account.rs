@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-// Define the GetAccountResult struct to wrap the result from Casper's RPC call
+// Define the GetAccountResult struct to wrap the result from Casper Client RPC call
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
