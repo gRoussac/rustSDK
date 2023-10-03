@@ -359,7 +359,7 @@ const get_deploy_options = this.sdk.get_deploy_options({
 
 const deploy_result = await this.sdk.get_deploy(get_deploy_options);
 
-const deploy = deploy_result.deploy.
+const deploy = deploy_result.deploy;
 const timestamp = deploy.timestamp();
 const header = deploy.toJson().header; // DeployHeader type not being exposed right now by the SDK you can convert every type to JSON
 ```
