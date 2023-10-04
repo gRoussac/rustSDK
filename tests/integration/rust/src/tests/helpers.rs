@@ -81,7 +81,7 @@ pub async fn get_block() -> (String, String) {
 }
 
 pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
-    let purse_uref = *(create_test_sdk(None)
+    let purse_uref: URef = create_test_sdk(None)
         .get_account(
             None,
             Some(account_identifier_as_string.to_owned()),
@@ -93,8 +93,8 @@ pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
         .unwrap()
         .result
         .account
-        .main_purse());
-    let purse_uref: URef = purse_uref.into();
+        .main_purse()
+        .into();
     purse_uref.to_formatted_string()
 }
 
@@ -231,18 +231,16 @@ pub async fn get_dictionnary_uref(contract_hash: &str, dictionary_name: &str) ->
     let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
     let query_global_state_result = query_global_state.unwrap();
 
-    // Parse the JSON string in 1.6
-    let json_string = to_string(&query_global_state_result.result.stored_value).unwrap();
-    let parsed_json: Value = serde_json::from_str(&json_string).unwrap();
-    let named_keys = &parsed_json["Contract"]["named_keys"];
-    let dictionnary_uref = named_keys
-        .as_array()
-        .unwrap_or_else(|| panic!("named_keys is not an array"))
+    let named_keys = query_global_state_result
+        .result
+        .stored_value
+        .as_contract()
+        .unwrap()
+        .named_keys();
+    let (_, dictionnary_uref) = named_keys
         .iter()
-        .find(|obj| obj["name"] == Value::String(dictionary_name.to_string()))
-        .and_then(|obj| obj["key"].as_str())
-        .unwrap_or_else(|| panic!("Dictionary name not found in named_keys"))
-        .to_string();
+        .find(|(key, _)| key == &dictionary_name)
+        .unwrap();
     dictionnary_uref.to_string()
 }
 
