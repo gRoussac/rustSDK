@@ -11,8 +11,8 @@ use super::{
 use crate::{
     debug::error,
     helpers::{
-        get_current_timestamp, get_ttl_or_default, insert_arg, insert_js_value_arg,
-        parse_timestamp, parse_ttl, secret_key_from_pem,
+        get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
+        secret_key_from_pem,
     },
     make_deploy, make_transfer,
 };
@@ -23,6 +23,7 @@ use casper_types::{
     Phase, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use num_traits::cast::FromPrimitive;
 use serde::{Deserialize, Serialize};
