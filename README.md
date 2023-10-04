@@ -311,7 +311,7 @@ let get_auction_info = sdk.get_auction_info(None, None, None).await;
 
 let auction_state = get_auction_info.unwrap().result.auction_state;
 let state_root_hash = auction_state.state_root_hash();
-let block_height = get_auction_info.result.auction_state.block_height();
+let block_height = auction_state.block_height();
 ```
 
 #### Get peers from the network
@@ -359,7 +359,7 @@ const get_deploy_options = this.sdk.get_deploy_options({
 
 const deploy_result = await this.sdk.get_deploy(get_deploy_options);
 
-const deploy = deploy_result.deploy.
+const deploy = deploy_result.deploy;
 const timestamp = deploy.timestamp();
 const header = deploy.toJson().header; // DeployHeader type not being exposed right now by the SDK you can convert every type to JSON
 ```
