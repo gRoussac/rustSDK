@@ -3,7 +3,7 @@ pub mod test_module {
     use crate::{
         config::{
             get_config, TestConfig, ARGS_JSON, ARGS_SIMPLE, DICTIONARY_ITEM_KEY, DICTIONARY_NAME,
-            ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WAIT_TIME,
+            ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL,
         },
         tests::helpers::{create_test_sdk, get_dictionnary_key, read_wasm_file},
     };
@@ -22,7 +22,6 @@ pub mod test_module {
             global_state_identifier::GlobalStateIdentifier,
         },
     };
-    use std::thread;
 
     pub async fn test_call_entrypoint() {
         let config: TestConfig = get_config().await;
@@ -70,7 +69,7 @@ pub mod test_module {
             .unwrap()
             .into();
         let state_root_hash = &state_root_hash_digest.to_string();
-        thread::sleep(WAIT_TIME);
+
         let dictionnary_key = get_dictionnary_key(
             &config.contract_cep78_hash,
             DICTIONARY_NAME,
@@ -79,7 +78,6 @@ pub mod test_module {
         )
         .await;
         assert_eq!(config.dictionary_key, dictionnary_key);
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_query_contract_dict_with_dictionary_key() {
@@ -93,7 +91,6 @@ pub mod test_module {
             .state_root_hash
             .unwrap()
             .into();
-        thread::sleep(WAIT_TIME);
 
         let mut params = DictionaryItemStrParams::new();
         params.set_dictionary(&config.dictionary_key);
@@ -101,7 +98,7 @@ pub mod test_module {
         let query_contract_dict = create_test_sdk(Some(config))
             .query_contract_dict(state_root_hash, dictionary_item, None, None)
             .await;
-        thread::sleep(WAIT_TIME);
+
         let query_contract_dict = query_contract_dict.unwrap();
         assert!(!query_contract_dict
             .result
@@ -115,7 +112,6 @@ pub mod test_module {
             .unwrap()
             .inner_bytes()
             .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn test_query_contract_dict_with_dictionary_uref() {
@@ -129,7 +125,6 @@ pub mod test_module {
             .state_root_hash
             .unwrap()
             .into();
-        thread::sleep(WAIT_TIME);
 
         let mut params = DictionaryItemStrParams::new();
         params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
@@ -137,7 +132,7 @@ pub mod test_module {
         let query_contract_dict = create_test_sdk(Some(config))
             .query_contract_dict(state_root_hash, dictionary_item, None, None)
             .await;
-        thread::sleep(WAIT_TIME);
+
         let query_contract_dict = query_contract_dict.unwrap();
         assert!(!query_contract_dict
             .result
@@ -151,7 +146,6 @@ pub mod test_module {
             .unwrap()
             .inner_bytes()
             .is_empty());
-        thread::sleep(WAIT_TIME);
     }
 
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
@@ -226,56 +220,44 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::{get_config, TestConfig, WAIT_TIME};
+    use crate::config::{get_config, TestConfig};
 
     use super::test_module::*;
     use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, global_state_identifier::GlobalStateIdentifier,
     };
-    use std::thread;
     use tokio::test;
 
     #[test]
     pub async fn test_install_test() {
-        thread::sleep(WAIT_TIME);
         test_install().await;
-        thread::sleep(WAIT_TIME);
     }
 
     #[test]
     pub async fn test_call_entrypoint_test() {
-        thread::sleep(WAIT_TIME);
         test_call_entrypoint().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_dict_test() {
-        thread::sleep(WAIT_TIME);
         test_query_contract_dict().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_dict_with_dictionary_key_test() {
-        thread::sleep(WAIT_TIME);
         test_query_contract_dict_with_dictionary_key().await;
-        thread::sleep(WAIT_TIME);
     }
     // TODO Remove
     #[should_panic]
     #[test]
     pub async fn test_query_contract_dict_with_dictionary_uref_test() {
-        thread::sleep(WAIT_TIME);
         test_query_contract_dict_with_dictionary_uref().await;
-        thread::sleep(WAIT_TIME);
     }
     #[test]
     pub async fn test_query_contract_key_test() {
         let config: TestConfig = get_config().await;
-        thread::sleep(WAIT_TIME);
+
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),
         ));
         query_contract_key(maybe_global_state_identifier).await;
-        thread::sleep(WAIT_TIME);
     }
 }

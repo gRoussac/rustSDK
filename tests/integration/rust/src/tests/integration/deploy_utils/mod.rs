@@ -83,30 +83,21 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::WAIT_TIME;
-
     use super::test_module::*;
-    use std::thread;
     use tokio::test;
 
     #[test]
     pub async fn test_make_deploy_test() {
-        thread::sleep(WAIT_TIME);
         test_make_deploy().await;
-        thread::sleep(WAIT_TIME);
     }
 
     #[test]
     pub async fn test_make_transfer_test() {
-        thread::sleep(WAIT_TIME);
         test_make_transfer().await;
-        thread::sleep(WAIT_TIME);
     }
 
     #[test]
     pub async fn test_sign_deploy_test() {
-        thread::sleep(WAIT_TIME);
         test_sign_deploy().await;
-        thread::sleep(WAIT_TIME);
     }
 }

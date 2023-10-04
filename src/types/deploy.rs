@@ -378,6 +378,7 @@ impl Deploy {
         deploy.into()
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "footprint")]
     pub fn footprint_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.footprint()) {
@@ -389,6 +390,7 @@ impl Deploy {
         }
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "approvalsHash")]
     pub fn compute_approvals_hash_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.compute_approvals_hash()) {

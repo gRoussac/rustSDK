@@ -166,42 +166,30 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-
-    use crate::config::WAIT_TIME;
-
     use super::test_module::*;
-    use std::thread;
     use tokio::test;
 
     #[test]
     pub async fn test_deploy_test() {
-        thread::sleep(WAIT_TIME);
         test_deploy().await;
-        thread::sleep(WAIT_TIME);
     }
 
     #[test]
     pub async fn test_transfer_test() {
-        thread::sleep(WAIT_TIME);
         test_transfer().await;
-        thread::sleep(WAIT_TIME);
     }
 
     // TODO Remove
     #[should_panic]
     #[test]
     pub async fn test_speculative_deploy_test() {
-        thread::sleep(WAIT_TIME);
         test_speculative_deploy().await;
-        thread::sleep(WAIT_TIME);
     }
 
     // TODO Remove
     #[should_panic]
     #[test]
     pub async fn test_speculative_transfer_test() {
-        thread::sleep(WAIT_TIME);
         test_speculative_transfer().await;
-        thread::sleep(WAIT_TIME);
     }
 }
