@@ -311,7 +311,7 @@ let get_auction_info = sdk.get_auction_info(None, None, None).await;
 
 let auction_state = get_auction_info.unwrap().result.auction_state;
 let state_root_hash = auction_state.state_root_hash();
-let block_height = get_auction_info.result.auction_state.block_height();
+let block_height = auction_state.block_height();
 ```
 
 #### Get peers from the network
@@ -359,7 +359,7 @@ const get_deploy_options = this.sdk.get_deploy_options({
 
 const deploy_result = await this.sdk.get_deploy(get_deploy_options);
 
-const deploy = deploy_result.deploy.
+const deploy = deploy_result.deploy;
 const timestamp = deploy.timestamp();
 const header = deploy.toJson().header; // DeployHeader type not being exposed right now by the SDK you can convert every type to JSON
 ```
@@ -503,7 +503,7 @@ You can download an alpha version of the app illustrating the sdk here :
 Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at root of tests of in
 `./NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (so levels higher than the test). This path can be changed in configuration.
 
-- [Rust Integration tests](tests/integration/rust/) can be run with `cargo test` [configured in config](tests/integration/rust/src/config.rs)
+- [Rust Integration tests](tests/integration/rust/) can be run with `cargo test -- --test-threads=1 --nocapture` [configured in config](tests/integration/rust/src/config.rs)
 
 - [Jest/Puppeteer E2E tests](tests/e2e/) can be run with `npm test` [configured with .env](tests/e2e/.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
 

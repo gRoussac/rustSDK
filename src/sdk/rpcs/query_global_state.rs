@@ -1,4 +1,4 @@
-use crate::debug::{error, log};
+use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
