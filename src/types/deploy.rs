@@ -8,6 +8,8 @@ use super::{
     },
     public_key::PublicKey,
 };
+#[cfg(target_arch = "wasm32")]
+use crate::helpers::insert_js_value_arg;
 use crate::{
     debug::error,
     helpers::{
