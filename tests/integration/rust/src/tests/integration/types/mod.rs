@@ -233,10 +233,10 @@ pub mod test_module_deploy {
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract());
         assert!(!deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains(&config.contract_cep78_hash));
-        assert!(deploy.to_json().unwrap().contains(new_session_hash));
+        assert!(deploy.to_json_string().unwrap().contains(new_session_hash));
     }
 
     pub async fn test_deploy_type_by_name() {
@@ -290,10 +290,13 @@ pub mod test_module_deploy {
         assert!(deploy.is_valid());
         assert!(deploy.is_stored_contract_package());
         assert!(!deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains(&config.contract_cep78_package_hash));
-        assert!(deploy.to_json().unwrap().contains(new_session_package_hash));
+        assert!(deploy
+            .to_json_string()
+            .unwrap()
+            .contains(new_session_package_hash));
     }
 
     pub async fn test_deploy_type_with_module_bytes() {
@@ -315,7 +318,7 @@ pub mod test_module_deploy {
         assert!(deploy.is_valid());
 
         assert!(deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains("\"module_bytes\":\"00\""));
         let file_path = HELLO_CONTRACT;
@@ -330,7 +333,7 @@ pub mod test_module_deploy {
         assert!(deploy.is_valid());
         assert!(deploy.is_module_bytes());
         assert!(!deploy
-            .to_json()
+            .to_json_string()
             .unwrap()
             .contains("\"module_bytes\":\"00\""));
     }

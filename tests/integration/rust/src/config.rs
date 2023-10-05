@@ -106,10 +106,12 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
         .await
         .unwrap();
 
+    println!("install_cep78");
     let (contract_cep78_hash, contract_cep78_package_hash) =
         get_contract_cep78_hash_keys(&account_hash).await;
 
     // install has been running for over 60 seconds
+    println!("mint_nft");
     mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
 
     let dictionary_key = get_dictionnary_key(
