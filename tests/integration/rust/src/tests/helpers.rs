@@ -72,7 +72,7 @@ pub async fn get_block() -> (String, String) {
             process::exit(1);
         }
         Ok(get_block) => {
-            let block = get_block.result.block.unwrap();
+            let block = get_block.result.block_with_signatures.unwrap().block;
             let block_hash: BlockHash = (*block.hash()).into();
             let block_height = block.header().height();
             (block_hash.to_string(), block_height.to_string())

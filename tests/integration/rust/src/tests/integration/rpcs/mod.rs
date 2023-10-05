@@ -145,8 +145,9 @@ pub mod test_module {
         assert!(!get_block.result.api_version.to_string().is_empty());
         assert!(!get_block
             .result
-            .block
+            .block_with_signatures
             .unwrap()
+            .block
             .hash()
             .to_string()
             .is_empty());
