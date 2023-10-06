@@ -77,18 +77,6 @@ impl Deploy {
         }
     }
 
-    pub fn to_json_string(&self) -> Result<String, String> {
-        let result = serde_json::to_string(&self.0);
-        match result {
-            Ok(json) => Ok(json),
-            Err(err) => {
-                let err_msg = format!("Error serializing data to JSON: {:?}", err);
-                error(&err_msg);
-                Err(err_msg)
-            }
-        }
-    }
-
     // static context
     #[wasm_bindgen(js_name = "withPaymentAndSession")]
     pub fn with_payment_and_session(
@@ -553,6 +541,18 @@ impl Deploy {
             Err(err) => {
                 error(&format!("Error getting footprint: {:?}", err));
                 deploy.footprint().unwrap()
+            }
+        }
+    }
+
+    pub fn to_json_string(&self) -> Result<String, String> {
+        let result = serde_json::to_string(&self.0);
+        match result {
+            Ok(json) => Ok(json),
+            Err(err) => {
+                let err_msg = format!("Error serializing data to JSON: {:?}", err);
+                error(&err_msg);
+                Err(err_msg)
             }
         }
     }

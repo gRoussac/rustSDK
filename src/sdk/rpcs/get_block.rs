@@ -50,7 +50,8 @@ impl GetBlockResult {
     /// Gets the block information as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn block(&self) -> JsValue {
-        JsValue::from_serde(&self.0.block).unwrap()
+        let block = &self.0.block_with_signatures.clone().unwrap().block;
+        JsValue::from_serde(&block).unwrap()
     }
 
     /// Converts the GetBlockResult to a JsValue.
