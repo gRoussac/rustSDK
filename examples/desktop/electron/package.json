@@ -1,0 +1,47 @@
+{
+  "name": "casper",
+  "version": "1.0.0",
+  "description": "Casper",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --linux",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^26.1.0",
+    "electron-builder": "^24.6.3",
+    "electron-updater": "^6.1.1"
+  },
+  "build": {
+    "appId": "com.example.myapp",
+    "productName": "Casper",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "favicon.png"
+    },
+    "linux": {
+      "category": "Network",
+      "icon": "favicon.png"
+    },
+    "mac": {
+      "category": "Network",
+      "icon": "favicon.png"
+    },
+    "files": [
+      "index.js",
+      "favicon.png"
+    ],
+    "extraFiles": [
+      {
+        "from": "./../../frontend/angular/dist/casper",
+        "to": "frontend/angular/dist/casper"
+      }
+    ]
+  }
+}

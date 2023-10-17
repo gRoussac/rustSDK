@@ -1,0 +1,4 @@
+node_modules/
+coverage/
+test.png
+secret_key.pem
