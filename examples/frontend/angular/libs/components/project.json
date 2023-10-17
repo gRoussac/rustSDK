@@ -1,0 +1,22 @@
+{
+  "name": "components",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/components/src",
+  "prefix": "comp",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "libs/components/**/*.ts",
+          "libs/components/**/*.html"
+        ]
+      }
+    }
+  }
+}
