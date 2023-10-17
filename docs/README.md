@@ -1256,15 +1256,14 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### SDK
 
-- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SDK.html)
-
-### RPC Methods
-
-- [RPC List](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [SDK Class and methods](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SDK.html)
 
 ### Deploy Params
 
-- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [Deploy Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeployStrParams.html)
+- [Session Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SessionStrParams.html)
+- [Payment Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/PaymentStrParams.html)
+- [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DictionaryItemStrParams.html)
 
 ### Deploy
 
@@ -1276,7 +1275,7 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### Helpers functions
 
-- [TS helpers](https://casper-ecosystem.github.io/rustSDK/api-wasm/modules.html)
+- [TS helpers](https://casper-ecosystem.github.io/rustSDK/api-wasm/modules.html#Functions)
 
 ## Testing
 
