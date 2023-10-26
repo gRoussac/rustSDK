@@ -42,6 +42,7 @@ thiserror = "=1.0.34"
 base16 = "0.2.1"
 hex = { version = "0.4.3", default-features = false }
 rust_decimal = "1.10"
+blake2 = { version = "0.9.0", default-features = false }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -57,4 +58,5 @@ doc = false
 lto = true
 
 [dev-dependencies]
-sdk-tests = { path = "tests/integration/rust" }
+sdk_tests = { path = "tests/integration/rust" }
+tokio = { version = "1", features = ["full"] }
