@@ -327,10 +327,41 @@
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::public_key::PublicKey;
 <span class="kw">use </span><span class="kw">crate</span>::types::sdk_error::SdkError;
 <span class="kw">use </span><span class="kw">crate</span>::types::verbosity::Verbosity;
+<span class="kw">use </span>blake2::{
+    digest::{Update, VariableOutput},
+    VarBlake2b,
+};
 <span class="kw">use </span>casper_client::cli::JsonArg;
 <span class="kw">use </span>casper_client::types::{Deploy, TimeDiff, Timestamp};
 <span class="kw">use </span>casper_types::cl_value::cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types;
@@ -343,6 +374,8 @@
 <span class="kw">use </span>serde_json::Value;
 <span class="kw">use </span>std::str::FromStr;
 <span class="kw">use </span>wasm_bindgen::{JsCast, JsValue};
+
+<span class="kw">pub const </span>BLAKE2B_DIGEST_LENGTH: usize = <span class="number">32</span>;
 
 <span class="doccomment">/// Converts a CLValue to a JSON Value.
 ///
@@ -376,6 +409,27 @@
         })
         .unwrap_or_else(Utc::now);
     current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, <span class="bool-val">true</span>)
+}
+
+<span class="doccomment">/// Computes the Blake2b hash of the provided metadata.
+///
+/// # Arguments
+///
+/// * `meta_data` - A reference to a string containing the metadata to be hashed.
+///
+/// # Returns
+///
+/// A hexadecimal string representing the Blake2b hash of the input metadata.
+
+</span><span class="kw">pub fn </span>get_blake2b_hash(meta_data: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = [<span class="number">0</span>; BLAKE2B_DIGEST_LENGTH];
+    <span class="kw">let </span><span class="kw-2">mut </span>hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect(<span class="string">&quot;should create hasher&quot;</span>);
+
+    hasher.update(meta_data);
+    hasher.finalize_variable(|slice| {
+        result.copy_from_slice(slice);
+    });
+    base16::encode_lower(<span class="kw-2">&amp;</span>result)
 }
 
 <span class="doccomment">/// Gets the time to live (TTL) value or returns the default value if not provided.
