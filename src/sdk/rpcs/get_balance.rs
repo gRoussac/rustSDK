@@ -148,10 +148,10 @@ impl SDK {
             self.get_balance(hash.as_str(), purse_uref, verbosity, node_address)
                 .await
         } else {
-            let err = "Error: Missing state_root_hash";
-            error(err);
-            return Err(JsError::new(err));
+            self.get_balance("", purse_uref, verbosity, node_address)
+                .await
         };
+
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {

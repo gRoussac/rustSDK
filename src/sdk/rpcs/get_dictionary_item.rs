@@ -161,10 +161,10 @@ impl SDK {
             self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, node_address)
                 .await
         } else {
-            let err = "Error: Missing state_root_hash";
-            error(err);
-            return Err(JsError::new(err));
+            self.get_dictionary_item("", dictionary_item, verbosity, node_address)
+                .await
         };
+
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
