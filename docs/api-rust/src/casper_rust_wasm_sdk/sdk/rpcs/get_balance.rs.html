@@ -399,10 +399,10 @@
             </span><span class="self">self</span>.get_balance(hash.as_str(), purse_uref, verbosity, node_address)
                 .<span class="kw">await
         </span>} <span class="kw">else </span>{
-            <span class="kw">let </span>err = <span class="string">&quot;Error: Missing state_root_hash&quot;</span>;
-            error(err);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
-        };
+            <span class="self">self</span>.get_balance(<span class="string">&quot;&quot;</span>, purse_uref, verbosity, node_address)
+                .<span class="kw">await
+        </span>};
+
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {

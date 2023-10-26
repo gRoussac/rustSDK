@@ -99,6 +99,11 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::public_key::PublicKey;
 <span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span>casper_types::{
@@ -152,6 +157,11 @@
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;toFormattedString&quot;</span>)]
     </span><span class="kw">pub fn </span>to_formatted_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.<span class="number">0</span>.to_formatted_string()
+    }
+
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;toHexString&quot;</span>)]
+    </span><span class="kw">pub fn </span>to_hex_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.<span class="number">0</span>.to_string()
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromUint8Array&quot;</span>)]
