@@ -1,6 +1,9 @@
 pub mod helpers;
+#[cfg(test)]
 pub mod integration;
+#[cfg(test)]
 pub mod integration_tests;
+use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
 use std::{
     fs::File,
     io::{self, Read},
@@ -9,10 +12,7 @@ use std::{
     time::{self, Duration},
 };
 
-use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
-
-#[cfg(not(test))]
-pub async fn run_tests_or_examples() {
+pub async fn _run_tests_or_examples() {
     // Run a specific test ?
     // integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?

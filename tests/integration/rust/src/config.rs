@@ -1,11 +1,11 @@
+#[cfg(test)]
 use crate::tests::helpers::{
     get_block, get_contract_cep78_hash_keys, get_dictionnary_key, get_dictionnary_uref,
     get_main_purse, install_cep78_if_needed, mint_nft, read_pem_file,
 };
-use casper_rust_wasm_sdk::{
-    helpers::public_key_from_private_key,
-    types::{public_key::PublicKey, verbosity::Verbosity},
-};
+use casper_rust_wasm_sdk::types::verbosity::Verbosity;
+#[cfg(test)]
+use casper_rust_wasm_sdk::{helpers::public_key_from_private_key, types::public_key::PublicKey};
 use lazy_static::lazy_static;
 use std::time::{self, Duration};
 use tokio::sync::Mutex;
@@ -79,6 +79,7 @@ lazy_static! {
     pub static ref BLOCK_HASH_INITIALIZED: Mutex<bool> = Mutex::new(false);
 }
 
+#[cfg(test)]
 pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::Error>> {
     let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
     if *block_hash_initialized_guard {
@@ -147,11 +148,13 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     Ok(config)
 }
 
+#[cfg(test)]
 pub async fn get_config() -> TestConfig {
     initialize_test_config_if_needed().await;
     CONFIG.lock().await.clone().unwrap()
 }
 
+#[cfg(test)]
 async fn initialize_test_config_if_needed() {
     let mut config_guard = CONFIG.lock().await;
     if config_guard.is_none() {
