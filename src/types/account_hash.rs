@@ -53,6 +53,11 @@ impl AccountHash {
         self.0.to_formatted_string()
     }
 
+    #[wasm_bindgen(js_name = "toHexString")]
+    pub fn to_hex_string(&self) -> String {
+        self.0.to_string()
+    }
+
     #[wasm_bindgen(js_name = "fromUint8Array")]
     pub fn from_bytes(bytes: Vec<u8>) -> AccountHash {
         let account_hash =

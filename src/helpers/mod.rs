@@ -2,6 +2,10 @@ use crate::debug::error;
 use crate::types::public_key::PublicKey;
 use crate::types::sdk_error::SdkError;
 use crate::types::verbosity::Verbosity;
+use blake2::{
+    digest::{Update, VariableOutput},
+    VarBlake2b,
+};
 use casper_client::cli::JsonArg;
 use casper_types::cl_value::cl_value_to_json as cl_value_to_json_from_casper_types;
 use casper_types::{
@@ -16,6 +20,8 @@ use serde::Serialize;
 use serde_json::Value;
 use std::str::FromStr;
 use wasm_bindgen::{JsCast, JsValue};
+
+pub const BLAKE2B_DIGEST_LENGTH: usize = 32;
 
 /// Converts a CLValue to a JSON Value.
 ///
@@ -49,6 +55,27 @@ pub fn get_current_timestamp(timestamp: Option<String>) -> String {
         })
         .unwrap_or_else(Utc::now);
     current_timestamp.to_rfc3339_opts(SecondsFormat::Secs, true)
+}
+
+/// Computes the Blake2b hash of the provided metadata.
+///
+/// # Arguments
+///
+/// * `meta_data` - A reference to a string containing the metadata to be hashed.
+///
+/// # Returns
+///
+/// A hexadecimal string representing the Blake2b hash of the input metadata.
+
+pub fn get_blake2b_hash(meta_data: &str) -> String {
+    let mut result = [0; BLAKE2B_DIGEST_LENGTH];
+    let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
+
+    hasher.update(meta_data);
+    hasher.finalize_variable(|slice| {
+        result.copy_from_slice(slice);
+    });
+    base16::encode_lower(&result)
 }
 
 /// Gets the time to live (TTL) value or returns the default value if not provided.
