@@ -1,5 +1,5 @@
 [package]
-name = "sdk-tests"
+name = "sdk_tests"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,3 +12,11 @@ once_cell = "*"
 chrono = "0.4"
 lazy_static = "*"
 serde_json = "*"
+
+[[bin]]
+name = "sdk_tests"
+path = "src/main.rs"
+
+[lib]
+name = "sdk_tests"
+path = "src/lib.rs"

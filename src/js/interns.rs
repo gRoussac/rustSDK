@@ -1,5 +1,4 @@
-use crate::helpers::get_current_timestamp;
-use crate::helpers::hex_to_uint8_vec;
+use crate::helpers::{get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec};
 use crate::types::cl::bytes::Bytes;
 use crate::{
     debug::error,
@@ -125,4 +124,18 @@ pub fn secret_to_public_key(secret_key: &str) -> JsValue {
 #[wasm_bindgen(js_name = "getTimestamp")]
 pub fn get_timestamp() -> JsValue {
     get_current_timestamp(None).into()
+}
+
+/// Encodes the given metadata using the lower-level Blake2b hashing algorithm.
+///
+/// # Arguments
+///
+/// * `meta_data` - A string containing the metadata to be hashed.
+///
+/// # Returns
+///
+/// A JsValue containing the hash generated using the Blake2b algorithm.
+#[wasm_bindgen(js_name = "encodeLowerBlake2b")]
+pub fn encode_lower_blake2b(meta_data: &str) -> JsValue {
+    get_blake2b_hash(meta_data).into()
 }
