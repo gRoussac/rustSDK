@@ -231,9 +231,12 @@ impl SDK {
                 }
             }
         } else {
-            let err = "Error: Missing purse identifier";
-            error(err);
-            return Err(SdkError::FailedToParsePurseIdentifier);
+            let err = "Error: Missing purse identifier".to_string();
+            error(&err);
+            return Err(SdkError::InvalidArgument {
+                context: "query_global_state",
+                error: err,
+            });
         };
 
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
@@ -279,5 +282,230 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::{
+            digest::Digest, global_state_identifier::GlobalStateIdentifier, public_key::PublicKey,
+            purse_identifier::PurseIdentifier,
+        },
+    };
+    use sdk_tests::{
+        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
+        tests::helpers::read_pem_file,
+    };
+
+    use super::*;
+
+    fn get_purse_identifier() -> PurseIdentifier {
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+        let public_key = PublicKey::new(&account).unwrap();
+
+        PurseIdentifier::from_main_purse_under_public_key(public_key)
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk
+            .query_balance(
+                None,
+                None,
+                Some(get_purse_identifier()),
+                None,
+                None,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_missing_purse() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "Error: Missing purse identifier";
+
+        // Act
+        let result = sdk
+            .query_balance(None, None, None, None, None, None, None)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+
+        assert!(err_string.contains(error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_global_state_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        // Act
+        let result = sdk
+            .query_balance(
+                Some(global_state_identifier.clone()),
+                None,
+                Some(get_purse_identifier()),
+                None,
+                None,
+                verbosity,
+                node_address.clone(),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let state_root_hash: Digest = sdk
+            .get_state_root_hash(None, verbosity, node_address.clone())
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into();
+
+        // Act
+        let result = sdk
+            .query_balance(
+                None,
+                None,
+                Some(get_purse_identifier()),
+                Some(state_root_hash.to_string()),
+                None,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_block_id() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .query_balance(
+                None,
+                None,
+                Some(get_purse_identifier()),
+                None,
+                Some("1".to_string()),
+                verbosity,
+                node_address.clone(),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_purse_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .query_balance(
+                None,
+                None,
+                Some(get_purse_identifier()),
+                None,
+                None,
+                verbosity,
+                node_address.clone(),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_purse_identifier_as_string() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .query_balance(
+                None,
+                Some(get_purse_identifier().to_string()),
+                None,
+                None,
+                None,
+                verbosity,
+                node_address.clone(),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_balance_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+
+        // Act
+        let result = sdk
+            .query_balance(
+                None,
+                Some(get_purse_identifier().to_string()),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

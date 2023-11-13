@@ -4,7 +4,7 @@ pub mod test_module_deploy {
         config::{
             get_config, TestConfig, ARGS_JSON, CONTRACT_CEP78_KEY, DEFAULT_TTL, ENTRYPOINT_MINT,
             HELLO_CONTRACT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT, TIMESTAMP_WAIT_TIME,
-            TRANSFER_AMOUNT, TTL,
+            TRANSFER_AMOUNT, TTL, WASM_PATH,
         },
         tests::helpers::read_wasm_file,
     };
@@ -359,7 +359,7 @@ pub mod test_module_deploy {
             .to_json_string()
             .unwrap()
             .contains("\"module_bytes\":\"00\""));
-        let file_path = HELLO_CONTRACT;
+        let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
         let module_bytes = match read_wasm_file(file_path) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
