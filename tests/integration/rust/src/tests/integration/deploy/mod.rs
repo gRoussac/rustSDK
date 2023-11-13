@@ -4,7 +4,7 @@ pub mod test_module {
         get_config, TestConfig, ENTRYPOINT_MINT, PAYMENT_AMOUNT, PAYMENT_TRANSFER_AMOUNT,
         TRANSFER_AMOUNT, TTL,
     };
-    use crate::tests::helpers::create_test_sdk;
+    use crate::tests::helpers::intern::create_test_sdk;
     use casper_rust_wasm_sdk::types::deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,

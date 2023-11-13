@@ -3,7 +3,12 @@ use crate::debug::error;
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
 use crate::{
-    types::{digest::ToDigest, sdk_error::SdkError, uref::URef, verbosity::Verbosity},
+    types::{
+        digest::{Digest, ToDigest},
+        sdk_error::SdkError,
+        uref::URef,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
@@ -213,17 +218,22 @@ impl SDK {
     ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
         //log("get_balance!");
         let state_root_hash = if state_root_hash.is_empty() {
-            self.get_state_root_hash(
-                None,
-                None,
-                Some(self.get_node_address(node_address.clone())),
-            )
-            .await
-            .unwrap()
-            .result
-            .state_root_hash
-            .unwrap()
-            .into()
+            let state_root_hash = self
+                .get_state_root_hash(
+                    None,
+                    None,
+                    Some(self.get_node_address(node_address.clone())),
+                )
+                .await;
+
+            match state_root_hash {
+                Ok(state_root_hash) => {
+                    let state_root_hash: Digest =
+                        state_root_hash.result.state_root_hash.unwrap().into();
+                    state_root_hash
+                }
+                Err(_) => "".to_digest(),
+            }
         } else {
             state_root_hash.to_digest()
         };
@@ -247,5 +257,156 @@ impl SDK {
             .await
             .map_err(SdkError::from),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::{helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH};
+    use sdk_tests::{
+        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
+        tests::helpers::read_pem_file,
+    };
+
+    async fn get_purse_uref() -> URef {
+        static mut PURSE_UREF: Option<URef> = None;
+        unsafe {
+            if let Some(uref) = &PURSE_UREF {
+                return uref.clone();
+            }
+        }
+        let sdk = SDK::new(None, None);
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+        let purse_uref = *sdk
+            .get_account(
+                None,
+                Some(account),
+                None,
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await
+            .unwrap()
+            .result
+            .account
+            .main_purse();
+
+        unsafe {
+            PURSE_UREF = Some(purse_uref.into());
+        }
+        purse_uref.into()
+    }
+
+    #[tokio::test]
+    async fn test_get_balance_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk
+            .get_balance(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
+                purse_uref,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_balance_with_purse_uref() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+
+        // Act
+        let result = sdk
+            .get_balance("", purse_uref, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_balance_with_purse_uref_as_string() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let purse_uref =
+            GetBalanceInput::PurseUrefAsString(get_purse_uref().await.to_formatted_string());
+
+        // Act
+        let result = sdk
+            .get_balance("", purse_uref, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_balance_with_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let state_root_hash: Digest = sdk
+            .get_state_root_hash(
+                None,
+                Some(Verbosity::High),
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into();
+        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+
+        // Act
+        let result = sdk
+            .get_balance(
+                state_root_hash.to_digest(),
+                purse_uref,
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_balance_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+
+        // Act
+        let result = sdk
+            .get_balance(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
+                purse_uref,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

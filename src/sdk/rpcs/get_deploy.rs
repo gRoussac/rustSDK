@@ -203,3 +203,158 @@ impl SDK {
         .await
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::{
+            deploy_hash::DeployHash,
+            deploy_params::{
+                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+            },
+        },
+    };
+    use sdk_tests::{
+        config::{
+            CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
+            TRANSFER_AMOUNT,
+        },
+        tests::helpers::read_pem_file,
+    };
+
+    #[tokio::test]
+    async fn test_get_deploy_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk.get_deploy(deploy_hash, None, None, None).await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_deploy_with_invalid_deploy_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_deploy(deploy_hash, None, verbosity, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_get_deploy_with_valid_deploy_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
+        let make_transfer = sdk
+            .transfer(
+                TRANSFER_AMOUNT,
+                &account, // self transfer
+                None,
+                deploy_params,
+                payment_params,
+                verbosity,
+                node_address.clone(),
+            )
+            .await
+            .unwrap();
+        let deploy_hash = make_transfer.result.deploy_hash;
+        assert!(!deploy_hash.to_string().is_empty());
+
+        // Act
+        let result = sdk
+            .get_deploy(deploy_hash.into(), None, verbosity, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_deploy_with_finalized_approvals() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
+        let make_transfer = sdk
+            .transfer(
+                TRANSFER_AMOUNT,
+                &account, // self transfer
+                None,
+                deploy_params,
+                payment_params,
+                verbosity,
+                node_address.clone(),
+            )
+            .await
+            .unwrap();
+        let deploy_hash = make_transfer.result.deploy_hash;
+        assert!(!deploy_hash.to_string().is_empty());
+        let finalized_approvals = true;
+
+        // Act
+        let result = sdk
+            .get_deploy(
+                deploy_hash.into(),
+                Some(finalized_approvals),
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_deploy_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+
+        // Act
+        let result = sdk.get_deploy(deploy_hash, None, None, None).await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+}

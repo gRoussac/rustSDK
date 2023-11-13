@@ -154,3 +154,146 @@ impl SDK {
             .map_err(SdkError::from)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
+        types::deploy_params::{
+            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+        },
+    };
+    use sdk_tests::{
+        config::{
+            ARGS_SIMPLE, CHAIN_NAME, DEFAULT_NODE_ADDRESS, HELLO_CONTRACT, PAYMENT_AMOUNT,
+            PRIVATE_KEY_NAME,
+        },
+        tests::helpers::{read_pem_file, read_wasm_file},
+    };
+
+    fn get_session_params() -> &'static SessionStrParams {
+        static mut SESSION_PARAMS: Option<SessionStrParams> = None;
+
+        unsafe {
+            if SESSION_PARAMS.is_none() {
+                let mut session_params = SessionStrParams::default();
+                let file_path = &format!("{WASM_PATH}{HELLO_CONTRACT}");
+                let module_bytes = match read_wasm_file(file_path) {
+                    Ok(module_bytes) => module_bytes,
+                    Err(err) => {
+                        eprintln!("Error reading file: {:?}", err);
+                        unimplemented!()
+                    }
+                };
+                session_params.set_session_bytes(module_bytes.into());
+                let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+                session_params.set_session_args(args_simple);
+                SESSION_PARAMS = Some(session_params);
+            }
+            SESSION_PARAMS.as_ref().unwrap()
+        }
+    }
+
+    #[tokio::test]
+    async fn test_deploy_with_valid_deploy_params() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+        // Act
+        let result = sdk
+            .deploy(
+                deploy_params,
+                get_session_params().clone(),
+                payment_params,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_deploy_with_valid_deploy_params_without_private_key() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let error_message = "Invalid Deploy".to_string();
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
+        // Act
+        let result = sdk
+            .deploy(
+                deploy_params,
+                get_session_params().clone(),
+                payment_params,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_deploy_with_invalid_deploy_params() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\"]".to_string();
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(""); // This is not valid payment amount
+
+        // Act
+        let result = sdk
+            .deploy(
+                deploy_params,
+                get_session_params().clone(),
+                payment_params,
+                verbosity,
+                node_address,
+            )
+            .await;
+        // Assert
+        assert!(result.is_err());
+
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+}

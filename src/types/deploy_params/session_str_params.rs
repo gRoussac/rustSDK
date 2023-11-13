@@ -315,3 +315,52 @@ pub fn session_str_params_to_casper_client(
         get_str_or_default(session_params.session_args_complex.get()),
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_session_str_params_to_casper_client() {
+        let session_params = SessionStrParams::default();
+        session_params.set_session_path("path_value");
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("session_path: \"path_value\""));
+
+        let session_params = SessionStrParams::default();
+        session_params.set_session_bytes(Bytes::from(vec![0, 1, 2]));
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("session_bytes: Bytes([0, 1, 2])"));
+
+        let session_params = SessionStrParams::default();
+        session_params.set_session_name("name_value");
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("session_name: \"name_value\""));
+
+        let session_params = SessionStrParams::default();
+        session_params.set_session_hash("hash_value");
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("session_hash: \"hash_value\""));
+
+        let session_params = SessionStrParams::default();
+        session_params.set_session_package_name("package_name_value");
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("session_package_name: \"package_name_value\""));
+
+        let session_params = SessionStrParams::default();
+        session_params.set_session_package_hash("package_hash_value");
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("session_package_hash: \"package_hash_value\""));
+
+        let session_params = SessionStrParams::default();
+        let result = session_str_params_to_casper_client(&session_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("is_session_transfer: true"));
+    }
+}

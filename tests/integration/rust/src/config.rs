@@ -1,7 +1,8 @@
 #[cfg(test)]
 use crate::tests::helpers::{
-    get_block, get_contract_cep78_hash_keys, get_dictionnary_key, get_dictionnary_uref,
-    get_main_purse, install_cep78_if_needed, mint_nft, read_pem_file,
+    get_block,
+    intern::{get_dictionnary_key, get_dictionnary_uref, get_main_purse},
+    read_pem_file,
 };
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
 #[cfg(test)]
@@ -20,6 +21,7 @@ pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look PRIVATE_KEY_NAME to root directory if relative path is not found (relative to root)
 pub const PRIVATE_KEY_NCTL_PATH: &str =
     "./../../../../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
+pub const WASM_PATH: &str = "../../wasm/";
 pub const DEFAULT_TTL: &str = "30m";
 pub const TTL: &str = "1h";
 pub const HELLO_CONTRACT: &str = "hello.wasm";
@@ -66,7 +68,7 @@ pub struct TestConfig {
     pub purse_uref: String,
     pub account_hash: String,
     pub target_account: String,
-    pub block_height: String,
+    pub block_height: u64,
     pub block_hash: String,
     pub deploy_hash: String,
     pub dictionary_key: String,
@@ -82,6 +84,8 @@ lazy_static! {
 
 #[cfg(test)]
 pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::Error>> {
+    use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
+
     let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
     if *block_hash_initialized_guard {
         return Err("initialize_test_config called after block_hash already initialized".into());
@@ -103,7 +107,7 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     let purse_uref = get_main_purse(&account).await;
 
     println!("install_cep78");
-    let deploy_hash = install_cep78_if_needed(&account, &private_key)
+    let deploy_hash = install_cep78_if_needed(&account, &private_key, None)
         .await
         .unwrap();
 
