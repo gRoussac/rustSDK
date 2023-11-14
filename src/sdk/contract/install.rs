@@ -57,6 +57,7 @@ impl SDK {
 }
 
 /// A set of functions for installing smart contracts on the blockchain.
+/// Alias of sdk.deploy
 impl SDK {
     /// Installs a smart contract with the specified parameters and returns the result.
     ///

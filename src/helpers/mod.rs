@@ -249,8 +249,8 @@ pub fn motes_to_cspr(motes: &str) -> String {
                 formatted_cspr
             }
         }
-        Err(_) => {
-            eprintln!("Failed to parse input as Decimal");
+        Err(err) => {
+            error(&format!("Failed to parse input as Decimal: {:?}", err));
             "Invalid input".to_string()
         }
     }
