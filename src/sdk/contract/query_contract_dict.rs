@@ -73,6 +73,7 @@ impl SDK {
     }
 }
 
+/// Alias of sdk.get_dictionary_item
 impl SDK {
     /// Query a contract dictionary item.
     ///
@@ -104,7 +105,7 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        contract::get_dictionary_item,
+        get_dictionary_item,
         types::{
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams, digest::Digest,
         },
@@ -112,15 +113,15 @@ mod tests {
     use sdk_tests::config::DEFAULT_NODE_ADDRESS;
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_none_values() {
+    async fn test_query_contract_dict_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
         let error_message = "builder error: relative URL without a base".to_string();
 
         // Act
         let result = sdk
-            .get_dictionary_item(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
+            .query_contract_dict(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
                 None,
                 None,
@@ -134,7 +135,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_state_root_hash() {
+    async fn test_query_contract_dict_with_state_root_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -153,7 +154,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
+            .query_contract_dict(state_root_hash, dictionary_item, verbosity, node_address)
             .await;
 
         // Assert
@@ -161,7 +162,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_empty_state_root_hash() {
+    async fn test_query_contract_dict_with_empty_state_root_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -170,7 +171,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(
+            .query_contract_dict(
                 state_root_hash,
                 get_dictionary_item(false).await,
                 verbosity,
@@ -183,7 +184,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_valid_identifier_input() {
+    async fn test_query_contract_dict_with_valid_identifier_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -192,7 +193,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(
+            .query_contract_dict(
                 state_root_hash,
                 get_dictionary_item(false).await,
                 verbosity,
@@ -205,7 +206,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_valid_params_input() {
+    async fn test_query_contract_dict_with_valid_params_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -214,7 +215,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(
+            .query_contract_dict(
                 state_root_hash,
                 get_dictionary_item(true).await,
                 verbosity,
@@ -227,7 +228,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_invalid_params_input() {
+    async fn test_query_contract_dict_with_invalid_params_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -241,7 +242,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(
+            .query_contract_dict(
                 state_root_hash,
                 DictionaryItemInput::Params(params),
                 verbosity,
@@ -256,7 +257,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_dictionary_item_with_error() {
+    async fn test_query_contract_dict_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let error_message =
@@ -264,8 +265,8 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
+            .query_contract_dict(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
                 None,
                 None,

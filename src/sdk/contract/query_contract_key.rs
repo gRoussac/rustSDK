@@ -70,6 +70,7 @@ impl SDK {
     }
 }
 
+/// Alias of sdk.query_global_state
 impl SDK {
     /// Query a contract key.
     ///

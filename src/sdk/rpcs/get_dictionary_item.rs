@@ -184,7 +184,7 @@ impl SDK {
         self.get_dictionary_item_js_alias(options).await
     }
 }
-
+#[derive(Debug, Clone)]
 pub enum DictionaryItemInput {
     Identifier(DictionaryItemIdentifier),
     Params(DictionaryItemStrParams),
