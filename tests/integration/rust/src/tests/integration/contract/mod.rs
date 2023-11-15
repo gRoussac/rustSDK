@@ -3,9 +3,12 @@ pub mod test_module {
     use crate::{
         config::{
             get_config, TestConfig, ARGS_JSON, ARGS_SIMPLE, DICTIONARY_ITEM_KEY, DICTIONARY_NAME,
-            ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL,
+            ENTRYPOINT_MINT, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH,
         },
-        tests::helpers::{create_test_sdk, get_dictionnary_key, read_wasm_file},
+        tests::helpers::{
+            intern::{create_test_sdk, get_dictionnary_key},
+            read_wasm_file,
+        },
     };
     use casper_rust_wasm_sdk::{
         rpcs::{
@@ -186,8 +189,7 @@ pub mod test_module {
         );
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
-        let file_path = HELLO_CONTRACT;
-        let module_bytes = match read_wasm_file(file_path) {
+        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
                 eprintln!("Error reading file: {:?}", err);

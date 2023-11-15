@@ -374,29 +374,212 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         } else {
-            let state_root_hash: Digest = self
+            let state_root_hash = self
                 .get_state_root_hash(
                     None,
                     None,
                     Some(self.get_node_address(node_address.clone())),
                 )
-                .await
-                .unwrap()
-                .result
-                .state_root_hash
-                .unwrap()
-                .into();
+                .await;
+            let state_root_hash_as_string: String = match state_root_hash {
+                Ok(state_root_hash) => {
+                    let state_root_hash: Digest =
+                        state_root_hash.result.state_root_hash.unwrap().into();
+                    state_root_hash.to_string()
+                }
+                Err(_) => "".to_string(),
+            };
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
                 "",
-                &state_root_hash.to_string(),
+                &state_root_hash_as_string,
                 &key.unwrap().to_formatted_string(),
                 &path_str,
             )
             .await
             .map_err(SdkError::from)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::{global_state_identifier::GlobalStateIdentifier, public_key::PublicKey},
+    };
+    use sdk_tests::{
+        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
+        tests::helpers::read_pem_file,
+    };
+
+    use super::*;
+
+    fn get_key_input() -> KeyIdentifierInput {
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+        let public_key = PublicKey::new(&account).unwrap();
+        KeyIdentifierInput::String(public_key.to_account_hash().to_formatted_string())
+    }
+
+    #[tokio::test]
+    async fn test_query_global_state_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk
+            .query_global_state(QueryGlobalStateParams {
+                key: get_key_input(),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity: None,
+                node_address: None,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_global_state_with_missing_key() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message =
+            "Invalid argument 'query_global_state': Error: Missing key from formatted string"
+                .to_string();
+
+        // Act
+        let result = sdk
+            .query_global_state(QueryGlobalStateParams {
+                key: KeyIdentifierInput::String(String::new()),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity: None,
+                node_address: None,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_global_state_with_global_state_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .query_global_state(QueryGlobalStateParams {
+                key: get_key_input(),
+                path: None,
+                maybe_global_state_identifier: Some(global_state_identifier.clone()),
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity,
+                node_address: node_address.clone(),
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_global_state_with_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let state_root_hash: Digest = sdk
+            .get_state_root_hash(None, verbosity, node_address.clone())
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into();
+        // Act
+        let result = sdk
+            .query_global_state(QueryGlobalStateParams {
+                key: get_key_input(),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: Some(state_root_hash.to_string()),
+                maybe_block_id: None,
+                verbosity,
+                node_address,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_global_state_with_block_id() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .query_global_state(QueryGlobalStateParams {
+                key: get_key_input(),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: Some("1".to_string()),
+                verbosity,
+                node_address: node_address.clone(),
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_global_state_with_error() {
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        // Act
+        let result = sdk
+            .query_global_state(QueryGlobalStateParams {
+                key: get_key_input(),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity: None,
+                node_address: None,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

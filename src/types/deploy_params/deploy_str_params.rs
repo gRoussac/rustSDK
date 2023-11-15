@@ -144,3 +144,43 @@ pub fn deploy_str_params_to_casper_client(deploy_params: &DeployStrParams) -> _D
         session_account: get_str_or_default(deploy_params.session_account.get()),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use once_cell::sync::OnceCell;
+
+    #[test]
+    fn test_deploy_str_params_to_casper_client() {
+        let secret_key = OnceCell::new();
+        secret_key.set("secret_key".to_string()).unwrap();
+
+        let timestamp = OnceCell::new();
+        timestamp.set("1234567890".to_string()).unwrap();
+
+        let ttl = OnceCell::new();
+        ttl.set("10".to_string()).unwrap();
+
+        let chain_name = OnceCell::new();
+        chain_name.set("test_chain".to_string()).unwrap();
+
+        let session_account = OnceCell::new();
+        session_account.set("account_id".to_string()).unwrap();
+
+        let deploy_params = DeployStrParams {
+            secret_key,
+            timestamp,
+            ttl,
+            chain_name,
+            session_account,
+        };
+
+        let result = deploy_str_params_to_casper_client(&deploy_params);
+
+        assert_eq!(result.secret_key, "secret_key");
+        assert_eq!(result.timestamp, "1234567890");
+        assert_eq!(result.ttl, "10");
+        assert_eq!(result.chain_name, "test_chain");
+        assert_eq!(result.session_account, "account_id");
+    }
+}
