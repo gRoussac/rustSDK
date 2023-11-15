@@ -2,7 +2,7 @@
 pub mod test_module {
     use crate::{
         config::{get_config, TestConfig, DEFAULT_TTL, TTL},
-        tests::helpers::create_test_sdk,
+        tests::helpers::intern::create_test_sdk,
     };
     use casper_rust_wasm_sdk::{
         helpers::{

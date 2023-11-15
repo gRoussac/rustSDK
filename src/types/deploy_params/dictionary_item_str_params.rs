@@ -233,3 +233,158 @@ pub fn dictionary_item_str_params_to_casper_client(
         return _DictionaryItemStrParams::Dictionary("");
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dictionary_item_str_params_to_casper_client() {
+        // Test case with AccountNamedKey variant
+        let account_named_key = AccountNamedKey {
+            key: OnceCell::new(),
+            dictionary_name: OnceCell::new(),
+            dictionary_item_key: OnceCell::new(),
+        };
+        account_named_key
+            .key
+            .set("account_key".to_string())
+            .unwrap();
+        account_named_key
+            .dictionary_name
+            .set("test_dict".to_string())
+            .unwrap();
+        account_named_key
+            .dictionary_item_key
+            .set("item_key".to_string())
+            .unwrap();
+
+        let dictionary_item_params = DictionaryItemStrParams {
+            account_named_key: Some(account_named_key),
+            contract_named_key: None,
+            uref: None,
+            dictionary: None,
+        };
+
+        if let _DictionaryItemStrParams::AccountNamedKey {
+            account_hash,
+            dictionary_name,
+            dictionary_item_key,
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        {
+            assert_eq!(account_hash, "account_key");
+            assert_eq!(dictionary_name, "test_dict");
+            assert_eq!(dictionary_item_key, "item_key");
+        } else {
+            panic!("Unexpected enum variant");
+        }
+
+        // Test case with ContractNamedKey variant
+        let contract_named_key = ContractNamedKey {
+            key: OnceCell::new(),
+            dictionary_name: OnceCell::new(),
+            dictionary_item_key: OnceCell::new(),
+        };
+        contract_named_key
+            .key
+            .set("contract_key".to_string())
+            .unwrap();
+        contract_named_key
+            .dictionary_name
+            .set("test_contract_dict".to_string())
+            .unwrap();
+        contract_named_key
+            .dictionary_item_key
+            .set("contract_item_key".to_string())
+            .unwrap();
+
+        let dictionary_item_params = DictionaryItemStrParams {
+            account_named_key: None,
+            contract_named_key: Some(contract_named_key),
+            uref: None,
+            dictionary: None,
+        };
+
+        if let _DictionaryItemStrParams::ContractNamedKey {
+            hash_addr,
+            dictionary_name,
+            dictionary_item_key,
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        {
+            assert_eq!(hash_addr, "contract_key");
+            assert_eq!(dictionary_name, "test_contract_dict");
+            assert_eq!(dictionary_item_key, "contract_item_key");
+        } else {
+            panic!("Unexpected enum variant");
+        }
+
+        // Test case with URef variant
+        let uref_variant = URefVariant {
+            seed_uref: OnceCell::new(),
+            dictionary_item_key: OnceCell::new(),
+        };
+        uref_variant.seed_uref.set("seed_uref".to_string()).unwrap();
+        uref_variant
+            .dictionary_item_key
+            .set("uref_item_key".to_string())
+            .unwrap();
+
+        let dictionary_item_params = DictionaryItemStrParams {
+            account_named_key: None,
+            contract_named_key: None,
+            uref: Some(uref_variant),
+            dictionary: None,
+        };
+
+        if let _DictionaryItemStrParams::URef {
+            seed_uref,
+            dictionary_item_key,
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        {
+            assert_eq!(seed_uref, "seed_uref");
+            assert_eq!(dictionary_item_key, "uref_item_key");
+        } else {
+            panic!("Unexpected enum variant");
+        }
+
+        // Test case with Dictionary variant
+        let dictionary_variant = DictionaryVariant {
+            value: OnceCell::new(),
+        };
+        dictionary_variant
+            .value
+            .set("dictionary_value".to_string())
+            .unwrap();
+
+        let dictionary_item_params = DictionaryItemStrParams {
+            account_named_key: None,
+            contract_named_key: None,
+            uref: None,
+            dictionary: Some(dictionary_variant),
+        };
+
+        if let _DictionaryItemStrParams::Dictionary(value) =
+            dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        {
+            assert_eq!(value, "dictionary_value");
+        } else {
+            panic!("Unexpected enum variant");
+        }
+
+        // Test case with invalid variant
+        let invalid_params = DictionaryItemStrParams {
+            account_named_key: None,
+            contract_named_key: None,
+            uref: None,
+            dictionary: None,
+        };
+
+        if let _DictionaryItemStrParams::Dictionary(value) =
+            dictionary_item_str_params_to_casper_client(&invalid_params)
+        {
+            assert_eq!(value, "");
+        } else {
+            panic!("Unexpected enum variant");
+        }
+    }
+}

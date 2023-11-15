@@ -17,3 +17,9 @@ pub mod put_deploy;
 pub mod query_balance;
 pub mod query_global_state;
 pub mod speculative_exec;
+
+#[cfg(test)]
+pub const PRIVATE_KEY_NCTL_PATH: &str =
+    "./../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
+#[cfg(test)]
+pub const WASM_PATH: &str = "./tests/wasm/";

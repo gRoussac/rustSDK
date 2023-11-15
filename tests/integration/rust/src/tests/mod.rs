@@ -393,6 +393,7 @@ pub async fn _run_example_11() -> Result<(), String> {
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
     pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "300000000000";
+    pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
     pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 
@@ -410,7 +411,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     let session_params = SessionStrParams::default();
     session_params.set_session_args_json(ARGS_JSON);
 
-    let file_path = CEP78_CONTRACT;
+    let file_path = &format!("{WASM_PATH}{CEP78_CONTRACT}");
     let module_bytes = match read_wasm_file(file_path) {
         Ok(module_bytes) => module_bytes,
         Err(err) => {

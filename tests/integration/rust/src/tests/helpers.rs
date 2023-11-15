@@ -1,48 +1,222 @@
-#![cfg(test)]
-
+use self::intern::{create_test_sdk, install_cep78};
+use crate::config::PRIVATE_KEY_NAME;
 use crate::config::{
-    TestConfig, ARGS_JSON, CEP78_CONTRACT, CHAIN_NAME, CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS,
-    DEPLOY_TIME, ENTRYPOINT_MINT, PACKAGE_CEP78_KEY, PAYMENT_AMOUNT, PAYMENT_AMOUNT_CONTRACT_CEP78,
-    PRIVATE_KEY_NAME,
+    CHAIN_NAME, DEFAULT_NODE_ADDRESS, DEPLOY_TIME, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
-use casper_rust_wasm_sdk::{
-    rpcs::query_global_state::QueryGlobalStateParams,
-    types::{
-        block_hash::BlockHash,
+use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY};
+use casper_rust_wasm_sdk::rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams};
+use casper_rust_wasm_sdk::types::block_hash::BlockHash;
+use casper_rust_wasm_sdk::types::deploy_params::{
+    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+    session_str_params::SessionStrParams,
+};
+use lazy_static::lazy_static;
+use serde_json::{to_string, Value};
+use std::process;
+use std::thread;
+use std::{
+    fs::File,
+    io::{self, Read},
+    path::PathBuf,
+};
+use tokio::sync::Mutex;
+
+lazy_static! {
+    pub static ref CEP78_INSTALLED_GUARD: Mutex<bool> = Mutex::new(false);
+    pub static ref CEP78_REINSTALL_GUARD: Mutex<bool> = Mutex::new(false);
+}
+
+pub(crate) mod intern {
+    use super::{read_wasm_file, CEP78_REINSTALL_GUARD};
+    use crate::config::{
+        TestConfig, ARGS_JSON, CEP78_CONTRACT, CHAIN_NAME, DEFAULT_NODE_ADDRESS, DEPLOY_TIME,
+        PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
+    };
+    #[cfg(test)]
+    use casper_rust_wasm_sdk::rpcs::query_global_state::{
+        KeyIdentifierInput, QueryGlobalStateParams,
+    };
+    #[cfg(test)]
+    use casper_rust_wasm_sdk::types::uref::URef;
+    use casper_rust_wasm_sdk::types::{
         deploy_hash::DeployHash,
         deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
             session_str_params::SessionStrParams,
         },
-        uref::URef,
-    },
-};
-use casper_rust_wasm_sdk::{
-    rpcs::{get_dictionary_item::DictionaryItemInput, query_global_state::KeyIdentifierInput},
-    types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-    SDK,
-};
-use lazy_static::lazy_static;
-use std::io::{self, Read};
-use std::path::{Path, PathBuf};
-use std::process;
-use std::{fs::File, thread};
-use tokio::sync::Mutex;
+    };
+    use casper_rust_wasm_sdk::SDK;
+    #[cfg(test)]
+    use casper_rust_wasm_sdk::{
+        rpcs::get_dictionary_item::DictionaryItemInput,
+        types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
+    };
+    #[cfg(test)]
+    use serde_json::{to_string, Value};
+    use std::thread;
 
-pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
-    match config {
-        Some(config) => SDK::new(config.node_address, config.verbosity),
-        None => SDK::new(None, None),
+    pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
+        match config {
+            Some(config) => SDK::new(config.node_address, config.verbosity),
+            None => SDK::new(None, None),
+        }
     }
-}
 
-pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
-    let root_path = Path::new("../../wasm/");
-    let path = root_path.join(file_path);
-    let mut file = File::open(path)?;
-    let mut buffer = Vec::new();
-    file.read_to_end(&mut buffer)?;
-    Ok(buffer)
+    #[cfg(test)]
+    pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
+        let purse_uref = *(create_test_sdk(None)
+            .get_account(
+                None,
+                Some(account_identifier_as_string.to_owned()),
+                None,
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await
+            .unwrap()
+            .result
+            .account
+            .main_purse());
+        let purse_uref: URef = purse_uref.into();
+        purse_uref.to_formatted_string()
+    }
+
+    #[cfg(test)]
+    pub async fn get_dictionnary_key(
+        contract_hash: &str,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
+        get_state_root_hash: Option<&str>,
+    ) -> String {
+        let mut params = DictionaryItemStrParams::new();
+        params.set_contract_named_key(contract_hash, dictionary_name, dictionary_item_key);
+        let dictionary_item = DictionaryItemInput::Params(params);
+        let get_dictionary_item = create_test_sdk(None)
+            .get_dictionary_item(
+                get_state_root_hash.unwrap_or_default(),
+                dictionary_item,
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await;
+        let get_dictionary_item = get_dictionary_item.unwrap();
+        assert!(!get_dictionary_item
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+
+        let stored_value = get_dictionary_item.result.stored_value;
+        let cl_value = stored_value.as_cl_value().unwrap();
+        assert!(!cl_value.inner_bytes().is_empty());
+
+        assert!(!get_dictionary_item
+            .result
+            .dictionary_key
+            .to_string()
+            .is_empty());
+        let dictionary_key = get_dictionary_item.result.dictionary_key;
+        dictionary_key.to_string()
+    }
+
+    #[cfg(test)]
+    pub async fn get_dictionnary_uref(contract_hash: &str, dictionary_name: &str) -> String {
+        let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
+            key: KeyIdentifierInput::String(contract_hash.to_string()),
+            path: None,
+            maybe_global_state_identifier: None,
+            state_root_hash: None,
+            maybe_block_id: None,
+            node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
+            verbosity: None,
+        };
+        let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
+        let query_global_state_result = query_global_state.unwrap();
+
+        let named_keys = query_global_state_result
+            .result
+            .stored_value
+            .as_contract()
+            .unwrap()
+            .named_keys();
+        let (_, dictionnary_uref) = named_keys
+            .iter()
+            .find(|(key, _)| key == &dictionary_name)
+            .unwrap();
+        dictionnary_uref.to_string()
+    }
+
+    pub async fn install_cep78(
+        account: &str,
+        private_key: &str,
+        path: Option<&str>,
+    ) -> Result<String, Box<dyn std::error::Error>> {
+        print!("passsssss");
+        let mut cep78_reinstall_guard = CEP78_REINSTALL_GUARD.lock().await;
+        if *cep78_reinstall_guard {
+            return Err("CEP78 contract already installed".into());
+        }
+        *cep78_reinstall_guard = true;
+        let deploy_params = DeployStrParams::new(
+            CHAIN_NAME,
+            account,
+            Some(private_key.to_string()),
+            None,
+            None,
+        );
+        let session_params = SessionStrParams::default();
+        session_params.set_session_args_json(ARGS_JSON);
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
+        let path = match path {
+            Some(path) => path,
+            None => WASM_PATH,
+        };
+        let file_path = &format!("{path}{CEP78_CONTRACT}");
+        let module_bytes = match read_wasm_file(file_path) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                return Err(format!("Error reading file {}: {:?}", file_path, err).into());
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        let sdk = create_test_sdk(None);
+        let install = sdk
+            .install(
+                deploy_params,
+                session_params,
+                payment_params,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await;
+        assert!(!install
+            .as_ref()
+            .unwrap()
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+
+        let deploy_hash = DeployHash::from(install.as_ref().unwrap().result.deploy_hash);
+        let deploy_hash_as_string = deploy_hash.to_string();
+        assert!(!deploy_hash_as_string.is_empty());
+
+        thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
+
+        let get_deploy = sdk
+            .get_deploy(
+                deploy_hash,
+                Some(true),
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
+            .await;
+        let get_deploy = get_deploy.unwrap();
+        assert!(!get_deploy.result.api_version.to_string().is_empty());
+        assert!(!get_deploy.result.deploy.to_string().is_empty());
+        Ok(deploy_hash_as_string)
+    }
 }
 
 pub fn read_pem_file(file_path: &str) -> Result<String, io::Error> {
@@ -64,40 +238,27 @@ pub fn read_pem_file(file_path: &str) -> Result<String, io::Error> {
     Ok(contents)
 }
 
-pub async fn get_block() -> (String, String) {
-    let get_block = create_test_sdk(None)
-        .get_block(None, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
-        .await;
-    match get_block {
-        Err(err) => {
-            eprintln!("Block hash unreachable! {}", err);
-            process::exit(1);
-        }
-        Ok(get_block) => {
-            let block = get_block.result.block_with_signatures.unwrap().block;
-            let block_hash: BlockHash = (*block.hash()).into();
-            let block_height = block.header().height();
-            (block_hash.to_string(), block_height.to_string())
-        }
-    }
+pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
+    let mut path_buf = PathBuf::new();
+    path_buf.push(file_path);
+    let mut file = File::open(path_buf.as_path())?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(buffer)
 }
 
-pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
-    let purse_uref: URef = create_test_sdk(None)
-        .get_account(
-            None,
-            Some(account_identifier_as_string.to_owned()),
-            None,
-            None,
-            Some(DEFAULT_NODE_ADDRESS.to_string()),
-        )
-        .await
-        .unwrap()
-        .result
-        .account
-        .main_purse()
-        .into();
-    purse_uref.to_formatted_string()
+pub async fn install_cep78_if_needed(
+    account: &str,
+    private_key: &str,
+    path: Option<&str>,
+) -> Option<String> {
+    let mut install_guard = CEP78_INSTALLED_GUARD.lock().await;
+    if !(*install_guard) {
+        let deploy_hash = install_cep78(account, private_key, path).await.unwrap();
+        *install_guard = true;
+        return Some(deploy_hash);
+    }
+    None
 }
 
 pub async fn get_contract_cep78_hash_keys(account_hash: &str) -> (String, String) {
@@ -187,144 +348,20 @@ pub async fn mint_nft(
     thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
 }
 
-pub async fn get_dictionnary_key(
-    contract_hash: &str,
-    dictionary_name: &str,
-    dictionary_item_key: &str,
-    get_state_root_hash: Option<&str>,
-) -> String {
-    let mut params = DictionaryItemStrParams::new();
-    params.set_contract_named_key(contract_hash, dictionary_name, dictionary_item_key);
-    let dictionary_item = DictionaryItemInput::Params(params);
-    let get_dictionary_item = create_test_sdk(None)
-        .get_dictionary_item(
-            get_state_root_hash.unwrap_or_default(),
-            dictionary_item,
-            None,
-            Some(DEFAULT_NODE_ADDRESS.to_string()),
-        )
+pub async fn get_block() -> (String, u64) {
+    let get_block = create_test_sdk(None)
+        .get_block(None, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
         .await;
-    let get_dictionary_item = get_dictionary_item.unwrap();
-    assert!(!get_dictionary_item
-        .result
-        .api_version
-        .to_string()
-        .is_empty());
-    let stored_value = get_dictionary_item.result.stored_value;
-
-    let cl_value = stored_value.as_cl_value().unwrap();
-
-    assert!(!cl_value.inner_bytes().is_empty());
-    assert!(!get_dictionary_item
-        .result
-        .dictionary_key
-        .to_string()
-        .is_empty());
-    let dictionary_key = get_dictionary_item.result.dictionary_key;
-    dictionary_key.to_string()
-}
-
-pub async fn get_dictionnary_uref(contract_hash: &str, dictionary_name: &str) -> String {
-    let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-        key: KeyIdentifierInput::String(contract_hash.to_string()),
-        path: None,
-        maybe_global_state_identifier: None,
-        state_root_hash: None,
-        maybe_block_id: None,
-        node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
-        verbosity: None,
-    };
-    let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
-    let query_global_state_result = query_global_state.unwrap();
-
-    let named_keys = query_global_state_result
-        .result
-        .stored_value
-        .as_contract()
-        .unwrap()
-        .named_keys();
-    let (_, dictionnary_uref) = named_keys
-        .iter()
-        .find(|(key, _)| key == &dictionary_name)
-        .unwrap();
-    dictionnary_uref.to_string()
-}
-
-lazy_static! {
-    pub static ref CEP78_INSTALLED_GUARD: Mutex<bool> = Mutex::new(false);
-    pub static ref CEP78_REINSTALL_GUARD: Mutex<bool> = Mutex::new(false);
-}
-
-pub async fn install_cep78(
-    account: &str,
-    private_key: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let mut cep78_reinstall_guard = CEP78_REINSTALL_GUARD.lock().await;
-    if *cep78_reinstall_guard {
-        return Err("CEP78 contract already installed".into());
-    }
-    *cep78_reinstall_guard = true;
-    let deploy_params = DeployStrParams::new(
-        CHAIN_NAME,
-        account,
-        Some(private_key.to_string()),
-        None,
-        None,
-    );
-    let session_params = SessionStrParams::default();
-    session_params.set_session_args_json(ARGS_JSON);
-
-    let payment_params = PaymentStrParams::default();
-    payment_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
-    let file_path = CEP78_CONTRACT;
-    let module_bytes = match read_wasm_file(file_path) {
-        Ok(module_bytes) => module_bytes,
+    match get_block {
         Err(err) => {
-            return Err(format!("Error reading file {}: {:?}", file_path, err).into());
+            eprintln!("Block hash unreachable! {}", err);
+            process::exit(1);
         }
-    };
-    session_params.set_session_bytes(module_bytes.into());
-    let sdk = create_test_sdk(None);
-    let install = sdk
-        .install(
-            deploy_params,
-            session_params,
-            payment_params,
-            Some(DEFAULT_NODE_ADDRESS.to_string()),
-        )
-        .await;
-    assert!(!install
-        .as_ref()
-        .unwrap()
-        .result
-        .api_version
-        .to_string()
-        .is_empty());
-
-    let deploy_hash = DeployHash::from(install.as_ref().unwrap().result.deploy_hash);
-    let deploy_hash_as_string = deploy_hash.to_string();
-    assert!(!deploy_hash_as_string.is_empty());
-
-    thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
-
-    //dbg!(deploy_hash_as_string.clone());
-    // let get_deploy = sdk
-    //     .get_deploy(deploy_hash, Some(true), None, Some(DEFAULT_NODE_ADDRESS.to_string()))
-    //     .await;
-    // let get_deploy = get_deploy.unwrap();
-    // assert!(!get_deploy.result.api_version.to_string().is_empty());
-    // assert!(!get_deploy.result.deploy.to_string().is_empty());
-    //dbg!(get_deploy.result.deploy);
-    //dbg!(deploy_hash_as_string);
-    Ok(deploy_hash_as_string)
-}
-
-pub async fn install_cep78_if_needed(account: &str, private_key: &str) -> Option<String> {
-    let mut install_guard = CEP78_INSTALLED_GUARD.lock().await;
-    if !(*install_guard) {
-        let deploy_hash = install_cep78(account, private_key).await.unwrap();
-        *install_guard = true;
-        return Some(deploy_hash);
+        Ok(get_block) => {
+            let block = get_block.result.block.unwrap();
+            let block_hash: BlockHash = (*block.hash()).into();
+            let block_height = block.header().height();
+            (block_hash.to_string(), block_height)
+        }
     }
-    None
 }

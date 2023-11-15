@@ -148,3 +148,167 @@ impl SDK {
         .map_err(SdkError::from)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::{
+            block_identifier::BlockIdentifier,
+            deploy_params::{
+                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+            },
+        },
+    };
+    use sdk_tests::{
+        config::{
+            CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
+            TRANSFER_AMOUNT,
+        },
+        tests::helpers::read_pem_file,
+    };
+
+    #[tokio::test]
+    async fn _test_speculative_transfer_with_valid_params() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
+
+        // Act
+        let result = sdk
+            .speculative_transfer(
+                TRANSFER_AMOUNT,
+                &account,
+                None,
+                deploy_params,
+                payment_params,
+                None,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn _test_speculative_transfer_with_block_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let block_identifier =
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
+
+        // Act
+        let result = sdk
+            .speculative_transfer(
+                TRANSFER_AMOUNT,
+                &account,
+                None,
+                deploy_params,
+                payment_params,
+                Some(block_identifier),
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_speculative_transfer_with_valid_params_without_private_key() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params = DeployStrParams::new(CHAIN_NAME, &account, None, None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
+
+        // Act
+        let result = sdk
+            .speculative_transfer(
+                TRANSFER_AMOUNT,
+                &account,
+                None,
+                deploy_params,
+                payment_params,
+                None,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_speculative_transfer_with_invalid_params() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\"]".to_string();
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(""); // This is not valid payment amount
+
+        // Act
+        let result = sdk
+            .speculative_transfer(
+                TRANSFER_AMOUNT,
+                &account,
+                None,
+                deploy_params,
+                payment_params,
+                None,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+}
