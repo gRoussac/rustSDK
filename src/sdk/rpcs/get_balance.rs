@@ -1,7 +1,5 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
-use crate::types::digest::Digest;
 use crate::{
     types::{
         digest::{Digest, ToDigest},

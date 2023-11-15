@@ -1,5 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::rpcs::speculative_exec::SpeculativeExecResult;
+#[cfg(target_arch = "wasm32")]
+use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     debug::error,
     types::{
@@ -31,6 +33,7 @@ impl SDK {
     /// * `deploy_params` - Deployment parameters for the deploy.
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
+    /// * `maybe_block_id_as_string` - An optional block ID as a string.
     /// * `maybe_block_identifier` - Optional block identifier.
     /// * `verbosity` - Optional verbosity level.
     /// * `node_address` - Optional node address.
@@ -44,6 +47,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
+        maybe_block_id_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifier>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
