@@ -11,7 +11,6 @@ use casper_rust_wasm_sdk::types::deploy_params::{
     session_str_params::SessionStrParams,
 };
 use lazy_static::lazy_static;
-use serde_json::{to_string, Value};
 use std::process;
 use std::thread;
 use std::{
@@ -51,8 +50,6 @@ pub(crate) mod intern {
         rpcs::get_dictionary_item::DictionaryItemInput,
         types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
     };
-    #[cfg(test)]
-    use serde_json::{to_string, Value};
     use std::thread;
 
     pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
@@ -64,7 +61,7 @@ pub(crate) mod intern {
 
     #[cfg(test)]
     pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
-        let purse_uref = *(create_test_sdk(None)
+        let purse_uref: URef = create_test_sdk(None)
             .get_account(
                 None,
                 Some(account_identifier_as_string.to_owned()),
@@ -76,8 +73,8 @@ pub(crate) mod intern {
             .unwrap()
             .result
             .account
-            .main_purse());
-        let purse_uref: URef = purse_uref.into();
+            .main_purse()
+            .into();
         purse_uref.to_formatted_string()
     }
 
@@ -151,7 +148,6 @@ pub(crate) mod intern {
         private_key: &str,
         path: Option<&str>,
     ) -> Result<String, Box<dyn std::error::Error>> {
-        print!("passsssss");
         let mut cep78_reinstall_guard = CEP78_REINSTALL_GUARD.lock().await;
         if *cep78_reinstall_guard {
             return Err("CEP78 contract already installed".into());
@@ -358,7 +354,7 @@ pub async fn get_block() -> (String, u64) {
             process::exit(1);
         }
         Ok(get_block) => {
-            let block = get_block.result.block.unwrap();
+            let block = get_block.result.block_with_signatures.unwrap().block;
             let block_hash: BlockHash = (*block.hash()).into();
             let block_height = block.header().height();
             (block_hash.to_string(), block_height)

@@ -236,7 +236,16 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
         let result = sdk.get_block(None, verbosity, node_address.clone()).await;
-        let block_hash = BlockHash::from(*result.unwrap().result.block.unwrap().hash()).to_string();
+        let block_hash = BlockHash::from(
+            *result
+                .unwrap()
+                .result
+                .block_with_signatures
+                .unwrap()
+                .block
+                .hash(),
+        )
+        .to_string();
         let block_identifier = BlockIdentifierInput::String(block_hash.to_string());
 
         // Act

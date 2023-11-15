@@ -8,6 +8,7 @@ pub mod test_module {
     };
     use crate::tests::helpers::intern::create_test_sdk;
     use crate::tests::integration::contract::test_module::test_install;
+    use casper_rust_wasm_sdk::helpers::cl_value_to_json;
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
     use casper_rust_wasm_sdk::{
