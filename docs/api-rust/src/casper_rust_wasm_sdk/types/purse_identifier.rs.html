@@ -101,8 +101,18 @@
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{account_hash::AccountHash, public_key::PublicKey, uref::URef};
 <span class="kw">use </span>casper_client::rpcs::PurseIdentifier <span class="kw">as </span>_PurseIdentifier;
+<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+</span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
@@ -128,6 +138,12 @@
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromURef&quot;</span>)]
     </span><span class="kw">pub fn </span>from_purse_uref(uref: URef) -&gt; <span class="self">Self </span>{
         PurseIdentifier(_PurseIdentifier::PurseUref(uref.into()))
+    }
+
+    <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+    #[wasm_bindgen(js_name = <span class="string">&quot;toJson&quot;</span>)]
+    </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
+        JsValue::from_serde(<span class="self">self</span>).unwrap_or(JsValue::null())
     }
 }
 
