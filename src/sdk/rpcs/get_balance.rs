@@ -281,7 +281,7 @@ mod tests {
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
         let account = public_key_from_private_key(&private_key).unwrap();
-        let purse_uref = *sdk
+        let purse_uref = sdk
             .get_account(
                 None,
                 Some(account),

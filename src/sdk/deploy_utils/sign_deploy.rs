@@ -62,7 +62,6 @@ mod tests {
         config::{CHAIN_NAME, PAYMENT_AMOUNT, PRIVATE_KEY_NAME},
         tests::helpers::read_pem_file,
     };
-    use serde_json::Value;
 
     #[tokio::test]
     async fn test_sign_deploy_with_valid_params() {
@@ -92,8 +91,12 @@ mod tests {
         // Assert
         assert!(signed_deploy.is_valid());
         assert!(signed_deploy.has_valid_hash());
-        assert!(signed_deploy.compute_approvals_hash());
-        assert_eq!(&signed_deploy.account(), account);
+        assert!(!signed_deploy
+            .compute_approvals_hash()
+            .unwrap()
+            .to_string()
+            .is_empty());
+        assert_eq!(signed_deploy.account(), account);
 
         // // Parse the JSON string in 1.6
         // let parsed_json: Value =
@@ -132,8 +135,12 @@ mod tests {
         // Assert
         assert!(!signed_deploy.is_valid());
         assert!(!signed_deploy.has_valid_hash());
-        assert!(!signed_deploy.compute_approvals_hash());
-        assert_eq!(&signed_deploy.account(), account);
+        assert!(!signed_deploy
+            .compute_approvals_hash()
+            .unwrap()
+            .to_string()
+            .is_empty());
+        assert_eq!(signed_deploy.account(), account);
 
         // // Parse the JSON string in 1.6
         // let parsed_json: Value =

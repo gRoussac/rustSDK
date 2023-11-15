@@ -78,7 +78,12 @@ pub async fn _run_example_4() {
 
     let get_block = sdk.get_block(None, None, None).await;
 
-    let block = get_block.unwrap().result.block.unwrap();
+    let block = get_block
+        .unwrap()
+        .result
+        .block_with_signatures
+        .unwrap()
+        .block;
     let block_hash = block.hash();
     println!("{:?}", block_hash);
 }
@@ -437,8 +442,10 @@ pub async fn _run_example_11() -> Result<(), String> {
         .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    let result = &get_deploy.result.execution_results.get(0).unwrap().result;
-    println!("{}", json_pretty_print(result, Some(Verbosity::High)));
+    println!(
+        "{}",
+        json_pretty_print(get_deploy.result, Some(Verbosity::High))
+    );
     Ok(())
 }
 
