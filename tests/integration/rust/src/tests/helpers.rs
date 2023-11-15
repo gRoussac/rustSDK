@@ -154,7 +154,6 @@ pub(crate) mod intern {
         private_key: &str,
         path: Option<&str>,
     ) -> Result<String, Box<dyn std::error::Error>> {
-        print!("passsssss");
         let mut cep78_reinstall_guard = CEP78_REINSTALL_GUARD.lock().await;
         if *cep78_reinstall_guard {
             return Err("CEP78 contract already installed".into());
