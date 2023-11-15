@@ -17,6 +17,12 @@
 <a href="#17" id="17">17</a>
 <a href="#18" id="18">18</a>
 <a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>get_account;
 <span class="kw">pub mod </span>get_auction_info;
 <span class="kw">pub mod </span>get_balance;
@@ -36,4 +42,10 @@
 <span class="kw">pub mod </span>query_balance;
 <span class="kw">pub mod </span>query_global_state;
 <span class="kw">pub mod </span>speculative_exec;
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">pub const </span>PRIVATE_KEY_NCTL_PATH: <span class="kw-2">&amp;</span>str =
+    <span class="string">&quot;./../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/&quot;</span>;
+<span class="attr">#[cfg(test)]
+</span><span class="kw">pub const </span>WASM_PATH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;./tests/wasm/&quot;</span>;
 </code></pre></div></section></main></body></html>
