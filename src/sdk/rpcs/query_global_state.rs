@@ -312,8 +312,8 @@ impl SDK {
         };
 
         if key.is_none() {
-            let err = "Error: Missing key from formatted string".to_string();
-            error(&err);
+            let err = "Error: Missing key from formatted string";
+            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state",
                 error: err,
