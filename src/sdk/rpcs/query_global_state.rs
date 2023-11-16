@@ -207,7 +207,7 @@ impl SDK {
             let err_msg = "Error: Missing Key as string or Key".to_string();
             error(&err_msg);
             return Err(SdkError::InvalidArgument {
-                context: "query_global_state",
+                context: "query_global_state_js_alias_params",
                 error: err_msg,
             });
         };
