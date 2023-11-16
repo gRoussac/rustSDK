@@ -234,7 +234,7 @@ impl SDK {
             let err = "Error: Missing purse identifier";
             error(err);
             return Err(SdkError::InvalidArgument {
-                context: "query_global_state",
+                context: "query_balance",
                 error: err.to_string(),
             });
         };
