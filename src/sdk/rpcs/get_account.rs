@@ -189,7 +189,7 @@ impl SDK {
             error(err);
             return Err(SdkError::InvalidArgument {
                 context: "get_account",
-                error: err,
+                error: err.to_string(),
             });
         };
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
