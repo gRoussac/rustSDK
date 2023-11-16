@@ -185,8 +185,8 @@ impl SDK {
                 }
             }
         } else {
-            let err = "Error: Missing account identifier".to_string();
-            error(&err);
+            let err = "Error: Missing account identifier";
+            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "get_account",
                 error: err,
