@@ -1279,7 +1279,7 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Testing
 
-Tests are run against NCTL by default or the network configured in corresponding configurations. Tests assume a `secret_key.pem` is either at the root of tests or in `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/` from the root (one level higher than the root). This path can be changed in configuration.
+Tests are run against NCTL by default. Alternately, you may configure another network in corresponding configurations. Testes assume a `secret_key.pem` will be located in the root `tests` directory, or one level higher at `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/`. This path can be changed in the configuration.
 (Rust tests must be run with `--test-threads=1`)
 
 - [Rust Integration tests](tests/integration/rust/) can be run with
