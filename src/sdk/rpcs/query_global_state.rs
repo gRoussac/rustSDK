@@ -316,7 +316,7 @@ impl SDK {
             error(err);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state",
-                error: err,
+                error: err.to_string(),
             });
         }
 
