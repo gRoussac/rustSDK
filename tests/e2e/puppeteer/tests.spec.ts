@@ -442,6 +442,8 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await seletAction('get_state_root_hash');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
     });
     afterEach(async () => {
       await clear();
