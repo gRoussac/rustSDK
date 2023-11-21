@@ -196,3 +196,55 @@ impl SDK {
         .await
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_get_node_status_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk.get_node_status(None, None).await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_node_status_with_specific_arguments() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk.get_node_status(verbosity, node_address.clone()).await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_node_status_with_error() {
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+
+        // Act
+        let result = sdk.get_node_status(None, None).await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+}

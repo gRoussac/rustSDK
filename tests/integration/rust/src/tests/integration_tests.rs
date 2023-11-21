@@ -2,13 +2,13 @@
 pub mod test_module {
     use crate::{
         config::{get_config, TestConfig, DEFAULT_TTL, TTL},
-        tests::helpers::create_test_sdk,
+        tests::helpers::intern::create_test_sdk,
     };
     use casper_rust_wasm_sdk::{
         helpers::{
-            get_current_timestamp, get_gas_price_or_default, get_ttl_or_default, hex_to_string,
-            hex_to_uint8_vec, json_pretty_print, motes_to_cspr, parse_timestamp, parse_ttl,
-            public_key_from_private_key, secret_key_from_pem,
+            get_blake2b_hash, get_current_timestamp, get_gas_price_or_default, get_ttl_or_default,
+            hex_to_string, hex_to_uint8_vec, json_pretty_print, motes_to_cspr, parse_timestamp,
+            parse_ttl, public_key_from_private_key, secret_key_from_pem,
         },
         types::verbosity::Verbosity,
     };
@@ -87,6 +87,14 @@ pub mod test_module {
         assert!(!parsed_timestamp.unwrap().to_string().is_empty());
     }
 
+    pub fn test_get_blake2b_hash() {
+        let hash = get_blake2b_hash("test_meta_data");
+        assert_eq!(
+            hash,
+            "21ba862c03d43fedded8c1c5a30397f567c1adab5b2a75debc58966c021e3b64"
+        );
+    }
+
     pub fn test_get_ttl_or_default() {
         let ttl = get_ttl_or_default(None);
         assert_eq!(ttl, DEFAULT_TTL);
@@ -157,6 +165,10 @@ mod tests {
     #[test]
     pub fn test_parse_timestamp_test() {
         test_parse_timestamp();
+    }
+    #[test]
+    pub fn test_get_blake2b_hash_test() {
+        test_get_blake2b_hash();
     }
     #[test]
     pub fn test_get_ttl_or_default_test() {

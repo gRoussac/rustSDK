@@ -1,10 +1,13 @@
 #[allow(dead_code)]
 pub mod test_module {
+    use std::thread;
+
     use crate::config::{
-        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DICTIONARY_ITEM_KEY,
-        DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
+        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DEPLOY_TIME,
+        DICTIONARY_ITEM_KEY, DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
-    use crate::tests::helpers::create_test_sdk;
+    use crate::tests::helpers::intern::create_test_sdk;
+    use crate::tests::integration::contract::test_module::test_install;
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
     use casper_rust_wasm_sdk::{
@@ -384,6 +387,12 @@ pub mod test_module {
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
         let config: TestConfig = get_config().await;
+
+        println!("install_hello_contract");
+
+        test_install().await;
+
+        thread::sleep(DEPLOY_TIME); // Let's wait for deployment on nctl
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(config.to_owned().account_hash),

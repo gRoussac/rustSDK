@@ -70,6 +70,7 @@ impl SDK {
     }
 }
 
+/// Alias of sdk.query_global_state
 impl SDK {
     /// Query a contract key.
     ///
@@ -88,5 +89,185 @@ impl SDK {
         self.query_global_state(query_params)
             .await
             .map_err(SdkError::from)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        install_cep78,
+        rpcs::query_global_state::KeyIdentifierInput,
+        types::{
+            digest::Digest, global_state_identifier::GlobalStateIdentifier, verbosity::Verbosity,
+        },
+    };
+    use sdk_tests::{config::DEFAULT_NODE_ADDRESS, tests::helpers::get_block};
+
+    async fn get_key_input() -> KeyIdentifierInput {
+        KeyIdentifierInput::String(install_cep78().await)
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk
+            .query_contract_key(QueryGlobalStateParams {
+                key: get_key_input().await,
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity: None,
+                node_address: None,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_missing_key() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message =
+            "Invalid argument 'query_global_state': Error: Missing key from formatted string"
+                .to_string();
+
+        // Act
+        let result = sdk
+            .query_contract_key(QueryGlobalStateParams {
+                key: KeyIdentifierInput::String(String::new()),
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity: None,
+                node_address: None,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_global_state_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let key = get_key_input().await;
+        let (_, block_height) = get_block().await;
+        let global_state_identifier = GlobalStateIdentifier::from_block_height(block_height);
+
+        // Act
+        let result = sdk
+            .query_contract_key(QueryGlobalStateParams {
+                key,
+                path: None,
+                maybe_global_state_identifier: Some(global_state_identifier.clone()),
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity,
+                node_address: node_address.clone(),
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let state_root_hash: Digest = sdk
+            .get_state_root_hash(None, verbosity, node_address.clone())
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into();
+        // Act
+        let result = sdk
+            .query_contract_key(QueryGlobalStateParams {
+                key: get_key_input().await,
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: Some(state_root_hash.to_string()),
+                maybe_block_id: None,
+                verbosity,
+                node_address,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_block_id() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let key = get_key_input().await;
+
+        let (_, block_height) = get_block().await;
+
+        // Act
+        let result = sdk
+            .query_contract_key(QueryGlobalStateParams {
+                key,
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: Some(block_height.to_string()),
+                verbosity,
+                node_address: node_address.clone(),
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_error() {
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        // Act
+        let result = sdk
+            .query_contract_key(QueryGlobalStateParams {
+                key: get_key_input().await,
+                path: None,
+                maybe_global_state_identifier: None,
+                state_root_hash: None,
+                maybe_block_id: None,
+                verbosity: None,
+                node_address: None,
+            })
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

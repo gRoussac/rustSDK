@@ -161,10 +161,10 @@ impl SDK {
             self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, node_address)
                 .await
         } else {
-            let err = "Error: Missing state_root_hash";
-            error(err);
-            return Err(JsError::new(err));
+            self.get_dictionary_item("", dictionary_item, verbosity, node_address)
+                .await
         };
+
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -184,7 +184,7 @@ impl SDK {
         self.get_dictionary_item_js_alias(options).await
     }
 }
-
+#[derive(Debug, Clone)]
 pub enum DictionaryItemInput {
     Identifier(DictionaryItemIdentifier),
     Params(DictionaryItemStrParams),
@@ -215,61 +215,214 @@ impl SDK {
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("state_get_dictionary_item!");
+
+        let state_root_hash = if state_root_hash.is_empty() {
+            let state_root_hash = self
+                .get_state_root_hash(
+                    None,
+                    None,
+                    Some(self.get_node_address(node_address.clone())),
+                )
+                .await;
+
+            match state_root_hash {
+                Ok(state_root_hash) => {
+                    let state_root_hash: Digest =
+                        state_root_hash.result.state_root_hash.unwrap().into();
+                    state_root_hash
+                }
+                Err(_) => "".to_digest(),
+            }
+        } else {
+            state_root_hash.to_digest()
+        };
+
         match dictionary_item_input {
-            DictionaryItemInput::Params(dictionary_item_params) => {
-                let state_root_hash_as_string: String = if !state_root_hash.is_empty() {
-                    state_root_hash.to_digest().to_string()
-                } else {
-                    let state_root_hash: Digest = self
-                        .get_state_root_hash(
-                            None,
-                            None,
-                            Some(self.get_node_address(node_address.clone())),
-                        )
-                        .await
-                        .unwrap()
-                        .result
-                        .state_root_hash
-                        .unwrap()
-                        .into();
-                    state_root_hash.to_string()
-                };
-                get_dictionary_item_cli(
-                    &rand::thread_rng().gen::<i64>().to_string(),
-                    &self.get_node_address(node_address),
-                    self.get_verbosity(verbosity).into(),
-                    &state_root_hash_as_string,
-                    dictionary_item_str_params_to_casper_client(&dictionary_item_params),
-                )
-                .await
-                .map_err(SdkError::from)
-            }
-            DictionaryItemInput::Identifier(dictionary_item_identifier) => {
-                let state_root_hash = if state_root_hash.is_empty() {
-                    self.get_state_root_hash(
-                        None,
-                        None,
-                        Some(self.get_node_address(node_address.clone())),
-                    )
-                    .await
-                    .unwrap()
-                    .result
-                    .state_root_hash
-                    .unwrap()
-                    .into()
-                } else {
-                    state_root_hash.to_digest()
-                };
-                get_dictionary_item_lib(
-                    JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                    &self.get_node_address(node_address),
-                    self.get_verbosity(verbosity).into(),
-                    state_root_hash.into(),
-                    dictionary_item_identifier.into(),
-                )
-                .await
-                .map_err(SdkError::from)
-            }
+            DictionaryItemInput::Params(dictionary_item_params) => get_dictionary_item_cli(
+                &rand::thread_rng().gen::<i64>().to_string(),
+                &self.get_node_address(node_address),
+                self.get_verbosity(verbosity).into(),
+                &state_root_hash.to_string(),
+                dictionary_item_str_params_to_casper_client(&dictionary_item_params),
+            )
+            .await
+            .map_err(SdkError::from),
+            DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
+                JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
+                &self.get_node_address(node_address),
+                self.get_verbosity(verbosity).into(),
+                state_root_hash.into(),
+                dictionary_item_identifier.into(),
+            )
+            .await
+            .map_err(SdkError::from),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        get_dictionary_item,
+        types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
+    };
+    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk
+            .get_dictionary_item(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
+                get_dictionary_item(false).await,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let dictionary_item = get_dictionary_item(false).await;
+        let state_root_hash: Digest = sdk
+            .get_state_root_hash(None, verbosity, node_address.clone())
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into();
+
+        // Act
+        let result = sdk
+            .get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_empty_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_dictionary_item(
+                "",
+                get_dictionary_item(false).await,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_valid_identifier_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_dictionary_item(
+                "",
+                get_dictionary_item(false).await,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_valid_params_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_dictionary_item("", get_dictionary_item(true).await, verbosity, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_invalid_params_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let error_message =
+            "Failed to parse dictionary item address as a key: unknown prefix for key".to_string();
+
+        let state_root_hash = "";
+        let params = DictionaryItemStrParams::new();
+
+        // Act
+        let result = sdk
+            .get_dictionary_item(
+                state_root_hash,
+                DictionaryItemInput::Params(params),
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_dictionary_item_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let error_message =
+            "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+
+        // Act
+        let result = sdk
+            .get_dictionary_item(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
+                get_dictionary_item(false).await,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

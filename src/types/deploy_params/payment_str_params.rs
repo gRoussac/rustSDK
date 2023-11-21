@@ -224,6 +224,15 @@ pub fn payment_str_params_to_casper_client(
         );
     }
 
+    if let Some(payment_path) = payment_params.payment_path.get() {
+        return _PaymentStrParams::with_path(
+            payment_path.as_str(),
+            payment_args_simple,
+            get_str_or_default(payment_params.payment_args_json.get()),
+            get_str_or_default(payment_params.payment_args_complex.get()),
+        );
+    }
+
     if let Some(payment_name) = payment_params.payment_name.get() {
         return _PaymentStrParams::with_name(
             payment_name.as_str(),
@@ -256,6 +265,63 @@ pub fn payment_str_params_to_casper_client(
         );
     }
 
+    if let Some(payment_package_name) = payment_params.payment_entry_point.get() {
+        return _PaymentStrParams::with_package_name(
+            payment_package_name.as_str(),
+            get_str_or_default(payment_params.payment_version.get()),
+            get_str_or_default(payment_params.payment_entry_point.get()),
+            payment_args_simple,
+            get_str_or_default(payment_params.payment_args_json.get()),
+            get_str_or_default(payment_params.payment_args_complex.get()),
+        );
+    }
+
     // Default to the Payment amount
     _PaymentStrParams::with_amount(get_str_or_default(payment_params.payment_amount.get()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_payment_str_params_to_casper_client() {
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount("100");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("payment_amount: \"100\""));
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_hash("hash_value");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("payment_hash: \"hash_value\""));
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_name("name_value");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("payment_name: \"name_value\""));
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_package_hash("package_hash_value");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("payment_package_hash: \"package_hash_value\""));
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_package_name("package_name_value");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("payment_package_name: \"package_name_value\""));
+
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_path("path_value");
+        let result = payment_str_params_to_casper_client(&payment_params);
+        let result_debug_output = format!("{:?}", result);
+        assert!(result_debug_output.contains("payment_path: \"path_value\""));
+
+        // TODO Find alternative as no setter in client
+    }
 }

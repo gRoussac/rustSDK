@@ -20,6 +20,15 @@ nodejs:
 clean:
 	rm -rf $(WEB_OUT_DIR) $(NODEJS_OUT_DIR)
 
+test:
+	cargo test -- --test-threads=1 --nocapture
+
+integration-test:
+	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
+
+e2e-test:
+	cd tests/e2e && npm test
+
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
 	cp -r target/doc/* docs/api-rust/
