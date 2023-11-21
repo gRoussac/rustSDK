@@ -1,6 +1,5 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 use crate::{
     types::{
@@ -13,7 +12,6 @@ use crate::{
     SDK,
 };
 use casper_client::cli::make_transfer as client_make_transfer;
-use casper_client::types::Deploy as _Deploy;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -84,7 +82,7 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<_Deploy, SdkError> {
+    ) -> Result<Deploy, SdkError> {
         // log("make_transfer");
         make_transfer(
             amount,
@@ -104,7 +102,7 @@ pub(crate) fn make_transfer(
     transfer_id: Option<String>,
     deploy_params: DeployStrParams,
     payment_params: PaymentStrParams,
-) -> Result<_Deploy, SdkError> {
+) -> Result<Deploy, SdkError> {
     let transfer_id = if let Some(transfer_id) = transfer_id {
         transfer_id
     } else {
@@ -119,6 +117,7 @@ pub(crate) fn make_transfer(
         payment_str_params_to_casper_client(&payment_params),
         false,
     )
+    .map(Into::into)
     .map_err(SdkError::from)
 }
 

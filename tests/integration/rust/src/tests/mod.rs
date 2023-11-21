@@ -122,7 +122,7 @@ pub async fn _run_example_5() {
             payment_params,
         )
         .unwrap();
-    println!("{:?}", make_transfer.header().timestamp());
+    println!("{:?}", make_transfer.timestamp());
 }
 
 pub async fn _run_example_6() {
@@ -209,7 +209,7 @@ pub async fn _run_example_7() {
     let deploy = sdk
         .make_deploy(deploy_params, session_params, payment_params)
         .unwrap();
-    println!("{:?}", deploy.header().timestamp());
+    println!("{:?}", deploy.timestamp());
 }
 
 pub async fn _run_example_8() {

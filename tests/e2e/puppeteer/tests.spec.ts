@@ -235,7 +235,7 @@ describe('Angular App Tests', () => {
     });
 
     afterEach(async () => {
-      await clear();
+      //  await clear();
     });
 
     it('should get_balance with state root hash', async () => {
@@ -260,6 +260,8 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await seletAction('get_block');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
     });
     afterEach(async () => {
       await clear();
@@ -271,7 +273,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_block with block height', async () => {
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
@@ -292,6 +293,8 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await seletAction('get_block_transfers');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
     });
     afterEach(async () => {
       await clear();
@@ -303,7 +306,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_block_transfers with block height', async () => {
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
@@ -1274,7 +1276,6 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();
-      await screenshot();
     });
   });
 

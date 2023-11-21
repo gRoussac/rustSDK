@@ -299,6 +299,7 @@ const example11 = async () => {
   console.log(install_result_as_json.deploy_hash);
 
 };
+
 const example12 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const sdk = new SDK(node_address);

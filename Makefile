@@ -19,6 +19,7 @@ nodejs:
 
 clean:
 	rm -rf $(WEB_OUT_DIR) $(NODEJS_OUT_DIR)
+	cargo clean
 
 test:
 	cargo test -- --test-threads=1 --nocapture
