@@ -1,6 +1,9 @@
 pub mod helpers;
+#[cfg(test)]
 pub mod integration;
+#[cfg(test)]
 pub mod integration_tests;
+use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
 use std::{
     fs::File,
     io::{self, Read},
@@ -9,10 +12,7 @@ use std::{
     time::{self, Duration},
 };
 
-use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
-
-#[cfg(not(test))]
-pub async fn run_tests_or_examples() {
+pub async fn _run_tests_or_examples() {
     // Run a specific test ?
     // integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
@@ -393,6 +393,7 @@ pub async fn _run_example_11() -> Result<(), String> {
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
     pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "300000000000";
+    pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
     pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 
@@ -410,7 +411,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     let session_params = SessionStrParams::default();
     session_params.set_session_args_json(ARGS_JSON);
 
-    let file_path = CEP78_CONTRACT;
+    let file_path = &format!("{WASM_PATH}{CEP78_CONTRACT}");
     let module_bytes = match read_wasm_file(file_path) {
         Ok(module_bytes) => module_bytes,
         Err(err) => {

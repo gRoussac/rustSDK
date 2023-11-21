@@ -187,7 +187,10 @@ impl SDK {
         } else {
             let err = "Error: Missing account identifier";
             error(err);
-            return Err(SdkError::FailedToParseAccountIdentifier);
+            return Err(SdkError::InvalidArgument {
+                context: "get_account",
+                error: err.to_string(),
+            });
         };
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
@@ -218,5 +221,153 @@ impl SDK {
             .await
             .map_err(SdkError::from)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::PRIVATE_KEY_NCTL_PATH,
+        types::{block_identifier::BlockIdentifier, public_key::PublicKey},
+    };
+    use sdk_tests::{
+        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
+        tests::helpers::read_pem_file,
+    };
+
+    fn get_account_identifier() -> AccountIdentifier {
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+        let public_key = PublicKey::new(&account).unwrap();
+
+        AccountIdentifier::from_account_account_under_public_key(public_key)
+    }
+
+    #[tokio::test]
+    async fn test_get_account_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+        let account_identifier = get_account_identifier();
+
+        // Act
+        let result = sdk
+            .get_account(Some(account_identifier), None, None, None, None)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_account_with_missing_account() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "Error: Missing account identifier";
+
+        // Act
+        let result = sdk.get_account(None, None, None, None, None).await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(error_message));
+    }
+
+    #[tokio::test]
+    async fn test_get_account_with_account_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let account_identifier = get_account_identifier();
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_account(
+                Some(account_identifier),
+                None,
+                None,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_account_with_account_identifier_as_string() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let account_identifier_as_string = get_account_identifier().to_string();
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_account(
+                None,
+                Some(account_identifier_as_string),
+                None,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_account_with_block_identifier() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let block_identifier =
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+        let account_identifier = get_account_identifier();
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        // Act
+        let result = sdk
+            .get_account(
+                Some(account_identifier),
+                None,
+                Some(block_identifier),
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_account_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let account_identifier = get_account_identifier();
+        let error_message =
+            "error sending request for url (http://localhost/rpc): error trying to connect: \
+            tcp connect error: Connection refused (os error 111)"
+                .to_string();
+
+        // Act
+        let result = sdk
+            .get_account(Some(account_identifier), None, None, None, None)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

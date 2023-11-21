@@ -73,6 +73,7 @@ impl SDK {
     }
 }
 
+/// Alias of sdk.get_dictionary_item
 impl SDK {
     /// Query a contract dictionary item.
     ///
@@ -97,5 +98,184 @@ impl SDK {
         self.get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
             .await
             .map_err(SdkError::from)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        get_dictionary_item,
+        types::{
+            deploy_params::dictionary_item_str_params::DictionaryItemStrParams, digest::Digest,
+        },
+    };
+    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let error_message = "builder error: relative URL without a base".to_string();
+
+        // Act
+        let result = sdk
+            .query_contract_dict(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
+                get_dictionary_item(false).await,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let dictionary_item = get_dictionary_item(false).await;
+
+        let state_root_hash: Digest = sdk
+            .get_state_root_hash(None, verbosity, node_address.clone())
+            .await
+            .unwrap()
+            .result
+            .state_root_hash
+            .unwrap()
+            .into();
+
+        // Act
+        let result = sdk
+            .query_contract_dict(state_root_hash, dictionary_item, verbosity, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_empty_state_root_hash() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let state_root_hash = "";
+
+        // Act
+        let result = sdk
+            .query_contract_dict(
+                state_root_hash,
+                get_dictionary_item(false).await,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_valid_identifier_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let state_root_hash = "";
+
+        // Act
+        let result = sdk
+            .query_contract_dict(
+                state_root_hash,
+                get_dictionary_item(false).await,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_valid_params_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let state_root_hash = "";
+
+        // Act
+        let result = sdk
+            .query_contract_dict(
+                state_root_hash,
+                get_dictionary_item(true).await,
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_invalid_params_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+
+        let error_message =
+            "Failed to parse dictionary item address as a key: unknown prefix for key".to_string();
+
+        let state_root_hash = "";
+        let params = DictionaryItemStrParams::new();
+
+        // Act
+        let result = sdk
+            .query_contract_dict(
+                state_root_hash,
+                DictionaryItemInput::Params(params),
+                verbosity,
+                node_address,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_dict_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let error_message =
+            "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+
+        // Act
+        let result = sdk
+            .query_contract_dict(
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
+                get_dictionary_item(false).await,
+                None,
+                None,
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }

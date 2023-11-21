@@ -57,6 +57,7 @@ impl SDK {
 }
 
 /// A set of functions for installing smart contracts on the blockchain.
+/// Alias of sdk.deploy
 impl SDK {
     /// Installs a smart contract with the specified parameters and returns the result.
     ///
@@ -97,5 +98,204 @@ impl SDK {
         self.put_deploy(deploy.unwrap().into(), None, node_address)
             .await
             .map_err(SdkError::from)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use sdk_tests::{
+        config::{
+            ARGS_SIMPLE, CHAIN_NAME, DEFAULT_NODE_ADDRESS, HELLO_CONTRACT, PAYMENT_AMOUNT,
+            PRIVATE_KEY_NAME, TTL,
+        },
+        tests::helpers::{read_pem_file, read_wasm_file},
+    };
+
+    use crate::{
+        helpers::public_key_from_private_key,
+        rpcs::{PRIVATE_KEY_NCTL_PATH, WASM_PATH},
+    };
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_install_with_none_values() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let deploy_params = DeployStrParams::new("", "", None, None, None);
+        let session_params = SessionStrParams::default();
+        let payment_params = PaymentStrParams::default();
+
+        let error_message =
+            "Invalid argument 'is_session_transfer': requires --session-arg to be present"
+                .to_string();
+
+        // Act
+        let result = sdk
+            .install(deploy_params, session_params, payment_params, None)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
+    }
+
+    #[tokio::test]
+    async fn test_install_with_valid_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+        let mut session_params = SessionStrParams::default();
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return;
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        session_params.set_session_args(args_simple);
+
+        // Act
+        let result = sdk
+            .install(deploy_params, session_params, payment_params, node_address)
+            .await;
+
+        // Assert
+
+        assert!(result.is_ok());
+        let deploy_hash = result.unwrap().result.deploy_hash;
+        assert!(!deploy_hash.to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_install_with_invalid_input() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let error_message =
+            "Missing a required arg - exactly one of the following must be provided";
+
+        let deploy_params = DeployStrParams::new(
+            CHAIN_NAME,
+            &account,
+            Some(private_key.clone()),
+            None,
+            Some(TTL.to_string()),
+        );
+        let mut session_params = SessionStrParams::default();
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(""); // This is not valid payment amount
+        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return;
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        session_params.set_session_args(args_simple);
+
+        // Act
+        let result = sdk
+            .install(deploy_params, session_params, payment_params, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(error_message));
+    }
+
+    #[tokio::test]
+    async fn test_install_without_private_key() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let error_message = "account authorization invalid at state root hash";
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, None, None, Some(TTL.to_string()));
+        let mut session_params = SessionStrParams::default();
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return;
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        session_params.set_session_args(args_simple);
+
+        // Act
+        let result = sdk
+            .install(deploy_params, session_params, payment_params, node_address)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(error_message));
+    }
+
+    #[tokio::test]
+    async fn test_install_with_error() {
+        // Arrange
+        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+
+        let private_key =
+            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
+        let account = public_key_from_private_key(&private_key).unwrap();
+
+        let deploy_params =
+            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key.clone()), None, None);
+
+        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+
+        let mut session_params = SessionStrParams::default();
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(module_bytes) => module_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return;
+            }
+        };
+        session_params.set_session_bytes(module_bytes.into());
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        session_params.set_session_args(args_simple);
+
+        // Act
+        let result = sdk
+            .install(deploy_params, session_params, payment_params, None)
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(&error_message));
     }
 }
