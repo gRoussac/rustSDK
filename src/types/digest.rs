@@ -1,5 +1,4 @@
 use super::sdk_error::SdkError;
-#[cfg(target_arch = "wasm32")]
 use crate::debug::error;
 use base16::DecodeError;
 use casper_types::{
@@ -115,20 +114,25 @@ impl From<&str> for Digest {
                     byte: 0,  // TODO Fix error
                     index: 0, // Set the index to 0 or a relevant value here
                 };
-                let error = DigestError::Base16DecodeError(base16_err);
-                SdkError::FailedToParseDigest { context, error }
+                let err = DigestError::Base16DecodeError(base16_err);
+                let err = SdkError::FailedToParseDigest {
+                    context,
+                    error: err,
+                };
+                error(&err.to_string());
+                err
             })
             .unwrap_or_default();
 
         if bytes.len() != _Digest::LENGTH {
             let context = "Invalid Digest length";
-            let error = DigestError::IncorrectDigestLength(bytes.len());
+            let err = DigestError::IncorrectDigestLength(bytes.len());
+
             let sdk_error = SdkError::FailedToParseDigest {
                 context: context.to_string(),
-                error,
+                error: err,
             };
-            // TODO remove this unreachable
-            unreachable!("{:?}", sdk_error);
+            error(&sdk_error.to_string());
         }
 
         let mut digest_bytes = [0u8; _Digest::LENGTH];

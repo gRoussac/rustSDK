@@ -1,6 +1,5 @@
 #[cfg(target_arch = "wasm32")]
 use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 use crate::{
     types::{
@@ -14,7 +13,6 @@ use crate::{
     SDK,
 };
 use casper_client::cli::make_deploy as client_make_deploy;
-use casper_types::Deploy as _Deploy;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
@@ -69,7 +67,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<_Deploy, SdkError> {
+    ) -> Result<Deploy, SdkError> {
         make_deploy(deploy_params, session_params, payment_params).map_err(SdkError::from)
     }
 }
@@ -79,7 +77,7 @@ pub(crate) fn make_deploy(
     deploy_params: DeployStrParams,
     session_params: SessionStrParams,
     payment_params: PaymentStrParams,
-) -> Result<_Deploy, SdkError> {
+) -> Result<Deploy, SdkError> {
     // log("make_deploy");
     client_make_deploy(
         "",
@@ -88,6 +86,7 @@ pub(crate) fn make_deploy(
         payment_str_params_to_casper_client(&payment_params),
         false,
     )
+    .map(Into::into)
     .map_err(SdkError::from)
 }
 

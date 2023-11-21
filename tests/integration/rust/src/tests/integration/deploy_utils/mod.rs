@@ -28,10 +28,8 @@ pub mod test_module {
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
         assert!(!make_deploy.hash().to_string().is_empty());
-        assert_eq!(
-            make_deploy.session().entry_point_name(),
-            ENTRYPOINT_DECIMALS
-        );
+        assert!(!make_deploy.has_valid_hash().to_string().is_empty());
+        assert_eq!(make_deploy.entry_point_name(), ENTRYPOINT_DECIMALS);
     }
 
     pub async fn test_make_transfer() {
@@ -55,7 +53,8 @@ pub mod test_module {
             )
             .unwrap();
         assert!(!make_transfer.hash().to_string().is_empty());
-        assert!(make_transfer.session().is_transfer());
+        assert!(!make_transfer.has_valid_hash().to_string().is_empty());
+        assert!(make_transfer.is_transfer());
     }
 
     pub async fn test_sign_deploy() {

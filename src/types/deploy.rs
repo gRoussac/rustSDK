@@ -2,6 +2,7 @@ use super::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
     contract_package_hash::ContractPackageHash,
+    deploy_hash::DeployHash,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -320,6 +321,19 @@ impl Deploy {
             Err(err) => {
                 error(&format!("Deploy is not valid: {:?}", err));
                 false
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn hash(&self) -> DeployHash {
+        let deploy: _Deploy = self.0.clone();
+        let deploy_hash = (*deploy.hash()).to_string();
+        match DeployHash::new(&deploy_hash) {
+            Ok(deploy_hash) => deploy_hash,
+            Err(err) => {
+                error(&format!("Deploy has not a valid hash: {:?}", err));
+                DeployHash::new("").unwrap()
             }
         }
     }
