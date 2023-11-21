@@ -50,7 +50,7 @@ pub fn get_current_timestamp(timestamp: Option<String>) -> String {
     let current_timestamp = parsed_timestamp
         .map(|parsed_time| {
             NaiveDateTime::from_timestamp_opt(parsed_time / 1000, 0)
-                .map(|naive_time| DateTime::<Utc>::from_utc(naive_time, Utc))
+                .map(|naive_time| DateTime::<Utc>::from_naive_utc_and_offset(naive_time, Utc))
                 .unwrap_or_else(Utc::now)
         })
         .unwrap_or_else(Utc::now);

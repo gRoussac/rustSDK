@@ -66,6 +66,12 @@ impl GetStateRootHashResult {
             .unwrap_or_default()
     }
 
+    /// Alias for state_root_hash_as_string
+    #[wasm_bindgen(js_name = "toString")]
+    pub fn to_string(&self) -> String {
+        self.state_root_hash_as_string()
+    }
+
     /// Converts the GetStateRootHashResult to a JsValue.
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {

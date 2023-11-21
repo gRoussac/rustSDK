@@ -39,7 +39,6 @@ impl PurseIdentifier {
 impl ToString for PurseIdentifier {
     fn to_string(&self) -> String {
         match &self.0 {
-            // TODO fix PublicKey to string not short version
             _PurseIdentifier::MainPurseUnderPublicKey(key) => {
                 PublicKey::from(key.clone()).to_string()
             }
