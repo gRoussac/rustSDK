@@ -36,9 +36,7 @@ impl SDK {
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
-        let result = self
-            .put_deploy(deploy.into(), verbosity, node_address)
-            .await;
+        let result = self.put_deploy(deploy, verbosity, node_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {

@@ -98,10 +98,10 @@ function App() {
       // get_state_root_hash
       const chain_get_state_root_hash = await sdk.chain_get_state_root_hash();
       console.log(chain_get_state_root_hash);
-      setHash(chain_get_state_root_hash?.state_root_hash_as_string);
+      setHash(chain_get_state_root_hash?.toString());
       console.log(
         'js chain_get_state_root_hash',
-        chain_get_state_root_hash?.state_root_hash_as_string
+        chain_get_state_root_hash?.toString()
       );
       console.log(chain_get_state_root_hash);
 
@@ -131,7 +131,7 @@ function App() {
       );
 
       // get_balance
-      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
+      let stateRootHashDigest = new Digest(chain_get_state_root_hash?.toString());
       let state_get_balance_options = sdk.get_balance_options({
         state_root_hash: stateRootHashDigest.toJson(),
         // purse_uref: new URef(
@@ -325,7 +325,7 @@ function App() {
       console.log(test_call_entrypoint.deploy_hash);
 
       // state_get_dictionary_item
-      stateRootHashDigest = new Digest(chain_get_state_root_hash?.state_root_hash_as_string);
+      stateRootHashDigest = new Digest(chain_get_state_root_hash?.toString());
       console.log(stateRootHashDigest);
       console.log(stateRootHashDigest.toJson());
       const dictionary_item_identifier =
@@ -334,7 +334,7 @@ function App() {
         );
 
       let get_dictionary_item_options = sdk.get_dictionary_item_options({
-        state_root_hash_as_string: chain_get_state_root_hash?.state_root_hash_as_string,
+        state_root_hash_as_string: chain_get_state_root_hash?.toString(),
         //state_root_hash: stateRootHashDigest.toJson(),
         dictionary_item_identifier: dictionary_item_identifier.toJson(),
       });
@@ -356,7 +356,7 @@ function App() {
       console.log(key);
       let query_global_state_options = sdk.query_global_state_options({
         global_state_identifier: GlobalStateIdentifier.fromStateRootHash(
-          new Digest(chain_get_state_root_hash?.state_root_hash_as_string)
+          new Digest(chain_get_state_root_hash?.toString())
         ).toJson(),
         key: key.toJson(),
         //path_as_string: path.toString(),
