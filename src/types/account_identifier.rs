@@ -47,7 +47,6 @@ impl AccountIdentifier {
 impl ToString for AccountIdentifier {
     fn to_string(&self) -> String {
         match &self.0 {
-            // TODO fix PublicKey to string not short version
             _AccountIdentifier::PublicKey(key) => PublicKey::from(key.clone()).to_string(),
             _AccountIdentifier::AccountHash(hash) => hash.to_formatted_string(),
         }

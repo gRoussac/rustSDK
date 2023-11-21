@@ -2,6 +2,7 @@ use super::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
     contract_package_hash::ContractPackageHash,
+    deploy_hash::DeployHash,
     deploy_params::{
         deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         session_str_params::SessionStrParams,
@@ -306,6 +307,12 @@ impl Deploy {
                 false
             }
         }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn hash(&self) -> DeployHash {
+        let deploy: _Deploy = self.0.clone();
+        deploy.hash.into()
     }
 
     // #[wasm_bindgen(js_name = "isValid")]

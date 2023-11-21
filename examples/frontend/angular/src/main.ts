@@ -6,7 +6,7 @@ import { NODE_ADDRESS, VERBOSITY, WASM_ASSET_PATH, WasmModule } from '@util/wasm
 import { config, CONFIG, ENV } from '@util/config';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
-import { Verbosity } from 'casper-sdk/casper_rust_wasm_sdk';
+import { Verbosity } from 'casper-sdk';
 
 if (environment.production) {
   enableProdMode();
