@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN, WasmModule } from '@util/wasm';
-import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, DeployHash, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes, PeerEntry } from "casper-sdk";
+import { BlockIdentifier, SDK, Verbosity, getBlockOptions, getStateRootHashOptions, GlobalStateIdentifier, Digest, DictionaryItemIdentifier, privateToPublicKey, getTimestamp, DeployStrParams, PaymentStrParams, jsonPrettyPrint, Deploy, SessionStrParams, BlockHash, DictionaryItemStrParams, hexToString, motesToCSPR, Bytes, PeerEntry } from "casper-sdk";
 import { ResultComponent, ResultService } from '@components';
 
 const imports = [
@@ -192,8 +192,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       const state_root_hash = await this.sdk.get_state_root_hash(options);
       this.state_root_hash && this.resultService.setResult(state_root_hash.toJson());
     } else {
-      const state_root_hash = await this.sdk.get_state_root_hash(options);
-      this.state_root_hash = state_root_hash.state_root_hash_as_string;
+      const chain_get_state_root_hash = await this.sdk.get_state_root_hash(options);
+      this.state_root_hash = chain_get_state_root_hash.toString();
       this.changeDetectorRef.markForCheck();
     }
   }

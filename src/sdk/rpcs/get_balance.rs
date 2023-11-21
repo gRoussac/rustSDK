@@ -147,8 +147,15 @@ impl SDK {
             self.get_balance(hash, purse_uref, verbosity, node_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            // Todo check state root hash validity here _Digest::LENGTH
-            self.get_balance(hash.as_str(), purse_uref, verbosity, node_address)
+            let hash = if !hash.is_empty() {
+                match Digest::new(&hash) {
+                    Ok(digest) => digest.to_string(),
+                    _ => "".to_string(),
+                }
+            } else {
+                "".to_string()
+            };
+            self.get_balance(&*hash, purse_uref, verbosity, node_address)
                 .await
         } else {
             self.get_balance("", purse_uref, verbosity, node_address)

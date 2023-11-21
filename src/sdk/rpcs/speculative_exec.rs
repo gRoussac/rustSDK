@@ -151,12 +151,7 @@ impl SDK {
         };
 
         let result = self
-            .speculative_exec(
-                deploy.into(),
-                maybe_block_identifier,
-                verbosity,
-                node_address,
-            )
+            .speculative_exec(deploy, maybe_block_identifier, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
