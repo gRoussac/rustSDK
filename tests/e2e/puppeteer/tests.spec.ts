@@ -152,7 +152,7 @@ describe('Angular App Tests', () => {
       deploy = JSON.parse(deploy);
       expect(deploy?.deploy_hash).toBeDefined();
       test.deploy_hash = deploy.deploy_hash;
-    });
+    }, 10000);
   });
 
   describe('Rpc call get_account', () => {
@@ -160,13 +160,13 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await seletAction('get_account');
+      await test.page.waitForSelector('[e2e-id="accountIdentifierElt"]');
     });
     afterEach(async () => {
       await clear();
     });
 
     it('should get_account from public key', async () => {
-      await test.page.waitForSelector('[e2e-id="accountIdentifierElt"]');
       await clearInput('[e2e-id="accountIdentifierElt"]');
       await test.page.type('[e2e-id="accountIdentifierElt"]', test.account);
       await submit();
@@ -176,7 +176,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_account from account hash', async () => {
-      await test.page.waitForSelector('[e2e-id="accountIdentifierElt"]');
       await clearInput('[e2e-id="accountIdentifierElt"]');
       await test.page.type('[e2e-id="accountIdentifierElt"]', test.account_hash);
       await submit();
@@ -186,7 +185,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_account from public key with block', async () => {
-      await test.page.waitForSelector('[e2e-id="accountIdentifierElt"]');
       await clearInput('[e2e-id="accountIdentifierElt"]');
       await test.page.type('[e2e-id="accountIdentifierElt"]', test.account);
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
@@ -208,7 +206,9 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_auction_info');
+      await delay(300);
     });
     afterEach(async () => {
       await clear();
@@ -325,7 +325,9 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_chainspec');
+      await delay(300);
     });
     afterEach(async () => {
       await clear();
@@ -333,14 +335,16 @@ describe('Angular App Tests', () => {
     it('should get_chainspec', async () => {
       await submit();
       await getResult();
-    });
+    }, 10000);
   });
 
   describe('Rpc call get_era_info', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_era_info');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
     });
 
     afterEach(async () => {
@@ -410,7 +414,9 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_node_status');
+      await delay(300);
     });
     afterEach(async () => {
       await clear();
@@ -425,7 +431,9 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_peers');
+      await delay(300);
     });
     afterEach(async () => {
       await clear();
@@ -434,7 +442,7 @@ describe('Angular App Tests', () => {
     it('should get_peers', async () => {
       await submit();
       await getResult();
-    });
+    }, 10000);
   });
 
   describe('Rpc call get_state_root_hash', () => {
@@ -458,7 +466,9 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_validator_changes');
+      await delay(300);
     });
     afterEach(async () => {
       await clear();
@@ -473,7 +483,9 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('list_rpcs');
+      await delay(300);
     });
     afterEach(async () => {
       await clear();
@@ -506,27 +518,27 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should query_balance without state root hash', async () => {
       await clearInput('[e2e-id="stateRootHashElt"]');
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should query_balance with public key', async () => {
       await clearInput('[e2e-id="purseIdentifierElt"]');
       await test.page.type('[e2e-id="purseIdentifierElt"]', test.account);
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should query_balance with account hash', async () => {
       await clearInput('[e2e-id="purseIdentifierElt"]');
       await test.page.type('[e2e-id="purseIdentifierElt"]', test.account_hash);
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should query_balance with block height', async () => {
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
@@ -534,7 +546,7 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
       await getResult();
-    });
+    }, 10000);
 
     it('should query_balance with block hash', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
@@ -542,7 +554,7 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
       await submit();
       await getResult();
-    });
+    }, 10000);
   });
 
   describe('Rpc call query_global_state', () => {
@@ -641,14 +653,16 @@ describe('Angular App Tests', () => {
       });
       result_json = JSON.parse(result);
       expect(result_json?.stored_value.CLValue.parsed).toEqual(config.collection_name);
-    });
+    }, 15000);
   });
 
   describe('Rpc call get_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
+      await clear();
       await seletAction('get_deploy');
+      await test.page.waitForSelector('[e2e-id="deployHashElt"]');
     });
 
     afterEach(async () => {
@@ -661,7 +675,7 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="deployHashElt"]', test.deploy_hash);
       await submit();
       await getResult();
-    });
+    }, 10000);
   });
 
   describe('Contract query_contract_key', () => {
