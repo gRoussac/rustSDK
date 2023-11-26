@@ -1,9 +1,6 @@
-.form-floating > label {
-  color: lightgrey;
-}
-.error {
-  display: block;
-  font-family: monospace;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+// :host ::ng-deep .row ui-input > * {
+//   flex-shrink: 1;
+//   padding-right: calc(var(--bs-gutter-x) * 0.5);
+//   padding-left: calc(var(--bs-gutter-x) * 0.5);
+//   margin-top: var(--bs-gutter-y);
+// }
