@@ -1,0 +1,24 @@
+<ng-template #template let-inputField="inputField" let-parentForm="parentForm">
+  <div [ngClass]="inputField.wrap_class">
+    <div class="form-floating mt-3">
+      <ng-container [formGroup]="parentForm">
+        <textarea
+          style="height: 300px; white-space: pre-wrap"
+          [id]="inputField.id"
+          [name]="inputField.name"
+          [formControlName]="inputField.controlName"
+          [placeholder]="inputField.placeholder || ''"
+          [attr.e2e-id]="inputField.e2e"
+          [ngClass]="[
+            inputField.class || 'form-control',
+            isInvalid(inputField.controlName) ? 'is-invalid' : ''
+          ]"
+        >
+        </textarea>
+        <label *ngIf="inputField.placeholder" [for]="inputField.id">{{
+          inputField.placeholder
+        }}</label>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

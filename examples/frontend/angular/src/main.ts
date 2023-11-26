@@ -7,6 +7,7 @@ import { config, CONFIG, ENV } from '@util/config';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { Verbosity } from 'casper-sdk';
+import { ResultModule } from '@util/result';
 
 if (environment.production) {
   enableProdMode();
@@ -21,6 +22,7 @@ const providers: Array<Provider | EnvironmentProviders> = [
   importProvidersFrom([
     HttpClientModule,
     WasmModule,
+    ResultModule
   ]),
 ];
 

@@ -1,0 +1,52 @@
+<nav class="navbar navbar-light">
+  <a class="navbar-brand"><img src="assets/logo.png" alt="CasperLabs" /></a>
+  <span
+    class="badge rounded-pill bg-success"
+    e2e-id="chain_name"
+    [hidden]="!chain_name"
+    >{{ chain_name }}</span
+  >
+  <span
+    class="badge rounded-pill bg-success"
+    e2e-id="node_address"
+    [hidden]="!node_address"
+    >{{ node_address }}</span
+  >
+  <form class="form-inline">
+    <div class="input-group">
+      <label
+        class="input-group-text"
+        for="selectActionElt"
+        for="selectNetworkElt"
+        >RPC</label
+      >
+      <select
+        id="selectNetworkElt"
+        class="form-select form-control form-control-sm"
+        (change)="selectNetwork()"
+        #selectNetworkElt
+        e2e-id="selectNetworkElt"
+      >
+        <option></option>
+        <optgroup label="default">
+          <option
+            [value]="network.name"
+            [selected]="network.node_address === node_address"
+            *ngFor="let network of networks; index as i"
+          >
+            {{ network.name }} ({{ network.node_address }})
+          </option>
+        </optgroup>
+        <optgroup label="fetched" *ngIf="peers">
+          <option
+            [value]="changePort(peer)"
+            [selected]="changePort(peer) === node_address"
+            *ngFor="let peer of peers; index as i"
+          >
+            {{ changePort(peer) }} ({{ chain_name }})
+          </option>
+        </optgroup>
+      </select>
+    </div>
+  </form>
+</nav>

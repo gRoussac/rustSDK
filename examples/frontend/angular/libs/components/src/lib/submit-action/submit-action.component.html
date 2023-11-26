@@ -1,0 +1,9 @@
+<button
+  *ngIf="!['sign_deploy'].includes(action)"
+  type="button"
+  class="btn btn-success ms-3"
+  (click)="submitAction(action)"
+  e2e-id="submit"
+>
+  Go
+</button>

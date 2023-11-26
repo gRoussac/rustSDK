@@ -1,0 +1,65 @@
+<ng-template #template let-inputField="inputField" let-parentForm="parentForm">
+  <div [ngClass]="inputField.wrap_class">
+    <label
+      [for]="inputField.id"
+      [ngClass]="[
+        inputField.label_class || '',
+        parentForm.get(inputField.controlName)?.disabled ? 'disabled' : ''
+      ]"
+      >{{ inputField.label }}
+      <span
+        class="fw-light small text-nowrap"
+        *ngIf="
+          inputField.change?.includes('motesToCSPR') &&
+          parentForm.get(inputField.controlName)?.value
+        "
+        >({{
+          motesToCSPR(parentForm.get(inputField.controlName)?.value)
+        }}
+        CSPR)</span
+      >
+    </label>
+    <div class="form-floating">
+      <ng-container
+        [formGroup]="parentForm"
+        *ngIf="inputField.type !== 'checkbox'; else checkboxContent"
+      >
+        <input
+          [id]="inputField.id"
+          [type]="inputField.type"
+          [name]="inputField.name"
+          [maxlength]="inputField.maxlength || ''"
+          [pattern]="inputField.pattern || ''"
+          [formControlName]="inputField.controlName"
+          [placeholder]="
+            inputField.placeholder_config_value
+              ? 'e.g. ' + inputField.placeholder_config_value
+              : inputField.placeholder || ''
+          "
+          [attr.e2e-id]="inputField.e2e"
+          [ngClass]="[
+            inputField.class || 'form-control',
+            isInvalid(inputField.controlName) ? 'is-invalid' : ''
+          ]"
+          (change)="onChange($event, inputField)"
+        />
+      </ng-container>
+      <label *ngIf="inputField.placeholder" [for]="inputField.id"
+        >e.g. {{ inputField.placeholder }}</label
+      >
+      <label *ngIf="inputField.placeholder_config_value" [for]="inputField.id"
+        >e.g. {{ inputField.placeholder_config_value }}</label
+      >
+    </div>
+  </div>
+
+  <ng-template [formGroup]="parentForm" #checkboxContent>
+    <input
+      [id]="inputField.id"
+      type="checkbox"
+      [name]="inputField.name"
+      [formControlName]="inputField.controlName"
+      [attr.e2e-id]="inputField.e2e"
+    />
+  </ng-template>
+</ng-template>

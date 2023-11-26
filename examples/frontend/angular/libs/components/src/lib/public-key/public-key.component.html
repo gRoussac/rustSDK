@@ -1,0 +1,13 @@
+<label class="input-group-text" for="publicKeyElt"> Public Key</label>
+<input
+  type="search"
+  class="form-control form-control-xs"
+  name="public_key"
+  [value]="public_key || ''"
+  placeholder="e.g. 0x"
+  (change)="onPublicKeyChange()"
+  id="publicKeyElt"
+  #publicKeyElt
+  e2e-id="publicKeyElt"
+  [ngClass]="[isInvalid() ? 'is-invalid' : '']"
+/>
