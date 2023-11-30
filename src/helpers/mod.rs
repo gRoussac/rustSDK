@@ -8,7 +8,7 @@ use blake2::{
 };
 use casper_client::cli::JsonArg;
 use casper_client::types::{Deploy, TimeDiff, Timestamp};
-use casper_types::cl_value::cl_value_to_json as cl_value_to_json_from_casper_types;
+use casper_types::cl_value_to_json as cl_value_to_json_from_casper_types;
 use casper_types::{CLValue, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey};
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
