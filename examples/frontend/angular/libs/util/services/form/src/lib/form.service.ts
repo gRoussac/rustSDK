@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { State, StateService } from '@util/state';
 import formFields from './form';
-import { BehaviorSubject } from 'rxjs';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 
 @Injectable({
@@ -12,7 +11,9 @@ export class FormService {
   form!: FormGroup;
 
   private state!: State;
-  private readonly formStateSubject = new BehaviorSubject<FormGroup>(this.form);
+  private action!: string;
+  private has_wasm!: boolean;
+  private select_dict_identifier!: string;
 
   constructor(
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
@@ -20,13 +21,14 @@ export class FormService {
     private readonly stateService: StateService,
   ) {
     this.stateService.getState().subscribe((state: State) => {
-      if (!state.action || this.state?.action === state?.action) {
-        return;
-      }
-      else if (state.action) {
-        state && (this.state = state);
+      this.has_wasm = !!state?.has_wasm;
+      state?.select_dict_identifier && (this.select_dict_identifier = state.select_dict_identifier);
+      if (state?.action && this.action !== state.action) {
+        state.action && (this.action = state.action);
         this.initializeForm();
       }
+      this.action && this.updateForm();
+      state && (this.state = state);
     });
     this.form = this.defaultForm;
   }
@@ -38,6 +40,12 @@ export class FormService {
         row.forEach((field) => {
           const name = field.input?.controlName || field.textarea?.controlName || '';
           name && (formControlsConfig[name] = new FormControl());
+          if (field.select?.options) {
+            const select_dict_identifier = field.select?.options.find(option => option.default)?.value || '';
+            this.stateService.setState({
+              select_dict_identifier
+            });
+          }
         });
       });
     });
@@ -45,12 +53,13 @@ export class FormService {
   }
 
   private initializeForm() {
-    const fields = this.state.action && formFields.get(this.state.action);
+    Object.values(this.form.controls).forEach(control => {
+      control.clearValidators();
+      control.markAsPristine();
+      control.disable();
+    });
+    const fields = this.action && formFields.get(this.action);
     if (fields) {
-      Object.values(this.form.controls).forEach(control => {
-        control.disable();
-        control.clearValidators();
-      });
       fields.forEach((row) => {
         row.forEach((field) => {
           if (!field.input && !field.textarea) {
@@ -58,59 +67,74 @@ export class FormService {
           }
           const name = field.input?.controlName || field.textarea?.controlName || '';
           const control = this.form.get(name);
+          if (!control) { return; }
+          const state = field.input?.state_name || field.textarea?.state_name || field.select?.state_name || [];
+          const stateName = state && state.find(name => this.state[name as keyof State]);
+          const defaultValue = stateName ? this.state[stateName as keyof State] : '';
 
-          if (control) {
-            if (field.required) {
-              control.setValidators([Validators.required]);
-            } else {
-              control.clearValidators();
-            }
+          if (defaultValue) {
+            defaultValue && control.setValue(defaultValue);
+          } else if (field.input?.config_name) {
+            const defaultValue = this.config[field.input?.config_name as string] || '';
+            defaultValue && control.setValue(defaultValue);
+            defaultValue && (field.input.placeholder_config_value = defaultValue as string);
+          }
 
-            const state = field.input?.state_name || field.textarea?.state_name || [];
-            const stateName = state && state.find(name => this.state[name as keyof State]);
-            const defaultValue = stateName ? this.state[stateName as keyof State] : '';
-
-            if (defaultValue) {
-              defaultValue && control.setValue(defaultValue);
-            } else if (field.input?.config_name) {
-              const defaultValue = this.config[field.input?.config_name as string] || '';
-              defaultValue && control.setValue(defaultValue);
-              defaultValue && (field.input.placeholder_config_value = defaultValue as string);
-            }
-            control.enable();
-
-            if (this.state.has_wasm && field.input?.disabled_when?.includes('has_wasm')) {
-              control.disable();
-            }
+          control.enable();
+          if (field.required) {
+            field.input && (field.input.required = true);
+            field.textarea && (field.textarea.required = true);
+            control.setValidators([Validators.required]);
           }
         });
       });
-      this.form.updateValueAndValidity();
     }
   }
 
-
-  setValue(controlName: string, value: string) {
-    const control = this.form.get(controlName);
-    if (control) {
-      control.setValue(value.trim());
+  updateForm() {
+    const fields = this.action && formFields.get(this.action);
+    if (!fields) {
+      return;
     }
-  }
-
-  getValue(controlName: string): string | undefined {
-    const control = this.form.get(controlName);
-    return control ? control.value : undefined;
+    const disabledTargets: string[] = [];
+    fields.forEach((row) => {
+      row.forEach(({ input }) => {
+        const name = input?.controlName;
+        if (!name) {
+          return;
+        }
+        const control = this.form.get(name);
+        if (!control) {
+          return;
+        }
+        if (input.enabled_when) {
+          if (this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
+            control.disable();
+          } else if (this.select_dict_identifier) {
+            control.enable();
+          }
+        }
+        else if (input.disabled_when) {
+          const fieldName: string = control.value && input.disabled_when?.find(field => field.includes('value'));
+          const targetControlName = fieldName && fieldName.split('.')[0];
+          const targetControl = targetControlName && this.form?.get(targetControlName);
+          if (targetControl) {
+            targetControl.disable();
+            disabledTargets.push(targetControlName);
+          }
+          if (this.has_wasm && input?.disabled_when?.includes('has_wasm')) {
+            control.reset();
+            control.disable();
+          } else if (!disabledTargets.includes(input.controlName)) {
+            control.enable();
+          }
+        }
+      });
+    });
   }
 
   get formFields() {
     return formFields;
   }
 
-  get formState() {
-    return this.formStateSubject.asObservable();
-  }
-
-  updateFormState(newState: FormGroup) {
-    this.formStateSubject.next(newState);
-  }
 }

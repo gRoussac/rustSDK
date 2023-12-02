@@ -11,4 +11,5 @@ export type State = {
   deploy_json?: string;
   verbosity?: Verbosity;
   has_wasm?: boolean;
+  select_dict_identifier?: string;
 };

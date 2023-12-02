@@ -18,4 +18,8 @@ export class StateService {
   getState() {
     return this.state.asObservable();
   }
+
+  getValue() {
+    return this.state.getValue();
+  }
 }

@@ -1,3 +1,4 @@
+export * from "./lib/form/form.component";
 export * from "./lib/result/result.component";
 export * from "./lib/header/header.component";
 export * from "./lib/error/error.component";

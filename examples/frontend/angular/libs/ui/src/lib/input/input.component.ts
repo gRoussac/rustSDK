@@ -1,10 +1,8 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { InputField } from '@util/form';
+import { FormService, InputField } from '@util/form';
 import { motesToCSPR } from 'casper-sdk';
-import { State, StateService } from '@util/state';
-import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -13,60 +11,33 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './input.component.html',
   styleUrls: ['./input.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputComponent implements AfterViewInit, OnDestroy {
+export class InputComponent {
 
   @Input() inputField!: InputField;
   @Input() parentForm!: FormGroup;
-
-  has_wasm!: boolean;
-
-  private stateSubscription!: Subscription;
-
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
+  @Input() hidden_when_disabled!: boolean;
 
   constructor(
-    private readonly stateService: StateService,
+    private readonly formService: FormService,
   ) { }
 
-  async ngAfterViewInit() {
-    this.setStateSubscription();
-  }
-
-  ngOnDestroy() {
-    this.stateSubscription && this.stateSubscription.unsubscribe();
-  }
-
-  private setStateSubscription() {
-    this.stateSubscription = this.stateService.getState().subscribe((state: State) => {
-      this.has_wasm = !!state.has_wasm;
-      const control = this.parentForm?.get(this.inputField.controlName);
-      if (this.has_wasm && this.inputField.disabled_when?.includes('has_wasm')) {
-        control?.setValue('');
-        control?.disable();
-      } else {
-        control?.enable();
-      }
-    });
-  }
-
-  onChange($event: Event, inputField: InputField) {
-    const value = ($event.target as HTMLInputElement)?.value;
-    if (inputField.disabled_when) {
-      const fieldName = inputField.disabled_when.find(field => field.includes('value'));
-      if (fieldName) {
-        const control = this.parentForm?.get(fieldName.split('.')[0]);
-        if (control && control) {
-          value ? control.disable() : control.enable();
-        }
-      }
-    }
+  onChange(inputField: InputField) {
+    const control = this.parentForm?.get(inputField.controlName);
+    const fieldName = control && inputField.disabled_when?.find(field => field.includes('value'));
+    fieldName && this.formService.updateForm();
   }
 
   isInvalid(controlName: string): boolean {
     const control = this.parentForm?.get(controlName);
-    return !!this.parentForm?.touched && !!control?.invalid;
+    return !!control?.enabled && !!control?.dirty && !control?.value && !control?.valid;
+  }
+
+  isRequired(inputField: InputField): boolean {
+    const control = this.parentForm?.get(inputField.controlName);
+    return !!control?.enabled && !control?.dirty && !control?.value && !!inputField.required;
   }
 
   motesToCSPR(amount: string) {
