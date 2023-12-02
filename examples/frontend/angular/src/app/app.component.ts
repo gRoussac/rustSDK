@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { SDK, PeerEntry, Deploy, Verbosity, jsonPrettyPrint } from "casper-sdk";
-import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, PrivateKeyComponent, SubmitWasmComponent, SubmitFileComponent } from '@components';
+import { SDK, PeerEntry } from "casper-sdk";
+import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, PrivateKeyComponent, FormComponent } from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
 import { ResultService } from '@util/result';
 import { ClientService } from '@util/client';
-import { FormService, InputContainer } from '@util/form';
+import { FormService } from '@util/form';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { InputComponent, TextareaComponent } from '@util/ui';
 import { ErrorService } from '@util/error';
 
 const imports = [
   CommonModule,
   ReactiveFormsModule,
+  FormComponent,
   ResultComponent,
   HeaderComponent,
   ErrorComponent,
@@ -24,10 +24,6 @@ const imports = [
   SubmitActionComponent,
   PublicKeyComponent,
   PrivateKeyComponent,
-  InputComponent,
-  SubmitWasmComponent,
-  SubmitFileComponent,
-  TextareaComponent
 ];
 
 @Component({
@@ -39,28 +35,14 @@ const imports = [
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
-  title = 'Casper client';
   action!: string;
-  deploy_json!: string;
   peers!: PeerEntry[];
-
-  item_key!: string;
-  seed_uref!: string;
-  seed_contract_hash!: string;
-  seed_account_hash!: string;
-  seed_name!: string;
-  seed_key!: string;
-
-  select_dict_identifier = 'newFromContractInfo';
-
   form: FormGroup<any> = this.formService.form;
-  formFields: Map<string, InputContainer[][]> = this.formService.formFields;
-
-  private verbosity = this.config['verbosity'];
-  private wasm!: Uint8Array | undefined;
-  private stateSubscription!: Subscription;
 
   @ViewChild('selectDictIdentifierElt') selectDictIdentifierElt!: ElementRef;
+
+  private wasm!: Uint8Array | undefined;
+  private stateSubscription!: Subscription;
 
   constructor(
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
@@ -70,8 +52,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly resultService: ResultService,
     private readonly stateService: StateService,
     private readonly formService: FormService,
-    private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly errorService: ErrorService,
+    private readonly errorService: ErrorService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -85,7 +66,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private setStateSubscription() {
     this.stateSubscription = this.stateService.getState().subscribe((state: State) => {
       state.action && (this.action = state.action);
-      state.deploy_json && (this.deploy_json = state.deploy_json);
     });
   }
 
@@ -116,12 +96,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async submitAction(action: string) {
-    this.form.markAsTouched();
     await this.cleanResult();
     const exec = true;
     if (this.form.disabled || this.form.valid) {
       await this.handleAction(action, exec);
-      this.changeDetectorRef.markForCheck();
     }
   }
 
@@ -138,60 +116,70 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async call_entrypoint() {
+  async onWasmSelected(wasm: Uint8Array) {
+    wasm && (this.wasm = wasm);
+  }
+
+  private async cleanResult() {
+    this.errorService.setError('');
+    await this.resultService.setResult('');
+  }
+
+  private async call_entrypoint() {
     return await this.clientService.call_entrypoint();
   }
 
-  async deploy(deploy_result = true, speculative?: boolean) {
-    return await this.clientService.deploy(deploy_result, speculative);
+  private async deploy(deploy_result = true, speculative?: boolean) {
+    return await this.clientService.deploy(deploy_result, speculative, this.wasm);
   }
 
-  async get_account(account_identifier_param: string) {
+  private async get_account(account_identifier_param: string) {
     return await this.clientService.get_account(account_identifier_param);
   }
 
-  async get_auction_info() {
+  private async get_auction_info() {
     return await this.clientService.get_auction_info();
   }
 
-  async get_balance() {
+  private async get_balance() {
     return await this.clientService.get_balance();
   }
 
-  async get_block() {
+  private async get_block() {
     return await this.clientService.get_block();
   }
 
-  async get_block_transfers() {
+  private async get_block_transfers() {
     return await this.clientService.get_block_transfers();
   }
 
-  async get_chainspec() {
+  private async get_chainspec() {
     return await this.clientService.get_chainspec();
   }
 
-  async get_deploy() {
+  private async get_deploy() {
     return await this.clientService.get_deploy();
   }
 
-  async get_dictionary_item() {
+  private async get_dictionary_item() {
     return await this.clientService.get_dictionary_item();
   }
 
-  async get_era_info() {
+  private async get_era_info() {
     return await this.clientService.get_era_info();
   }
 
-  async get_era_summary() {
+  private async get_era_summary() {
     return await this.clientService.get_era_summary();
   }
 
-  async get_node_status() {
+  private async get_node_status() {
     return await this.clientService.get_node_status();
   }
 
-  async get_peers() {
-    return this.peers = await this.clientService.get_peers();
+  private async get_peers() {
+    this.peers = await this.clientService.get_peers();
+    return this.peers;
   }
 
   async get_state_root_hash(no_mark_for_check?: boolean) {
@@ -202,87 +190,64 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return state_root_hash;
   }
 
-  async get_validator_changes() {
+  private async get_validator_changes() {
     return await this.clientService.get_validator_changes();
   }
 
-  async install() {
+  private async install() {
     return await this.clientService.install(this.wasm);
   }
 
-  async list_rpcs() {
+  private async list_rpcs() {
     return await this.clientService.list_rpcs();
   }
 
-  async make_deploy() {
-    return await this.clientService.make_deploy();
+  private async make_deploy() {
+    return await this.clientService.make_deploy(this.wasm);
   }
 
-  async make_transfer() {
+  private async make_transfer() {
     return await this.clientService.make_transfer();
   }
 
-  async put_deploy() {
+  private async put_deploy() {
     return await this.clientService.put_deploy();
   }
 
-  async query_balance() {
+  private async query_balance() {
     return await this.clientService.query_balance();
   }
 
-  async query_contract_dict() {
+  private async query_contract_dict() {
     return await this.clientService.query_contract_dict();
   }
 
-  async query_contract_key() {
+  private async query_contract_key() {
     return await this.clientService.query_contract_key();
   }
 
-  async query_global_state() {
+  private async query_global_state() {
     return await this.clientService.query_global_state();
   }
 
-  async sign_deploy() {
+  private async sign_deploy() {
     return await this.clientService.sign_deploy();
   }
 
-  async speculative_deploy() {
-    return await this.clientService.speculative_deploy();
+  private async speculative_deploy() {
+    return await this.clientService.speculative_deploy(this.wasm);
   }
 
-  async speculative_exec() {
+  private async speculative_exec() {
     return await this.clientService.speculative_exec();
   }
 
-  async speculative_transfer() {
+  private async speculative_transfer() {
     return await this.clientService.speculative_transfer();
   }
 
-  async transfer(deploy_result = true, speculative?: boolean) {
+  private async transfer(deploy_result = true, speculative?: boolean) {
     return await this.clientService.transfer(deploy_result, speculative);
-  }
-
-  async onDeployFileSelected(deploy_json: string) {
-    deploy_json = deploy_json && jsonPrettyPrint(new Deploy(deploy_json).toJson(), this.verbosity as Verbosity);
-    deploy_json && this.stateService.setState({
-      deploy_json
-    });
-  }
-
-  async cleanResult() {
-    this.errorService.setError('');
-    await this.resultService.setResult('');
-  }
-
-  async onWasmSelected(wasm: Uint8Array | undefined) {
-    wasm && (this.wasm = wasm);
-    this.stateService.setState({
-      has_wasm: !!wasm
-    });
-  }
-
-  async copy(value: string) {
-    this.resultService.copyClipboard(value);
   }
 
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
@@ -14,6 +14,8 @@ import { State, StateService } from '@util/state';
 export class SubmitActionComponent implements AfterViewInit, OnDestroy {
 
   action!: string;
+  @Input() class!: string;
+  @Input() e2e!: string;
 
   @Output() submit_action: EventEmitter<string> = new EventEmitter<string>();
 

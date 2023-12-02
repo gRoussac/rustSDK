@@ -1,3 +1,9 @@
+export type option = {
+  value: string,
+  label: string;
+  default?: boolean;
+};
+
 export type InputField = {
   id: string;
   type?: string;
@@ -16,11 +22,16 @@ export type InputField = {
   placeholder_config_value?: string;
   change?: string;
   disabled_when?: string[];
+  options?: option[];
+  enabled_when?: string[];
+  required?: boolean;
+  hidden?: boolean;
 };
 
 export type InputContainer = {
   input?: InputField;
   textarea?: InputField;
+  select?: InputField;
   required?: boolean;
   wasm_button?: boolean;
   file_button?: boolean;
@@ -55,7 +66,7 @@ const accountIdentifier: InputField = {
   type: 'search',
   wrap_class: 'col-sm-7',
   class: 'form-control',
-  label: 'Account identifier *',
+  label: 'Account identifier',
   name: 'account_identifier',
   controlName: 'accountIdentifier',
   placeholder: 'Public Key, AccountHash, Purse URef',
@@ -73,7 +84,6 @@ const stateRootHash: InputField = {
   controlName: 'stateRootHash',
   placeholder: '0x',
   e2e: 'stateRootHashElt',
-  state_name: ['state_root_hash'],
 };
 
 const purseUref: InputField = {
@@ -127,7 +137,6 @@ const paymentAmount: InputField = {
   controlName: 'paymentAmount',
   placeholder: '',
   e2e: 'paymentAmountElt',
-  state_name: ['payment_amount'],
   change: "motesToCSPR"
 };
 
@@ -153,7 +162,6 @@ const targetAccount: InputField = {
   controlName: 'targetAccount',
   placeholder: 'Public Key, AccountHash, Purse URef',
   e2e: 'targetAccountElt',
-  state_name: ['target_account'],
 };
 
 const sessionHash: InputField = {
@@ -166,7 +174,6 @@ const sessionHash: InputField = {
   controlName: 'sessionHash',
   placeholder: 'Contract Hash or Package Hash',
   e2e: 'sessionHashElt',
-  state_name: ['session_hash'],
   disabled_when: ['has_wasm', 'sessionName.value']
 };
 
@@ -194,7 +201,6 @@ const versionInput: InputField = {
   controlName: 'version',
   placeholder: 'e.g.1, empty for last version',
   e2e: 'versionElt',
-  state_name: ['version'],
   disabled_when: ['has_wasm']
 };
 
@@ -208,7 +214,6 @@ const sessionNameInput: InputField = {
   controlName: 'sessionName',
   placeholder: 'Counter',
   e2e: 'sessionNameElt',
-  state_name: ['session_name'],
   disabled_when: ['has_wasm', 'sessionHash.value']
 };
 
@@ -222,7 +227,6 @@ const entryPointInput: InputField = {
   controlName: 'entryPoint',
   placeholder: 'counter_inc',
   e2e: 'entryPointElt',
-  state_name: ['entry_point'],
   disabled_when: ['has_wasm']
 };
 
@@ -236,7 +240,6 @@ const argsSimpleInput: InputField = {
   controlName: 'argsSimple',
   placeholder: 'foo:Bool=\'true\', bar:String=\'value\'',
   e2e: 'argsSimpleElt',
-  state_name: ['args_simple'],
   disabled_when: ['argsJson.value']
 };
 
@@ -250,7 +253,6 @@ const argsJson: InputField = {
   controlName: 'argsJson',
   placeholder: '[{ "name": "foo", "type": "U256", "value": 1 }]',
   e2e: 'argsJsonElt',
-  state_name: ['args_json'],
   disabled_when: ['argsSimple.value']
 };
 
@@ -289,7 +291,7 @@ const seedUref: InputField = {
   controlName: 'seedUref',
   placeholder: 'uref-0x',
   e2e: 'seedUrefElt',
-  state_name: ['seed_uref'],
+  enabled_when: ['newFromSeedUref']
 };
 
 const seedAccountHash: InputField = {
@@ -302,7 +304,7 @@ const seedAccountHash: InputField = {
   controlName: 'seedAccountHash',
   placeholder: 'account-hash-0x',
   e2e: 'seedAccountHashElt',
-  state_name: ['seed_account_hash'],
+  enabled_when: ['newFromAccountInfo']
 };
 
 const seedContractHash: InputField = {
@@ -315,7 +317,7 @@ const seedContractHash: InputField = {
   controlName: 'seedContractHash',
   placeholder: 'hash-0x',
   e2e: 'seedContractHashElt',
-  state_name: ['seed_contract_hash'],
+  enabled_when: ['newFromContractInfo']
 };
 
 const seedKey: InputField = {
@@ -328,7 +330,7 @@ const seedKey: InputField = {
   controlName: 'seedKey',
   placeholder: 'dictionary-0x',
   e2e: 'seedKeyElt',
-  state_name: ['seed_key'],
+  enabled_when: ['newFromDictionaryKey']
 };
 
 const seedName: InputField = {
@@ -341,7 +343,7 @@ const seedName: InputField = {
   controlName: 'seedName',
   placeholder: 'events',
   e2e: 'seedNameElt',
-  state_name: ['seed_name'],
+  enabled_when: ['newFromContractInfo', 'newFromAccountInfo']
 };
 
 const itemKey: InputField = {
@@ -354,7 +356,7 @@ const itemKey: InputField = {
   controlName: 'itemKey',
   placeholder: 'Item key string',
   e2e: 'itemKeyElt',
-  state_name: ['item_key'],
+  enabled_when: ['newFromContractInfo', 'newFromAccountInfo', 'newFromSeedUref']
 };
 
 const queryKey: InputField = {
@@ -385,7 +387,6 @@ const queryPath: InputField = {
   controlName: 'queryPath',
   placeholder: 'counter/count',
   e2e: 'queryPathElt',
-  state_name: ['query_path'],
 };
 
 const deployJson: InputField = {
@@ -399,6 +400,25 @@ const deployJson: InputField = {
   placeholder: 'Deploy as Json string',
   e2e: 'deployJsonElt',
   state_name: ['deploy_json'],
+};
+
+const selectDictIdentifier: InputField = {
+  id: 'selectDictIdentifierElt',
+  type: 'textarea',
+  wrap_class: 'mt-3 col-sm-5 mb-4',
+  class: 'form-select form-control form-control-sm',
+  label: 'Dictionary identifier',
+  label_class: 'input-group-text',
+  name: 'select_dict_identifier',
+  controlName: 'selectDictIdentifier',
+  e2e: 'selectDictIdentifierElt',
+  state_name: ['select_dict_identifier'],
+  options: [
+    { value: 'newFromSeedUref', label: 'From Dictionary Uref' },
+    { value: 'newFromContractInfo', label: 'From Contract Info', default: true },
+    { value: 'newFromAccountInfo', label: 'From Account Info' },
+    { value: 'newFromDictionaryKey', label: 'From Dictionary Key' },
+  ]
 };
 
 const getBlockFields: InputContainer[][] = [
@@ -430,22 +450,26 @@ const queryGlobalStateFields: InputContainer[][] = [
 
 const queryContractDictFields: InputContainer[][] = [
   [{ input: stateRootHash }],
-  [{ input: seedContractHash }],
-  [{ input: seedName }],
-  [{ input: itemKey }],
+  [{ input: seedContractHash, required: true }],
+  [{ input: seedName, required: true }],
+  [{ input: itemKey, required: true }],
 ];
 
 const queryContractKeyFields: InputContainer[][] = [
   [{ input: stateRootHash }],
-  [{ input: queryContractKey }],
+  [{ input: queryContractKey, required: true }],
   [{ input: queryPath }],
 ];
 
 const getDictionaryItemFields: InputContainer[][] = [
   [{ input: stateRootHash }],
-  [{ input: seedContractHash }],
-  [{ input: seedName }],
-  [{ input: itemKey }],
+  [{ select: selectDictIdentifier }],
+  [{ input: seedContractHash, required: true }],
+  [{ input: seedAccountHash, required: true }],
+  [{ input: seedUref, required: true }],
+  [{ input: seedName, required: true }],
+  [{ input: itemKey, required: true }],
+  [{ input: seedKey, required: true }],
 ];
 
 const getDeployFields: InputContainer[][] = [

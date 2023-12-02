@@ -53,7 +53,6 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
   async onPublicKeyChange() {
     const public_key: string = this.publicKeyElt && this.publicKeyElt.nativeElement.value.toString().trim();
     if (public_key !== this.public_key) {
-      this.public_key = public_key;
       const private_key = '';
       this.stateService.setState({
         public_key,
@@ -71,8 +70,11 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   private async updateAccount() {
     const get_account = await this.clientService.get_account(this.public_key);
-    const account_hash = get_account?.account.account_hash;
-    const main_purse = get_account?.account.main_purse;
+    if (!get_account.account) {
+      return;
+    }
+    const account_hash = get_account?.account?.account_hash;
+    const main_purse = get_account?.account?.main_purse;
     this.stateService.setState({
       account_hash,
       main_purse

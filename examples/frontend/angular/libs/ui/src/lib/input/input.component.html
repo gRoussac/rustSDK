@@ -1,12 +1,19 @@
 <ng-template #template let-inputField="inputField" let-parentForm="parentForm">
-  <div [ngClass]="inputField.wrap_class">
+  <div
+    [ngClass]="inputField.wrap_class"
+    *ngIf="
+      !(
+        hidden_when_disabled && parentForm.get(inputField.controlName)?.disabled
+      )
+    "
+  >
     <label
       [for]="inputField.id"
       [ngClass]="[
         inputField.label_class || '',
         parentForm.get(inputField.controlName)?.disabled ? 'disabled' : ''
       ]"
-      >{{ inputField.label }}
+      >{{ inputField.label }}{{ inputField.required ? ' *' : '' }}
       <span
         class="fw-light small text-nowrap"
         *ngIf="
@@ -39,9 +46,10 @@
           [attr.e2e-id]="inputField.e2e"
           [ngClass]="[
             inputField.class || 'form-control',
-            isInvalid(inputField.controlName) ? 'is-invalid' : ''
+            isInvalid(inputField.controlName) ? 'is-invalid' : '',
+            isRequired(inputField) ? 'is-required' : ''
           ]"
-          (change)="onChange($event, inputField)"
+          (change)="onChange(inputField)"
         />
       </ng-container>
       <label *ngIf="inputField.placeholder" [for]="inputField.id"

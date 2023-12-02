@@ -13,13 +13,13 @@ import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryI
 })
 export class ClientService {
 
-  chain_name!: string;
-  public_key!: string;
-  private_key!: string | undefined;
-  deploy_json!: string;
-  verbosity = Verbosity.High;
-
-  select_dict_identifier = 'newFromContractInfo';
+  private chain_name!: string;
+  private public_key!: string;
+  private private_key!: string | undefined;
+  private deploy_json!: string;
+  private select_dict_identifier!: string;
+  // TODO Verbosity from config
+  private verbosity = Verbosity.High;
 
   constructor(
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
@@ -39,13 +39,14 @@ export class ClientService {
       state.private_key && (this.private_key = state.private_key);
       state.deploy_json && (this.deploy_json = state.deploy_json);
       state.verbosity && (this.verbosity = state.verbosity);
+      state.select_dict_identifier && (this.select_dict_identifier = state.select_dict_identifier);
     });
   }
 
   async get_account(account_identifier_param: string) {
     let account_identifier!: string;
     if (!account_identifier_param) {
-      account_identifier = this.getIdentifier('accountIdentifier')?.value;
+      account_identifier = this.getIdentifier('accountIdentifier')?.value?.trim();
     } else {
       account_identifier = account_identifier_param;
     }
@@ -77,7 +78,7 @@ export class ClientService {
 
   async get_deploy() {
     const finalized_approvals = this.getIdentifier('finalizedApprovals')?.value;
-    const deploy_hash_as_string: string = this.getIdentifier('deployHash')?.value;
+    const deploy_hash_as_string: string = this.getIdentifier('deployHash')?.value?.trim();
     if (!deploy_hash_as_string) {
       const err = "deploy_hash_as_string is missing";
       err && (this.errorService.setError(err.toString()));
@@ -117,7 +118,8 @@ export class ClientService {
     let state_root_hash = '';
     const options: getStateRootHashOptions = this.sdk.get_state_root_hash_options({});
     if (!options) {
-      return;
+      const err = "get_state_root_hash options are missing";
+      err && (this.errorService.setError(err.toString()));
     }
     if (!no_mark_for_check) {
       this.getIdentifieBlock(options);
@@ -142,9 +144,11 @@ export class ClientService {
   }
 
   async get_balance() {
-    const purse_uref_as_string: string = this.getIdentifier('purseUref')?.value;
-    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value;
+    const purse_uref_as_string: string = this.getIdentifier('purseUref')?.value?.trim();
+    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
     if (!purse_uref_as_string) {
+      const err = "purse_uref_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     try {
@@ -164,7 +168,6 @@ export class ClientService {
       const chain_get_block_options: getBlockOptions = this.sdk.get_block_options({});
       this.getIdentifieBlock(chain_get_block_options);
       const chain_get_block = await this.sdk.get_block(chain_get_block_options);
-      console.log(chain_get_block);
       chain_get_block && this.resultService.setResult(chain_get_block.toJson());
     } catch (err) {
       err && (this.errorService.setError(err.toString()));
@@ -233,7 +236,7 @@ export class ClientService {
   }
 
   async query_balance() {
-    const purse_identifier_as_string: string = this.getIdentifier('purseIdentifier')?.value;
+    const purse_identifier_as_string: string = this.getIdentifier('purseIdentifier')?.value?.trim();
     if (!purse_identifier_as_string) {
       const err = "deploy_hash_as_string is missing";
       err && (this.errorService.setError(err.toString()));
@@ -252,9 +255,11 @@ export class ClientService {
   }
 
   async query_global_state() {
-    const path_as_string: string = this.getIdentifier('queryPath')?.value;
-    const key_as_string: string = this.getIdentifier('queryKey')?.value;
+    const path_as_string: string = this.getIdentifier('queryPath')?.value?.trim() || '';
+    const key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
     if (!key_as_string) {
+      const err = "key_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const query_global_state_options = this.sdk.query_global_state_options({
@@ -270,10 +275,12 @@ export class ClientService {
     }
   }
 
-  async deploy(deploy_result = true, speculative?: boolean) {
+  async deploy(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
     const timestamp = getTimestamp();
-    const ttl: string = this.getIdentifier('TTL')?.value;
+    const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
     if (!this.public_key) {
+      const err = "public_key is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const deploy_params = new DeployStrParams(
@@ -283,15 +290,15 @@ export class ClientService {
       timestamp,
       ttl
     );
-    // TODO Fix better
-    // Fix invalid form
     const payment_params = new PaymentStrParams();
-    const payment_amount: string = this.getIdentifier('paymentAmount')?.value;
+    const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
+      const err = "paymentAmount is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     payment_params.payment_amount = payment_amount;
-    const session_params = this.get_session_params();
+    const session_params = this.get_session_params(wasm);
     // let test_deploy = Deploy.withPaymentAndSession(
     //   deploy_params,
     //   session_params,
@@ -338,16 +345,21 @@ export class ClientService {
   }
 
   async install(wasm?: Uint8Array) {
-    const payment_amount: string = this.getIdentifier('paymentAmount')?.value;
+    const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
+      const err = "paymentAmount is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     if (!this.public_key || !this.private_key) {
+      const err = "public_key or private_key is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const wasmBuffer = wasm?.buffer;
     if (!wasmBuffer) {
-      return;
+      const err = "wasmBuffer is missing";
+      err && (this.errorService.setError(err.toString()));
     }
     const deploy_params = new DeployStrParams(
       this.chain_name,
@@ -363,15 +375,16 @@ export class ClientService {
       );
       install && this.resultService.setResult(install.toJson());
     } catch (err) {
-      console.error(err);
       err && (this.errorService.setError(err.toString()));
     }
   }
 
   async transfer(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
-    const ttl: string = this.getIdentifier('TTL')?.value;
+    const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
     if (!this.public_key) {
+      const err = "public_key is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
 
@@ -384,9 +397,11 @@ export class ClientService {
     );
     const payment_params = new PaymentStrParams();
     payment_params.payment_amount = this.config['gas_fee_transfer'].toString();
-    const transfer_amount: string = this.getIdentifier('transferAmount')?.value;
-    const target_account: string = this.getIdentifier('targetAccount')?.value;
+    const transfer_amount: string = this.getIdentifier('transferAmount')?.value?.trim();
+    const target_account: string = this.getIdentifier('targetAccount')?.value?.trim();
     if (!transfer_amount || !target_account) {
+      const err = "transfer_amount or target_account is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
 
@@ -442,8 +457,10 @@ export class ClientService {
   }
 
   async put_deploy() {
-    const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value;
+    const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
+      const err = "deployJson is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
@@ -468,8 +485,10 @@ export class ClientService {
   }
 
   async speculative_exec() {
-    const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value;
+    const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
+      const err = "signed_deploy_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
@@ -492,10 +511,14 @@ export class ClientService {
 
   async sign_deploy() {
     if (!this.private_key) {
+      const err = "private_key is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
-    const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value;
+    const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
+      const err = "signed_deploy_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
 
@@ -509,9 +532,13 @@ export class ClientService {
       signed_deploy = new Deploy(JSON.parse(signed_deploy_as_string));
     }
     catch {
-      console.error("Error parsing deploy");
+      const err = "Error parsing deploy";
+      err && (this.errorService.setError(err.toString()));
+      return;
     }
     if (!signed_deploy) {
+      const err = "signed_deploy_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     signed_deploy = signed_deploy.sign(this.private_key);
@@ -519,9 +546,10 @@ export class ClientService {
     this.getIdentifier('deployJson')?.setValue(this.deploy_json);
   }
 
-  async make_deploy() {
+  async make_deploy(wasm?: Uint8Array) {
     const deploy_result = false;
-    await this.deploy(deploy_result);
+    const speculative = false;
+    await this.deploy(deploy_result, speculative, wasm);
   }
 
   async make_transfer() {
@@ -535,14 +563,16 @@ export class ClientService {
     await this.transfer(deploy_result, speculative);
   }
 
-  async speculative_deploy() {
+  async speculative_deploy(wasm?: Uint8Array) {
     const speculative = true;
     const deploy_result = !speculative;
-    await this.deploy(deploy_result, speculative);
+    await this.deploy(deploy_result, speculative, wasm);
   }
 
   async call_entrypoint() {
     if (!this.public_key || !this.private_key) {
+      const err = "public_key or private_key is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const deploy_params = new DeployStrParams(
@@ -551,8 +581,10 @@ export class ClientService {
       this.private_key,
     );
     const session_params = this.get_session_params();
-    const payment_amount: string = this.getIdentifier('paymentAmount')?.value;
+    const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
+      const err = "paymentAmount is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     try {
@@ -568,14 +600,18 @@ export class ClientService {
   }
 
   async query_contract_dict() {
-    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value;
-    const dictionary_item_key: string = this.getIdentifier('itemKey')?.value;
+    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
+    const dictionary_item_key: string = this.getIdentifier('itemKey')?.value?.trim();
     if (!dictionary_item_key) {
+      const err = "itemKey is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
-    const contract_named_key: string = this.getIdentifier('seedContractHash')?.value;
-    const dictionary_name: string = this.getIdentifier('seedName')?.value;
+    const contract_named_key: string = this.getIdentifier('seedContractHash')?.value?.trim() || '';
+    const dictionary_name: string = this.getIdentifier('seedName')?.value?.trim();
     if (!dictionary_name) {
+      const err = "seedName is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     let dictionary_item_params: DictionaryItemStrParams | undefined;
@@ -591,6 +627,8 @@ export class ClientService {
       dictionary_item_params.setContractNamedKey(contract_named_key, dictionary_name, dictionary_item_key);
     }
     if (!dictionary_item_params) {
+      const err = "dictionary_item_params is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const query_contract_dict_options = this.sdk.query_contract_dict_options({
@@ -608,9 +646,11 @@ export class ClientService {
   }
 
   async query_contract_key() {
-    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value;
-    const key_as_string: string = this.getIdentifier('queryKey')?.value;
+    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
+    const key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
     if (!key_as_string) {
+      const err = "key_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const path_as_string: string = this.getIdentifier('queryPath')?.value.toString().trim().replace(/^\/+|\/+$/g, '');
@@ -628,13 +668,15 @@ export class ClientService {
   }
 
   async get_dictionary_item() {
-    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value;
-    const item_key: string = this.getIdentifier('itemKey')?.value;
-    const seed_key: string = this.getIdentifier('seedKey')?.value;
+    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
+    const item_key: string = this.getIdentifier('itemKey')?.value?.trim();
+    const seed_key: string = this.getIdentifier('seedKey')?.value?.trim();
     if (!item_key && !seed_key) {
+      const err = "seedKey or itemKey is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
-    const seed_uref: string = this.getIdentifier('seedUref')?.value;
+    const seed_uref: string = this.getIdentifier('seedUref')?.value?.trim();
     let dictionary_item_identifier: DictionaryItemIdentifier | undefined;
     if (seed_uref && this.select_dict_identifier === 'newFromSeedUref') {
       dictionary_item_identifier =
@@ -649,10 +691,12 @@ export class ClientService {
             seed_key
           );
       } else {
-        const seed_contract_hash: string = this.getIdentifier('seedContractHash')?.value;
-        const seed_account_hash: string = this.getIdentifier('seedAccountHash')?.value;
-        const seed_name: string = this.getIdentifier('seedName')?.value;
+        const seed_contract_hash: string = this.getIdentifier('seedContractHash')?.value?.trim();
+        const seed_account_hash: string = this.getIdentifier('seedAccountHash')?.value?.trim();
+        const seed_name: string = this.getIdentifier('seedName')?.value?.trim();
         if (!seed_name) {
+          const err = "seed_name  is missing";
+          err && (this.errorService.setError(err.toString()));
           return;
         }
         if (seed_contract_hash && this.select_dict_identifier === 'newFromContractInfo') {
@@ -674,6 +718,8 @@ export class ClientService {
       }
     }
     if (!dictionary_item_identifier) {
+      const err = "dictionary_item_identifier  is missing";
+      err && (this.errorService.setError(err.toString()));
       return;
     }
     const get_dictionary_item_options = this.sdk.get_dictionary_item_options({
@@ -693,8 +739,8 @@ export class ClientService {
   }
 
   private getIdentifieBlock(options: { maybe_block_id_as_string?: string; maybe_block_identifier?: BlockIdentifier; }) {
-    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value;
-    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value;
+    const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+    const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
     if (block_identifier_hash) {
       options.maybe_block_id_as_string = block_identifier_hash;
       options.maybe_block_identifier = undefined;
@@ -709,7 +755,7 @@ export class ClientService {
   }
 
   private getGlobalIdentifier(options: { global_state_identifier?: GlobalStateIdentifier; }) {
-    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value;
+    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
 
     let global_state_identifier!: GlobalStateIdentifier;
     if (state_root_hash) {
@@ -717,8 +763,8 @@ export class ClientService {
         new Digest(state_root_hash)
       );
     } else {
-      const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value;
-      const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value;
+      const block_identifier_height: string = this.getIdentifier('blockIdentifierHeight')?.value?.trim();
+      const block_identifier_hash: string = this.getIdentifier('blockIdentifierHash')?.value?.trim();
       if (block_identifier_hash) {
         global_state_identifier = GlobalStateIdentifier.fromBlockHash(new BlockHash(block_identifier_hash));
       } else if (block_identifier_height) {
@@ -732,7 +778,7 @@ export class ClientService {
 
   private get_session_params(wasm?: Uint8Array): SessionStrParams {
     const session_params = new SessionStrParams();
-    const entry_point: string = this.getIdentifier('entryPoint')?.value;
+    const entry_point: string = this.getIdentifier('entryPoint')?.value?.trim();
     if (entry_point) {
       session_params.session_entry_point = entry_point;
     }
@@ -740,7 +786,7 @@ export class ClientService {
       .split(',')
       .map((item: string) => item.trim())
       .filter((item: string) => item !== '');
-    const args_json: string = this.getIdentifier('argsJsonElt')?.value;
+    const args_json: string = this.getIdentifier('argsJson')?.value?.trim();
     if (args_simple?.length) {
       session_params.session_args_simple = args_simple;
     }
@@ -748,8 +794,8 @@ export class ClientService {
       session_params.session_args_json = args_json;
     }
     const call_package: boolean = this.getIdentifier('callPackage')?.value;
-    const session_hash: string = this.getIdentifier('sessionHash')?.value;
-    const session_name: string = this.getIdentifier('sessionName')?.value;
+    const session_hash: string = this.getIdentifier('sessionHash')?.value?.trim();
+    const session_name: string = this.getIdentifier('sessionName')?.value?.trim();
     if (!call_package) {
       if (session_hash) {
         session_params.session_hash = session_hash;
@@ -766,7 +812,7 @@ export class ClientService {
     if (wasm) {
       session_params.session_bytes = Bytes.fromUint8Array(wasm);
     }
-    const version: string = this.getIdentifier('version')?.value;
+    const version: string = this.getIdentifier('version')?.value?.trim();
     if (version) {
       session_params.session_version = version;
     }
