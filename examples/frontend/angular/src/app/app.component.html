@@ -3,8 +3,10 @@
   <comp-status
     (get_state_root_hash_output)="get_state_root_hash($event)"
   ></comp-status>
-  <div class="row align-items-start">
-    <div class="col-sm-4 d-flex justify-content-between">
+  <div class="row flex-column-reverse flex-column-reverse flex-md-row">
+    <div
+      class="col-12 col-md-6 col-lg-5 my-1 my-md-0 d-flex justify-content-between"
+    >
       <comp-action
         (select_action)="selectAction($event)"
         class="w-100"
@@ -12,14 +14,16 @@
       <comp-submit-action
         *ngIf="!['sign_deploy'].includes(action)"
         (submit_action)="submitAction($event)"
-        [class]="'btn-success ms-3'"
+        [class]="'btn-success ms-1 ms-sm-2 ms-xl-3'"
         [e2e]="'submit'"
         >Go</comp-submit-action
       >
     </div>
-    <div class="col-sm-8 ps-0 d-flex justify-content-end">
-      <comp-public-key class="input-group me-2"></comp-public-key>
-      <div class="d-flex justify-content-end ms-3">
+    <div
+      class="col-12 col-md-6 col-lg-7 my-1 my-md-0 d-flex justify-content-end ps-md-0"
+    >
+      <comp-public-key class="input-group"></comp-public-key>
+      <div class="d-flex justify-content-end ms-1 ms-sm-2 ms-xl-3">
         <comp-private-key></comp-private-key>
       </div>
     </div>

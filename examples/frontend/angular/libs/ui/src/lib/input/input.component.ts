@@ -17,7 +17,7 @@ export class InputComponent {
 
   @Input() inputField!: InputField;
   @Input() parentForm!: FormGroup;
-  @ViewChild('template', { static: true }) template!: TemplateRef<any>;
+  @ViewChild('template', { static: true }) template!: TemplateRef<never>;
   @Input() hidden_when_disabled!: boolean;
 
   constructor(
