@@ -26,6 +26,12 @@ select {
   // background-color: rgb(232, 240, 254);
   background-color: white !important;
   max-height: 2.5rem;
+  -webkit-tap-highlight-color: transparent;
+}
+.form-control:focus {
+  @media (max-width: 767px) {
+    box-shadow: none !important;
+  }
 }
 
 form {
@@ -49,14 +55,19 @@ svg {
   width: 24px;
 }
 
-.hljs-attr {
-  font-weight: bold;
-}
-
 .is-invalid {
   color: #dc3545;
 }
 
 .is-required {
   border-color: orange;
+}
+
+select,
+label,
+button,
+input {
+  @media (max-width: 767px) {
+    font-size: 0.8em !important;
+  }
 }
