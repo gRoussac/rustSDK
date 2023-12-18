@@ -52,3 +52,11 @@ svg {
 .hljs-attr {
   font-weight: bold;
 }
+
+.is-invalid {
+  color: #dc3545;
+}
+
+.is-required {
+  border-color: orange;
+}
