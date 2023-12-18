@@ -162,7 +162,7 @@ mod tests {
     async fn test_make_deploy_with_invalid_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\"]".to_string();
+        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
         let account = public_key_from_private_key(&private_key).unwrap();

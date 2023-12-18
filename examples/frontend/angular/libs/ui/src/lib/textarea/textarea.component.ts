@@ -16,7 +16,7 @@ export class TextareaComponent {
   @Input() inputField!: InputField;
   @Input() parentForm!: FormGroup;
 
-  @ViewChild('template', { static: true }) template!: TemplateRef<any>;
+  @ViewChild('template', { static: true }) template!: TemplateRef<never>;
 
   isInvalid(controlName: string): boolean {
     const control = this.parentForm?.get(controlName);

@@ -1,0 +1,7 @@
+textarea {
+  min-height: 350px !important;
+  white-space: pre-wrap;
+  @media (max-width: 767px) {
+    min-height: 200px !important;
+  }
+}
