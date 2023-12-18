@@ -20,9 +20,9 @@ exclude = [
 ]
 
 [dependencies]
-casper-hashing = { version = "3.0.0", git = "https://github.com/Fraser999/casper-node", branch = "rustSDK-1.6", default-features = false }
-casper-types = { version = "4.0.1", git = "https://github.com/Fraser999/casper-node", branch = "rustSDK-1.6", default-features = false }
-casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "rustSDK-feat-1.6", default-features = false }
+casper-hashing = { version = "3.0.0", default-features = false }
+casper-types = { version = "4.0.1", default-features = false }
+casper-client = { version = "2.0.0", default-features = false }
 rand = { version = "0.8.5", default-features = false }
 wee_alloc = { version = "*", default-features = false, optional = true }
 wasm-bindgen = "*"
@@ -53,8 +53,9 @@ path = "src/main.rs"
 doc = false
 
 [patch.crates-io]
-casper-hashing = { version = "3.0.0", git = "https://github.com/Fraser999/casper-node", branch = "rustSDK-1.6" }
-casper-types = { version = "4.0.1", git = "https://github.com/Fraser999/casper-node", branch = "rustSDK-1.6" }
+casper-hashing = { version = "3.0.0", git = "https://github.com/casper-network/casper-node", branch = "dev" }
+casper-types = { version = "4.0.1", git = "https://github.com/casper-network/casper-node", branch = "dev" }
+casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
 
 [profile.release]
 lto = true
