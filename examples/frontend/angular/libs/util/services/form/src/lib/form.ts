@@ -40,7 +40,7 @@ export type InputContainer = {
 const blockIdentifierHeight: InputField = {
   id: 'blockIdentifierHeightElt',
   type: 'search',
-  wrap_class: 'col-sm-2 mb-2',
+  wrap_class: 'col-lg-3 col-xl-2 mb-2',
   class: 'form-control',
   label: 'Block Height',
   name: 'block_identifier_height',
@@ -52,7 +52,7 @@ const blockIdentifierHeight: InputField = {
 const blockIdentifierHash: InputField = {
   id: 'blockIdentifierHashElt',
   type: 'search',
-  wrap_class: 'col-sm-6 mb-2',
+  wrap_class: 'col-lg-9 col-xl-8 mb-2',
   class: 'form-control',
   label: 'Block Hash',
   name: 'block_identifier_hash',
@@ -64,7 +64,7 @@ const blockIdentifierHash: InputField = {
 const accountIdentifier: InputField = {
   id: 'accountIdentifierElt',
   type: 'search',
-  wrap_class: 'col-sm-7',
+  wrap_class: 'col-lg-9',
   class: 'form-control',
   label: 'Account identifier',
   name: 'account_identifier',
@@ -77,7 +77,7 @@ const accountIdentifier: InputField = {
 const stateRootHash: InputField = {
   id: 'stateRootHashElt',
   type: 'search',
-  wrap_class: 'col-sm-6 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'State Root Hash',
   name: 'state_root_hash',
@@ -89,7 +89,7 @@ const stateRootHash: InputField = {
 const purseUref: InputField = {
   id: 'purseUrefElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Purse Uref',
   name: 'purse_uref',
@@ -102,7 +102,7 @@ const purseUref: InputField = {
 const purseIdentifier: InputField = {
   id: 'purseIdentifierElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Purse Identifier',
   name: 'purse_identifier',
@@ -115,7 +115,7 @@ const purseIdentifier: InputField = {
 const transferAmount: InputField = {
   id: 'transferAmountElt',
   type: 'tel',
-  wrap_class: 'col-sm-3 mb-2',
+  wrap_class: 'col-lg-3 mb-2',
   class: 'form-control',
   label: 'Transfer Amount',
   name: 'transfer_amount',
@@ -130,7 +130,7 @@ const transferAmount: InputField = {
 const paymentAmount: InputField = {
   id: 'paymentAmountElt',
   type: 'tel',
-  wrap_class: 'col-sm-3 mb-2',
+  wrap_class: 'col-lg-3 mb-2',
   class: 'form-control',
   label: 'Payment Amount',
   name: 'payment_amount',
@@ -143,7 +143,7 @@ const paymentAmount: InputField = {
 const ttlInput: InputField = {
   id: 'TTLElt',
   type: 'search',
-  wrap_class: 'col-sm-1 mb-2',
+  wrap_class: 'col-lg-2 mb-2',
   class: 'form-control',
   label: 'TTL',
   name: 'ttl',
@@ -155,7 +155,7 @@ const ttlInput: InputField = {
 const targetAccount: InputField = {
   id: 'targetAccountElt',
   type: 'search',
-  wrap_class: 'col-sm-7',
+  wrap_class: 'col-xl-9',
   class: 'form-control',
   label: 'Target Account',
   name: 'target_account',
@@ -167,7 +167,7 @@ const targetAccount: InputField = {
 const sessionHash: InputField = {
   id: 'sessionHashElt',
   type: 'search',
-  wrap_class: 'col-sm-6 mb-2',
+  wrap_class: 'col-xl-6 mb-2',
   class: 'form-control',
   label: 'Smart Contract hash or Package hash',
   name: 'session_hash',
@@ -180,7 +180,7 @@ const sessionHash: InputField = {
 const callPackage: InputField = {
   id: 'callPackageElt',
   type: 'checkbox',
-  wrap_class: 'col-sm-2 mb-2',
+  wrap_class: 'col-lg-2 mb-2',
   class: 'form-check-input mt-0',
   label: 'Call Package',
   name: 'call_package',
@@ -194,7 +194,7 @@ const callPackage: InputField = {
 const versionInput: InputField = {
   id: 'versionElt',
   type: 'search',
-  wrap_class: 'col-sm-3 mb-2',
+  wrap_class: 'col-lg-3 mb-2',
   class: 'form-control',
   label: 'Version',
   name: 'version',
@@ -207,7 +207,7 @@ const versionInput: InputField = {
 const sessionNameInput: InputField = {
   id: 'sessionNameElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Smart Contract name or Package name',
   name: 'session_name',
@@ -220,7 +220,7 @@ const sessionNameInput: InputField = {
 const entryPointInput: InputField = {
   id: 'entryPointElt',
   type: 'search',
-  wrap_class: 'col-sm-5 mb-2',
+  wrap_class: 'col-lg-5 mb-2',
   class: 'form-control',
   label: 'Entry point',
   name: 'entry_point',
@@ -233,7 +233,7 @@ const entryPointInput: InputField = {
 const argsSimpleInput: InputField = {
   id: 'argsSimpleElt',
   type: 'search',
-  wrap_class: 'col-sm-8 mb-2',
+  wrap_class: 'col-lg-8 mb-2',
   class: 'form-control',
   label: 'Args',
   name: 'args_simple',
@@ -246,7 +246,7 @@ const argsSimpleInput: InputField = {
 const argsJson: InputField = {
   id: 'argsJsonElt',
   type: 'search',
-  wrap_class: 'col-sm-8 mb-2',
+  wrap_class: 'col-lg-8 mb-2',
   class: 'form-control',
   label: 'Args Json',
   name: 'args_json',
@@ -259,7 +259,7 @@ const argsJson: InputField = {
 const deployHash: InputField = {
   id: 'deployHashElt',
   type: 'search',
-  wrap_class: 'col-sm-6',
+  wrap_class: 'col-xl-7',
   class: 'form-control',
   label: 'Deploy Hash',
   name: 'deploy_hash',
@@ -271,7 +271,7 @@ const deployHash: InputField = {
 const finalizedApprovals: InputField = {
   id: 'finalizedApprovalsElt',
   type: 'checkbox',
-  wrap_class: 'col-sm-2',
+  wrap_class: 'col-lg-3 mt-3 mt-xl-0',
   class: 'form-check-input mt-0',
   label: 'Finalized approvals',
   name: 'finalized_approvals',
@@ -284,7 +284,7 @@ const finalizedApprovals: InputField = {
 const seedUref: InputField = {
   id: 'seedUrefElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Dictionary Uref',
   name: 'seed_uref',
@@ -297,7 +297,7 @@ const seedUref: InputField = {
 const seedAccountHash: InputField = {
   id: 'seedAccountHashElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Account Hash',
   name: 'seed_account_hash',
@@ -310,7 +310,7 @@ const seedAccountHash: InputField = {
 const seedContractHash: InputField = {
   id: 'seedContractHashElt',
   type: 'search',
-  wrap_class: 'col-sm-6 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Contract Hash',
   name: 'seed_contract_hash',
@@ -323,7 +323,7 @@ const seedContractHash: InputField = {
 const seedKey: InputField = {
   id: 'seedKeyElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Dictionary Key',
   name: 'seed_key',
@@ -336,7 +336,7 @@ const seedKey: InputField = {
 const seedName: InputField = {
   id: 'seedNameElt',
   type: 'search',
-  wrap_class: 'col-sm-4 mb-2',
+  wrap_class: 'col-lg-6 mb-2',
   class: 'form-control',
   label: 'Dictionary Name',
   name: 'seed_name',
@@ -349,7 +349,7 @@ const seedName: InputField = {
 const itemKey: InputField = {
   id: 'itemKeyElt',
   type: 'search',
-  wrap_class: 'col-sm-6 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Dictionary Item key',
   name: 'item_key',
@@ -362,7 +362,7 @@ const itemKey: InputField = {
 const queryKey: InputField = {
   id: 'queryKeyElt',
   type: 'search',
-  wrap_class: 'col-sm-7 mb-2',
+  wrap_class: 'col-xl-8 mb-2',
   class: 'form-control',
   label: 'Key',
   name: 'query_key',
@@ -380,7 +380,7 @@ const queryContractKey: InputField = {
 const queryPath: InputField = {
   id: 'queryPathElt',
   type: 'search',
-  wrap_class: 'col-sm-4 mb-2',
+  wrap_class: 'col-lg-4 mb-2',
   class: 'form-control',
   label: 'Path',
   name: 'query_path',
@@ -392,7 +392,7 @@ const queryPath: InputField = {
 const deployJson: InputField = {
   id: 'deployJsonElt',
   type: 'textarea',
-  wrap_class: 'col-sm-12',
+  wrap_class: 'col-lg-12',
   class: 'form-control',
   label: 'Deploy as Json string',
   name: 'deploy_json',
@@ -405,7 +405,7 @@ const deployJson: InputField = {
 const selectDictIdentifier: InputField = {
   id: 'selectDictIdentifierElt',
   type: 'textarea',
-  wrap_class: 'mt-3 col-sm-5 mb-4',
+  wrap_class: 'mt-3 col-lg-5 mb-4',
   class: 'form-select form-control form-control-sm',
   label: 'Dictionary identifier',
   label_class: 'input-group-text',

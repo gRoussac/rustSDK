@@ -37,7 +37,7 @@ const imports = [
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   action!: string;
   peers!: PeerEntry[];
-  form: FormGroup<any> = this.formService.form;
+  form: FormGroup = this.formService.form;
 
   @ViewChild('selectDictIdentifierElt') selectDictIdentifierElt!: ElementRef;
 
@@ -103,11 +103,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+
   private async handleAction(action: string, exec?: boolean) {
-    const fn = (this as any)[action];
-    if (typeof fn === 'function') {
+    const fn = (this as unknown as { [key: string]: () => Promise<void>; })[action];
+    if (fn && typeof fn === 'function') {
       if (exec) {
-        await fn.bind(this).call();
+        await fn.bind(this)();
       }
     } else {
       const error = `Method ${action} is not defined on the component.`;
