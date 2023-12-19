@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/key.rs`."><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (a57770440 2023-11-16)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/key.rs`."><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6a6287132 2023-12-17)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -224,7 +225,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::sdk_error::SdkError;
 <span class="kw">use </span>casper_types::Key <span class="kw">as </span>_Key;
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
@@ -241,66 +242,66 @@
         <span class="prelude-val">Ok</span>(Key(key))
     }
 
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-    #[wasm_bindgen(js_name = <span class="string">&quot;toJson&quot;</span>)]
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
     </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         JsValue::from_serde(<span class="self">self</span>).unwrap_or(JsValue::null())
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromURef&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromURef"</span>)]
     </span><span class="kw">pub fn </span>from_uref(key: URef) -&gt; Key {
         Key(_Key::URef(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromDeployInfo&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDeployInfo"</span>)]
     </span><span class="kw">pub fn </span>from_deploy_info(key: DeployHash) -&gt; Key {
         Key(_Key::DeployInfo(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromAccount&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromAccount"</span>)]
     </span><span class="kw">pub fn </span>from_account(key: AccountHash) -&gt; Key {
         Key(_Key::Account(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen]
-    #[wasm_bindgen(js_name = <span class="string">&quot;fromHash&quot;</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"fromHash"</span>)]
     </span><span class="kw">pub fn </span>from_hash(key: HashAddr) -&gt; Key {
         Key(_Key::Hash(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromTransfer&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromTransfer"</span>)]
     </span><span class="kw">pub fn </span>from_transfer(key: Vec&lt;u8&gt;) -&gt; TransferAddr {
         <span class="comment">// TODO Fix with TransferAddr as _TransferAddr, and [u8; 32]
         // Key(_Key::Transfer(key.into()))
         </span>TransferAddr::from(key)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromEraInfo&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromEraInfo"</span>)]
     </span><span class="kw">pub fn </span>from_era_info(key: EraId) -&gt; Key {
         Key(_Key::EraInfo(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromBalance&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromBalance"</span>)]
     </span><span class="kw">pub fn </span>from_balance(key: URefAddr) -&gt; Key {
         Key(_Key::Balance(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromBid&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromBid"</span>)]
     </span><span class="kw">pub fn </span>from_bid(key: AccountHash) -&gt; Key {
         Key(_Key::Bid(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromWithdraw&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromWithdraw"</span>)]
     </span><span class="kw">pub fn </span>from_withdraw(key: AccountHash) -&gt; Key {
         Key(_Key::Withdraw(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromDictionaryAddr&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDictionaryAddr"</span>)]
     </span><span class="kw">pub fn </span>from_dictionary_addr(key: DictionaryAddr) -&gt; Key {
         Key(_Key::Dictionary(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;asDictionaryAddr&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"asDictionaryAddr"</span>)]
     </span><span class="kw">pub fn </span>as_dictionary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DictionaryAddr&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
             _Key::Dictionary(v) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>v).into()),
@@ -308,63 +309,63 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromSystemContractRegistry&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromSystemContractRegistry"</span>)]
     </span><span class="kw">pub fn </span>from_system_contract_registry() -&gt; Key {
         Key(_Key::SystemContractRegistry)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromEraSummary&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromEraSummary"</span>)]
     </span><span class="kw">pub fn </span>from_era_summary() -&gt; Key {
         Key(_Key::EraSummary)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromUnbond&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromUnbond"</span>)]
     </span><span class="kw">pub fn </span>from_unbond(key: AccountHash) -&gt; Key {
         Key(_Key::Unbond(key.into()))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromChainspecRegistry&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromChainspecRegistry"</span>)]
     </span><span class="kw">pub fn </span>from_chainspec_registry() -&gt; Key {
         Key(_Key::ChainspecRegistry)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromChecksumRegistry&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromChecksumRegistry"</span>)]
     </span><span class="kw">pub fn </span>from_checksum_registry() -&gt; Key {
         Key(_Key::ChecksumRegistry)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;toFormattedString&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toFormattedString"</span>)]
     </span><span class="kw">pub fn </span>to_formatted_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         _Key::to_formatted_string(<span class="self">self</span>.<span class="number">0</span>)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromFormattedString&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromFormattedString"</span>)]
     </span><span class="kw">pub fn </span>from_formatted_str_js_alias(input: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;Key, JsValue&gt; {
         <span class="kw">let </span>input_string = input.as_string();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(input_string) = input_string {
             Key::from_formatted_str(<span class="kw-2">&amp;</span>input_string)
                 .map_err(|err| {
-                    error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Error parsing Key from formatted string, {}&quot;</span>, err));
+                    error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing Key from formatted string, {}"</span>, err));
                     JsValue::null()
                 })
                 .map(Into::into)
         } <span class="kw">else </span>{
-            error(<span class="string">&quot;Input is not a string&quot;</span>);
+            error(<span class="string">"Input is not a string"</span>);
             <span class="prelude-val">Err</span>(JsValue::null())
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;fromDictionaryKey&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDictionaryKey"</span>)]
     </span><span class="kw">pub fn </span>from_dictionary_key(seed_uref: URef, dictionary_item_key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
         _Key::dictionary(seed_uref.into(), dictionary_item_key).into()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;isDictionaryKey&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"isDictionaryKey"</span>)]
     </span><span class="kw">pub fn </span>is_dictionary_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, _Key::Dictionary(<span class="kw">_</span>))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;intoAccount&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"intoAccount"</span>)]
     </span><span class="kw">pub fn </span>into_account(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AccountHash&gt; {
         <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
             _Key::Account(bytes) =&gt; <span class="prelude-val">Some</span>(bytes.into()),
@@ -372,7 +373,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;intoHash&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"intoHash"</span>)]
     </span><span class="kw">pub fn </span>into_hash(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HashAddr&gt; {
         <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
             _Key::Hash(hash) =&gt; <span class="prelude-val">Some</span>(hash.into()),
@@ -380,7 +381,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;asBalance&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"asBalance"</span>)]
     </span><span class="kw">pub fn </span>as_balance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;URefAddr&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
             _Key::Balance(v) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>v).into()),
@@ -388,7 +389,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;intoURef&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"intoURef"</span>)]
     </span><span class="kw">pub fn </span>into_uref(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;URef&gt; {
         <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
             _Key::URef(uref) =&gt; <span class="prelude-val">Some</span>(uref.into()),
@@ -396,7 +397,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;urefToHash&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"urefToHash"</span>)]
     </span><span class="kw">pub fn </span>uref_to_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Key&gt; {
         <span class="kw">if let </span>_Key::URef(uref) = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
             <span class="kw">let </span>addr = uref.addr();
@@ -405,7 +406,7 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;withdrawToUnbond&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withdrawToUnbond"</span>)]
     </span><span class="kw">pub fn </span>withdraw_to_unbond(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Key&gt; {
         <span class="kw">if let </span>_Key::Withdraw(account_hash) = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Some</span>(Key(_Key::Unbond(<span class="kw-2">*</span>account_hash)));
@@ -419,7 +420,7 @@
         _Key::from_formatted_str(input)
             .map(Into::into)
             .map_err(|error| SdkError::FailedToParseKey {
-                context: <span class="string">&quot;Key from formatted string&quot;</span>,
+                context: <span class="string">"Key from formatted string"</span>,
                 error,
             })
     }
