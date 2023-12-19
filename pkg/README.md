@@ -1293,6 +1293,13 @@ make integration-test
 - [Jest/Puppeteer E2E tests](tests/e2e/) can be run with
 
 ```shell
+cd tests/e2e/puppeteer
+npm install
+```
+
+then
+
+```shell
 make e2e-test
 ```
 

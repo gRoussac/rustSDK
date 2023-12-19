@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_era_info.rs`."><title>get_era_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (a57770440 2023-11-16)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_era_info.rs`."><title>get_era_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6a6287132 2023-12-17)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -232,9 +233,9 @@
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -245,33 +246,33 @@
     cli::get_era_info <span class="kw">as </span>get_era_info_cli, get_era_info <span class="kw">as </span>get_era_info_lib,
     rpcs::results::GetEraInfoResult <span class="kw">as </span>_GetEraInfoResult, JsonRpcId, SuccessResponse,
 };
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>rand::Rng;
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 </span><span class="kw">pub struct </span>GetEraInfoResult(_GetEraInfoResult);
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">impl </span>From&lt;GetEraInfoResult&gt; <span class="kw">for </span>_GetEraInfoResult {
     <span class="kw">fn </span>from(result: GetEraInfoResult) -&gt; <span class="self">Self </span>{
         result.<span class="number">0
     </span>}
 }
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">impl </span>From&lt;_GetEraInfoResult&gt; <span class="kw">for </span>GetEraInfoResult {
     <span class="kw">fn </span>from(result: _GetEraInfoResult) -&gt; <span class="self">Self </span>{
         GetEraInfoResult(result)
     }
 }
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 #[wasm_bindgen]
 </span><span class="kw">impl </span>GetEraInfoResult {
     <span class="attr">#[wasm_bindgen(getter)]
@@ -284,15 +285,15 @@
         JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.era_summary).unwrap()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;toJson&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
     </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).unwrap_or(JsValue::null())
     }
 }
 
 <span class="attr">#[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-#[wasm_bindgen(js_name = <span class="string">&quot;getEraInfoOptions&quot;</span>, getter_with_clone)]
+#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+#[wasm_bindgen(js_name = <span class="string">"getEraInfoOptions"</span>, getter_with_clone)]
 </span><span class="kw">pub struct </span>GetEraInfoOptions {
     <span class="kw">pub </span>maybe_block_id_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifier&gt;,
@@ -300,19 +301,19 @@
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 #[wasm_bindgen]
 </span><span class="kw">impl </span>SDK {
-    <span class="attr">#[deprecated(note = <span class="string">&quot;prefer &#39;get_era_summary&#39; as it doesn&#39;t require a switch block&quot;</span>)]
+    <span class="attr">#[deprecated(note = <span class="string">"prefer 'get_era_summary' as it doesn't require a switch block"</span>)]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = <span class="string">&quot;get_era_info_options&quot;</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"get_era_info_options"</span>)]
     </span><span class="kw">pub fn </span>get_era_info_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetEraInfoOptions {
         options.into_serde().unwrap_or_default()
     }
 
-    <span class="attr">#[deprecated(note = <span class="string">&quot;prefer &#39;get_era_summary&#39; as it doesn&#39;t require a switch block&quot;</span>)]
+    <span class="attr">#[deprecated(note = <span class="string">"prefer 'get_era_summary' as it doesn't require a switch block"</span>)]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = <span class="string">&quot;get_era_info&quot;</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"get_era_info"</span>)]
     </span><span class="kw">pub async fn </span>get_era_info_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         options: <span class="prelude-ty">Option</span>&lt;GetEraInfoOptions&gt;,
@@ -337,7 +338,7 @@
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Error occurred with {:?}&quot;</span>, err);
+                <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
                 error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
@@ -346,7 +347,7 @@
 }
 
 <span class="kw">impl </span>SDK {
-    <span class="attr">#[deprecated(note = <span class="string">&quot;prefer &#39;get_era_summary&#39; as it doesn&#39;t require a switch block&quot;</span>)]
+    <span class="attr">#[deprecated(note = <span class="string">"prefer 'get_era_summary' as it doesn't require a switch block"</span>)]
     #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>get_era_info(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -354,7 +355,7 @@
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
         node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetEraInfoResult&gt;, SdkError&gt; {
-        <span class="comment">//log(&quot;get_era_info!&quot;);
+        <span class="comment">//log("get_era_info!");
 
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_era_info_cli(
@@ -400,7 +401,7 @@
     </span><span class="kw">async fn </span>test_get_era_info_with_none_values() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>error_message = <span class="string">&quot;builder error: relative URL without a base&quot;</span>.to_string();
+        <span class="kw">let </span>error_message = <span class="string">"builder error: relative URL without a base"</span>.to_string();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk.get_era_info(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
@@ -453,9 +454,9 @@
     <span class="attr">#[tokio::test]
     #[allow(deprecated)]
     </span><span class="kw">async fn </span>test_get_era_info_with_error() {
-        <span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">&quot;http://localhost&quot;</span>.to_string()), <span class="prelude-val">None</span>);
+        <span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span>error_message = <span class="string">&quot;error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)&quot;</span>.to_string();
+        <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)"</span>.to_string();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk.get_era_info(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;

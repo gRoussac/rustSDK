@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/deploy_params/dictionary_item_str_params.rs`."><title>dictionary_item_str_params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (a57770440 2023-11-16)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/deploy_params/dictionary_item_str_params.rs`."><title>dictionary_item_str_params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6a6287132 2023-12-17)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -391,7 +392,7 @@
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{debug::error, helpers::get_str_or_default, types::sdk_error::SdkError};
 <span class="kw">use </span>casper_client::cli::DictionaryItemStrParams <span class="kw">as </span>_DictionaryItemStrParams;
 <span class="kw">use </span>casper_types::URef;
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>serde::{de::Error <span class="kw">as </span>SerdeError, Deserialize, Serialize, Serializer};
@@ -399,56 +400,56 @@
 
 <span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>AccountNamedKey {
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>key: OnceCell&lt;String&gt;,
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>dictionary_name: OnceCell&lt;String&gt;,
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>dictionary_item_key: OnceCell&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ContractNamedKey {
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>key: OnceCell&lt;String&gt;,
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>dictionary_name: OnceCell&lt;String&gt;,
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>dictionary_item_key: OnceCell&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>URefVariant {
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>seed_uref: OnceCell&lt;String&gt;,
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>dictionary_item_key: OnceCell&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>DictionaryVariant {
-    <span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_once_cell&quot;</span>)]
-    #[serde(deserialize_with = <span class="string">&quot;deserialize_once_cell&quot;</span>)]
+    <span class="attr">#[serde(serialize_with = <span class="string">"serialize_once_cell"</span>)]
+    #[serde(deserialize_with = <span class="string">"deserialize_once_cell"</span>)]
     </span>value: OnceCell&lt;String&gt;,
 }
 
-<span class="kw">fn </span>deserialize_once_cell&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;OnceCell&lt;String&gt;, D::Error&gt;
+<span class="kw">fn </span>deserialize_once_cell&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;OnceCell&lt;String&gt;, D::Error&gt;
 <span class="kw">where
-    </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+    </span>D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;,
 {
     <span class="kw">let </span>value: String = Deserialize::deserialize(deserializer)<span class="question-mark">?</span>;
     <span class="kw">let </span>cell = OnceCell::new();
     cell.set(value)
         .map(|<span class="kw">_</span>| cell)
-        .map_err(|<span class="kw">_</span>| SerdeError::custom(<span class="string">&quot;Could not deser DictionaryItemStrParams&quot;</span>))
+        .map_err(|<span class="kw">_</span>| SerdeError::custom(<span class="string">"Could not deser DictionaryItemStrParams"</span>))
 }
 
 <span class="kw">fn </span>serialize_once_cell&lt;S&gt;(value: <span class="kw-2">&amp;</span>OnceCell&lt;String&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
@@ -480,7 +481,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;setAccountNamedKey&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setAccountNamedKey"</span>)]
     </span><span class="kw">pub fn </span>set_account_named_key(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         key: <span class="kw-2">&amp;</span>str,
@@ -504,7 +505,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;setContractNamedKey&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setContractNamedKey"</span>)]
     </span><span class="kw">pub fn </span>set_contract_named_key(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         key: <span class="kw-2">&amp;</span>str,
@@ -528,7 +529,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;setUref&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setUref"</span>)]
     </span><span class="kw">pub fn </span>set_uref(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed_uref: <span class="kw-2">&amp;</span>str, dictionary_item_key: <span class="kw-2">&amp;</span>str) {
         <span class="self">self</span>.uref = <span class="prelude-val">Some</span>(URefVariant {
             seed_uref: OnceCell::new(),
@@ -537,7 +538,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(uref) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.uref {
             <span class="kw">let </span>seed_uref = URef::from_formatted_str(seed_uref)
                 .map_err(|error| SdkError::FailedToParseURef {
-                    context: <span class="string">&quot;dictionary item uref&quot;</span>,
+                    context: <span class="string">"dictionary item uref"</span>,
                     error,
                 })
                 .unwrap();
@@ -548,7 +549,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;setDictionary&quot;</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setDictionary"</span>)]
     </span><span class="kw">pub fn </span>set_dictionary(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) {
         <span class="self">self</span>.dictionary = <span class="prelude-val">Some</span>(DictionaryVariant {
             value: OnceCell::new(),
@@ -559,8 +560,8 @@
         }
     }
 
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-    #[wasm_bindgen(js_name = <span class="string">&quot;toJson&quot;</span>)]
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
     </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         JsValue::from_serde(<span class="self">self</span>).unwrap_or(JsValue::null())
     }
@@ -589,7 +590,7 @@
 
 <span class="kw">pub fn </span>dictionary_item_str_params_to_casper_client(
     dictionary_item_params: <span class="kw-2">&amp;</span>DictionaryItemStrParams,
-) -&gt; _DictionaryItemStrParams&lt;<span class="lifetime">&#39;_</span>&gt; {
+) -&gt; _DictionaryItemStrParams&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(account_named_key) = <span class="kw-2">&amp;</span>dictionary_item_params.account_named_key {
         <span class="kw">let </span>account_hash = get_str_or_default(account_named_key.key.get());
         <span class="kw">let </span>dictionary_name = get_str_or_default(account_named_key.dictionary_name.get());
@@ -619,8 +620,8 @@
         <span class="kw">let </span>value = get_str_or_default(dictionary_variant.value.get());
         <span class="kw">return </span>_DictionaryItemStrParams::Dictionary(value);
     } <span class="kw">else </span>{
-        error(<span class="string">&quot;Error converting dictionary_item_params&quot;</span>);
-        <span class="kw">return </span>_DictionaryItemStrParams::Dictionary(<span class="string">&quot;&quot;</span>);
+        error(<span class="string">"Error converting dictionary_item_params"</span>);
+        <span class="kw">return </span>_DictionaryItemStrParams::Dictionary(<span class="string">""</span>);
     }
 }
 
@@ -638,15 +639,15 @@
         };
         account_named_key
             .key
-            .set(<span class="string">&quot;account_key&quot;</span>.to_string())
+            .set(<span class="string">"account_key"</span>.to_string())
             .unwrap();
         account_named_key
             .dictionary_name
-            .set(<span class="string">&quot;test_dict&quot;</span>.to_string())
+            .set(<span class="string">"test_dict"</span>.to_string())
             .unwrap();
         account_named_key
             .dictionary_item_key
-            .set(<span class="string">&quot;item_key&quot;</span>.to_string())
+            .set(<span class="string">"item_key"</span>.to_string())
             .unwrap();
 
         <span class="kw">let </span>dictionary_item_params = DictionaryItemStrParams {
@@ -662,11 +663,11 @@
             dictionary_item_key,
         } = dictionary_item_str_params_to_casper_client(<span class="kw-2">&amp;</span>dictionary_item_params)
         {
-            <span class="macro">assert_eq!</span>(account_hash, <span class="string">&quot;account_key&quot;</span>);
-            <span class="macro">assert_eq!</span>(dictionary_name, <span class="string">&quot;test_dict&quot;</span>);
-            <span class="macro">assert_eq!</span>(dictionary_item_key, <span class="string">&quot;item_key&quot;</span>);
+            <span class="macro">assert_eq!</span>(account_hash, <span class="string">"account_key"</span>);
+            <span class="macro">assert_eq!</span>(dictionary_name, <span class="string">"test_dict"</span>);
+            <span class="macro">assert_eq!</span>(dictionary_item_key, <span class="string">"item_key"</span>);
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unexpected enum variant&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Unexpected enum variant"</span>);
         }
 
         <span class="comment">// Test case with ContractNamedKey variant
@@ -677,15 +678,15 @@
         };
         contract_named_key
             .key
-            .set(<span class="string">&quot;contract_key&quot;</span>.to_string())
+            .set(<span class="string">"contract_key"</span>.to_string())
             .unwrap();
         contract_named_key
             .dictionary_name
-            .set(<span class="string">&quot;test_contract_dict&quot;</span>.to_string())
+            .set(<span class="string">"test_contract_dict"</span>.to_string())
             .unwrap();
         contract_named_key
             .dictionary_item_key
-            .set(<span class="string">&quot;contract_item_key&quot;</span>.to_string())
+            .set(<span class="string">"contract_item_key"</span>.to_string())
             .unwrap();
 
         <span class="kw">let </span>dictionary_item_params = DictionaryItemStrParams {
@@ -701,11 +702,11 @@
             dictionary_item_key,
         } = dictionary_item_str_params_to_casper_client(<span class="kw-2">&amp;</span>dictionary_item_params)
         {
-            <span class="macro">assert_eq!</span>(hash_addr, <span class="string">&quot;contract_key&quot;</span>);
-            <span class="macro">assert_eq!</span>(dictionary_name, <span class="string">&quot;test_contract_dict&quot;</span>);
-            <span class="macro">assert_eq!</span>(dictionary_item_key, <span class="string">&quot;contract_item_key&quot;</span>);
+            <span class="macro">assert_eq!</span>(hash_addr, <span class="string">"contract_key"</span>);
+            <span class="macro">assert_eq!</span>(dictionary_name, <span class="string">"test_contract_dict"</span>);
+            <span class="macro">assert_eq!</span>(dictionary_item_key, <span class="string">"contract_item_key"</span>);
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unexpected enum variant&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Unexpected enum variant"</span>);
         }
 
         <span class="comment">// Test case with URef variant
@@ -713,10 +714,10 @@
             seed_uref: OnceCell::new(),
             dictionary_item_key: OnceCell::new(),
         };
-        uref_variant.seed_uref.set(<span class="string">&quot;seed_uref&quot;</span>.to_string()).unwrap();
+        uref_variant.seed_uref.set(<span class="string">"seed_uref"</span>.to_string()).unwrap();
         uref_variant
             .dictionary_item_key
-            .set(<span class="string">&quot;uref_item_key&quot;</span>.to_string())
+            .set(<span class="string">"uref_item_key"</span>.to_string())
             .unwrap();
 
         <span class="kw">let </span>dictionary_item_params = DictionaryItemStrParams {
@@ -731,10 +732,10 @@
             dictionary_item_key,
         } = dictionary_item_str_params_to_casper_client(<span class="kw-2">&amp;</span>dictionary_item_params)
         {
-            <span class="macro">assert_eq!</span>(seed_uref, <span class="string">&quot;seed_uref&quot;</span>);
-            <span class="macro">assert_eq!</span>(dictionary_item_key, <span class="string">&quot;uref_item_key&quot;</span>);
+            <span class="macro">assert_eq!</span>(seed_uref, <span class="string">"seed_uref"</span>);
+            <span class="macro">assert_eq!</span>(dictionary_item_key, <span class="string">"uref_item_key"</span>);
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unexpected enum variant&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Unexpected enum variant"</span>);
         }
 
         <span class="comment">// Test case with Dictionary variant
@@ -743,7 +744,7 @@
         };
         dictionary_variant
             .value
-            .set(<span class="string">&quot;dictionary_value&quot;</span>.to_string())
+            .set(<span class="string">"dictionary_value"</span>.to_string())
             .unwrap();
 
         <span class="kw">let </span>dictionary_item_params = DictionaryItemStrParams {
@@ -756,9 +757,9 @@
         <span class="kw">if let </span>_DictionaryItemStrParams::Dictionary(value) =
             dictionary_item_str_params_to_casper_client(<span class="kw-2">&amp;</span>dictionary_item_params)
         {
-            <span class="macro">assert_eq!</span>(value, <span class="string">&quot;dictionary_value&quot;</span>);
+            <span class="macro">assert_eq!</span>(value, <span class="string">"dictionary_value"</span>);
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unexpected enum variant&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Unexpected enum variant"</span>);
         }
 
         <span class="comment">// Test case with invalid variant
@@ -772,9 +773,9 @@
         <span class="kw">if let </span>_DictionaryItemStrParams::Dictionary(value) =
             dictionary_item_str_params_to_casper_client(<span class="kw-2">&amp;</span>invalid_params)
         {
-            <span class="macro">assert_eq!</span>(value, <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_eq!</span>(value, <span class="string">""</span>);
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unexpected enum variant&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Unexpected enum variant"</span>);
         }
     }
 }

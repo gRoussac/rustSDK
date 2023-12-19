@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/query_global_state.rs`."><title>query_global_state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (a57770440 2023-11-16)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/query_global_state.rs`."><title>query_global_state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6a6287132 2023-12-17)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -595,7 +596,7 @@
     query_global_state <span class="kw">as </span>query_global_state_lib,
     rpcs::results::QueryGlobalStateResult <span class="kw">as </span>_QueryGlobalStateResult, JsonRpcId, SuccessResponse,
 };
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>rand::Rng;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -618,7 +619,7 @@
     }
 }
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 #[wasm_bindgen]
 </span><span class="kw">impl </span>QueryGlobalStateResult {
     <span class="doccomment">/// Gets the API version as a JsValue.
@@ -646,7 +647,7 @@
     }
 
     <span class="doccomment">/// Converts the QueryGlobalStateResult to a JsValue.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;toJson&quot;</span>)]
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
     </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).unwrap_or(JsValue::null())
     }
@@ -654,7 +655,7 @@
 
 <span class="doccomment">/// Options for the `query_global_state` method.
 </span><span class="attr">#[derive(Debug, Deserialize, Clone, Default, Serialize)]
-#[wasm_bindgen(js_name = <span class="string">&quot;queryGlobalStateOptions&quot;</span>, getter_with_clone)]
+#[wasm_bindgen(js_name = <span class="string">"queryGlobalStateOptions"</span>, getter_with_clone)]
 </span><span class="kw">pub struct </span>QueryGlobalStateOptions {
     <span class="kw">pub </span>global_state_identifier: <span class="prelude-ty">Option</span>&lt;GlobalStateIdentifier&gt;,
     <span class="kw">pub </span>state_root_hash_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -668,7 +669,7 @@
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 #[wasm_bindgen]
 </span><span class="kw">impl </span>SDK {
     <span class="doccomment">/// Parses query global state options from a JsValue.
@@ -680,13 +681,13 @@
     /// # Returns
     ///
     /// Parsed query global state options as a `QueryGlobalStateOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;query_global_state_options&quot;</span>)]
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_global_state_options"</span>)]
     </span><span class="kw">pub fn </span>query_global_state_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; QueryGlobalStateOptions {
         <span class="kw">let </span>options_result = options.into_serde::&lt;QueryGlobalStateOptions&gt;();
         <span class="kw">match </span>options_result {
             <span class="prelude-val">Ok</span>(options) =&gt; options,
             <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Error deserializing options: {:?}&quot;</span>, err));
+                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
                 QueryGlobalStateOptions::default()
             }
         }
@@ -705,7 +706,7 @@
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">&quot;query_global_state&quot;</span>)]
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_global_state"</span>)]
     </span><span class="kw">pub async fn </span>query_global_state_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         options: <span class="prelude-ty">Option</span>&lt;QueryGlobalStateOptions&gt;,
@@ -716,14 +717,14 @@
                 <span class="kw">match </span>result {
                     <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
                     <span class="prelude-val">Err</span>(err) =&gt; {
-                        <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Error occurred with {:?}&quot;</span>, err);
+                        <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
                         error(err);
                         <span class="prelude-val">Err</span>(JsError::new(err))
                     }
                 }
             }
             <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Error building parameters: {:?}&quot;</span>, err);
+                <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error building parameters: {:?}"</span>, err);
                 error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
@@ -789,10 +790,10 @@
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(key_as_string) = key_as_string {
             <span class="prelude-val">Some</span>(KeyIdentifierInput::String(key_as_string))
         } <span class="kw">else </span>{
-            <span class="kw">let </span>err_msg = <span class="string">&quot;Error: Missing Key as string or Key&quot;</span>.to_string();
+            <span class="kw">let </span>err_msg = <span class="string">"Error: Missing Key as string or Key"</span>.to_string();
             error(<span class="kw-2">&amp;</span>err_msg);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::InvalidArgument {
-                context: <span class="string">&quot;query_global_state_js_alias_params&quot;</span>,
+                context: <span class="string">"query_global_state_js_alias_params"</span>,
                 error: err_msg,
             });
         };
@@ -876,7 +877,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         query_params: QueryGlobalStateParams,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_QueryGlobalStateResult&gt;, SdkError&gt; {
-        <span class="comment">//log(&quot;query_global_state!&quot;);
+        <span class="comment">//log("query_global_state!");
 
         </span><span class="kw">let </span>QueryGlobalStateParams {
             key,
@@ -897,10 +898,10 @@
         };
 
         <span class="kw">if </span>key.is_none() {
-            <span class="kw">let </span>err = <span class="string">&quot;Error: Missing key from formatted string&quot;</span>;
+            <span class="kw">let </span>err = <span class="string">"Error: Missing key from formatted string"</span>;
             error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::InvalidArgument {
-                context: <span class="string">&quot;query_global_state&quot;</span>,
+                context: <span class="string">"query_global_state"</span>,
                 error: err.to_string(),
             });
         }
@@ -939,7 +940,7 @@
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
                 <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
-                <span class="string">&quot;&quot;</span>,
+                <span class="string">""</span>,
                 <span class="kw-2">&amp;</span>state_root_hash,
                 <span class="kw-2">&amp;</span>key.unwrap().to_formatted_string(),
                 <span class="kw-2">&amp;</span>path_str,
@@ -952,7 +953,7 @@
                 <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="kw-2">&amp;</span>maybe_block_id,
-                <span class="string">&quot;&quot;</span>,
+                <span class="string">""</span>,
                 <span class="kw-2">&amp;</span>key.unwrap().to_formatted_string(),
                 <span class="kw-2">&amp;</span>path_str,
             )
@@ -972,13 +973,13 @@
                         state_root_hash.result.state_root_hash.unwrap().into();
                     state_root_hash.to_string()
                 }
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;&quot;</span>.to_string(),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="string">""</span>.to_string(),
             };
             query_global_state_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
                 <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
-                <span class="string">&quot;&quot;</span>,
+                <span class="string">""</span>,
                 <span class="kw-2">&amp;</span>state_root_hash_as_string,
                 <span class="kw-2">&amp;</span>key.unwrap().to_formatted_string(),
                 <span class="kw-2">&amp;</span>path_str,
@@ -1006,7 +1007,7 @@
 
     <span class="kw">fn </span>get_key_input() -&gt; KeyIdentifierInput {
         <span class="kw">let </span>private_key =
-            read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}&quot;</span>)).unwrap();
+            read_pem_file(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"</span>)).unwrap();
         <span class="kw">let </span>account = public_key_from_private_key(<span class="kw-2">&amp;</span>private_key).unwrap();
         <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
         KeyIdentifierInput::String(public_key.to_account_hash().to_formatted_string())
@@ -1016,7 +1017,7 @@
     </span><span class="kw">async fn </span>test_query_global_state_with_none_values() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>error_message = <span class="string">&quot;builder error: relative URL without a base&quot;</span>.to_string();
+        <span class="kw">let </span>error_message = <span class="string">"builder error: relative URL without a base"</span>.to_string();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -1042,7 +1043,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>error_message =
-            <span class="string">&quot;Invalid argument &#39;query_global_state&#39;: Error: Missing key from formatted string&quot;
+            <span class="string">"Invalid argument 'query_global_state': Error: Missing key from formatted string"
                 </span>.to_string();
 
         <span class="comment">// Act
@@ -1134,7 +1135,7 @@
                 path: <span class="prelude-val">None</span>,
                 maybe_global_state_identifier: <span class="prelude-val">None</span>,
                 state_root_hash: <span class="prelude-val">None</span>,
-                maybe_block_id: <span class="prelude-val">Some</span>(<span class="string">&quot;1&quot;</span>.to_string()),
+                maybe_block_id: <span class="prelude-val">Some</span>(<span class="string">"1"</span>.to_string()),
                 verbosity,
                 node_address: node_address.clone(),
             })
@@ -1146,9 +1147,9 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_query_global_state_with_error() {
-        <span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">&quot;http://localhost&quot;</span>.to_string()), <span class="prelude-val">None</span>);
+        <span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span>error_message = <span class="string">&quot;error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)&quot;</span>.to_string();
+        <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)"</span>.to_string();
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
             .query_global_state(QueryGlobalStateParams {
