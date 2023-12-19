@@ -11,18 +11,19 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^26.1.0",
-    "electron-builder": "^24.6.3",
-    "electron-updater": "^6.1.1"
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-updater": "^6.1.7"
   },
   "build": {
     "appId": "com.example.myapp",
     "productName": "Casper",
+    "compression": "maximum",
     "directories": {
       "output": "release"
     },
     "win": {
-      "target": "nsis",
+      "target": "portable",
       "icon": "favicon.png"
     },
     "linux": {

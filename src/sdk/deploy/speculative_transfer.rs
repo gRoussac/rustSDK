@@ -283,7 +283,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
 
-        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\"]".to_string();
+        let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]".to_string();
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
         let account = public_key_from_private_key(&private_key).unwrap();
