@@ -13,7 +13,7 @@ describe('Angular App Tests', () => {
       width: 1920,
       height: 1080,
     });
-    // page
+    // test.page
     //   .on('console', (message: { type: () => string; text: () => any; }) =>
     //     console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
     //   .on('pageerror', (message: any) => console.log(message))
@@ -140,6 +140,7 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
       await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
       await setWasm(config.contract_cep78);
+
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
       let deploy = await test.page.evaluate(() => {
@@ -613,7 +614,7 @@ describe('Angular App Tests', () => {
       await getResult();
     });
 
-    it(`should query_global_state with ${config.test_hello_key}`, async () => {
+    it(`should query_global_state with test_hello_key`, async () => {
       await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHashElt"]');
@@ -626,13 +627,13 @@ describe('Angular App Tests', () => {
     });
 
     it(`should query_global_state with nft key`, async () => {
+      await clearInput('[e2e-id="queryPathElt"]');
       await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="queryKeyElt"]');
       await test.page.type('[e2e-id="queryKeyElt"]', test.account_hash);
-      await clearInput('[e2e-id="queryPathElt"]');
       await submit();
       await getResult();
       let result = await test.page.evaluate(() => {
@@ -642,8 +643,10 @@ describe('Angular App Tests', () => {
       expect(result_json?.stored_value.Account.named_keys).toBeDefined();
       let named_keys = result_json?.stored_value.Account.named_keys as Array<{ name: string; key: string; }>;
       test.contract_cep78_hash = named_keys.find(key => key.name === config.contract_cep78_key)?.key || '';
+      test.contract_cep78_package_hash = named_keys.find(key => key.name === config.package_cep78_key)?.key || '';
       expect(test.contract_cep78_hash).toBeDefined();
       expect(test.contract_cep78_hash).toBeTruthy();
+      await clearInput('[e2e-id="queryPathElt"]');
       await test.page.type('[e2e-id="queryPathElt"]', config.contract_cep78_key + '/collection_name');
       await clear();
       await submit();
@@ -687,6 +690,9 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.waitForSelector('[e2e-id="queryPathElt"]');
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="queryKeyElt"]');
+      await clearInput('[e2e-id="queryPathElt"]');
     });
 
     afterEach(async () => {
@@ -702,7 +708,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should query_contract_key with contract hash without state root hash', async () => {
-      await clearInput('[e2e-id="stateRootHashElt"]');
       await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
       await test.page.type('[e2e-id="queryPathElt"]', 'installer');
       await submit();
@@ -710,7 +715,6 @@ describe('Angular App Tests', () => {
     });
 
     it('should query_contract_key to get dictionary uref', async () => {
-      await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
       await submit();
       await getResult();
@@ -740,6 +744,7 @@ describe('Angular App Tests', () => {
     afterEach(async () => {
       await clear();
     });
+
     it('should call entry point with contract hash', async () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
       await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
@@ -815,7 +820,7 @@ describe('Angular App Tests', () => {
       let args_simple_mint =
         `token_meta_data:String='test_meta_data',token_owner:Key='${test.account_hash}'`;
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
-      await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
+      await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_package_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
       await test.page.type('[e2e-id="argsSimpleElt"]', args_simple_mint);
       await test.page.waitForSelector('[e2e-id="callPackageElt"]');
@@ -908,7 +913,7 @@ describe('Angular App Tests', () => {
 
     it('should make_deploy with package hash and args simple', async () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
-      await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
+      await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_package_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
       await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
       await test.page.waitForSelector('[e2e-id="callPackageElt"]');
@@ -1142,7 +1147,7 @@ describe('Angular App Tests', () => {
 
     it('should deploy with package hash and args simple', async () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
-      await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_hash);
+      await test.page.type('[e2e-id="sessionHashElt"]', test.contract_cep78_package_hash);
       await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
       await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
       await test.page.waitForSelector('[e2e-id="callPackageElt"]');
@@ -1244,9 +1249,11 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
     });
+
     afterEach(async () => {
       await clear();
     });
+
     it('should get_dictionary_item with contract hash with state root hash', async () => {
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
@@ -1255,6 +1262,7 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
       await test.page.type('[e2e-id="seedNameElt"]', 'events');
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
+      await clearInput('[e2e-id="itemKeyElt"]');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();
@@ -1278,6 +1286,7 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
       await test.page.select('[e2e-id="selectDictIdentifierElt"]', "newFromDictionaryKey");
       await test.page.waitForSelector('[e2e-id="seedKeyElt"]');
+      await clearInput('[e2e-id="seedKeyElt"]');
       await test.page.type('[e2e-id="seedKeyElt"]', test.dictionary_key);
       await submit();
       await getResult();
@@ -1289,6 +1298,7 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="seedUrefElt"]');
       await test.page.type('[e2e-id="seedUrefElt"]', test.dictionary_uref);
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
+      await clearInput('[e2e-id="itemKeyElt"]');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
       await submit();
       await getResult();

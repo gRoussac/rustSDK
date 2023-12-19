@@ -1,14 +1,21 @@
+import { Verbosity } from "casper-sdk";
+
 export type EnvironmentConfig = {
-  [key: string]: string | object;
+  [key: string]: string | object | Verbosity;
 };
+
+const action_needs_private_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec', 'sign_deploy', 'call_entrypoint', 'install'];
+const action_needs_public_key = ['make_deploy', 'make_transfer', ...action_needs_private_key];
+
 export const config: EnvironmentConfig = {
   wasm_asset_path: 'assets/casper_rust_wasm_sdk_bg.wasm',
-  verbosity: 'High',
+  default_action: 'get_node_status',
+  verbosity: Verbosity.High,
   minimum_transfer: '2500000000',
   TTL: '30m',
   gas_fee_transfer: '100000000',
-  block_identifier_height_default: '1958541',
-  block_identifier_hash: '372e4c83a6ca19c027d3daf4807ad8fc16b9f01411ef39d5e00888128bf4fd59',
+  action_needs_private_key,
+  action_needs_public_key,
   networks: {
     localhost: {
       node_address: 'http://localhost:11101',
@@ -30,5 +37,7 @@ export const config: EnvironmentConfig = {
       node_address: 'http://3.136.227.9:7777',
       chain_name: 'integration-test'
     },
-  }
+  },
+  default_port: '7777',
+  default_protocol: 'http://',
 };

@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div
+      class="alert alert-success d-flex flex-md-row flex-column justify-content-between align-items-center mb-1 mb-md-3"
+      *ngIf="state_root_hash"
+    >
+      <span class="ellipsis-container" e2e-id="state_root_hash"
+        >state root hash is {{ state_root_hash }}</span
+      >
+      <button class="btn me-0" (click)="get_state_root_hash()">Refresh</button>
+    </div>
+    <div class="alert alert-warning d-flex mb-1 mb-md-3" *ngIf="account_hash">
+      <span class="ellipsis-container" e2e-id="account_hash"
+        >account hash is {{ account_hash }}</span
+      >
+    </div>
+    <div class="alert alert-warning d-flex mb-1 mb-md-3" *ngIf="main_purse">
+      <span class="ellipsis-container" e2e-id="main_purse"
+        >main purse is {{ main_purse }}</span
+      >
+    </div>
+  </div>
+</div>

@@ -22,6 +22,7 @@ export const variables = {
   dictionary_key: '',
   dictionary_uref: '',
   contract_cep78_hash: '',
+  contract_cep78_package_hash: '',
   delete_key_at_root_after_test: false,
   sdk: undefined as typeof SDK | undefined,
 };
@@ -39,10 +40,11 @@ export async function clear() {
 
 export async function clearInput(id: string) {
   await variables.page.waitForSelector(id);
-  await variables.page.$eval(id, (input: { value: string; }) => {
+  await variables.page.$eval(id, (input: HTMLInputElement) => {
     input.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    // input.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  await variables.page.$eval(id, (e: { blur: () => any; }) => e.blur());
 }
 
 export async function submit() {
