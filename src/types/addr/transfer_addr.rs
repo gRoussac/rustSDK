@@ -19,6 +19,10 @@ impl TransferAddr {
         array.copy_from_slice(&bytes);
         Ok(TransferAddr(array))
     }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
 }
 
 impl From<Vec<u8>> for TransferAddr {
@@ -30,12 +34,7 @@ impl From<Vec<u8>> for TransferAddr {
 }
 
 // TODO cannot initialize a tuple struct which contains private fields
-// Implement Into<_TransferAddr> for TransferAddr
-// impl Into<_TransferAddr> for TransferAddr {
-//     fn into(self) -> _TransferAddr {
-//         _TransferAddr(self.0)
-//     }
-// }
+//Implement Into<_TransferAddr> for TransferAddr
 
 #[wasm_bindgen(js_name = "fromTransfer")]
 pub fn from_transfer(key: Vec<u8>) -> TransferAddr {
