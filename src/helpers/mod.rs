@@ -8,7 +8,9 @@ use blake2::{
 };
 use casper_client::cli::JsonArg;
 use casper_client::types::{Deploy, TimeDiff, Timestamp};
-use casper_types::cl_value_to_json as cl_value_to_json_from_casper_types;
+use casper_types::{
+    bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, CLTyped,
+};
 use casper_types::{CLValue, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey};
 use casper_types::{NamedArg, RuntimeArgs};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
@@ -76,6 +78,51 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
         result.copy_from_slice(slice);
     });
     base16::encode_lower(&result)
+}
+
+/// Creates a dictionary item key by concatenating the serialized bytes of the key and value.
+///
+/// # Arguments
+///
+/// * `key` - The key to be serialized.
+/// * `value` - The value to be serialized.
+///
+/// # Returns
+///
+/// A hexadecimal-encoded string representing the dictionary item key.
+///
+/// # Panics
+///
+/// Panics if the hasher cannot be created.
+///
+/// # Example
+///
+/// ```rust
+/// use casper_types::{U256, U512};
+/// use contract::make_dictionary_item_key;
+///
+/// let key = U256::from(42);
+/// let value = U512::from(1000);
+/// let dictionary_item_key = make_dictionary_item_key(&key, &value);
+/// println!("Dictionary Item Key: {}", dictionary_item_key);
+/// ```
+pub fn make_dictionary_item_key<T: CLTyped + ToBytes, V: CLTyped + ToBytes>(
+    key: &T,
+    value: &V,
+) -> String {
+    let mut bytes_a = key.to_bytes().unwrap_or_default();
+    let mut bytes_b = value.to_bytes().unwrap_or_default();
+
+    bytes_a.append(&mut bytes_b);
+
+    let mut result = [0; BLAKE2B_DIGEST_LENGTH];
+    let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
+
+    hasher.update(bytes_a);
+    hasher.finalize_variable(|slice| {
+        result.copy_from_slice(slice);
+    });
+    hex::encode(&result)
 }
 
 /// Gets the time to live (TTL) value or returns the default value if not provided.
