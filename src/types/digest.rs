@@ -100,7 +100,7 @@ impl FromBytes for Digest {
 
 impl From<[u8; _Digest::LENGTH]> for Digest {
     fn from(bytes: [u8; _Digest::LENGTH]) -> Self {
-        let digest = _Digest::try_from(bytes).unwrap();
+        let digest = _Digest::from(bytes);
         Digest(digest)
     }
 }
