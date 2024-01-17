@@ -1,7 +1,5 @@
 use crate::debug::error;
-use crate::types::public_key::PublicKey;
-use crate::types::sdk_error::SdkError;
-use crate::types::verbosity::Verbosity;
+use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 use blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
@@ -9,7 +7,7 @@ use blake2::{
 use casper_client::cli::JsonArg;
 use casper_client::types::{Deploy, TimeDiff, Timestamp};
 use casper_types::{
-    bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, CLTyped,
+    bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, Key as _Key,
 };
 use casper_types::{CLValue, ErrorExt, PublicKey as CasperTypesPublicKey, SecretKey};
 use casper_types::{NamedArg, RuntimeArgs};
@@ -99,17 +97,23 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
 ///
 /// ```rust
 /// use casper_types::{U256, U512};
-/// use contract::make_dictionary_item_key;
-///
-/// let key = U256::from(42);
-/// let value = U512::from(1000);
-/// let dictionary_item_key = make_dictionary_item_key(&key, &value);
-/// println!("Dictionary Item Key: {}", dictionary_item_key);
+/// use casper_rust_wasm_sdk::helpers::make_dictionary_item_key;
+/// use casper_rust_wasm_sdk::types::key::Key;
+/// // Key / Value as U256
+/// let key = Key::from_formatted_str( "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
+/// let value = U256::from(1);
+/// let dictionary_item_key = make_dictionary_item_key(key, &value);
+/// println!("Dictionary Item Key (Key/Value as U256): {}", dictionary_item_key);
+/// assert_eq!(dictionary_item_key,"145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9".to_string());
+/// // Key / Value as Key
+/// let key = Key::from_formatted_str( "account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f").unwrap();
+/// let value = Key::from_formatted_str("account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
+/// let dictionary_item_key = make_dictionary_item_key(key, &value);
+/// println!("Dictionary Item Key (Key/Value as Key): {}", dictionary_item_key);
+/// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```
-pub fn make_dictionary_item_key<T: CLTyped + ToBytes, V: CLTyped + ToBytes>(
-    key: &T,
-    value: &V,
-) -> String {
+pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
+    let key: _Key = _Key::from(key);
     let mut bytes_a = key.to_bytes().unwrap_or_default();
     let mut bytes_b = value.to_bytes().unwrap_or_default();
 
@@ -122,7 +126,7 @@ pub fn make_dictionary_item_key<T: CLTyped + ToBytes, V: CLTyped + ToBytes>(
     hasher.finalize_variable(|slice| {
         result.copy_from_slice(slice);
     });
-    hex::encode(&result)
+    hex::encode(result)
 }
 
 /// Gets the time to live (TTL) value or returns the default value if not provided.
@@ -407,6 +411,8 @@ pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArg
 
 #[cfg(test)]
 mod tests {
+    use casper_types::U256;
+
     use super::*;
 
     #[test]
@@ -595,5 +601,32 @@ mod tests {
         let json = cl_value_to_json(cl_value).unwrap();
         let expexted_json = Value::String("1".to_string());
         assert_eq!(json, expexted_json);
+    }
+
+    #[test]
+    pub fn test_make_dictionary_item_key() {
+        let key = Key::from_formatted_str(
+            "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538",
+        )
+        .unwrap();
+        let value = U256::from(1);
+        let dictionary_item_key = make_dictionary_item_key(key, &value);
+        assert_eq!(
+            dictionary_item_key,
+            "145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9".to_string()
+        );
+        let key = Key::from_formatted_str(
+            "account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f",
+        )
+        .unwrap();
+        let value = Key::from_formatted_str(
+            "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538",
+        )
+        .unwrap();
+        let dictionary_item_key = make_dictionary_item_key(key, &value);
+        assert_eq!(
+            dictionary_item_key,
+            "1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string()
+        );
     }
 }
