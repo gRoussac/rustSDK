@@ -276,12 +276,6 @@ mod tests {
     };
 
     async fn get_purse_uref() -> URef {
-        static mut PURSE_UREF: Option<URef> = None;
-        unsafe {
-            if let Some(uref) = &PURSE_UREF {
-                return uref.clone();
-            }
-        }
         let sdk = SDK::new(None, None);
         let private_key =
             read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
@@ -299,10 +293,6 @@ mod tests {
             .result
             .account
             .main_purse();
-
-        unsafe {
-            PURSE_UREF = Some(purse_uref.into());
-        }
         purse_uref.into()
     }
 

@@ -4,6 +4,7 @@ use super::era_id::EraId;
 use super::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
 use crate::debug::error;
 use crate::types::sdk_error::SdkError;
+use casper_types::bytesrepr::ToBytes;
 use casper_types::Key as _Key;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -215,5 +216,15 @@ impl From<Key> for _Key {
 impl From<_Key> for Key {
     fn from(key: _Key) -> Self {
         Key(key)
+    }
+}
+
+impl ToBytes for Key {
+    fn to_bytes(&self) -> Result<Vec<u8>, casper_types::bytesrepr::Error> {
+        self.0.to_bytes()
+    }
+
+    fn serialized_length(&self) -> usize {
+        self.0.serialized_length()
     }
 }

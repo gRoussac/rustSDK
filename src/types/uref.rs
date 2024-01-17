@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::{
     debug::error,
     types::{access_rights::AccessRights, addr::uref_addr::URefAddr},
@@ -66,5 +68,13 @@ impl From<_URef> for URef {
 impl From<URef> for _URef {
     fn from(uref: URef) -> Self {
         uref.0
+    }
+}
+
+impl Deref for URef {
+    type Target = _URef;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

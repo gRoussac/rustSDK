@@ -7,10 +7,11 @@ pub mod test_module {
     use casper_rust_wasm_sdk::{
         helpers::{
             get_blake2b_hash, get_current_timestamp, get_gas_price_or_default, get_ttl_or_default,
-            hex_to_string, hex_to_uint8_vec, json_pretty_print, motes_to_cspr, parse_timestamp,
-            parse_ttl, public_key_from_private_key, secret_key_from_pem,
+            hex_to_string, hex_to_uint8_vec, json_pretty_print, make_dictionary_item_key,
+            motes_to_cspr, parse_timestamp, parse_ttl, public_key_from_private_key,
+            secret_key_from_pem,
         },
-        types::verbosity::Verbosity,
+        types::{key::Key, verbosity::Verbosity},
     };
     use chrono::DateTime;
 
@@ -148,6 +149,22 @@ pub mod test_module {
         let expected = "{\n  \"historical\": null,\n  \"forward\": null\n}";
         assert_eq!(print, expected);
     }
+
+    pub fn test_make_dictionary_item_key() {
+        let key = Key::from_formatted_str(
+            "account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f",
+        )
+        .unwrap();
+        let value = Key::from_formatted_str(
+            "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538",
+        )
+        .unwrap();
+        let dictionary_item_key = make_dictionary_item_key(key, &value);
+        assert_eq!(
+            dictionary_item_key,
+            "1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string()
+        );
+    }
 }
 
 #[cfg(test)]
@@ -204,5 +221,9 @@ mod tests_async {
     #[test]
     pub async fn test_get_json_pretty_print_test() {
         test_get_json_pretty_print().await;
+    }
+    #[test]
+    pub async fn make_dictionary_item_key_test() {
+        test_make_dictionary_item_key();
     }
 }
