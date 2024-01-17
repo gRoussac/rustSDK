@@ -599,10 +599,41 @@
 <a href="#597" id="597">597</a>
 <a href="#598" id="598">598</a>
 <a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span><span class="kw">crate</span>::types::public_key::PublicKey;
-<span class="kw">use </span><span class="kw">crate</span>::types::sdk_error::SdkError;
-<span class="kw">use </span><span class="kw">crate</span>::types::verbosity::Verbosity;
+<span class="kw">use </span><span class="kw">crate</span>::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 <span class="kw">use </span>blake2::{
     digest::{Update, VariableOutput},
     VarBlake2b,
@@ -610,7 +641,7 @@
 <span class="kw">use </span>casper_client::cli::JsonArg;
 <span class="kw">use </span>casper_client::types::{Deploy, TimeDiff, Timestamp};
 <span class="kw">use </span>casper_types::{
-    bytesrepr::ToBytes, cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, CLTyped,
+    bytesrepr::ToBytes, cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, Key <span class="kw">as </span>_Key,
 };
 <span class="kw">use </span>casper_types::{CLValue, ErrorExt, PublicKey <span class="kw">as </span>CasperTypesPublicKey, SecretKey};
 <span class="kw">use </span>casper_types::{NamedArg, RuntimeArgs};
@@ -700,17 +731,23 @@
 ///
 /// ```rust
 /// use casper_types::{U256, U512};
-/// use contract::make_dictionary_item_key;
-///
-/// let key = U256::from(42);
-/// let value = U512::from(1000);
-/// let dictionary_item_key = make_dictionary_item_key(&amp;key, &amp;value);
-/// println!("Dictionary Item Key: {}", dictionary_item_key);
+/// use casper_rust_wasm_sdk::helpers::make_dictionary_item_key;
+/// use casper_rust_wasm_sdk::types::key::Key;
+/// // Key / Value as U256
+/// let key = Key::from_formatted_str( "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
+/// let value = U256::from(1);
+/// let dictionary_item_key = make_dictionary_item_key(key, &amp;value);
+/// println!("Dictionary Item Key (Key/Value as U256): {}", dictionary_item_key);
+/// assert_eq!(dictionary_item_key,"145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9".to_string());
+/// // Key / Value as Key
+/// let key = Key::from_formatted_str( "account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f").unwrap();
+/// let value = Key::from_formatted_str("account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538").unwrap();
+/// let dictionary_item_key = make_dictionary_item_key(key, &amp;value);
+/// println!("Dictionary Item Key (Key/Value as Key): {}", dictionary_item_key);
+/// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```
-</span><span class="kw">pub fn </span>make_dictionary_item_key&lt;T: CLTyped + ToBytes, V: CLTyped + ToBytes&gt;(
-    key: <span class="kw-2">&amp;</span>T,
-    value: <span class="kw-2">&amp;</span>V,
-) -&gt; String {
+</span><span class="kw">pub fn </span>make_dictionary_item_key&lt;V: ToBytes&gt;(key: Key, value: <span class="kw-2">&amp;</span>V) -&gt; String {
+    <span class="kw">let </span>key: _Key = _Key::from(key);
     <span class="kw">let </span><span class="kw-2">mut </span>bytes_a = key.to_bytes().unwrap_or_default();
     <span class="kw">let </span><span class="kw-2">mut </span>bytes_b = value.to_bytes().unwrap_or_default();
 
@@ -723,7 +760,7 @@
     hasher.finalize_variable(|slice| {
         result.copy_from_slice(slice);
     });
-    hex::encode(<span class="kw-2">&amp;</span>result)
+    hex::encode(result)
 }
 
 <span class="doccomment">/// Gets the time to live (TTL) value or returns the default value if not provided.
@@ -1008,6 +1045,8 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>casper_types::U256;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
@@ -1196,6 +1235,33 @@
         <span class="kw">let </span>json = cl_value_to_json(cl_value).unwrap();
         <span class="kw">let </span>expexted_json = Value::String(<span class="string">"1"</span>.to_string());
         <span class="macro">assert_eq!</span>(json, expexted_json);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">pub fn </span>test_make_dictionary_item_key() {
+        <span class="kw">let </span>key = Key::from_formatted_str(
+            <span class="string">"account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538"</span>,
+        )
+        .unwrap();
+        <span class="kw">let </span>value = U256::from(<span class="number">1</span>);
+        <span class="kw">let </span>dictionary_item_key = make_dictionary_item_key(key, <span class="kw-2">&amp;</span>value);
+        <span class="macro">assert_eq!</span>(
+            dictionary_item_key,
+            <span class="string">"145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9"</span>.to_string()
+        );
+        <span class="kw">let </span>key = Key::from_formatted_str(
+            <span class="string">"account-hash-813428ce1a9805f1087db07e6017c6c4f5af0ee78a05591bb6577763e89b4f1f"</span>,
+        )
+        .unwrap();
+        <span class="kw">let </span>value = Key::from_formatted_str(
+            <span class="string">"account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538"</span>,
+        )
+        .unwrap();
+        <span class="kw">let </span>dictionary_item_key = make_dictionary_item_key(key, <span class="kw-2">&amp;</span>value);
+        <span class="macro">assert_eq!</span>(
+            dictionary_item_key,
+            <span class="string">"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca"</span>.to_string()
+        );
     }
 }
 </code></pre></div></section></main></body></html>

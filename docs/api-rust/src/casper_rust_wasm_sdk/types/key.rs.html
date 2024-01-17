@@ -219,12 +219,24 @@
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::addr::transfer_addr::TransferAddr;
 <span class="kw">use </span><span class="kw">super</span>::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
 <span class="kw">use </span><span class="kw">super</span>::era_id::EraId;
 <span class="kw">use super</span>::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
 <span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::sdk_error::SdkError;
+<span class="kw">use </span>casper_types::bytesrepr::ToBytes;
 <span class="kw">use </span>casper_types::Key <span class="kw">as </span>_Key;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
@@ -436,6 +448,16 @@
 <span class="kw">impl </span>From&lt;_Key&gt; <span class="kw">for </span>Key {
     <span class="kw">fn </span>from(key: _Key) -&gt; <span class="self">Self </span>{
         Key(key)
+    }
+}
+
+<span class="kw">impl </span>ToBytes <span class="kw">for </span>Key {
+    <span class="kw">fn </span>to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, casper_types::bytesrepr::Error&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.to_bytes()
+    }
+
+    <span class="kw">fn </span>serialized_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.serialized_length()
     }
 }
 </code></pre></div></section></main></body></html>
