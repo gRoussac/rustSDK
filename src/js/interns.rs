@@ -1,11 +1,14 @@
-use crate::helpers::{get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec};
-use crate::types::cl::bytes::Bytes;
+use crate::helpers::{
+    get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
+    make_dictionary_item_key as make_dictionary_item_key_helper,
+};
+use crate::types::{cl::bytes::Bytes, key::Key};
 use crate::{
     debug::error,
     helpers::{hex_to_string, motes_to_cspr, secret_key_from_pem},
     types::verbosity::Verbosity,
 };
-use casper_types::PublicKey;
+use casper_types::{PublicKey, U256};
 use gloo_utils::format::JsValueSerdeExt;
 use wasm_bindgen::prelude::*;
 
@@ -138,4 +141,35 @@ pub fn get_timestamp() -> JsValue {
 #[wasm_bindgen(js_name = "encodeLowerBlake2b")]
 pub fn encode_lower_blake2b(meta_data: &str) -> JsValue {
     get_blake2b_hash(meta_data).into()
+}
+
+/// Converts a key and value into a formatted dictionary item key for ditionaries queries.
+///
+/// # Arguments
+///
+/// * `key` - A string representation of a account/contract hash as a Key.
+/// * `value` - A string representation of the value, for now restricted to parse as U256 or Key
+///
+/// # Returns
+///
+/// A string representing the formatted dictionary item key.
+///
+#[wasm_bindgen(js_name = "makeDictionaryItemKey")]
+pub fn make_dictionary_item_key(key: Key, value: &str) -> String {
+    // Try to parse value as U256, default to zero if unsuccessful
+    let value_as_u256 = U256::from_dec_str(value).unwrap_or_default();
+
+    // If value_as_u256 is zero, attempt to parse it as a key and return the result
+    if value_as_u256 == U256::zero() {
+        match Key::from_formatted_str(value) {
+            Ok(value_as_key) => make_dictionary_item_key_helper(key, &value_as_key),
+            Err(err) => {
+                error(&format!("Error serializing key: {:?}", err));
+                String::from("")
+            }
+        }
+    } else {
+        // Otherwise, proceed with the original key and parsed value_as_u256
+        make_dictionary_item_key_helper(key, &value_as_u256)
+    }
 }
