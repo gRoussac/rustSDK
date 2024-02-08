@@ -278,7 +278,7 @@ const example11 = async () => {
     { "name": "metadata_mutability", "type": "U8", "value": 0 },
     { "name": "events_mode", "type": "U8", "value": 1 }
   ]);
-  const payment_amount = '300000000000';
+  const payment_amount = '500000000000';
 
   const buffer = await loadFile();
   const wasm = buffer && new Uint8Array(buffer);

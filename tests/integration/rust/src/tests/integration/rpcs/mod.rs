@@ -3,8 +3,8 @@ pub mod test_module {
     use std::thread;
 
     use crate::config::{
-        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DEPLOY_TIME,
-        DICTIONARY_ITEM_KEY, DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
+        get_config, TestConfig, COLLECTION_NAME, CONTRACT_CEP78_KEY, DEFAULT_NODE_ADDRESS,
+        DEPLOY_TIME, DICTIONARY_ITEM_KEY, DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
     use crate::tests::helpers::intern::create_test_sdk;
     use crate::tests::integration::contract::test_module::test_install;
@@ -25,8 +25,9 @@ pub mod test_module {
     use serde_json::{to_string, Value};
 
     pub async fn test_get_peers() {
-        let config: TestConfig = get_config().await;
-        let peers = create_test_sdk(Some(config)).get_peers(None, None).await;
+        let peers = create_test_sdk(None)
+            .get_peers(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .await;
         let peers = peers.unwrap();
         assert!(!peers.result.api_version.to_string().is_empty());
         assert!(!peers.result.peers.is_empty());
@@ -156,9 +157,8 @@ pub mod test_module {
     }
 
     pub async fn test_get_chainspec() {
-        let config: TestConfig = get_config().await;
-        let get_chainspec = create_test_sdk(Some(config))
-            .get_chainspec(None, None)
+        let get_chainspec = create_test_sdk(None)
+            .get_chainspec(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
             .await;
 
         let get_chainspec = get_chainspec.unwrap();
@@ -259,18 +259,24 @@ pub mod test_module {
 
     #[allow(deprecated)]
     pub async fn test_get_era_info(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let config: TestConfig = get_config().await;
-        let get_era_info = create_test_sdk(Some(config))
-            .get_era_info(maybe_block_identifier, None, None)
+        let get_era_info = create_test_sdk(None)
+            .get_era_info(
+                maybe_block_identifier,
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
             .await;
         let get_era_info = get_era_info.unwrap();
         assert!(!get_era_info.result.api_version.to_string().is_empty());
     }
 
     pub async fn test_get_era_summary(maybe_block_identifier: Option<BlockIdentifierInput>) {
-        let config: TestConfig = get_config().await;
-        let get_era_summary = create_test_sdk(Some(config))
-            .get_era_summary(maybe_block_identifier, None, None)
+        let get_era_summary = create_test_sdk(None)
+            .get_era_summary(
+                maybe_block_identifier,
+                None,
+                Some(DEFAULT_NODE_ADDRESS.to_string()),
+            )
             .await;
 
         let get_era_summary = get_era_summary.unwrap();
@@ -284,9 +290,8 @@ pub mod test_module {
     }
 
     pub async fn test_get_node_status() {
-        let config: TestConfig = get_config().await;
-        let get_node_status = create_test_sdk(Some(config))
-            .get_node_status(None, None)
+        let get_node_status = create_test_sdk(None)
+            .get_node_status(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
             .await;
         let get_node_status = get_node_status.unwrap();
         assert!(!get_node_status.result.api_version.to_string().is_empty());
@@ -294,9 +299,8 @@ pub mod test_module {
     }
 
     pub async fn test_get_state_root_hash() {
-        let config: TestConfig = get_config().await;
-        let get_state_root_hash = create_test_sdk(Some(config))
-            .get_state_root_hash(None, None, None)
+        let get_state_root_hash = create_test_sdk(None)
+            .get_state_root_hash(None, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
             .await;
 
         let state_root_hash: Digest = get_state_root_hash
@@ -309,9 +313,8 @@ pub mod test_module {
     }
 
     pub async fn test_get_validator_changes() {
-        let config: TestConfig = get_config().await;
-        let validator_changes = create_test_sdk(Some(config))
-            .get_validator_changes(None, None)
+        let validator_changes = create_test_sdk(None)
+            .get_validator_changes(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
             .await;
         let validator_changes = validator_changes.unwrap();
         assert!(!validator_changes.result.api_version.to_string().is_empty());
@@ -319,8 +322,9 @@ pub mod test_module {
     }
 
     pub async fn test_list_rpcs() {
-        let config: TestConfig = get_config().await;
-        let list_rpcs = create_test_sdk(Some(config)).list_rpcs(None, None).await;
+        let list_rpcs = create_test_sdk(None)
+            .list_rpcs(None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .await;
         let list_rpcs = list_rpcs.unwrap();
         assert!(!list_rpcs.result.api_version.to_string().is_empty());
         assert!(!list_rpcs.result.name.is_empty());
@@ -449,7 +453,6 @@ mod tests {
     #[test]
     pub async fn test_get_account_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_account(maybe_block_identifier).await;
     }
@@ -464,7 +467,6 @@ mod tests {
     #[test]
     pub async fn test_get_auction_info_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_auction_info(maybe_block_identifier).await;
     }
@@ -479,7 +481,6 @@ mod tests {
     #[test]
     pub async fn test_get_block_transfers_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_block_transfers(maybe_block_identifier).await;
     }
@@ -506,7 +507,6 @@ mod tests {
     #[test]
     pub async fn test_get_era_info_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_era_info(maybe_block_identifier).await;
     }
@@ -517,7 +517,6 @@ mod tests {
     #[test]
     pub async fn test_get_era_summary_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_era_summary(maybe_block_identifier).await;
     }
@@ -540,7 +539,6 @@ mod tests {
     #[test]
     pub async fn test_query_balance_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),
         ));
@@ -557,7 +555,6 @@ mod tests {
     #[test]
     pub async fn test_query_global_state_test_with_block_identifier() {
         let config: TestConfig = get_config().await;
-
         let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
             BlockHash::new(&config.block_hash).unwrap(),
         ));
