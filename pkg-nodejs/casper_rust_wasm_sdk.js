@@ -67,6 +67,7 @@ function passStringToWasm0(arg, malloc, realloc) {
         const ret = encodeString(arg, view);
 
         offset += ret.written;
+        ptr = realloc(ptr, len, offset, 1) >>> 0;
     }
 
     WASM_VECTOR_LEN = offset;
@@ -183,6 +184,12 @@ function debugString(val) {
     return className;
 }
 
+const CLOSURE_DTORS = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(state => {
+    wasm.__wbindgen_export_2.get(state.dtor)(state.a, state.b)
+});
+
 function makeMutClosure(arg0, arg1, dtor, f) {
     const state = { a: arg0, b: arg1, cnt: 1, dtor };
     const real = (...args) => {
@@ -197,18 +204,18 @@ function makeMutClosure(arg0, arg1, dtor, f) {
         } finally {
             if (--state.cnt === 0) {
                 wasm.__wbindgen_export_2.get(state.dtor)(a, state.b);
-
+                CLOSURE_DTORS.unregister(state);
             } else {
                 state.a = a;
             }
         }
     };
     real.original = state;
-
+    CLOSURE_DTORS.register(real, state, state);
     return real;
 }
 function __wbg_adapter_32(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1d2d6635dde685e3(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h950a3df6e852f9c6(arg0, arg1, addHeapObject(arg2));
 }
 
 function passArray8ToWasm0(arg, malloc) {
@@ -468,7 +475,7 @@ function handleError(f, args) {
     }
 }
 function __wbg_adapter_707(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__ha84663cc4f5f7d36(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__h418f18809bb538b9(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
 /**
@@ -477,6 +484,10 @@ module.exports.Verbosity = Object.freeze({ Low:0,"0":"Low",Medium:1,"1":"Medium"
 /**
 */
 module.exports.CLTypeEnum = Object.freeze({ Bool:0,"0":"Bool",I32:1,"1":"I32",I64:2,"2":"I64",U8:3,"3":"U8",U32:4,"4":"U32",U64:5,"5":"U64",U128:6,"6":"U128",U256:7,"7":"U256",U512:8,"8":"U512",Unit:9,"9":"Unit",String:10,"10":"String",Key:11,"11":"Key",URef:12,"12":"URef",PublicKey:13,"13":"PublicKey",Option:14,"14":"Option",List:15,"15":"List",ByteArray:16,"16":"ByteArray",Result:17,"17":"Result",Map:18,"18":"Map",Tuple1:19,"19":"Tuple1",Tuple2:20,"20":"Tuple2",Tuple3:21,"21":"Tuple3",Any:22,"22":"Any", });
+
+const AccessRightsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_accessrights_free(ptr >>> 0));
 /**
 */
 class AccessRights {
@@ -485,14 +496,14 @@ class AccessRights {
         ptr = ptr >>> 0;
         const obj = Object.create(AccessRights.prototype);
         obj.__wbg_ptr = ptr;
-
+        AccessRightsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        AccessRightsFinalization.unregister(this);
         return ptr;
     }
 
@@ -615,6 +626,10 @@ class AccessRights {
     }
 }
 module.exports.AccessRights = AccessRights;
+
+const AccountHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_accounthash_free(ptr >>> 0));
 /**
 */
 class AccountHash {
@@ -623,14 +638,14 @@ class AccountHash {
         ptr = ptr >>> 0;
         const obj = Object.create(AccountHash.prototype);
         obj.__wbg_ptr = ptr;
-
+        AccountHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        AccountHashFinalization.unregister(this);
         return ptr;
     }
 
@@ -747,6 +762,10 @@ class AccountHash {
     }
 }
 module.exports.AccountHash = AccountHash;
+
+const AccountIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_accountidentifier_free(ptr >>> 0));
 /**
 */
 class AccountIdentifier {
@@ -755,14 +774,14 @@ class AccountIdentifier {
         ptr = ptr >>> 0;
         const obj = Object.create(AccountIdentifier.prototype);
         obj.__wbg_ptr = ptr;
-
+        AccountIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        AccountIdentifierFinalization.unregister(this);
         return ptr;
     }
 
@@ -841,6 +860,10 @@ class AccountIdentifier {
     }
 }
 module.exports.AccountIdentifier = AccountIdentifier;
+
+const ArgsSimpleFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_argssimple_free(ptr >>> 0));
 /**
 */
 class ArgsSimple {
@@ -849,14 +872,14 @@ class ArgsSimple {
         ptr = ptr >>> 0;
         const obj = Object.create(ArgsSimple.prototype);
         obj.__wbg_ptr = ptr;
-
+        ArgsSimpleFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        ArgsSimpleFinalization.unregister(this);
         return ptr;
     }
 
@@ -866,6 +889,10 @@ class ArgsSimple {
     }
 }
 module.exports.ArgsSimple = ArgsSimple;
+
+const BlockHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_blockhash_free(ptr >>> 0));
 /**
 */
 class BlockHash {
@@ -874,14 +901,14 @@ class BlockHash {
         ptr = ptr >>> 0;
         const obj = Object.create(BlockHash.prototype);
         obj.__wbg_ptr = ptr;
-
+        BlockHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        BlockHashFinalization.unregister(this);
         return ptr;
     }
 
@@ -959,6 +986,10 @@ class BlockHash {
     }
 }
 module.exports.BlockHash = BlockHash;
+
+const BlockIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_blockidentifier_free(ptr >>> 0));
 /**
 */
 class BlockIdentifier {
@@ -967,14 +998,14 @@ class BlockIdentifier {
         ptr = ptr >>> 0;
         const obj = Object.create(BlockIdentifier.prototype);
         obj.__wbg_ptr = ptr;
-
+        BlockIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        BlockIdentifierFinalization.unregister(this);
         return ptr;
     }
 
@@ -1019,6 +1050,10 @@ class BlockIdentifier {
     }
 }
 module.exports.BlockIdentifier = BlockIdentifier;
+
+const BytesFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_bytes_free(ptr >>> 0));
 /**
 */
 class Bytes {
@@ -1027,14 +1062,14 @@ class Bytes {
         ptr = ptr >>> 0;
         const obj = Object.create(Bytes.prototype);
         obj.__wbg_ptr = ptr;
-
+        BytesFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        BytesFinalization.unregister(this);
         return ptr;
     }
 
@@ -1059,6 +1094,10 @@ class Bytes {
     }
 }
 module.exports.Bytes = Bytes;
+
+const CLTypeFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_cltype_free(ptr >>> 0));
 /**
 */
 class CLType {
@@ -1067,14 +1106,14 @@ class CLType {
         ptr = ptr >>> 0;
         const obj = Object.create(CLType.prototype);
         obj.__wbg_ptr = ptr;
-
+        CLTypeFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        CLTypeFinalization.unregister(this);
         return ptr;
     }
 
@@ -1308,6 +1347,10 @@ class CLType {
     }
 }
 module.exports.CLType = CLType;
+
+const ContractHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_contracthash_free(ptr >>> 0));
 /**
 */
 class ContractHash {
@@ -1316,14 +1359,14 @@ class ContractHash {
         ptr = ptr >>> 0;
         const obj = Object.create(ContractHash.prototype);
         obj.__wbg_ptr = ptr;
-
+        ContractHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        ContractHashFinalization.unregister(this);
         return ptr;
     }
 
@@ -1404,6 +1447,10 @@ class ContractHash {
     }
 }
 module.exports.ContractHash = ContractHash;
+
+const ContractPackageHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_contractpackagehash_free(ptr >>> 0));
 /**
 */
 class ContractPackageHash {
@@ -1412,14 +1459,14 @@ class ContractPackageHash {
         ptr = ptr >>> 0;
         const obj = Object.create(ContractPackageHash.prototype);
         obj.__wbg_ptr = ptr;
-
+        ContractPackageHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        ContractPackageHashFinalization.unregister(this);
         return ptr;
     }
 
@@ -1500,6 +1547,10 @@ class ContractPackageHash {
     }
 }
 module.exports.ContractPackageHash = ContractPackageHash;
+
+const DeployFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_deploy_free(ptr >>> 0));
 /**
 */
 class Deploy {
@@ -1508,14 +1559,14 @@ class Deploy {
         ptr = ptr >>> 0;
         const obj = Object.create(Deploy.prototype);
         obj.__wbg_ptr = ptr;
-
+        DeployFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DeployFinalization.unregister(this);
         return ptr;
     }
 
@@ -1867,6 +1918,10 @@ class Deploy {
     }
 }
 module.exports.Deploy = Deploy;
+
+const DeployHashFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_deployhash_free(ptr >>> 0));
 /**
 */
 class DeployHash {
@@ -1875,14 +1930,14 @@ class DeployHash {
         ptr = ptr >>> 0;
         const obj = Object.create(DeployHash.prototype);
         obj.__wbg_ptr = ptr;
-
+        DeployHashFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DeployHashFinalization.unregister(this);
         return ptr;
     }
 
@@ -1960,6 +2015,10 @@ class DeployHash {
     }
 }
 module.exports.DeployHash = DeployHash;
+
+const DeployStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_deploystrparams_free(ptr >>> 0));
 /**
 */
 class DeployStrParams {
@@ -1967,7 +2026,7 @@ class DeployStrParams {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DeployStrParamsFinalization.unregister(this);
         return ptr;
     }
 
@@ -2144,6 +2203,10 @@ class DeployStrParams {
     }
 }
 module.exports.DeployStrParams = DeployStrParams;
+
+const DictionaryAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryaddr_free(ptr >>> 0));
 /**
 */
 class DictionaryAddr {
@@ -2152,14 +2215,14 @@ class DictionaryAddr {
         ptr = ptr >>> 0;
         const obj = Object.create(DictionaryAddr.prototype);
         obj.__wbg_ptr = ptr;
-
+        DictionaryAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DictionaryAddrFinalization.unregister(this);
         return ptr;
     }
 
@@ -2190,6 +2253,10 @@ class DictionaryAddr {
     }
 }
 module.exports.DictionaryAddr = DictionaryAddr;
+
+const DictionaryItemIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryitemidentifier_free(ptr >>> 0));
 /**
 */
 class DictionaryItemIdentifier {
@@ -2198,14 +2265,14 @@ class DictionaryItemIdentifier {
         ptr = ptr >>> 0;
         const obj = Object.create(DictionaryItemIdentifier.prototype);
         obj.__wbg_ptr = ptr;
-
+        DictionaryItemIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DictionaryItemIdentifierFinalization.unregister(this);
         return ptr;
     }
 
@@ -2321,6 +2388,10 @@ class DictionaryItemIdentifier {
     }
 }
 module.exports.DictionaryItemIdentifier = DictionaryItemIdentifier;
+
+const DictionaryItemStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_dictionaryitemstrparams_free(ptr >>> 0));
 /**
 */
 class DictionaryItemStrParams {
@@ -2329,14 +2400,14 @@ class DictionaryItemStrParams {
         ptr = ptr >>> 0;
         const obj = Object.create(DictionaryItemStrParams.prototype);
         obj.__wbg_ptr = ptr;
-
+        DictionaryItemStrParamsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DictionaryItemStrParamsFinalization.unregister(this);
         return ptr;
     }
 
@@ -2407,6 +2478,10 @@ class DictionaryItemStrParams {
     }
 }
 module.exports.DictionaryItemStrParams = DictionaryItemStrParams;
+
+const DigestFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_digest_free(ptr >>> 0));
 /**
 */
 class Digest {
@@ -2415,14 +2490,14 @@ class Digest {
         ptr = ptr >>> 0;
         const obj = Object.create(Digest.prototype);
         obj.__wbg_ptr = ptr;
-
+        DigestFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        DigestFinalization.unregister(this);
         return ptr;
     }
 
@@ -2521,6 +2596,10 @@ class Digest {
     }
 }
 module.exports.Digest = Digest;
+
+const EraIdFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_eraid_free(ptr >>> 0));
 /**
 */
 class EraId {
@@ -2528,7 +2607,7 @@ class EraId {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        EraIdFinalization.unregister(this);
         return ptr;
     }
 
@@ -2553,6 +2632,10 @@ class EraId {
     }
 }
 module.exports.EraId = EraId;
+
+const GetAccountResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getaccountresult_free(ptr >>> 0));
 /**
 */
 class GetAccountResult {
@@ -2561,14 +2644,14 @@ class GetAccountResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetAccountResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetAccountResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetAccountResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2618,6 +2701,10 @@ class GetAccountResult {
     }
 }
 module.exports.GetAccountResult = GetAccountResult;
+
+const GetAuctionInfoResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getauctioninforesult_free(ptr >>> 0));
 /**
 */
 class GetAuctionInfoResult {
@@ -2626,14 +2713,14 @@ class GetAuctionInfoResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetAuctionInfoResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetAuctionInfoResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetAuctionInfoResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2667,6 +2754,10 @@ class GetAuctionInfoResult {
     }
 }
 module.exports.GetAuctionInfoResult = GetAuctionInfoResult;
+
+const GetBalanceResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getbalanceresult_free(ptr >>> 0));
 /**
 */
 class GetBalanceResult {
@@ -2675,14 +2766,14 @@ class GetBalanceResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetBalanceResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetBalanceResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetBalanceResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2736,6 +2827,10 @@ class GetBalanceResult {
     }
 }
 module.exports.GetBalanceResult = GetBalanceResult;
+
+const GetBlockResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblockresult_free(ptr >>> 0));
 /**
 */
 class GetBlockResult {
@@ -2744,14 +2839,14 @@ class GetBlockResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetBlockResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetBlockResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetBlockResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2785,6 +2880,10 @@ class GetBlockResult {
     }
 }
 module.exports.GetBlockResult = GetBlockResult;
+
+const GetBlockTransfersResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblocktransfersresult_free(ptr >>> 0));
 /**
 */
 class GetBlockTransfersResult {
@@ -2793,14 +2892,14 @@ class GetBlockTransfersResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetBlockTransfersResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetBlockTransfersResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetBlockTransfersResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2842,6 +2941,10 @@ class GetBlockTransfersResult {
     }
 }
 module.exports.GetBlockTransfersResult = GetBlockTransfersResult;
+
+const GetChainspecResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getchainspecresult_free(ptr >>> 0));
 /**
 * A struct representing the result of the `get_chainspec` function.
 */
@@ -2851,14 +2954,14 @@ class GetChainspecResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetChainspecResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetChainspecResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetChainspecResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2892,6 +2995,10 @@ class GetChainspecResult {
     }
 }
 module.exports.GetChainspecResult = GetChainspecResult;
+
+const GetDeployResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdeployresult_free(ptr >>> 0));
 /**
 */
 class GetDeployResult {
@@ -2900,14 +3007,14 @@ class GetDeployResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetDeployResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetDeployResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetDeployResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -2941,6 +3048,10 @@ class GetDeployResult {
     }
 }
 module.exports.GetDeployResult = GetDeployResult;
+
+const GetDictionaryItemResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdictionaryitemresult_free(ptr >>> 0));
 /**
 */
 class GetDictionaryItemResult {
@@ -2949,14 +3060,14 @@ class GetDictionaryItemResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetDictionaryItemResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetDictionaryItemResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetDictionaryItemResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3030,6 +3141,10 @@ class GetDictionaryItemResult {
     }
 }
 module.exports.GetDictionaryItemResult = GetDictionaryItemResult;
+
+const GetEraInfoResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterainforesult_free(ptr >>> 0));
 /**
 */
 class GetEraInfoResult {
@@ -3038,14 +3153,14 @@ class GetEraInfoResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetEraInfoResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetEraInfoResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetEraInfoResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3076,6 +3191,10 @@ class GetEraInfoResult {
     }
 }
 module.exports.GetEraInfoResult = GetEraInfoResult;
+
+const GetEraSummaryResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterasummaryresult_free(ptr >>> 0));
 /**
 * Wrapper struct for the `GetEraSummaryResult` from casper_client.
 */
@@ -3085,14 +3204,14 @@ class GetEraSummaryResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetEraSummaryResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetEraSummaryResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetEraSummaryResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3126,6 +3245,10 @@ class GetEraSummaryResult {
     }
 }
 module.exports.GetEraSummaryResult = GetEraSummaryResult;
+
+const GetNodeStatusResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getnodestatusresult_free(ptr >>> 0));
 /**
 * Wrapper struct for the `GetNodeStatusResult` from casper_client.
 */
@@ -3135,14 +3258,14 @@ class GetNodeStatusResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetNodeStatusResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetNodeStatusResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetNodeStatusResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3296,6 +3419,10 @@ class GetNodeStatusResult {
     }
 }
 module.exports.GetNodeStatusResult = GetNodeStatusResult;
+
+const GetPeersResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getpeersresult_free(ptr >>> 0));
 /**
 * A wrapper for the `GetPeersResult` type from the Casper client.
 */
@@ -3305,14 +3432,14 @@ class GetPeersResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetPeersResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetPeersResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetPeersResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3346,6 +3473,10 @@ class GetPeersResult {
     }
 }
 module.exports.GetPeersResult = GetPeersResult;
+
+const GetStateRootHashResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getstateroothashresult_free(ptr >>> 0));
 /**
 * Wrapper struct for the `GetStateRootHashResult` from casper_client.
 */
@@ -3355,14 +3486,14 @@ class GetStateRootHashResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetStateRootHashResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetStateRootHashResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetStateRootHashResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3436,6 +3567,10 @@ class GetStateRootHashResult {
     }
 }
 module.exports.GetStateRootHashResult = GetStateRootHashResult;
+
+const GetValidatorChangesResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getvalidatorchangesresult_free(ptr >>> 0));
 /**
 * Wrapper struct for the `GetValidatorChangesResult` from casper_client.
 */
@@ -3445,14 +3580,14 @@ class GetValidatorChangesResult {
         ptr = ptr >>> 0;
         const obj = Object.create(GetValidatorChangesResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        GetValidatorChangesResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GetValidatorChangesResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3486,6 +3621,10 @@ class GetValidatorChangesResult {
     }
 }
 module.exports.GetValidatorChangesResult = GetValidatorChangesResult;
+
+const GlobalStateIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_globalstateidentifier_free(ptr >>> 0));
 /**
 */
 class GlobalStateIdentifier {
@@ -3494,14 +3633,14 @@ class GlobalStateIdentifier {
         ptr = ptr >>> 0;
         const obj = Object.create(GlobalStateIdentifier.prototype);
         obj.__wbg_ptr = ptr;
-
+        GlobalStateIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        GlobalStateIdentifierFinalization.unregister(this);
         return ptr;
     }
 
@@ -3556,6 +3695,10 @@ class GlobalStateIdentifier {
     }
 }
 module.exports.GlobalStateIdentifier = GlobalStateIdentifier;
+
+const HashAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_hashaddr_free(ptr >>> 0));
 /**
 */
 class HashAddr {
@@ -3564,14 +3707,14 @@ class HashAddr {
         ptr = ptr >>> 0;
         const obj = Object.create(HashAddr.prototype);
         obj.__wbg_ptr = ptr;
-
+        HashAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        HashAddrFinalization.unregister(this);
         return ptr;
     }
 
@@ -3602,6 +3745,10 @@ class HashAddr {
     }
 }
 module.exports.HashAddr = HashAddr;
+
+const KeyFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_key_free(ptr >>> 0));
 /**
 */
 class Key {
@@ -3610,14 +3757,14 @@ class Key {
         ptr = ptr >>> 0;
         const obj = Object.create(Key.prototype);
         obj.__wbg_ptr = ptr;
-
+        KeyFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        KeyFinalization.unregister(this);
         return ptr;
     }
 
@@ -3903,6 +4050,10 @@ class Key {
     }
 }
 module.exports.Key = Key;
+
+const ListRpcsResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_listrpcsresult_free(ptr >>> 0));
 /**
 * Wrapper struct for the `ListRpcsResult` from casper_client.
 */
@@ -3912,14 +4063,14 @@ class ListRpcsResult {
         ptr = ptr >>> 0;
         const obj = Object.create(ListRpcsResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        ListRpcsResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        ListRpcsResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -3973,6 +4124,10 @@ class ListRpcsResult {
     }
 }
 module.exports.ListRpcsResult = ListRpcsResult;
+
+const PathFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_path_free(ptr >>> 0));
 /**
 */
 class Path {
@@ -3981,14 +4136,14 @@ class Path {
         ptr = ptr >>> 0;
         const obj = Object.create(Path.prototype);
         obj.__wbg_ptr = ptr;
-
+        PathFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        PathFinalization.unregister(this);
         return ptr;
     }
 
@@ -4047,6 +4202,10 @@ class Path {
     }
 }
 module.exports.Path = Path;
+
+const PaymentStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_paymentstrparams_free(ptr >>> 0));
 /**
 */
 class PaymentStrParams {
@@ -4054,7 +4213,7 @@ class PaymentStrParams {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        PaymentStrParamsFinalization.unregister(this);
         return ptr;
     }
 
@@ -4385,6 +4544,10 @@ class PaymentStrParams {
     }
 }
 module.exports.PaymentStrParams = PaymentStrParams;
+
+const PeerEntryFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_peerentry_free(ptr >>> 0));
 /**
 */
 class PeerEntry {
@@ -4392,7 +4555,7 @@ class PeerEntry {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        PeerEntryFinalization.unregister(this);
         return ptr;
     }
 
@@ -4440,6 +4603,10 @@ class PeerEntry {
     }
 }
 module.exports.PeerEntry = PeerEntry;
+
+const PublicKeyFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_publickey_free(ptr >>> 0));
 /**
 */
 class PublicKey {
@@ -4448,14 +4615,14 @@ class PublicKey {
         ptr = ptr >>> 0;
         const obj = Object.create(PublicKey.prototype);
         obj.__wbg_ptr = ptr;
-
+        PublicKeyFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        PublicKeyFinalization.unregister(this);
         return ptr;
     }
 
@@ -4517,6 +4684,10 @@ class PublicKey {
     }
 }
 module.exports.PublicKey = PublicKey;
+
+const PurseIdentifierFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_purseidentifier_free(ptr >>> 0));
 /**
 */
 class PurseIdentifier {
@@ -4525,14 +4696,14 @@ class PurseIdentifier {
         ptr = ptr >>> 0;
         const obj = Object.create(PurseIdentifier.prototype);
         obj.__wbg_ptr = ptr;
-
+        PurseIdentifierFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        PurseIdentifierFinalization.unregister(this);
         return ptr;
     }
 
@@ -4579,6 +4750,10 @@ class PurseIdentifier {
     }
 }
 module.exports.PurseIdentifier = PurseIdentifier;
+
+const PutDeployResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_putdeployresult_free(ptr >>> 0));
 /**
 */
 class PutDeployResult {
@@ -4587,14 +4762,14 @@ class PutDeployResult {
         ptr = ptr >>> 0;
         const obj = Object.create(PutDeployResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        PutDeployResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        PutDeployResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -4628,6 +4803,10 @@ class PutDeployResult {
     }
 }
 module.exports.PutDeployResult = PutDeployResult;
+
+const QueryBalanceResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querybalanceresult_free(ptr >>> 0));
 /**
 */
 class QueryBalanceResult {
@@ -4636,14 +4815,14 @@ class QueryBalanceResult {
         ptr = ptr >>> 0;
         const obj = Object.create(QueryBalanceResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        QueryBalanceResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        QueryBalanceResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -4677,6 +4856,10 @@ class QueryBalanceResult {
     }
 }
 module.exports.QueryBalanceResult = QueryBalanceResult;
+
+const QueryGlobalStateResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_queryglobalstateresult_free(ptr >>> 0));
 /**
 */
 class QueryGlobalStateResult {
@@ -4685,14 +4868,14 @@ class QueryGlobalStateResult {
         ptr = ptr >>> 0;
         const obj = Object.create(QueryGlobalStateResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        QueryGlobalStateResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        QueryGlobalStateResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -4754,6 +4937,10 @@ class QueryGlobalStateResult {
     }
 }
 module.exports.QueryGlobalStateResult = QueryGlobalStateResult;
+
+const SDKFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_sdk_free(ptr >>> 0));
 /**
 */
 class SDK {
@@ -4761,7 +4948,7 @@ class SDK {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        SDKFinalization.unregister(this);
         return ptr;
     }
 
@@ -5363,6 +5550,85 @@ class SDK {
         return Deploy.__wrap(ret);
     }
     /**
+    * Installs a smart contract with the specified parameters and returns the result.
+    *
+    * # Arguments
+    *
+    * * `deploy_params` - The deploy parameters.
+    * * `session_params` - The session parameters.
+    * * `payment_amount` - The payment amount as a string.
+    * * `node_address` - An optional node address to send the request to.
+    *
+    * # Returns
+    *
+    * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+    *
+    * # Errors
+    *
+    * Returns a `JsError` if there is an error during the installation.
+    * @param {DeployStrParams} deploy_params
+    * @param {SessionStrParams} session_params
+    * @param {string} payment_amount
+    * @param {string | undefined} [node_address]
+    * @returns {Promise<PutDeployResult>}
+    */
+    install(deploy_params, session_params, payment_amount, node_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        return takeObject(ret);
+    }
+    /**
+    * This function allows executing a deploy speculatively.
+    *
+    * # Arguments
+    *
+    * * `deploy_params` - Deployment parameters for the deploy.
+    * * `session_params` - Session parameters for the deploy.
+    * * `payment_params` - Payment parameters for the deploy.
+    * * `maybe_block_id_as_string` - An optional block ID as a string.
+    * * `maybe_block_identifier` - Optional block identifier.
+    * * `verbosity` - Optional verbosity level.
+    * * `node_address` - Optional node address.
+    *
+    * # Returns
+    *
+    * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
+    * @param {DeployStrParams} deploy_params
+    * @param {SessionStrParams} session_params
+    * @param {PaymentStrParams} payment_params
+    * @param {string | undefined} [maybe_block_id_as_string]
+    * @param {BlockIdentifier | undefined} [maybe_block_identifier]
+    * @param {Verbosity | undefined} [verbosity]
+    * @param {string | undefined} [node_address]
+    * @returns {Promise<SpeculativeExecResult>}
+    */
+    speculative_deploy(deploy_params, session_params, payment_params, maybe_block_id_as_string, maybe_block_identifier, verbosity, node_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        var ptr3 = isLikeNone(maybe_block_id_as_string) ? 0 : passStringToWasm0(maybe_block_id_as_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        let ptr4 = 0;
+        if (!isLikeNone(maybe_block_identifier)) {
+            _assertClass(maybe_block_identifier, BlockIdentifier);
+            ptr4 = maybe_block_identifier.__destroy_into_raw();
+        }
+        var ptr5 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, ptr3, len3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return takeObject(ret);
+    }
+    /**
     * JS Alias for transferring funds.
     *
     * # Arguments
@@ -5448,41 +5714,6 @@ class SDK {
         } finally {
             wasm.__wbindgen_add_to_stack_pointer(16);
         }
-    }
-    /**
-    * Calls a smart contract entry point with the specified parameters and returns the result.
-    *
-    * # Arguments
-    *
-    * * `deploy_params` - The deploy parameters.
-    * * `session_params` - The session parameters.
-    * * `payment_amount` - The payment amount as a string.
-    * * `node_address` - An optional node address to send the request to.
-    *
-    * # Returns
-    *
-    * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-    *
-    * # Errors
-    *
-    * Returns a `JsError` if there is an error during the call.
-    * @param {DeployStrParams} deploy_params
-    * @param {SessionStrParams} session_params
-    * @param {string} payment_amount
-    * @param {string | undefined} [node_address]
-    * @returns {Promise<PutDeployResult>}
-    */
-    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
-        return takeObject(ret);
     }
     /**
     * @param {any} options
@@ -5693,7 +5924,7 @@ class SDK {
         return takeObject(ret);
     }
     /**
-    * Installs a smart contract with the specified parameters and returns the result.
+    * Calls a smart contract entry point with the specified parameters and returns the result.
     *
     * # Arguments
     *
@@ -5708,14 +5939,14 @@ class SDK {
     *
     * # Errors
     *
-    * Returns a `JsError` if there is an error during the installation.
+    * Returns a `JsError` if there is an error during the call.
     * @param {DeployStrParams} deploy_params
     * @param {SessionStrParams} session_params
     * @param {string} payment_amount
     * @param {string | undefined} [node_address]
     * @returns {Promise<PutDeployResult>}
     */
-    install(deploy_params, session_params, payment_amount, node_address) {
+    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -5724,7 +5955,7 @@ class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return takeObject(ret);
     }
     /**
@@ -5970,52 +6201,12 @@ class SDK {
         const ret = wasm.sdk_query_contract_key(this.__wbg_ptr, ptr0);
         return takeObject(ret);
     }
-    /**
-    * This function allows executing a deploy speculatively.
-    *
-    * # Arguments
-    *
-    * * `deploy_params` - Deployment parameters for the deploy.
-    * * `session_params` - Session parameters for the deploy.
-    * * `payment_params` - Payment parameters for the deploy.
-    * * `maybe_block_id_as_string` - An optional block ID as a string.
-    * * `maybe_block_identifier` - Optional block identifier.
-    * * `verbosity` - Optional verbosity level.
-    * * `node_address` - Optional node address.
-    *
-    * # Returns
-    *
-    * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-    * @param {DeployStrParams} deploy_params
-    * @param {SessionStrParams} session_params
-    * @param {PaymentStrParams} payment_params
-    * @param {string | undefined} [maybe_block_id_as_string]
-    * @param {BlockIdentifier | undefined} [maybe_block_identifier]
-    * @param {Verbosity | undefined} [verbosity]
-    * @param {string | undefined} [node_address]
-    * @returns {Promise<SpeculativeExecResult>}
-    */
-    speculative_deploy(deploy_params, session_params, payment_params, maybe_block_id_as_string, maybe_block_identifier, verbosity, node_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        var ptr3 = isLikeNone(maybe_block_id_as_string) ? 0 : passStringToWasm0(maybe_block_id_as_string, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        let ptr4 = 0;
-        if (!isLikeNone(maybe_block_identifier)) {
-            _assertClass(maybe_block_identifier, BlockIdentifier);
-            ptr4 = maybe_block_identifier.__destroy_into_raw();
-        }
-        var ptr5 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, ptr3, len3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
-        return takeObject(ret);
-    }
 }
 module.exports.SDK = SDK;
+
+const SessionStrParamsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_sessionstrparams_free(ptr >>> 0));
 /**
 */
 class SessionStrParams {
@@ -6023,7 +6214,7 @@ class SessionStrParams {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        SessionStrParamsFinalization.unregister(this);
         return ptr;
     }
 
@@ -6359,6 +6550,10 @@ class SessionStrParams {
     }
 }
 module.exports.SessionStrParams = SessionStrParams;
+
+const SpeculativeExecResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_speculativeexecresult_free(ptr >>> 0));
 /**
 */
 class SpeculativeExecResult {
@@ -6367,14 +6562,14 @@ class SpeculativeExecResult {
         ptr = ptr >>> 0;
         const obj = Object.create(SpeculativeExecResult.prototype);
         obj.__wbg_ptr = ptr;
-
+        SpeculativeExecResultFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        SpeculativeExecResultFinalization.unregister(this);
         return ptr;
     }
 
@@ -6416,6 +6611,10 @@ class SpeculativeExecResult {
     }
 }
 module.exports.SpeculativeExecResult = SpeculativeExecResult;
+
+const TransferAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_transferaddr_free(ptr >>> 0));
 /**
 */
 class TransferAddr {
@@ -6424,14 +6623,14 @@ class TransferAddr {
         ptr = ptr >>> 0;
         const obj = Object.create(TransferAddr.prototype);
         obj.__wbg_ptr = ptr;
-
+        TransferAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        TransferAddrFinalization.unregister(this);
         return ptr;
     }
 
@@ -6478,6 +6677,10 @@ class TransferAddr {
     }
 }
 module.exports.TransferAddr = TransferAddr;
+
+const URefFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_uref_free(ptr >>> 0));
 /**
 */
 class URef {
@@ -6486,14 +6689,14 @@ class URef {
         ptr = ptr >>> 0;
         const obj = Object.create(URef.prototype);
         obj.__wbg_ptr = ptr;
-
+        URefFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        URefFinalization.unregister(this);
         return ptr;
     }
 
@@ -6562,6 +6765,10 @@ class URef {
     }
 }
 module.exports.URef = URef;
+
+const URefAddrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_urefaddr_free(ptr >>> 0));
 /**
 */
 class URefAddr {
@@ -6570,14 +6777,14 @@ class URefAddr {
         ptr = ptr >>> 0;
         const obj = Object.create(URefAddr.prototype);
         obj.__wbg_ptr = ptr;
-
+        URefAddrFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        URefAddrFinalization.unregister(this);
         return ptr;
     }
 
@@ -6608,6 +6815,10 @@ class URefAddr {
     }
 }
 module.exports.URefAddr = URefAddr;
+
+const getAccountOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getaccountoptions_free(ptr >>> 0));
 /**
 */
 class getAccountOptions {
@@ -6616,14 +6827,14 @@ class getAccountOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getAccountOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getAccountOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getAccountOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -6763,6 +6974,10 @@ class getAccountOptions {
     }
 }
 module.exports.getAccountOptions = getAccountOptions;
+
+const getAuctionInfoOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getauctioninfooptions_free(ptr >>> 0));
 /**
 * Options for the `get_auction_info` method.
 */
@@ -6772,14 +6987,14 @@ class getAuctionInfoOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getAuctionInfoOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getAuctionInfoOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getAuctionInfoOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -6874,6 +7089,10 @@ class getAuctionInfoOptions {
     }
 }
 module.exports.getAuctionInfoOptions = getAuctionInfoOptions;
+
+const getBalanceOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getbalanceoptions_free(ptr >>> 0));
 /**
 * Options for the `get_balance` method.
 */
@@ -6883,14 +7102,14 @@ class getBalanceOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getBalanceOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getBalanceOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getBalanceOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7030,6 +7249,10 @@ class getBalanceOptions {
     }
 }
 module.exports.getBalanceOptions = getBalanceOptions;
+
+const getBlockOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblockoptions_free(ptr >>> 0));
 /**
 * Options for the `get_block` method.
 */
@@ -7039,14 +7262,14 @@ class getBlockOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getBlockOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getBlockOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getBlockOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7141,6 +7364,10 @@ class getBlockOptions {
     }
 }
 module.exports.getBlockOptions = getBlockOptions;
+
+const getBlockTransfersOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getblocktransfersoptions_free(ptr >>> 0));
 /**
 * Options for the `get_block_transfers` method.
 */
@@ -7150,14 +7377,14 @@ class getBlockTransfersOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getBlockTransfersOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getBlockTransfersOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getBlockTransfersOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7252,6 +7479,10 @@ class getBlockTransfersOptions {
     }
 }
 module.exports.getBlockTransfersOptions = getBlockTransfersOptions;
+
+const getDeployOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdeployoptions_free(ptr >>> 0));
 /**
 * Options for the `get_deploy` method.
 */
@@ -7261,14 +7492,14 @@ class getDeployOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getDeployOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getDeployOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getDeployOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7376,6 +7607,10 @@ class getDeployOptions {
     }
 }
 module.exports.getDeployOptions = getDeployOptions;
+
+const getDictionaryItemOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getdictionaryitemoptions_free(ptr >>> 0));
 /**
 * Options for the `get_dictionary_item` method.
 */
@@ -7385,14 +7620,14 @@ class getDictionaryItemOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getDictionaryItemOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getDictionaryItemOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getDictionaryItemOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7523,6 +7758,10 @@ class getDictionaryItemOptions {
     }
 }
 module.exports.getDictionaryItemOptions = getDictionaryItemOptions;
+
+const getEraInfoOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterainfooptions_free(ptr >>> 0));
 /**
 */
 class getEraInfoOptions {
@@ -7531,14 +7770,14 @@ class getEraInfoOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getEraInfoOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getEraInfoOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getEraInfoOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7633,6 +7872,10 @@ class getEraInfoOptions {
     }
 }
 module.exports.getEraInfoOptions = getEraInfoOptions;
+
+const getEraSummaryOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_geterasummaryoptions_free(ptr >>> 0));
 /**
 * Options for the `get_era_summary` method.
 */
@@ -7642,14 +7885,14 @@ class getEraSummaryOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getEraSummaryOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getEraSummaryOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getEraSummaryOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7744,6 +7987,10 @@ class getEraSummaryOptions {
     }
 }
 module.exports.getEraSummaryOptions = getEraSummaryOptions;
+
+const getSpeculativeExecOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getspeculativeexecoptions_free(ptr >>> 0));
 /**
 * Options for speculative execution.
 */
@@ -7753,14 +8000,14 @@ class getSpeculativeExecOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getSpeculativeExecOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getSpeculativeExecOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getSpeculativeExecOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -7912,6 +8159,10 @@ class getSpeculativeExecOptions {
     }
 }
 module.exports.getSpeculativeExecOptions = getSpeculativeExecOptions;
+
+const getStateRootHashOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_getstateroothashoptions_free(ptr >>> 0));
 /**
 * Options for the `get_state_root_hash` method.
 */
@@ -7921,14 +8172,14 @@ class getStateRootHashOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(getStateRootHashOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        getStateRootHashOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        getStateRootHashOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -8023,6 +8274,10 @@ class getStateRootHashOptions {
     }
 }
 module.exports.getStateRootHashOptions = getStateRootHashOptions;
+
+const queryBalanceOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querybalanceoptions_free(ptr >>> 0));
 /**
 * Options for the `query_balance` method.
 */
@@ -8032,14 +8287,14 @@ class queryBalanceOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(queryBalanceOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        queryBalanceOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        queryBalanceOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -8224,6 +8479,10 @@ class queryBalanceOptions {
     }
 }
 module.exports.queryBalanceOptions = queryBalanceOptions;
+
+const queryContractDictOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querycontractdictoptions_free(ptr >>> 0));
 /**
 */
 class queryContractDictOptions {
@@ -8232,14 +8491,14 @@ class queryContractDictOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(queryContractDictOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        queryContractDictOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        queryContractDictOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -8370,6 +8629,10 @@ class queryContractDictOptions {
     }
 }
 module.exports.queryContractDictOptions = queryContractDictOptions;
+
+const queryContractKeyOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_querycontractkeyoptions_free(ptr >>> 0));
 /**
 */
 class queryContractKeyOptions {
@@ -8378,14 +8641,14 @@ class queryContractKeyOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(queryContractKeyOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        queryContractKeyOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        queryContractKeyOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -8615,6 +8878,10 @@ class queryContractKeyOptions {
     }
 }
 module.exports.queryContractKeyOptions = queryContractKeyOptions;
+
+const queryGlobalStateOptionsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_queryglobalstateoptions_free(ptr >>> 0));
 /**
 * Options for the `query_global_state` method.
 */
@@ -8624,14 +8891,14 @@ class queryGlobalStateOptions {
         ptr = ptr >>> 0;
         const obj = Object.create(queryGlobalStateOptions.prototype);
         obj.__wbg_ptr = ptr;
-
+        queryGlobalStateOptionsFinalization.register(obj, obj.__wbg_ptr, obj);
         return obj;
     }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
         this.__wbg_ptr = 0;
-
+        queryGlobalStateOptionsFinalization.unregister(this);
         return ptr;
     }
 
@@ -8862,23 +9129,13 @@ class queryGlobalStateOptions {
 }
 module.exports.queryGlobalStateOptions = queryGlobalStateOptions;
 
-module.exports.__wbg_getaccountresult_new = function(arg0) {
-    const ret = GetAccountResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_getvalidatorchangesresult_new = function(arg0) {
-    const ret = GetValidatorChangesResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
 module.exports.__wbg_getpeersresult_new = function(arg0) {
     const ret = GetPeersResult.__wrap(arg0);
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_getauctioninforesult_new = function(arg0) {
-    const ret = GetAuctionInfoResult.__wrap(arg0);
+module.exports.__wbg_getblocktransfersresult_new = function(arg0) {
+    const ret = GetBlockTransfersResult.__wrap(arg0);
     return addHeapObject(ret);
 };
 
@@ -8897,13 +9154,23 @@ module.exports.__wbg_putdeployresult_new = function(arg0) {
     return addHeapObject(ret);
 };
 
+module.exports.__wbg_getaccountresult_new = function(arg0) {
+    const ret = GetAccountResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_getvalidatorchangesresult_new = function(arg0) {
+    const ret = GetValidatorChangesResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
 module.exports.__wbg_querybalanceresult_new = function(arg0) {
     const ret = QueryBalanceResult.__wrap(arg0);
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_getblocktransfersresult_new = function(arg0) {
-    const ret = GetBlockTransfersResult.__wrap(arg0);
+module.exports.__wbg_getauctioninforesult_new = function(arg0) {
+    const ret = GetAuctionInfoResult.__wrap(arg0);
     return addHeapObject(ret);
 };
 
@@ -8920,6 +9187,11 @@ module.exports.__wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);
 };
 
+module.exports.__wbg_getbalanceresult_new = function(arg0) {
+    const ret = GetBalanceResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
 module.exports.__wbg_error_82cd4adbafcf90ca = function(arg0, arg1) {
     console.error(getStringFromWasm0(arg0, arg1));
 };
@@ -8929,43 +9201,8 @@ module.exports.__wbindgen_error_new = function(arg0, arg1) {
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_listrpcsresult_new = function(arg0) {
-    const ret = ListRpcsResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_getnodestatusresult_new = function(arg0) {
-    const ret = GetNodeStatusResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
 module.exports.__wbg_geterainforesult_new = function(arg0) {
     const ret = GetEraInfoResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_speculativeexecresult_new = function(arg0) {
-    const ret = SpeculativeExecResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_getdictionaryitemresult_new = function(arg0) {
-    const ret = GetDictionaryItemResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_getdeployresult_new = function(arg0) {
-    const ret = GetDeployResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_geterasummaryresult_new = function(arg0) {
-    const ret = GetEraSummaryResult.__wrap(arg0);
-    return addHeapObject(ret);
-};
-
-module.exports.__wbg_getbalanceresult_new = function(arg0) {
-    const ret = GetBalanceResult.__wrap(arg0);
     return addHeapObject(ret);
 };
 
@@ -8979,8 +9216,38 @@ module.exports.__wbg_queryglobalstateresult_new = function(arg0) {
     return addHeapObject(ret);
 };
 
+module.exports.__wbg_speculativeexecresult_new = function(arg0) {
+    const ret = SpeculativeExecResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_geterasummaryresult_new = function(arg0) {
+    const ret = GetEraSummaryResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
 module.exports.__wbindgen_string_new = function(arg0, arg1) {
     const ret = getStringFromWasm0(arg0, arg1);
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_getdeployresult_new = function(arg0) {
+    const ret = GetDeployResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_getdictionaryitemresult_new = function(arg0) {
+    const ret = GetDictionaryItemResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_getnodestatusresult_new = function(arg0) {
+    const ret = GetNodeStatusResult.__wrap(arg0);
+    return addHeapObject(ret);
+};
+
+module.exports.__wbg_listrpcsresult_new = function(arg0) {
+    const ret = ListRpcsResult.__wrap(arg0);
     return addHeapObject(ret);
 };
 
@@ -9014,16 +9281,16 @@ module.exports.__wbindgen_object_clone_ref = function(arg0) {
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_fetch_6a2624d7f767e331 = function(arg0) {
+module.exports.__wbg_fetch_27eb4c0a08a9ca04 = function(arg0) {
     const ret = fetch(getObject(arg0));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_queueMicrotask_118eeb525d584d9a = function(arg0) {
+module.exports.__wbg_queueMicrotask_f61ee94ee663068b = function(arg0) {
     queueMicrotask(getObject(arg0));
 };
 
-module.exports.__wbg_queueMicrotask_26a89c14c53809c0 = function(arg0) {
+module.exports.__wbg_queueMicrotask_f82fc5d1e8f816ae = function(arg0) {
     const ret = getObject(arg0).queueMicrotask;
     return addHeapObject(ret);
 };
@@ -9033,21 +9300,21 @@ module.exports.__wbindgen_is_function = function(arg0) {
     return ret;
 };
 
-module.exports.__wbg_fetch_06d656a1b748ac0d = function(arg0, arg1) {
+module.exports.__wbg_fetch_10edd7d7da150227 = function(arg0, arg1) {
     const ret = getObject(arg0).fetch(getObject(arg1));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_new_a979e9eedc5e81a3 = function() { return handleError(function () {
+module.exports.__wbg_new_4db22fd5d40c5665 = function() { return handleError(function () {
     const ret = new Headers();
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_append_047382169b61373d = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+module.exports.__wbg_append_b2e8ed692fc5eb6e = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
     getObject(arg0).append(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
 }, arguments) };
 
-module.exports.__wbg_instanceof_Response_0d25bb8436a9cefe = function(arg0) {
+module.exports.__wbg_instanceof_Response_b5451a06784a2404 = function(arg0) {
     let result;
     try {
         result = getObject(arg0) instanceof Response;
@@ -9058,7 +9325,7 @@ module.exports.__wbg_instanceof_Response_0d25bb8436a9cefe = function(arg0) {
     return ret;
 };
 
-module.exports.__wbg_url_47f8307501523859 = function(arg0, arg1) {
+module.exports.__wbg_url_e319aee56d26ddf1 = function(arg0, arg1) {
     const ret = getObject(arg1).url;
     const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
@@ -9066,36 +9333,36 @@ module.exports.__wbg_url_47f8307501523859 = function(arg0, arg1) {
     getInt32Memory0()[arg0 / 4 + 0] = ptr1;
 };
 
-module.exports.__wbg_status_351700a30c61ba61 = function(arg0) {
+module.exports.__wbg_status_bea567d1049f0b6a = function(arg0) {
     const ret = getObject(arg0).status;
     return ret;
 };
 
-module.exports.__wbg_headers_e38c00d713e8888c = function(arg0) {
+module.exports.__wbg_headers_96d9457941f08a33 = function(arg0) {
     const ret = getObject(arg0).headers;
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_arrayBuffer_ec4617b29bb0f61c = function() { return handleError(function (arg0) {
+module.exports.__wbg_arrayBuffer_eb2005809be09726 = function() { return handleError(function (arg0) {
     const ret = getObject(arg0).arrayBuffer();
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_signal_7876560d9d0f914c = function(arg0) {
+module.exports.__wbg_signal_8fbb4942ce477464 = function(arg0) {
     const ret = getObject(arg0).signal;
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_new_fa36281638875de8 = function() { return handleError(function () {
+module.exports.__wbg_new_92cc7d259297256c = function() { return handleError(function () {
     const ret = new AbortController();
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_abort_7792bf3f664d7bb3 = function(arg0) {
+module.exports.__wbg_abort_510372063dd66b29 = function(arg0) {
     getObject(arg0).abort();
 };
 
-module.exports.__wbg_newwithstrandinit_9fd2fc855c6327eb = function() { return handleError(function (arg0, arg1, arg2) {
+module.exports.__wbg_newwithstrandinit_11fbc38beb4c26b0 = function() { return handleError(function (arg0, arg1, arg2) {
     const ret = new Request(getStringFromWasm0(arg0, arg1), getObject(arg2));
     return addHeapObject(ret);
 }, arguments) };
@@ -9149,107 +9416,107 @@ module.exports.__wbg_getRandomValues_7e42b4fb8779dc6d = function() { return hand
     getObject(arg0).getRandomValues(getObject(arg1));
 }, arguments) };
 
-module.exports.__wbg_get_c43534c00f382c8a = function(arg0, arg1) {
+module.exports.__wbg_get_0ee8ea3c7c984c45 = function(arg0, arg1) {
     const ret = getObject(arg0)[arg1 >>> 0];
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_length_d99b680fd68bf71b = function(arg0) {
+module.exports.__wbg_length_161c0d89c6535c1d = function(arg0) {
     const ret = getObject(arg0).length;
     return ret;
 };
 
-module.exports.__wbg_new_34c624469fb1d4fd = function() {
+module.exports.__wbg_new_75208e29bddfd88c = function() {
     const ret = new Array();
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_newnoargs_5859b6d41c6fe9f7 = function(arg0, arg1) {
+module.exports.__wbg_newnoargs_cfecb3965268594c = function(arg0, arg1) {
     const ret = new Function(getStringFromWasm0(arg0, arg1));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_next_1938cf110c9491d4 = function(arg0) {
+module.exports.__wbg_next_586204376d2ed373 = function(arg0) {
     const ret = getObject(arg0).next;
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_next_267398d0e0761bf9 = function() { return handleError(function (arg0) {
+module.exports.__wbg_next_b2d3366343a208b3 = function() { return handleError(function (arg0) {
     const ret = getObject(arg0).next();
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_done_506b44765ba84b9c = function(arg0) {
+module.exports.__wbg_done_90b14d6f6eacc42f = function(arg0) {
     const ret = getObject(arg0).done;
     return ret;
 };
 
-module.exports.__wbg_value_31485d8770eb06ab = function(arg0) {
+module.exports.__wbg_value_3158be908c80a75e = function(arg0) {
     const ret = getObject(arg0).value;
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_iterator_364187e1ee96b750 = function() {
+module.exports.__wbg_iterator_40027cdd598da26b = function() {
     const ret = Symbol.iterator;
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_get_5027b32da70f39b1 = function() { return handleError(function (arg0, arg1) {
+module.exports.__wbg_get_3fddfed2c83f434c = function() { return handleError(function (arg0, arg1) {
     const ret = Reflect.get(getObject(arg0), getObject(arg1));
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_call_a79f1973a4f07d5e = function() { return handleError(function (arg0, arg1) {
+module.exports.__wbg_call_3f093dd26d5569f8 = function() { return handleError(function (arg0, arg1) {
     const ret = getObject(arg0).call(getObject(arg1));
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_new_87d841e70661f6e9 = function() {
+module.exports.__wbg_new_632630b5cec17f21 = function() {
     const ret = new Object();
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_self_086b5302bcafb962 = function() { return handleError(function () {
+module.exports.__wbg_self_05040bd9523805b9 = function() { return handleError(function () {
     const ret = self.self;
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_window_132fa5d7546f1de5 = function() { return handleError(function () {
+module.exports.__wbg_window_adc720039f2cb14f = function() { return handleError(function () {
     const ret = window.window;
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_globalThis_e5f801a37ad7d07b = function() { return handleError(function () {
+module.exports.__wbg_globalThis_622105db80c1457d = function() { return handleError(function () {
     const ret = globalThis.globalThis;
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_global_f9a61fce4af6b7c1 = function() { return handleError(function () {
+module.exports.__wbg_global_f56b013ed9bcf359 = function() { return handleError(function () {
     const ret = global.global;
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_push_906164999551d793 = function(arg0, arg1) {
+module.exports.__wbg_push_0239ee92f127e807 = function(arg0, arg1) {
     const ret = getObject(arg0).push(getObject(arg1));
     return ret;
 };
 
-module.exports.__wbg_call_f6a2bc58c19c53c6 = function() { return handleError(function (arg0, arg1, arg2) {
+module.exports.__wbg_call_67f2111acd2dfdb6 = function() { return handleError(function (arg0, arg1, arg2) {
     const ret = getObject(arg0).call(getObject(arg1), getObject(arg2));
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_getTime_af7ca51c0bcefa08 = function(arg0) {
+module.exports.__wbg_getTime_0e03c3f524be31ef = function(arg0) {
     const ret = getObject(arg0).getTime();
     return ret;
 };
 
-module.exports.__wbg_new0_c0e40662db0749ee = function() {
+module.exports.__wbg_new0_7a6141101f2206da = function() {
     const ret = new Date();
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_instanceof_Object_06e0ec0f1056bcd5 = function(arg0) {
+module.exports.__wbg_instanceof_Object_4abbcd5d20d5f7df = function(arg0) {
     let result;
     try {
         result = getObject(arg0) instanceof Object;
@@ -9260,7 +9527,7 @@ module.exports.__wbg_instanceof_Object_06e0ec0f1056bcd5 = function(arg0) {
     return ret;
 };
 
-module.exports.__wbg_new_1d93771b84541aa5 = function(arg0, arg1) {
+module.exports.__wbg_new_70828a4353259d4b = function(arg0, arg1) {
     try {
         var state0 = {a: arg0, b: arg1};
         var cb0 = (arg0, arg1) => {
@@ -9279,76 +9546,76 @@ module.exports.__wbg_new_1d93771b84541aa5 = function(arg0, arg1) {
     }
 };
 
-module.exports.__wbg_resolve_97ecd55ee839391b = function(arg0) {
+module.exports.__wbg_resolve_5da6faf2c96fd1d5 = function(arg0) {
     const ret = Promise.resolve(getObject(arg0));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_then_7aeb7c5f1536640f = function(arg0, arg1) {
+module.exports.__wbg_then_f9e58f5a50f43eae = function(arg0, arg1) {
     const ret = getObject(arg0).then(getObject(arg1));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_then_5842e4e97f7beace = function(arg0, arg1, arg2) {
+module.exports.__wbg_then_20a5920e447d1cb1 = function(arg0, arg1, arg2) {
     const ret = getObject(arg0).then(getObject(arg1), getObject(arg2));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_buffer_5d1b598a01b41a42 = function(arg0) {
+module.exports.__wbg_buffer_b914fb8b50ebbc3e = function(arg0) {
     const ret = getObject(arg0).buffer;
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_newwithbyteoffsetandlength_d695c7957788f922 = function(arg0, arg1, arg2) {
+module.exports.__wbg_newwithbyteoffsetandlength_0de9ee56e9f6ee6e = function(arg0, arg1, arg2) {
     const ret = new Uint8Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_new_ace717933ad7117f = function(arg0) {
+module.exports.__wbg_new_b1f2d6842d615181 = function(arg0) {
     const ret = new Uint8Array(getObject(arg0));
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_set_74906aa30864df5a = function(arg0, arg1, arg2) {
+module.exports.__wbg_set_7d988c98e6ced92d = function(arg0, arg1, arg2) {
     getObject(arg0).set(getObject(arg1), arg2 >>> 0);
 };
 
-module.exports.__wbg_length_f0764416ba5bb237 = function(arg0) {
+module.exports.__wbg_length_21c4b0ae73cba59d = function(arg0) {
     const ret = getObject(arg0).length;
     return ret;
 };
 
-module.exports.__wbg_newwithlength_728575f3bba9959b = function(arg0) {
+module.exports.__wbg_newwithlength_0d03cef43b68a530 = function(arg0) {
     const ret = new Uint8Array(arg0 >>> 0);
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_subarray_7f7a652672800851 = function(arg0, arg1, arg2) {
+module.exports.__wbg_subarray_adc418253d76e2f1 = function(arg0, arg1, arg2) {
     const ret = getObject(arg0).subarray(arg1 >>> 0, arg2 >>> 0);
     return addHeapObject(ret);
 };
 
-module.exports.__wbg_getindex_0462906f06036feb = function(arg0, arg1) {
+module.exports.__wbg_getindex_25dd2331a4ab0671 = function(arg0, arg1) {
     const ret = getObject(arg0)[arg1 >>> 0];
     return ret;
 };
 
-module.exports.__wbg_parse_06816e879d29d4df = function() { return handleError(function (arg0, arg1) {
+module.exports.__wbg_parse_1ed8bea2409da238 = function() { return handleError(function (arg0, arg1) {
     const ret = JSON.parse(getStringFromWasm0(arg0, arg1));
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_stringify_daa6661e90c04140 = function() { return handleError(function (arg0) {
+module.exports.__wbg_stringify_865daa6fb8c83d5a = function() { return handleError(function (arg0) {
     const ret = JSON.stringify(getObject(arg0));
     return addHeapObject(ret);
 }, arguments) };
 
-module.exports.__wbg_has_a2919659b7b645b3 = function() { return handleError(function (arg0, arg1) {
+module.exports.__wbg_has_ad45eb020184f624 = function() { return handleError(function (arg0, arg1) {
     const ret = Reflect.has(getObject(arg0), getObject(arg1));
     return ret;
 }, arguments) };
 
-module.exports.__wbg_set_37a50e901587b477 = function() { return handleError(function (arg0, arg1, arg2) {
+module.exports.__wbg_set_961700853a212a39 = function() { return handleError(function (arg0, arg1, arg2) {
     const ret = Reflect.set(getObject(arg0), getObject(arg1), getObject(arg2));
     return ret;
 }, arguments) };
@@ -9370,7 +9637,7 @@ module.exports.__wbindgen_memory = function() {
     return addHeapObject(ret);
 };
 
-module.exports.__wbindgen_closure_wrapper3906 = function(arg0, arg1, arg2) {
+module.exports.__wbindgen_closure_wrapper3914 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 800, __wbg_adapter_32);
     return addHeapObject(ret);
 };
