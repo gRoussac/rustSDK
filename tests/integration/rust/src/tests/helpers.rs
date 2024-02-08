@@ -31,11 +31,9 @@ pub(crate) mod intern {
         TestConfig, ARGS_JSON, CEP78_CONTRACT, CHAIN_NAME, DEFAULT_NODE_ADDRESS, DEPLOY_TIME,
         PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
     };
-    #[cfg(test)]
     use casper_rust_wasm_sdk::rpcs::query_global_state::{
         KeyIdentifierInput, QueryGlobalStateParams,
     };
-    #[cfg(test)]
     use casper_rust_wasm_sdk::types::uref::URef;
     use casper_rust_wasm_sdk::types::{
         deploy_hash::DeployHash,
@@ -45,11 +43,11 @@ pub(crate) mod intern {
         },
     };
     use casper_rust_wasm_sdk::SDK;
-    #[cfg(test)]
     use casper_rust_wasm_sdk::{
         rpcs::get_dictionary_item::DictionaryItemInput,
         types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
     };
+    use serde_json::{to_string, Value};
     use std::thread;
 
     pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
@@ -59,7 +57,6 @@ pub(crate) mod intern {
         }
     }
 
-    #[cfg(test)]
     pub async fn get_main_purse(account_identifier_as_string: &str) -> String {
         let purse_uref: URef = create_test_sdk(None)
             .get_account(
@@ -78,7 +75,6 @@ pub(crate) mod intern {
         purse_uref.to_formatted_string()
     }
 
-    #[cfg(test)]
     pub async fn get_dictionnary_key(
         contract_hash: &str,
         dictionary_name: &str,
@@ -116,7 +112,6 @@ pub(crate) mod intern {
         dictionary_key.to_string()
     }
 
-    #[cfg(test)]
     pub async fn get_dictionnary_uref(contract_hash: &str, dictionary_name: &str) -> String {
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(contract_hash.to_string()),

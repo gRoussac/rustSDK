@@ -1,5 +1,4 @@
 pub mod helpers;
-#[cfg(test)]
 pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
@@ -12,13 +11,14 @@ use std::{
     time::{self, Duration},
 };
 
-pub async fn _run_tests_or_examples() {
+pub async fn run_tests_or_examples() {
     // Run a specific test ?
-    // integration::rpcs::test_module::test_get_peers().await;
+    integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_1().await;
+    let _ = _run_example_3().await;
 }
 
+// get_deploy
 pub async fn _run_example_1() {
     let sdk = SDK::new(
         Some("https://rpc.integration.casperlabs.io".to_string()),
@@ -41,6 +41,7 @@ pub async fn _run_example_1() {
     println!("{timestamp}");
 }
 
+// get_auction_info
 pub async fn _run_example_2() {
     let sdk = SDK::new(
         Some("https://rpc.integration.casperlabs.io".to_string()),
@@ -56,6 +57,7 @@ pub async fn _run_example_2() {
     println!("{block_height}");
 }
 
+// get_peers
 pub async fn _run_example_3() {
     let sdk = SDK::new(
         Some("https://rpc.integration.casperlabs.io".to_string()),
@@ -70,6 +72,7 @@ pub async fn _run_example_3() {
     }
 }
 
+// get_block
 pub async fn _run_example_4() {
     let sdk = SDK::new(
         Some("https://rpc.integration.casperlabs.io".to_string()),
@@ -88,6 +91,7 @@ pub async fn _run_example_4() {
     println!("{:?}", block_hash);
 }
 
+// make_transfer
 pub async fn _run_example_5() {
     let sdk = SDK::new(
         Some("https://rpc.integration.casperlabs.io".to_string()),
@@ -130,6 +134,7 @@ pub async fn _run_example_5() {
     println!("{:?}", make_transfer.timestamp());
 }
 
+// transfer
 pub async fn _run_example_6() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -176,6 +181,7 @@ pub async fn _run_example_6() {
     println!("{:?}", transfer.as_ref().unwrap().result.deploy_hash);
 }
 
+// make_deploy
 pub async fn _run_example_7() {
     let sdk = SDK::new(
         Some("https://rpc.integration.casperlabs.io".to_string()),
@@ -217,6 +223,7 @@ pub async fn _run_example_7() {
     println!("{:?}", deploy.timestamp());
 }
 
+// deploy
 pub async fn _run_example_8() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -260,6 +267,7 @@ pub async fn _run_example_8() {
     println!("{:?}", deploy.as_ref().unwrap().result.deploy_hash);
 }
 
+// put_deploy
 pub async fn _run_example_9() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -307,6 +315,7 @@ pub async fn _run_example_9() {
     println!("{:?}", put_deploy.as_ref().unwrap().result.deploy_hash);
 }
 
+// put_deploy transfer
 pub async fn _run_example_10() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -353,6 +362,7 @@ pub async fn _run_example_10() {
     println!("{:?}", put_deploy.as_ref().unwrap().result.deploy_hash);
 }
 
+// install
 pub async fn _run_example_11() -> Result<(), String> {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -397,7 +407,7 @@ pub async fn _run_example_11() -> Result<(), String> {
 {"name": "metadata_mutability", "type": "U8", "value": 0},
 {"name": "events_mode", "type": "U8", "value": 1}
 ]"#;
-    pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "300000000000";
+    pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "400000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
     pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
@@ -442,13 +452,12 @@ pub async fn _run_example_11() -> Result<(), String> {
         .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    println!(
-        "{}",
-        json_pretty_print(get_deploy.result, Some(Verbosity::High))
-    );
+    let result = &get_deploy.result.execution_results.first().unwrap().result;
+    println!("{}", json_pretty_print(result, Some(Verbosity::High)));
     Ok(())
 }
 
+// call_entrypoint
 pub async fn _run_example_12() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
