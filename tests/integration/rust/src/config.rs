@@ -1,11 +1,9 @@
-#[cfg(test)]
 use crate::tests::helpers::{
     get_block,
     intern::{get_dictionnary_key, get_dictionnary_uref, get_main_purse},
     read_pem_file,
 };
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
-#[cfg(test)]
 use casper_rust_wasm_sdk::{helpers::public_key_from_private_key, types::public_key::PublicKey};
 use lazy_static::lazy_static;
 use std::time::{self, Duration};
@@ -29,7 +27,7 @@ pub const CEP78_CONTRACT: &str = "cep78.wasm";
 pub const PAYMENT_AMOUNT: &str = "5500000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const PAYMENT_TRANSFER_AMOUNT: &str = "100000000";
-pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "300000000000";
+pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CONTRACT_CEP78_KEY: &str = "cep78_contract_hash_enhanced-nft-1";
 pub const PACKAGE_CEP78_KEY: &str = "cep78_contract_package_enhanced-nft-1";
 pub const ENTRYPOINT_MINT: &str = "mint";
@@ -82,7 +80,6 @@ lazy_static! {
     pub static ref BLOCK_HASH_INITIALIZED: Mutex<bool> = Mutex::new(false);
 }
 
-#[cfg(test)]
 pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::Error>> {
     use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
 
@@ -151,13 +148,11 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     Ok(config)
 }
 
-#[cfg(test)]
 pub async fn get_config() -> TestConfig {
     initialize_test_config_if_needed().await;
     CONFIG.lock().await.clone().unwrap()
 }
 
-#[cfg(test)]
 async fn initialize_test_config_if_needed() {
     let mut config_guard = CONFIG.lock().await;
     if config_guard.is_none() {
