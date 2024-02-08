@@ -1965,6 +1965,56 @@ export class SDK {
 */
   sign_deploy(deploy: Deploy, secret_key: string): Deploy;
 /**
+* Installs a smart contract with the specified parameters and returns the result.
+*
+* # Arguments
+*
+* * `deploy_params` - The deploy parameters.
+* * `session_params` - The session parameters.
+* * `payment_amount` - The payment amount as a string.
+* * `node_address` - An optional node address to send the request to.
+*
+* # Returns
+*
+* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the installation.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {string} payment_amount
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+/**
+* This function allows executing a deploy speculatively.
+*
+* # Arguments
+*
+* * `deploy_params` - Deployment parameters for the deploy.
+* * `session_params` - Session parameters for the deploy.
+* * `payment_params` - Payment parameters for the deploy.
+* * `maybe_block_id_as_string` - An optional block ID as a string.
+* * `maybe_block_identifier` - Optional block identifier.
+* * `verbosity` - Optional verbosity level.
+* * `node_address` - Optional node address.
+*
+* # Returns
+*
+* A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @param {string | undefined} [maybe_block_id_as_string]
+* @param {BlockIdentifier | undefined} [maybe_block_identifier]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<SpeculativeExecResult>}
+*/
+  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
+/**
 * JS Alias for transferring funds.
 *
 * # Arguments
@@ -2012,30 +2062,6 @@ export class SDK {
 * @returns {Deploy}
 */
   make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
-/**
-* Calls a smart contract entry point with the specified parameters and returns the result.
-*
-* # Arguments
-*
-* * `deploy_params` - The deploy parameters.
-* * `session_params` - The session parameters.
-* * `payment_amount` - The payment amount as a string.
-* * `node_address` - An optional node address to send the request to.
-*
-* # Returns
-*
-* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the call.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {string} payment_amount
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
@@ -2174,7 +2200,7 @@ export class SDK {
 */
   query_global_state(options?: queryGlobalStateOptions): Promise<QueryGlobalStateResult>;
 /**
-* Installs a smart contract with the specified parameters and returns the result.
+* Calls a smart contract entry point with the specified parameters and returns the result.
 *
 * # Arguments
 *
@@ -2189,14 +2215,14 @@ export class SDK {
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the installation.
+* Returns a `JsError` if there is an error during the call.
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {string} payment_amount
 * @param {string | undefined} [node_address]
 * @returns {Promise<PutDeployResult>}
 */
-  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
 * @param {string | undefined} [node_address]
 * @param {Verbosity | undefined} [verbosity]
@@ -2328,32 +2354,6 @@ export class SDK {
 * @returns {Promise<QueryGlobalStateResult>}
 */
   query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
-/**
-* This function allows executing a deploy speculatively.
-*
-* # Arguments
-*
-* * `deploy_params` - Deployment parameters for the deploy.
-* * `session_params` - Session parameters for the deploy.
-* * `payment_params` - Payment parameters for the deploy.
-* * `maybe_block_id_as_string` - An optional block ID as a string.
-* * `maybe_block_identifier` - Optional block identifier.
-* * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
-*
-* # Returns
-*
-* A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @param {string | undefined} [maybe_block_id_as_string]
-* @param {BlockIdentifier | undefined} [maybe_block_identifier]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<SpeculativeExecResult>}
-*/
-  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
 }
 /**
 */
