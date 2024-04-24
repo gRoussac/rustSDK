@@ -25,6 +25,7 @@ export class SubmitFileComponent {
   async onDeployFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.item(0);
     let text;
+    this.deploy_json = '';
     if (file) {
       text = await file.text();
       if (!text.trim()) {
@@ -39,10 +40,9 @@ export class SubmitFileComponent {
         console.error(error);
         this.errorService.setError(error as string);
       }
-    } else {
-      this.deploy_json = '';
     }
     this.select_file.emit(this.deploy_json);
+    this.deployFileElt.nativeElement.value = '';
   }
 
   deployFileClick() {
