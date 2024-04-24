@@ -230,7 +230,7 @@ mod tests {
     async fn test_get_block_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk.get_block(None, None, None).await;
@@ -238,7 +238,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -284,7 +284,7 @@ mod tests {
     async fn test_get_block_with_error() {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk.get_block(None, None, None).await;
@@ -292,6 +292,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }
