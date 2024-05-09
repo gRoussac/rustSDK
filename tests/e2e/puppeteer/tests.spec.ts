@@ -351,6 +351,8 @@ describe('Angular App Tests', () => {
       await clear();
       await seletAction('get_era_info');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await delay(300);
     });
 
     afterEach(async () => {
