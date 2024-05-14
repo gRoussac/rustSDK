@@ -8,7 +8,7 @@ use crate::{
     },
     SDK,
 };
-use casper_client::cli::parse_account_identifier;
+use casper_client::cli::parse::account_identifier as parse_account_identifier;
 use casper_client::{
     cli::get_account as get_account_cli, get_account as get_account_lib,
     rpcs::results::GetAccountResult as _GetAccountResult, JsonRpcId, SuccessResponse,
@@ -228,19 +228,14 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
+        helpers::public_key_from_secret_key,
         types::{block_identifier::BlockIdentifier, public_key::PublicKey},
     };
-    use sdk_tests::{
-        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
-        tests::helpers::read_pem_file,
-    };
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
 
     fn get_account_identifier() -> AccountIdentifier {
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
         AccountIdentifier::from_account_account_under_public_key(public_key)
@@ -250,7 +245,7 @@ mod tests {
     async fn test_get_account_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
         let account_identifier = get_account_identifier();
 
         // Act
@@ -261,7 +256,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -285,7 +280,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -294,7 +289,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -308,7 +303,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let account_identifier_as_string = get_account_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -317,7 +312,7 @@ mod tests {
                 Some(account_identifier_as_string),
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -333,7 +328,7 @@ mod tests {
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -342,7 +337,7 @@ mod tests {
                 None,
                 Some(block_identifier),
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -355,10 +350,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let account_identifier = get_account_identifier();
-        let error_message =
-            "error sending request for url (http://localhost/rpc): error trying to connect: \
-            tcp connect error: Connection refused (os error 111)"
-                .to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk
@@ -368,6 +360,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

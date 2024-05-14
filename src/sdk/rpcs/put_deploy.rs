@@ -99,27 +99,22 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
+        helpers::public_key_from_secret_key,
         types::deploy_params::{
             deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         },
     };
     use sdk_tests::{
-        config::{
-            CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
-            TRANSFER_AMOUNT,
-        },
-        tests::helpers::read_pem_file,
+        config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
 
     fn get_deploy() -> Deploy {
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
-
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
+        let (_, _, chain_name) = get_network_constants();
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -137,7 +132,7 @@ mod tests {
     async fn test_put_deploy_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
         let deploy = get_deploy();
 
         // Act
@@ -146,7 +141,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -154,11 +149,11 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let deploy = get_deploy();
 
         // Act
-        let result = sdk.put_deploy(deploy, verbosity, node_address).await;
+        let result = sdk.put_deploy(deploy, verbosity, Some(node_address)).await;
 
         // Assert
         assert!(result.is_ok());
@@ -168,7 +163,7 @@ mod tests {
     async fn test_put_deploy_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
         let deploy = get_deploy();
 
         // Act
@@ -177,6 +172,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

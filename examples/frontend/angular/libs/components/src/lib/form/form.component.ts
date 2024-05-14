@@ -70,9 +70,12 @@ export class FormComponent implements AfterViewInit, OnDestroy {
 
   async onDeployFileSelected(deploy_json: string) {
     deploy_json = deploy_json && jsonPrettyPrint(new Deploy(deploy_json).toJson(), this.verbosity as Verbosity);
+    this.updateDeployJson(deploy_json);
+  }
+
+  updateDeployJson(deploy_json: string) {
     deploy_json && this.stateService.setState({
       deploy_json
     });
   }
-
 }

@@ -1,6 +1,6 @@
 [package]
 name = "casper-rust-wasm-sdk"
-version = "0.1.0"
+version = "2.0.0"
 edition = "2021"
 description = "Casper Rust Wasm Web SDK"
 repository = "https://github.com/casper-ecosystem/rustSDK"
@@ -21,14 +21,10 @@ exclude = [
 
 
 [dependencies]
-casper-types = { version = "3.0.0", git = "https://github.com/casper-network/casper-node.git", branch = "rustSDK-feat-2.0", default-features = false }
-casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "rustSDK-feat-2.0", default-features = false, features = [
-  "sdk",
-] }
+casper-types = { version = "5.0.0", default-features = false }
+casper-client = { version = "2.0.0", default-features = false }
 rand = { version = "0.8.5", default-features = false }
-wee_alloc = { version = "*", default-features = false, optional = true }
 wasm-bindgen = "*"
-wasm-bindgen-test = "*"
 wasm-bindgen-futures = "*"
 js-sys = "*"
 gloo-utils = { version = "0.2", default-features = false, features = ["serde"] }
@@ -38,11 +34,14 @@ once_cell = { version = "1.18.0", default-features = false }
 chrono = "0.4.31"
 num-traits = "0.2"
 humantime = "2"
-thiserror = "=1.0.34"
+thiserror = "1"
 base16 = "0.2.1"
+base64 = { version = "0.21.2", default-features = false, features = ["alloc"] }
 hex = { version = "0.4.3", default-features = false }
 rust_decimal = "1.10"
 blake2 = { version = "0.9.0", default-features = false }
+reqwest = { version = "0.11", default-features = false, features = ["stream"] }
+futures-util = "*"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -59,4 +58,9 @@ lto = true
 
 [dev-dependencies]
 sdk_tests = { path = "tests/integration/rust" }
-tokio = { version = "1", features = ["full"] }
+ctor = "*"
+dotenv = "0.15.0"
+
+[patch.crates-io]
+casper-types = { git = "https://github.com/casper-network/casper-node", branch = "rustSDK-feat-2.0" }
+casper-client = { git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "rustSDK-feat-2.0" }

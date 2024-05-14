@@ -25,7 +25,7 @@ pub mod test_module_deploy {
     use std::thread;
 
     pub async fn test_deploy_type() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -51,7 +51,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_transfer() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -74,7 +74,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_ttl() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -98,7 +98,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_timestamp() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -130,7 +130,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_chain_name() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -156,7 +156,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_account() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -182,7 +182,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_entry_point_name() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -206,7 +206,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_hash() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -240,7 +240,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_by_name() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -262,7 +262,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_package_hash() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -300,7 +300,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_module_bytes() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -339,7 +339,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_secret_key() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -364,7 +364,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_with_standard_payment() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -389,7 +389,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_is_expired() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let old_timestamp = "2023-09-05T16:53:46";
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
@@ -424,7 +424,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_sign() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -453,7 +453,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_footprint() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -478,7 +478,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_empty_args() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -499,7 +499,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_args() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -526,7 +526,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_args_json() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -549,7 +549,7 @@ pub mod test_module_deploy {
     }
 
     pub async fn test_deploy_type_add_arg() {
-        let config: TestConfig = get_config().await;
+        let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
@@ -574,6 +574,46 @@ pub mod test_module_deploy {
         deploy = deploy.add_arg(arg_json.into(), Some(config.private_key.clone()));
         assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 2);
+    }
+
+    pub async fn test_deploy_type_add_signature() {
+        let config: TestConfig = get_config(false).await;
+        let deploy_params = DeployStrParams::new(
+            &config.chain_name,
+            &config.account,
+            None,
+            None,
+            Some(TTL.to_string()),
+        );
+        let session_params = SessionStrParams::default();
+        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+        let deploy =
+            Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
+                .unwrap();
+        // assert!(deploy.is_valid());
+        // assert!(deploy.has_valid_hash());
+        // assert!(deploy
+        //     .compute_approvals_hash()
+        //     .unwrap()
+        //     .to_string()
+        //     .is_empty());
+
+        let signature = "02ae4a8f1cd2c7480c3f7d70ba9aa74263703d404334981eec5f940545ebe3ad998996ba8819156086105109eb9bedeba4985d7c36c0beb66bf7ff8505548f3fed";
+        let deploy_signed = deploy.add_signature(&config.account, signature);
+
+        // Parse the JSON string in 1.6
+        let parsed_json: Value =
+            serde_json::from_str(&deploy_signed.to_json_string().unwrap()).unwrap();
+        let cl_value_as_value = &parsed_json["approvals"][0]["signer"];
+        assert_eq!(
+            *cl_value_as_value,
+            Value::String(config.account.to_string())
+        );
+        let cl_value_as_value = &parsed_json["approvals"][0]["signature"];
+        assert_eq!(*cl_value_as_value, Value::String(signature.to_string()));
     }
 }
 
@@ -661,5 +701,9 @@ mod tests_deploy {
     #[test]
     pub async fn test_deploy_type_add_arg_test() {
         test_deploy_type_add_arg().await;
+    }
+    #[test]
+    pub async fn test_deploy_type_add_signature_test() {
+        test_deploy_type_add_signature().await;
     }
 }

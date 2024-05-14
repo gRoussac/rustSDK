@@ -208,21 +208,14 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{
-            deploy_hash::DeployHash,
-            deploy_params::{
-                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-            },
+        helpers::public_key_from_secret_key,
+        types::deploy_params::{
+            deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
         },
     };
     use sdk_tests::{
-        config::{
-            CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
-            TRANSFER_AMOUNT,
-        },
-        tests::helpers::read_pem_file,
+        config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
 
     #[tokio::test]
@@ -230,7 +223,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk.get_deploy(deploy_hash, None, None, None).await;
@@ -238,7 +231,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -247,11 +240,11 @@ mod tests {
         let sdk = SDK::new(None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_deploy(deploy_hash, None, verbosity, node_address)
+            .get_deploy(deploy_hash, None, verbosity, Some(node_address))
             .await;
 
         // Assert
@@ -263,14 +256,13 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let make_transfer = sdk
@@ -281,7 +273,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                node_address.clone(),
+                Some(node_address.clone()),
             )
             .await
             .unwrap();
@@ -290,7 +282,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_deploy(deploy_hash.into(), None, verbosity, node_address)
+            .get_deploy(deploy_hash.into(), None, verbosity, Some(node_address))
             .await;
 
         // Assert
@@ -302,14 +294,13 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let make_transfer = sdk
@@ -320,7 +311,7 @@ mod tests {
                 deploy_params,
                 payment_params,
                 verbosity,
-                node_address.clone(),
+                Some(node_address.clone()),
             )
             .await
             .unwrap();
@@ -334,7 +325,7 @@ mod tests {
                 deploy_hash.into(),
                 Some(finalized_approvals),
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -347,7 +338,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk.get_deploy(deploy_hash, None, None, None).await;
@@ -355,6 +346,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

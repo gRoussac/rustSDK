@@ -199,17 +199,15 @@ impl SDK {
 #[cfg(test)]
 mod tests {
 
-    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
-
-    use crate::types::{block_hash::BlockHash, block_identifier::BlockIdentifier};
-
     use super::*;
+    use crate::types::{block_hash::BlockHash, block_identifier::BlockIdentifier};
+    use sdk_tests::tests::helpers::get_network_constants;
 
     #[tokio::test]
     async fn test_get_auction_info_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk.get_auction_info(None, None, None).await;
@@ -217,7 +215,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -225,23 +223,16 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
-        let result = sdk.get_block(None, verbosity, node_address.clone()).await;
-        let block_hash = BlockHash::from(
-            *result
-                .unwrap()
-                .result
-                .block_with_signatures
-                .unwrap()
-                .block
-                .hash(),
-        )
-        .to_string();
+        let (node_address, _, _) = get_network_constants();
+        let result = sdk
+            .get_block(None, verbosity, Some(node_address.clone()))
+            .await;
+        let block_hash = BlockHash::from(*result.unwrap().result.block.unwrap().hash()).to_string();
         let block_identifier = BlockIdentifierInput::String(block_hash.to_string());
 
         // Act
         let result = sdk
-            .get_auction_info(Some(block_identifier), verbosity, node_address.clone())
+            .get_auction_info(Some(block_identifier), verbosity, Some(node_address))
             .await;
 
         // Assert
@@ -255,11 +246,11 @@ mod tests {
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_auction_info(Some(block_identifier), verbosity, node_address.clone())
+            .get_auction_info(Some(block_identifier), verbosity, Some(node_address))
             .await;
 
         // Assert
@@ -270,7 +261,7 @@ mod tests {
     async fn test_get_auction_info_with_error() {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk.get_auction_info(None, None, None).await;
@@ -278,6 +269,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }
