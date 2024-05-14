@@ -268,26 +268,18 @@ impl SDK {
 #[cfg(test)]
 mod tests {
 
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+
     use super::*;
-    use crate::{helpers::public_key_from_private_key, rpcs::PRIVATE_KEY_NCTL_PATH};
-    use sdk_tests::{
-        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
-        tests::helpers::read_pem_file,
-    };
+    use crate::helpers::public_key_from_secret_key;
 
     async fn get_purse_uref() -> URef {
         let sdk = SDK::new(None, None);
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
-        let purse_uref = sdk
-            .get_account(
-                None,
-                Some(account),
-                None,
-                None,
-                Some(DEFAULT_NODE_ADDRESS.to_string()),
-            )
+        let (node_address, _, _) = get_network_constants();
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
+        let purse_uref = *sdk
+            .get_account(None, Some(account), None, None, Some(node_address))
             .await
             .unwrap()
             .result
@@ -301,7 +293,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk
@@ -316,18 +308,19 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
     async fn test_get_balance_with_purse_uref() {
         // Arrange
         let sdk = SDK::new(None, None);
+        let (node_address, _, _) = get_network_constants();
         let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_balance("", purse_uref, None, Some(node_address))
             .await;
 
         // Assert
@@ -338,12 +331,13 @@ mod tests {
     async fn test_get_balance_with_purse_uref_as_string() {
         // Arrange
         let sdk = SDK::new(None, None);
+        let (node_address, _, _) = get_network_constants();
         let purse_uref =
             GetBalanceInput::PurseUrefAsString(get_purse_uref().await.to_formatted_string());
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(DEFAULT_NODE_ADDRESS.to_string()))
+            .get_balance("", purse_uref, None, Some(node_address))
             .await;
 
         // Assert
@@ -354,12 +348,10 @@ mod tests {
     async fn test_get_balance_with_state_root_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
+        let (node_address, _, _) = get_network_constants();
+
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(
-                None,
-                Some(Verbosity::High),
-                Some(DEFAULT_NODE_ADDRESS.to_string()),
-            )
+            .get_state_root_hash(None, Some(Verbosity::High), Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -374,7 +366,7 @@ mod tests {
                 state_root_hash.to_digest(),
                 purse_uref,
                 None,
-                Some(DEFAULT_NODE_ADDRESS.to_string()),
+                Some(node_address),
             )
             .await;
 
@@ -386,7 +378,7 @@ mod tests {
     async fn test_get_balance_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
         let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
 
         // Act
@@ -402,6 +394,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

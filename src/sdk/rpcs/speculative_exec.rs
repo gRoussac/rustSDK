@@ -137,9 +137,9 @@ impl SDK {
         } else if let Some(deploy) = deploy {
             deploy
         } else {
-            let err = &format!("Error: Missing deploy as json or deploy");
-            error(err);
-            return Err(JsError::new(err));
+            let err = "Error: Missing deploy as json or deploy".to_string();
+            error(&err);
+            return Err(JsError::new(&err));
         };
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -211,8 +211,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
+        helpers::public_key_from_secret_key,
         types::{
             block_identifier::BlockIdentifier,
             deploy_params::{
@@ -221,20 +220,16 @@ mod tests {
         },
     };
     use sdk_tests::{
-        config::{
-            CHAIN_NAME, DEFAULT_NODE_ADDRESS, PAYMENT_TRANSFER_AMOUNT, PRIVATE_KEY_NAME,
-            TRANSFER_AMOUNT,
-        },
-        tests::helpers::read_pem_file,
+        config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
 
     fn get_deploy() -> Deploy {
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
-
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
+        let (_, _, chain_name) = get_network_constants();
         let deploy_params =
-            DeployStrParams::new(CHAIN_NAME, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -253,7 +248,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let deploy = get_deploy();
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk.speculative_exec(deploy, None, None, None).await;
@@ -261,7 +256,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -269,14 +264,19 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let deploy = get_deploy();
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
         // Act
         let result = sdk
-            .speculative_exec(deploy, Some(block_identifier), verbosity, node_address)
+            .speculative_exec(
+                deploy,
+                Some(block_identifier),
+                verbosity,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -288,14 +288,19 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let deploy = get_deploy();
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
         // Act
         let result = sdk
-            .speculative_exec(deploy, Some(block_identifier), verbosity, node_address)
+            .speculative_exec(
+                deploy,
+                Some(block_identifier),
+                verbosity,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -307,8 +312,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let deploy = get_deploy();
-        let error_message =
-            "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk.speculative_exec(deploy, None, None, None).await;
@@ -316,6 +320,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

@@ -307,41 +307,47 @@ export class ClientService {
     // if (this.private_key) {
     //   test_deploy = test_deploy.sign(this.private_key);
     // }
-    let result;
-    if (speculative) {
-      const maybe_block_options = {
-        maybe_block_id_as_string: undefined,
-        maybe_block_identifier: undefined,
-      };
-      this.getIdentifieBlock(maybe_block_options);
-      const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
-      result = await this.sdk.speculative_deploy(
-        deploy_params,
-        session_params,
-        payment_params,
-        maybe_block_id_as_string,
-        maybe_block_identifier
-      );
+    try {
+      let result;
+      if (speculative) {
+        const maybe_block_options = {
+          maybe_block_id_as_string: undefined,
+          maybe_block_identifier: undefined,
+        };
+        this.getIdentifieBlock(maybe_block_options);
+        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
+        result = await this.sdk.speculative_deploy(
+          deploy_params,
+          session_params,
+          payment_params,
+          maybe_block_id_as_string,
+          maybe_block_identifier
+        );
+      }
+      else if (deploy_result) {
+        result = await this.sdk.deploy(
+          deploy_params,
+          session_params,
+          payment_params,
+        );
+      } else {
+        result = this.sdk.make_deploy(
+          deploy_params,
+          session_params,
+          payment_params,
+        );
+      }
+      if (result) {
+        const result_json = result.toJson();
+        this.deploy_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
+        this.deploy_json && this.resultService.setResult(result_json);
+        !deploy_result && this.updateDeployJson(this.deploy_json);
+      }
+      return result;
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
     }
-    else if (deploy_result) {
-      result = await this.sdk.deploy(
-        deploy_params,
-        session_params,
-        payment_params,
-      );
-    } else {
-      result = this.sdk.make_deploy(
-        deploy_params,
-        session_params,
-        payment_params,
-      );
-    }
-    if (result) {
-      const result_json = result.toJson();
-      this.deploy_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
-      this.deploy_json && this.resultService.setResult(result_json);
-    }
-    return result;
   }
 
   async install(wasm?: Uint8Array) {
@@ -413,47 +419,53 @@ export class ClientService {
     //   payment_params,
     // );
     // console.log(test_transfer);
-    let result;
-    if (speculative) {
-      const maybe_block_options = {
-        maybe_block_id_as_string: undefined,
-        maybe_block_identifier: undefined,
-      };
-      this.getIdentifieBlock(maybe_block_options);
-      const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
-      result = await this.sdk.speculative_transfer(
-        transfer_amount,
-        target_account,
-        undefined, // transfer_id
-        deploy_params,
-        payment_params,
-        maybe_block_id_as_string,
-        maybe_block_identifier
-      );
+    try {
+      let result;
+      if (speculative) {
+        const maybe_block_options = {
+          maybe_block_id_as_string: undefined,
+          maybe_block_identifier: undefined,
+        };
+        this.getIdentifieBlock(maybe_block_options);
+        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
+        result = await this.sdk.speculative_transfer(
+          transfer_amount,
+          target_account,
+          undefined, // transfer_id
+          deploy_params,
+          payment_params,
+          maybe_block_id_as_string,
+          maybe_block_identifier
+        );
+      }
+      else if (deploy_result) {
+        result = await this.sdk.transfer(
+          transfer_amount,
+          target_account,
+          undefined, // transfer_id
+          deploy_params,
+          payment_params,
+        );
+      } else {
+        result = await this.sdk.make_transfer(
+          transfer_amount,
+          target_account,
+          undefined, // transfer_id
+          deploy_params,
+          payment_params,
+        );
+      }
+      if (result) {
+        const result_json = result.toJson();
+        this.deploy_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
+        this.deploy_json && this.resultService.setResult(result_json);
+        !deploy_result && this.updateDeployJson(this.deploy_json);
+      }
+      return result;
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
     }
-    else if (deploy_result) {
-      result = await this.sdk.transfer(
-        transfer_amount,
-        target_account,
-        undefined, // transfer_id
-        deploy_params,
-        payment_params,
-      );
-    } else {
-      result = await this.sdk.make_transfer(
-        transfer_amount,
-        target_account,
-        undefined, // transfer_id
-        deploy_params,
-        payment_params,
-      );
-    }
-    if (result) {
-      const result_json = result.toJson();
-      this.deploy_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
-      this.deploy_json && this.resultService.setResult(result_json);
-    }
-    return result;
   }
 
   async put_deploy() {
@@ -544,6 +556,13 @@ export class ClientService {
     signed_deploy = signed_deploy.sign(this.private_key);
     this.deploy_json = jsonPrettyPrint(signed_deploy.toJson(), this.verbosity as Verbosity);
     this.getIdentifier('deployJson')?.setValue(this.deploy_json);
+    this.updateDeployJson(this.deploy_json);
+  }
+
+  private updateDeployJson(deploy_json: string) {
+    deploy_json && this.stateService.setState({
+      deploy_json
+    });
   }
 
   async make_deploy(wasm?: Uint8Array) {

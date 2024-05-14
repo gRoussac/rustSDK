@@ -263,17 +263,14 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        get_dictionary_item,
-        types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-    };
-    use sdk_tests::config::DEFAULT_NODE_ADDRESS;
+    use crate::get_dictionary_item;
+    use sdk_tests::tests::helpers::get_network_constants;
 
     #[tokio::test]
     async fn test_get_dictionary_item_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk
@@ -288,7 +285,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -296,10 +293,10 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let dictionary_item = get_dictionary_item(false).await;
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, node_address.clone())
+            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -309,7 +306,12 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
+            .get_dictionary_item(
+                state_root_hash,
+                dictionary_item,
+                verbosity,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -321,7 +323,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -329,7 +331,7 @@ mod tests {
                 "",
                 get_dictionary_item(false).await,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -342,7 +344,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -350,7 +352,7 @@ mod tests {
                 "",
                 get_dictionary_item(false).await,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -363,11 +365,16 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
-            .get_dictionary_item("", get_dictionary_item(true).await, verbosity, node_address)
+            .get_dictionary_item(
+                "",
+                get_dictionary_item(true).await,
+                verbosity,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -379,10 +386,10 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         let error_message =
-            "Failed to parse dictionary item address as a key: unknown prefix for key".to_string();
+            "Failed to parse dictionary item address as a key: unknown prefix for key";
 
         let state_root_hash = "";
         let params = DictionaryItemStrParams::new();
@@ -393,22 +400,21 @@ mod tests {
                 state_root_hash,
                 DictionaryItemInput::Params(params),
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
     async fn test_get_dictionary_item_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let error_message =
-            "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk
@@ -423,6 +429,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

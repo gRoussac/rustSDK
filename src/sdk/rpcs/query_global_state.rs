@@ -407,22 +407,15 @@ impl SDK {
 #[cfg(test)]
 mod tests {
 
-    use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{global_state_identifier::GlobalStateIdentifier, public_key::PublicKey},
-    };
-    use sdk_tests::{
-        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
-        tests::helpers::read_pem_file,
-    };
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+
+    use crate::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
 
     use super::*;
 
     fn get_key_input() -> KeyIdentifierInput {
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
         KeyIdentifierInput::String(public_key.to_account_hash().to_formatted_string())
     }
@@ -431,7 +424,7 @@ mod tests {
     async fn test_query_global_state_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk
@@ -449,7 +442,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -457,8 +450,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let error_message =
-            "Invalid argument 'query_global_state': Error: Missing key from formatted string"
-                .to_string();
+            "Invalid argument 'query_global_state': Error: Missing key from formatted string";
 
         // Act
         let result = sdk
@@ -476,7 +468,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -485,7 +477,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -496,7 +488,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity,
-                node_address: node_address.clone(),
+                node_address: Some(node_address),
             })
             .await;
 
@@ -509,9 +501,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, node_address.clone())
+            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -527,7 +519,7 @@ mod tests {
                 state_root_hash: Some(state_root_hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
-                node_address,
+                node_address: Some(node_address),
             })
             .await;
 
@@ -540,7 +532,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -551,7 +543,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: Some("1".to_string()),
                 verbosity,
-                node_address: node_address.clone(),
+                node_address: Some(node_address),
             })
             .await;
 
@@ -563,7 +555,7 @@ mod tests {
     async fn test_query_global_state_with_error() {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
         // Act
         let result = sdk
             .query_global_state(QueryGlobalStateParams {
@@ -580,6 +572,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

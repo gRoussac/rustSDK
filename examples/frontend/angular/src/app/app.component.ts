@@ -11,6 +11,7 @@ import { ClientService } from '@util/client';
 import { FormService } from '@util/form';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ErrorService } from '@util/error';
+import { StorageService } from '@util/storage';
 
 const imports = [
   CommonModule,
@@ -52,12 +53,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly resultService: ResultService,
     private readonly stateService: StateService,
     private readonly formService: FormService,
-    private readonly errorService: ErrorService
+    private readonly errorService: ErrorService,
+    private readonly storageService: StorageService,
   ) { }
 
   async ngOnInit(): Promise<void> {
     console.info(this.sdk);
-  };
+  }
 
   ngOnDestroy() {
     this.stateSubscription && this.stateSubscription.unsubscribe();
@@ -71,19 +73,19 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngAfterViewInit() {
     const no_mark_for_check = true;
-    const action = this.config['default_action'].toString();
+    const action = this.storageService.get('action') || this.config['default_action'].toString();
     try {
       const get_node_status = await this.get_node_status();
       if (get_node_status) {
         await this.get_state_root_hash(no_mark_for_check);
-        this.stateService.setState({
-          action
-        });
       }
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
     }
+    this.stateService.setState({
+      action
+    });
     this.setStateSubscription();
   }
 
@@ -93,6 +95,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       action
     });
     await this.handleAction(action);
+    this.storageService.setState({
+      action
+    });
   }
 
   async submitAction(action: string) {
@@ -108,7 +113,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const fn = (this as unknown as { [key: string]: () => Promise<void>; })[action];
     if (fn && typeof fn === 'function') {
       if (exec) {
-        await fn.bind(this)();
+        try {
+          await fn.bind(this)();
+        }
+        catch (error) {
+          this.errorService.setError(error as string);
+        }
       }
     } else {
       const error = `Method ${action} is not defined on the component.`;

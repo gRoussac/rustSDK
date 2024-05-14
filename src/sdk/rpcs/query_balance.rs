@@ -8,7 +8,7 @@ use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
-use casper_client::cli::parse_purse_identifier;
+use casper_client::cli::parse::purse_identifier as parse_purse_identifier;
 use casper_client::{
     cli::query_balance as query_balance_cli, query_balance as query_balance_lib,
     rpcs::results::QueryBalanceResult as _QueryBalanceResult, JsonRpcId, SuccessResponse,
@@ -135,7 +135,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 Some(hash.to_string()),
                 None,
                 verbosity,
@@ -146,7 +146,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 Some(hash.to_string()),
                 None,
                 verbosity,
@@ -157,7 +157,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 None,
                 Some(maybe_block_id_as_string),
                 verbosity,
@@ -168,7 +168,7 @@ impl SDK {
             self.query_balance(
                 global_state_identifier,
                 purse_identifier_as_string,
-                purse_identifier.into(),
+                purse_identifier,
                 None,
                 None,
                 verbosity,
@@ -288,24 +288,16 @@ impl SDK {
 mod tests {
 
     use crate::{
-        helpers::public_key_from_private_key,
-        rpcs::PRIVATE_KEY_NCTL_PATH,
-        types::{
-            digest::Digest, global_state_identifier::GlobalStateIdentifier, public_key::PublicKey,
-            purse_identifier::PurseIdentifier,
-        },
+        helpers::public_key_from_secret_key,
+        types::{digest::Digest, public_key::PublicKey},
     };
-    use sdk_tests::{
-        config::{DEFAULT_NODE_ADDRESS, PRIVATE_KEY_NAME},
-        tests::helpers::read_pem_file,
-    };
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
 
     use super::*;
 
     fn get_purse_identifier() -> PurseIdentifier {
-        let private_key =
-            read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}")).unwrap();
-        let account = public_key_from_private_key(&private_key).unwrap();
+        let private_key = get_user_private_key(None).unwrap();
+        let account = public_key_from_secret_key(&private_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
         PurseIdentifier::from_main_purse_under_public_key(public_key)
@@ -315,7 +307,7 @@ mod tests {
     async fn test_query_balance_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk
@@ -333,7 +325,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -360,7 +352,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         // Act
         let result = sdk
             .query_balance(
@@ -370,7 +362,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address.clone(),
+                Some(node_address),
             )
             .await;
 
@@ -383,9 +375,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, node_address.clone())
+            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -402,7 +394,7 @@ mod tests {
                 Some(state_root_hash.to_string()),
                 None,
                 verbosity,
-                node_address,
+                Some(node_address),
             )
             .await;
 
@@ -415,7 +407,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -426,7 +418,7 @@ mod tests {
                 None,
                 Some("1".to_string()),
                 verbosity,
-                node_address.clone(),
+                Some(node_address.clone()),
             )
             .await;
 
@@ -439,7 +431,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -450,7 +442,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address.clone(),
+                Some(node_address.clone()),
             )
             .await;
 
@@ -463,7 +455,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -474,7 +466,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                node_address.clone(),
+                Some(node_address),
             )
             .await;
 
@@ -487,7 +479,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
         let result = sdk
@@ -505,6 +497,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

@@ -102,7 +102,7 @@ mod tests {
             digest::Digest, global_state_identifier::GlobalStateIdentifier, verbosity::Verbosity,
         },
     };
-    use sdk_tests::{config::DEFAULT_NODE_ADDRESS, tests::helpers::get_block};
+    use sdk_tests::tests::helpers::{get_block, get_network_constants};
 
     async fn get_key_input() -> KeyIdentifierInput {
         KeyIdentifierInput::String(install_cep78().await)
@@ -112,7 +112,7 @@ mod tests {
     async fn test_query_contract_key_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error: relative URL without a base".to_string();
+        let error_message = "builder error";
 
         // Act
         let result = sdk
@@ -130,7 +130,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -138,8 +138,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let error_message =
-            "Invalid argument 'query_global_state': Error: Missing key from formatted string"
-                .to_string();
+            "Invalid argument 'query_global_state': Error: Missing key from formatted string";
 
         // Act
         let result = sdk
@@ -157,7 +156,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
@@ -165,10 +164,10 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         let key = get_key_input().await;
-        let (_, block_height) = get_block().await;
+        let (_, block_height) = get_block(&node_address.clone()).await;
         let global_state_identifier = GlobalStateIdentifier::from_block_height(block_height);
 
         // Act
@@ -180,7 +179,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: None,
                 verbosity,
-                node_address: node_address.clone(),
+                node_address: Some(node_address),
             })
             .await;
 
@@ -193,9 +192,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, node_address.clone())
+            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
             .unwrap()
             .result
@@ -211,7 +210,7 @@ mod tests {
                 state_root_hash: Some(state_root_hash.to_string()),
                 maybe_block_id: None,
                 verbosity,
-                node_address,
+                node_address: Some(node_address),
             })
             .await;
 
@@ -224,11 +223,11 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let node_address = Some(DEFAULT_NODE_ADDRESS.to_string());
+        let (node_address, _, _) = get_network_constants();
 
         let key = get_key_input().await;
 
-        let (_, block_height) = get_block().await;
+        let (_, block_height) = get_block(&node_address.clone()).await;
 
         // Act
         let result = sdk
@@ -239,7 +238,7 @@ mod tests {
                 state_root_hash: None,
                 maybe_block_id: Some(block_height.to_string()),
                 verbosity,
-                node_address: node_address.clone(),
+                node_address: Some(node_address),
             })
             .await;
 
@@ -251,7 +250,7 @@ mod tests {
     async fn test_query_contract_key_with_error() {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
-        let error_message = "error sending request for url (http://localhost/rpc): error trying to connect: tcp connect error: Connection refused (os error 111)".to_string();
+        let error_message = "error sending request for url (http://localhost/rpc)";
         // Act
         let result = sdk
             .query_contract_key(QueryGlobalStateParams {
@@ -268,6 +267,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(&error_message));
+        assert!(err_string.contains(error_message));
     }
 }

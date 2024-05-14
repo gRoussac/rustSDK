@@ -1,24 +1,25 @@
 use crate::tests::helpers::{
-    get_block,
+    get_block, get_network_constants, get_user_private_key,
     intern::{get_dictionnary_key, get_dictionnary_uref, get_main_purse},
-    read_pem_file,
 };
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
-use casper_rust_wasm_sdk::{helpers::public_key_from_private_key, types::public_key::PublicKey};
+use casper_rust_wasm_sdk::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
 use lazy_static::lazy_static;
 use std::time::{self, Duration};
 use tokio::sync::Mutex;
 
 pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
-pub const CHAIN_NAME: &str = "casper-net-1";
-pub const PRIVATE_KEY_NAME: &str = "secret_key.pem";
-// TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static not working
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
+pub const DEFAULT_PRIVATE_KEY_NAME: &str = "secret_key.pem";
+// TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
+// https://github.com/seanmonstar/reqwest/issues/1148#issuecomment-910868788
 pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 // read_pem_file will look PRIVATE_KEY_NAME to root directory if relative path is not found (relative to root)
-pub const PRIVATE_KEY_NCTL_PATH: &str =
-    "./../../../../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
-pub const WASM_PATH: &str = "../../wasm/";
+pub const DEFAULT_PRIVATE_KEY_NCTL_PATH: &str =
+    "../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
+pub const WASM_PATH: &str = "./tests/wasm/";
 pub const DEFAULT_TTL: &str = "30m";
 pub const TTL: &str = "1h";
 pub const HELLO_CONTRACT: &str = "hello.wasm";
@@ -59,6 +60,7 @@ pub const ARGS_JSON: &str = r#"[
 pub struct TestConfig {
     pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
+    pub event_address: String,
     pub chain_name: String,
     pub private_key: String,
     pub account: String,
@@ -79,62 +81,89 @@ lazy_static! {
     pub static ref BLOCK_HASH_INITIALIZED: Mutex<bool> = Mutex::new(false);
 }
 
-pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::Error>> {
+pub async fn initialize_test_config(
+    skip_install: bool,
+) -> Result<TestConfig, Box<dyn std::error::Error>> {
     use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
+    use dotenv::dotenv;
+
+    dotenv().ok();
+
+    let (default_node_address, event_address, chain_name) = get_network_constants();
 
     let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
     if *block_hash_initialized_guard {
         return Err("initialize_test_config called after block_hash already initialized".into());
     }
-
-    let private_key = read_pem_file(&format!("{PRIVATE_KEY_NCTL_PATH}{PRIVATE_KEY_NAME}"))?;
-    let private_key_target_account = read_pem_file(&format!(
-        "{}{}",
-        PRIVATE_KEY_NCTL_PATH.replace("user-1", "user-2"),
-        PRIVATE_KEY_NAME
-    ))?;
-
-    let account = public_key_from_private_key(&private_key).unwrap();
-
-    let target_account = public_key_from_private_key(&private_key_target_account).unwrap();
-
+    let private_key = get_user_private_key(None).unwrap();
+    let private_key_target_account = get_user_private_key(Some("user-2"))?;
+    let account = public_key_from_secret_key(&private_key).unwrap();
+    let target_account = public_key_from_secret_key(&private_key_target_account).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
-
     let account_hash = public_key.to_account_hash().to_formatted_string();
+    let purse_uref = get_main_purse(&account, &default_node_address).await;
 
-    let purse_uref = get_main_purse(&account).await;
+    let mut deploy_hash = String::from("");
+    let mut contract_cep78_hash = String::from("");
+    let mut contract_cep78_package_hash = String::from("");
+    let mut dictionary_key = String::from("");
+    let mut dictionary_uref = String::from("");
 
-    println!("install_cep78");
-    let deploy_hash = install_cep78_if_needed(&account, &private_key, None)
+    if !skip_install {
+        println!("install_cep78");
+        deploy_hash = install_cep78_if_needed(
+            &account,
+            &private_key,
+            None,
+            (&default_node_address, &event_address, &chain_name),
+        )
         .await
         .unwrap();
 
-    let (contract_cep78_hash, contract_cep78_package_hash) =
-        get_contract_cep78_hash_keys(&account_hash).await;
+        let (_contract_cep78_hash, _contract_cep78_package_hash) =
+            get_contract_cep78_hash_keys(&account_hash, &default_node_address).await;
 
-    // install has been running for over 60 seconds
-    println!("mint_nft");
-    mint_nft(&contract_cep78_hash, &account, &account_hash, &private_key).await;
+        contract_cep78_hash = _contract_cep78_hash;
+        contract_cep78_package_hash = _contract_cep78_package_hash;
 
-    let dictionary_key = get_dictionnary_key(
-        &contract_cep78_hash,
-        DICTIONARY_NAME,
-        DICTIONARY_ITEM_KEY,
-        None,
-    )
-    .await;
+        println!("mint_nft");
+        // install has been running for over 60 seconds
+        mint_nft(
+            &contract_cep78_hash,
+            &account,
+            &account_hash,
+            &private_key,
+            (&default_node_address, &event_address, &chain_name),
+        )
+        .await;
 
-    let dictionary_uref = get_dictionnary_uref(&contract_cep78_hash, DICTIONARY_NAME).await;
+        dictionary_key = get_dictionnary_key(
+            &contract_cep78_hash,
+            DICTIONARY_NAME,
+            DICTIONARY_ITEM_KEY,
+            None,
+            Some(default_node_address.clone()),
+        )
+        .await;
 
-    let (block_hash, block_height) = get_block().await;
+        dictionary_uref = get_dictionnary_uref(
+            &contract_cep78_hash,
+            DICTIONARY_NAME,
+            Some(default_node_address.clone()),
+        )
+        .await;
+    }
+
+    let (block_hash, block_height) = get_block(&default_node_address).await;
     *block_hash_initialized_guard = true;
 
     let config = TestConfig {
-        node_address: Some(DEFAULT_NODE_ADDRESS.to_string()),
+        node_address: Some(default_node_address.to_string()),
         verbosity: Some(Verbosity::High),
+        event_address,
         account,
         private_key,
-        chain_name: CHAIN_NAME.to_string(),
+        chain_name,
         block_height,
         block_hash,
         purse_uref,
@@ -149,14 +178,14 @@ pub async fn initialize_test_config() -> Result<TestConfig, Box<dyn std::error::
     Ok(config)
 }
 
-pub async fn get_config() -> TestConfig {
-    initialize_test_config_if_needed().await;
+pub async fn get_config(skip_install: bool) -> TestConfig {
+    initialize_test_config_if_needed(skip_install).await;
     CONFIG.lock().await.clone().unwrap()
 }
 
-async fn initialize_test_config_if_needed() {
+async fn initialize_test_config_if_needed(skip_install: bool) {
     let mut config_guard = CONFIG.lock().await;
     if config_guard.is_none() {
-        *config_guard = Some(initialize_test_config().await.unwrap());
+        *config_guard = Some(initialize_test_config(skip_install).await.unwrap());
     }
 }

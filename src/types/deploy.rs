@@ -22,14 +22,16 @@ use crate::{
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
-    Deploy as _Deploy, DeployApprovalsHash, DeployBuilder, DeployFootprint, ExecutableDeployItem,
-    Phase, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
+    transaction::Deploy as _Deploy,
+    ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase, RuntimeArgs,
+    SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use num_traits::cast::FromPrimitive;
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
@@ -380,17 +382,17 @@ impl Deploy {
         deploy.into()
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "footprint")]
-    pub fn footprint_js_alias(&self) -> JsValue {
-        match JsValue::from_serde(&self.footprint()) {
-            Ok(json) => json,
-            Err(err) => {
-                error(&format!("Error serializing footprint to JSON: {:?}", err));
-                JsValue::null()
-            }
-        }
-    }
+    // #[cfg(target_arch = "wasm32")]
+    // #[wasm_bindgen(js_name = "footprint")]
+    // pub fn footprint_js_alias(&self) -> JsValue {
+    //     match JsValue::from_serde(&self.footprint()) {
+    //         Ok(json) => json,
+    //         Err(err) => {
+    //             error(&format!("Error serializing footprint to JSON: {:?}", err));
+    //             JsValue::null()
+    //         }
+    //     }
+    // }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "approvalsHash")]
@@ -451,6 +453,48 @@ impl Deploy {
         self.0.clone().session().entry_point_name().to_string()
     }
 
+    #[wasm_bindgen(js_name = "addSignature")]
+    pub fn add_signature(&self, public_key: &str, signature: &str) -> Deploy {
+        // Serialize the existing approvals to JSON
+        let casper_deploy: _Deploy = self.0.clone();
+        let existing_approvals_json = casper_deploy
+            .approvals()
+            .iter()
+            .map(|approval| {
+                json!({
+                    "signer": approval.signer().to_hex(),
+                    "signature": approval.signature().to_hex(),
+                })
+            })
+            .collect::<Vec<_>>();
+
+        // Create JSON object for the new approval
+        let new_approval_json = json!({
+            "signer": public_key,
+            "signature": signature,
+        });
+
+        // Append the new approval to existing approvals
+        let mut all_approvals_json = existing_approvals_json;
+        all_approvals_json.push(new_approval_json);
+
+        // Convert the approvals JSON back to string
+        let updated_approvals_str = serde_json::to_string(&all_approvals_json)
+            .expect("Failed to serialize updated approvals JSON");
+
+        // Replace the approvals field in the original deploy JSON string
+        let mut deploy_json: Value = serde_json::from_str(&self.to_json_string().unwrap())
+            .expect("Failed to deserialize deploy JSON");
+        deploy_json["approvals"] = serde_json::from_str(&updated_approvals_str)
+            .expect("Failed to deserialize updated approvals JSON");
+
+        // Convert the updated deploy JSON back to a Deploy struct
+        let updated_deploy: Deploy =
+            serde_json::from_value(deploy_json).expect("Failed to deserialize updated deploy JSON");
+
+        updated_deploy
+    }
+
     #[wasm_bindgen(js_name = "TTL")]
     pub fn ttl(&self) -> String {
         self.0.clone().header().ttl().to_string()
@@ -473,7 +517,7 @@ impl Deploy {
     }
 
     #[wasm_bindgen(js_name = "paymentAmount")]
-    pub fn payment_amount(&self, conv_rate: u64) -> String {
+    pub fn payment_amount(&self, conv_rate: u8) -> String {
         self.0
             .clone()
             .payment()
@@ -548,16 +592,16 @@ impl Deploy {
         })
     }
 
-    pub fn footprint(&self) -> DeployFootprint {
-        let deploy: _Deploy = self.0.clone();
-        match deploy.footprint() {
-            Ok(footprint) => footprint,
-            Err(err) => {
-                error(&format!("Error getting footprint: {:?}", err));
-                deploy.footprint().unwrap()
-            }
-        }
-    }
+    // pub fn footprint(&self) -> DeployFootprint {
+    //     let deploy: _Deploy = self.0.clone();
+    //     match deploy.footprint() {
+    //         Ok(footprint) => footprint,
+    //         Err(err) => {
+    //             error(&format!("Error getting footprint: {:?}", err));
+    //             deploy.footprint().unwrap()
+    //         }
+    //     }
+    // }
 
     pub fn to_json_string(&self) -> Result<String, String> {
         let result = serde_json::to_string(&self.0);
@@ -571,7 +615,7 @@ impl Deploy {
         }
     }
 
-    pub fn compute_approvals_hash(&self) -> Result<DeployApprovalsHash, bytesrepr::Error> {
+    pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
         let deploy: _Deploy = self.0.clone();
         deploy.compute_approvals_hash()
     }
