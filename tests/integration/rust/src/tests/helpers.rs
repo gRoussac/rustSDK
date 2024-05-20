@@ -13,7 +13,6 @@ use casper_rust_wasm_sdk::types::deploy_params::{
     session_str_params::SessionStrParams,
 };
 use lazy_static::lazy_static;
-use serde_json::{to_string, Value};
 use std::{
     env,
     fs::File,
@@ -49,8 +48,6 @@ pub(crate) mod intern {
         },
         SDK,
     };
-    use serde_json::{to_string, Value};
-
     pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
         match config {
             Some(config) => SDK::new(config.node_address, config.verbosity),
@@ -59,7 +56,7 @@ pub(crate) mod intern {
     }
 
     pub async fn get_main_purse(account_identifier_as_string: &str, node_address: &str) -> String {
-        let purse_uref = *(create_test_sdk(None)
+        let purse_uref = create_test_sdk(None)
             .get_account(
                 None,
                 Some(account_identifier_as_string.to_owned()),
@@ -71,8 +68,8 @@ pub(crate) mod intern {
             .unwrap()
             .result
             .account
-            .main_purse()
-            .into();
+            .main_purse();
+        let purse_uref: URef = purse_uref.into();
         purse_uref.to_formatted_string()
     }
 
@@ -426,7 +423,7 @@ pub async fn get_block(node_address: &str) -> (String, u64) {
         Ok(get_block) => {
             let block = get_block.result.block_with_signatures.unwrap().block;
             let block_hash: BlockHash = (*block.hash()).into();
-            let block_height = block.header().height();
+            let block_height = block.height();
             (block_hash.to_string(), block_height)
         }
     }

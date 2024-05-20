@@ -111,6 +111,7 @@ mod tests {
         },
     };
     use sdk_tests::tests::helpers::get_network_constants;
+    use tokio;
 
     #[tokio::test]
     async fn test_query_contract_dict_with_none_values() {

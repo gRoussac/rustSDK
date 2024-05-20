@@ -123,10 +123,8 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
-
-    use sdk_tests::tests::helpers::get_network_constants;
-
     use super::*;
+    use sdk_tests::tests::helpers::get_network_constants;
 
     #[tokio::test]
     async fn test_get_validator_changes_with_none_values() {

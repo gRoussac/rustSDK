@@ -208,7 +208,6 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
@@ -223,6 +222,7 @@ mod tests {
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
         tests::helpers::{get_network_constants, get_user_private_key},
     };
+    use tokio;
 
     fn get_deploy() -> Deploy {
         let private_key = get_user_private_key(None).unwrap();

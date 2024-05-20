@@ -223,9 +223,8 @@ pub mod test_module {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::{get_config, TestConfig};
-
     use super::test_module::*;
+    use crate::config::{get_config, TestConfig};
     use casper_rust_wasm_sdk::types::{
         block_hash::BlockHash, global_state_identifier::GlobalStateIdentifier,
     };

@@ -457,9 +457,8 @@ pub(crate) fn insert_arg(args: &mut RuntimeArgs, new_arg: String) -> &RuntimeArg
 
 #[cfg(test)]
 mod tests {
-    use casper_types::U256;
-
     use super::*;
+    use casper_types::U256;
 
     #[test]
     fn test_cl_value_to_json() {

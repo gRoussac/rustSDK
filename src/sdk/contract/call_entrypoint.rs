@@ -106,14 +106,13 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH},
         tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
     };
-
-    use crate::helpers::public_key_from_secret_key;
-
-    use super::*;
+    use tokio;
 
     #[tokio::test]
     async fn test_call_entrypoint_with_none_values() {
