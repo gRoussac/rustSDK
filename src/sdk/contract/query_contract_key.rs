@@ -103,6 +103,7 @@ mod tests {
         },
     };
     use sdk_tests::tests::helpers::{get_block, get_network_constants};
+    use tokio;
 
     async fn get_key_input() -> KeyIdentifierInput {
         KeyIdentifierInput::String(install_cep78().await)

@@ -696,11 +696,10 @@ impl fmt::Display for EventName {
 
 #[cfg(test)]
 mod tests {
-    use sdk_tests::tests::helpers::get_network_constants;
-
-    use crate::deploy_watcher::deploy_mock::DEPLOY_MOCK;
-
     use super::*;
+    use crate::deploy_watcher::deploy_mock::DEPLOY_MOCK;
+    use sdk_tests::tests::helpers::get_network_constants;
+    use tokio;
 
     #[test]
     fn test_new() {

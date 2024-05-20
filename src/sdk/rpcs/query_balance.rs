@@ -287,14 +287,12 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
-
+    use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
         types::{digest::Digest, public_key::PublicKey},
     };
     use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
-
-    use super::*;
 
     fn get_purse_identifier() -> PurseIdentifier {
         let private_key = get_user_private_key(None).unwrap();

@@ -157,7 +157,6 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{

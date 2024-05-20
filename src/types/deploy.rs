@@ -382,6 +382,7 @@ impl Deploy {
         deploy.into()
     }
 
+    // TODO TOFIX
     // #[cfg(target_arch = "wasm32")]
     // #[wasm_bindgen(js_name = "footprint")]
     // pub fn footprint_js_alias(&self) -> JsValue {
@@ -592,6 +593,7 @@ impl Deploy {
         })
     }
 
+    // TODO TOFIX
     // pub fn footprint(&self) -> DeployFootprint {
     //     let deploy: _Deploy = self.0.clone();
     //     match deploy.footprint() {

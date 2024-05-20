@@ -406,12 +406,9 @@ impl SDK {
 
 #[cfg(test)]
 mod tests {
-
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
-
-    use crate::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
-
     use super::*;
+    use crate::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
 
     fn get_key_input() -> KeyIdentifierInput {
         let private_key = get_user_private_key(None).unwrap();
