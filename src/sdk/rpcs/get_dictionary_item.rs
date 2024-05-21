@@ -202,7 +202,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `GetDictionaryItemResult` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `_GetDictionaryItemResult` or a `SdkError` in case of an error.
     ///
     /// # Errors
     ///
@@ -293,7 +293,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let dictionary_item = get_dictionary_item(false).await;
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, verbosity, Some(node_address.clone()))
@@ -323,7 +323,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -344,7 +344,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -365,7 +365,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -386,7 +386,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key";

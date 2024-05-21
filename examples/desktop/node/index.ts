@@ -253,7 +253,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 // install
 const example11 = async () => {
   const node_address = 'http://127.0.0.1:11101';
-  const events_address = 'http://127.0.0.1:18101/events/main';
+  const events_address = 'http://127.0.0.1:18101/events';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
@@ -305,15 +305,15 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   const install_result_as_json = install_result.toJson();
   console.log(install_result_as_json.deploy_hash);
   const eventParseResult: EventParseResult = await sdk.waitDeploy(events_address, install_result_as_json.deploy_hash);
-  const cost = eventParseResult.body?.DeployProcessed?.execution_result.Success?.cost;
-  //  console.log(eventParseResult.body.DeployProcessed);
+  const cost = eventParseResult.body?.TransactionProcessed?.execution_result.Success?.cost;
+  //  console.log(eventParseResult.body.TransactionProcessed);
   console.log(`install cost ${cost}`);
 };
 
 // call_entrypoint
 const example12 = async () => {
   const node_address = 'http://127.0.0.1:11101';
-  const events_address = 'http://127.0.0.1:18101/events/main';
+  const events_address = 'http://127.0.0.1:18101/events';
   const sdk = new SDK(node_address);
   const chain_name = 'casper-net-1';
   const private_key = `-----BEGIN PRIVATE KEY-----
@@ -351,12 +351,12 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
       if (eventParseResult.err) {
         return false;
       }
-      else if (eventParseResult.body?.DeployProcessed?.execution_result.Success) {
-        console.log(eventParseResult.body?.DeployProcessed?.execution_result.Success);
+      else if (eventParseResult.body?.TransactionProcessed?.execution_result.Success) {
+        console.log(eventParseResult.body?.TransactionProcessed?.execution_result.Success);
         return true;
       }
       else {
-        console.error(eventParseResult.body?.DeployProcessed?.execution_result.Failure);
+        console.error(eventParseResult.body?.TransactionProcessed?.execution_result.Failure);
         return false;
       };
     };

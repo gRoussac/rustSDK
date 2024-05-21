@@ -24,12 +24,12 @@ impl AccountIdentifier {
             Ok(Self::from_account_under_account_hash(account_hash))
         } else {
             let public_key = PublicKey::new(formatted_str)?;
-            Ok(Self::from_account_account_under_public_key(public_key))
+            Ok(Self::from_account_under_public_key(public_key))
         }
     }
 
     #[wasm_bindgen(js_name = "fromPublicKey")]
-    pub fn from_account_account_under_public_key(key: PublicKey) -> Self {
+    pub fn from_account_under_public_key(key: PublicKey) -> Self {
         AccountIdentifier(_AccountIdentifier::PublicKey(key.into()))
     }
 

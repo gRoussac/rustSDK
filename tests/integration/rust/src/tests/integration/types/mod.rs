@@ -33,6 +33,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -59,6 +60,7 @@ pub mod test_module_deploy {
             Some(config.private_key.to_string()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -82,6 +84,7 @@ pub mod test_module_deploy {
             Some(config.private_key.to_string()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -106,6 +109,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -138,6 +142,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -164,6 +169,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -190,6 +196,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -214,6 +221,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -248,6 +256,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
@@ -270,6 +279,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_package_hash(&config.contract_cep78_package_hash);
@@ -308,6 +318,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_bytes(Vec::from([0]).into());
@@ -347,6 +358,7 @@ pub mod test_module_deploy {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -372,6 +384,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -398,6 +411,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             Some(old_timestamp.to_string()),
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -432,6 +446,7 @@ pub mod test_module_deploy {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -461,6 +476,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -487,6 +503,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -508,6 +525,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let mut session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -535,6 +553,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -558,6 +577,7 @@ pub mod test_module_deploy {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -586,6 +606,7 @@ pub mod test_module_deploy {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);

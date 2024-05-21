@@ -35,6 +35,7 @@ pub mod test_module {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -189,6 +190,7 @@ pub mod test_module {
             Some(config.private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();

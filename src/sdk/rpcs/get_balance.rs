@@ -271,26 +271,35 @@ mod tests {
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
 
-    async fn get_purse_uref() -> URef {
+    async fn get_main_purse() -> URef {
         let sdk = SDK::new(None, None);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
-        let purse_uref = sdk
-            .get_account(None, Some(account), None, None, Some(node_address))
+
+        let entity_result = sdk
+            .get_entity(None, Some(account), None, None, Some(node_address))
             .await
             .unwrap()
             .result
-            .account
+            .entity_result;
+
+        let purse_uref = entity_result
+            .addressable_entity()
+            .unwrap()
+            .entity
             .main_purse();
-        purse_uref.into()
+
+        let purse_uref_value: URef = purse_uref.into();
+
+        purse_uref_value
     }
 
     #[tokio::test]
     async fn test_get_balance_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+        let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         let error_message = "builder error";
 
         // Act
@@ -313,8 +322,8 @@ mod tests {
     async fn test_get_balance_with_purse_uref() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _) = get_network_constants();
-        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+        let (node_address, _, _, _) = get_network_constants();
+        let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
 
         // Act
         let result = sdk
@@ -329,9 +338,9 @@ mod tests {
     async fn test_get_balance_with_purse_uref_as_string() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let purse_uref =
-            GetBalanceInput::PurseUrefAsString(get_purse_uref().await.to_formatted_string());
+            GetBalanceInput::PurseUrefAsString(get_main_purse().await.to_formatted_string());
 
         // Act
         let result = sdk
@@ -346,7 +355,7 @@ mod tests {
     async fn test_get_balance_with_state_root_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, Some(Verbosity::High), Some(node_address.clone()))
@@ -356,7 +365,7 @@ mod tests {
             .state_root_hash
             .unwrap()
             .into();
-        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
+        let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
 
         // Act
         let result = sdk
@@ -377,8 +386,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let error_message = "error sending request for url (http://localhost/rpc)";
-        let purse_uref = GetBalanceInput::PurseUref(get_purse_uref().await);
-
+        let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         // Act
         let result = sdk
             .get_balance(

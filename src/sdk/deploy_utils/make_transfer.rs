@@ -134,12 +134,12 @@ mod tests {
     async fn test_make_transfer_with_valid_transfer_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -160,11 +160,11 @@ mod tests {
     async fn test_make_transfer_with_valid_transfer_params_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -185,13 +185,13 @@ mod tests {
     async fn test_make_transfer_with_invalid_transfer_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 

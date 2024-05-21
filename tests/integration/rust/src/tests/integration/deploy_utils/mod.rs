@@ -18,6 +18,7 @@ pub mod test_module {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
@@ -40,6 +41,7 @@ pub mod test_module {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
@@ -65,6 +67,7 @@ pub mod test_module {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);

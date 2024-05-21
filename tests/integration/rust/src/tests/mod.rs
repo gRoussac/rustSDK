@@ -121,6 +121,7 @@ pub async fn _run_example_5() {
         None,                  // optional secret key to sign transfer deploy
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
+        None,                  // optional Gas price tolerance
     );
 
     let payment_params = PaymentStrParams::default();
@@ -166,6 +167,7 @@ pub async fn _run_example_6() {
         Some(PRIVATE_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
+        None,                  // optional Gas price tolerance
     );
 
     let payment_params = PaymentStrParams::default();
@@ -212,6 +214,7 @@ pub async fn _run_example_7() {
         None,                  // optional secret key to sign deploy
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
+        None,                  // optional Gas price tolerance
     );
 
     let session_params = SessionStrParams::default();
@@ -256,6 +259,7 @@ pub async fn _run_example_8() {
         Some(PRIVATE_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
+        None,                  // optional Gas price tolerance
     );
 
     let session_params = SessionStrParams::default();
@@ -303,6 +307,7 @@ pub async fn _run_example_9() {
         Some(PRIVATE_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
+        None,                  // optional Gas price tolerance
     );
 
     let session_params = SessionStrParams::default();
@@ -348,6 +353,7 @@ pub async fn _run_example_10() {
         Some(PRIVATE_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
+        None,                  // optional Gas price tolerance
     );
 
     let payment_params = PaymentStrParams::default();
@@ -413,12 +419,13 @@ pub async fn _run_example_11() -> Result<(), String> {
     pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
-    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         public_key,
         Some(PRIVATE_KEY.to_string()),
+        None,
         None,
         None,
     );
@@ -496,6 +503,7 @@ pub async fn _run_example_12() {
         CHAIN_NAME,
         public_key,
         Some(PRIVATE_KEY.to_string()),
+        None,
         None,
         None,
     );

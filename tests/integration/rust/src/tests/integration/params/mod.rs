@@ -18,6 +18,7 @@ pub mod test_module {
             None,
             None,
             Some(TTL.to_string()),
+            None,
         );
         assert_eq!(deploy_params.chain_name().unwrap(), config.chain_name);
         assert_eq!(deploy_params.ttl().unwrap(), TTL);

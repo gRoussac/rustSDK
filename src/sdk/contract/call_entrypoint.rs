@@ -71,7 +71,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `PutDeployResult` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `_PutDeployResult` or a `SdkError` in case of an error.
     ///
     /// # Errors
     ///
@@ -118,7 +118,7 @@ mod tests {
     async fn test_call_entrypoint_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let deploy_params = DeployStrParams::new("", "", None, None, None);
+        let deploy_params = DeployStrParams::new("", "", None, None, None, None);
         let session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
 
@@ -140,12 +140,12 @@ mod tests {
     async fn test_call_entrypoint_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (node_address, _,_, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -180,7 +180,7 @@ mod tests {
     async fn test_call_entrypoint_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (node_address, _,_, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
@@ -193,6 +193,7 @@ mod tests {
             Some(private_key.clone()),
             None,
             Some(TTL.to_string()),
+            None,
         );
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
@@ -228,14 +229,20 @@ mod tests {
     async fn test_call_entrypoint_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (node_address, _,_, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let error_message = "account authorization invalid at state root hash";
+        let error_message = "the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
 
-        let deploy_params =
-            DeployStrParams::new(&chain_name, &account, None, None, Some(TTL.to_string()));
+        let deploy_params = DeployStrParams::new(
+            &chain_name,
+            &account,
+            None,
+            None,
+            Some(TTL.to_string()),
+            None,
+        );
         let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -270,12 +277,18 @@ mod tests {
     async fn test_call_entrypoint_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key.clone()), None, None);
+        let deploy_params = DeployStrParams::new(
+            &chain_name,
+            &account,
+            Some(private_key.clone()),
+            None,
+            None,
+            None,
+        );
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

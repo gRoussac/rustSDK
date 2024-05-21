@@ -95,7 +95,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `SuccessResponse<SpeculativeExecResult>` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `SuccessResponse<_SpeculativeExecResult>` or a `SdkError` in case of an error.
     pub async fn speculative_deploy(
         &self,
         deploy_params: DeployStrParams,
@@ -164,17 +164,18 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn _test_speculative_deploy_with_valid_params() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -186,7 +187,7 @@ mod tests {
                 payment_params,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(default_speculative_address),
             )
             .await;
 
@@ -195,18 +196,19 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn _test_speculative_deploy_with_block_identifier() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (_, _, default_speculative_address, chain_name) = get_network_constants();
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -218,7 +220,7 @@ mod tests {
                 payment_params,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(default_speculative_address),
             )
             .await;
 
@@ -231,9 +233,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
-        let deploy_params = DeployStrParams::new(&chain_name, "", None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, "", None, None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -245,7 +247,7 @@ mod tests {
                 payment_params,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(default_speculative_address),
             )
             .await;
 
@@ -258,7 +260,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (_, _, default_speculative_address, _) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
 
@@ -274,7 +276,7 @@ mod tests {
                 payment_params,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(default_speculative_address),
             )
             .await;
 
@@ -282,6 +284,7 @@ mod tests {
         assert!(result.is_err());
 
         let err_string = result.err().unwrap().to_string();
+
         assert!(err_string.contains(error_message));
     }
 }

@@ -21,7 +21,7 @@ pub mod test_module {
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
-        assert_eq!(deploy_processed.deploy_hash, deploy_hash);
+        assert_eq!(deploy_processed.transaction_hash.deploy, deploy_hash);
     }
 
     pub async fn test_wait_deploy_timeout(timeout_duration: Option<u64>) {
@@ -69,7 +69,7 @@ pub mod test_module {
             .as_ref()
             .and_then(|result| result.body.as_ref())
             .and_then(|body| body.deploy_processed.as_ref())
-            .map(|deploy_processed| deploy_processed.deploy_hash.clone())
+            .map(|deploy_processed| deploy_processed.transaction_hash.deploy.clone())
             .expect("Expected deploy hash in the result");
 
         assert_eq!(actual_deploy_hash, deploy_hash);

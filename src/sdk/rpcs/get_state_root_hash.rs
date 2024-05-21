@@ -194,7 +194,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `GetStateRootHashResult` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `_GetStateRootHashResult` or a `SdkError` in case of an error.
     ///
     /// # Errors
     ///
@@ -225,6 +225,7 @@ impl SDK {
                 } else {
                     None
                 };
+
             get_state_root_hash_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
@@ -263,7 +264,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let result = sdk
             .get_block(None, verbosity, Some(node_address.clone()))
             .await;
@@ -292,9 +293,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk

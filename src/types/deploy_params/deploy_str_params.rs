@@ -13,6 +13,7 @@ pub struct DeployStrParams {
     ttl: OnceCell<String>,
     chain_name: OnceCell<String>,
     session_account: OnceCell<String>,
+    gas_price_tolerance: OnceCell<String>,
 }
 
 impl Default for DeployStrParams {
@@ -23,6 +24,7 @@ impl Default for DeployStrParams {
             ttl: OnceCell::new(),
             chain_name: OnceCell::new(),
             session_account: OnceCell::new(),
+            gas_price_tolerance: OnceCell::new(),
         }
     }
 }
@@ -36,6 +38,7 @@ impl DeployStrParams {
         secret_key: Option<String>,
         timestamp: Option<String>,
         ttl: Option<String>,
+        gas_price_tolerance: Option<String>,
     ) -> Self {
         let deploy_params = DeployStrParams::default();
         deploy_params.set_chain_name(chain_name);
@@ -45,6 +48,9 @@ impl DeployStrParams {
         };
         deploy_params.set_timestamp(timestamp);
         deploy_params.set_ttl(ttl);
+        if let Some(gas_price_tolerance) = gas_price_tolerance {
+            deploy_params.set_gas_price_tolerance(gas_price_tolerance);
+        };
         deploy_params
     }
 
@@ -132,6 +138,17 @@ impl DeployStrParams {
             .set(session_account.to_string())
             .unwrap();
     }
+
+    // Getter and setter for gas_price_tolerance field
+    #[wasm_bindgen(getter)]
+    pub fn gas_price_tolerance(&self) -> Option<String> {
+        self.gas_price_tolerance.get().cloned()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_gas_price_tolerance(&self, gas_price_tolerance: String) {
+        self.gas_price_tolerance.set(gas_price_tolerance).unwrap();
+    }
 }
 
 // Convert DeployStrParams to casper_client::cli::DeployStrParams
@@ -142,6 +159,7 @@ pub fn deploy_str_params_to_casper_client(deploy_params: &DeployStrParams) -> _D
         ttl: get_str_or_default(deploy_params.ttl.get()),
         chain_name: get_str_or_default(deploy_params.chain_name.get()),
         session_account: get_str_or_default(deploy_params.session_account.get()),
+        gas_price_tolerance: get_str_or_default(deploy_params.gas_price_tolerance.get()),
     }
 }
 
@@ -166,12 +184,16 @@ mod tests {
         let session_account = OnceCell::new();
         session_account.set("account_id".to_string()).unwrap();
 
+        let gas_price_tolerance = OnceCell::new();
+        gas_price_tolerance.set("1".to_string()).unwrap();
+
         let deploy_params = DeployStrParams {
             secret_key,
             timestamp,
             ttl,
             chain_name,
             session_account,
+            gas_price_tolerance,
         };
 
         let result = deploy_str_params_to_casper_client(&deploy_params);
