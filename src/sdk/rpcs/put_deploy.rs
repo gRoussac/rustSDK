@@ -73,7 +73,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `PutDeployResult` or an `Error` in case of an error.
+    /// A `Result` containing either a `_PutDeployResult` or an `Error` in case of an error.
     ///
     /// # Errors
     ///
@@ -112,9 +112,9 @@ mod tests {
     fn get_deploy() -> Deploy {
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -149,7 +149,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let deploy = get_deploy();
 
         // Act

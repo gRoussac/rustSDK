@@ -12,6 +12,7 @@ pub mod deploy_hash;
 pub mod deploy_params;
 pub mod dictionary_item_identifier;
 pub mod digest;
+pub mod entity_identifier;
 pub mod era_id;
 pub mod global_state_identifier;
 pub mod key;

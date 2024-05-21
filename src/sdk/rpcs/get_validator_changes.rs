@@ -101,7 +101,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `GetValidatorChangesResult` or an `Error` in case of an error.
+    /// A `Result` containing either a `_GetValidatorChangesResult` or an `Error` in case of an error.
     ///
     /// # Errors
     ///
@@ -146,7 +146,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk

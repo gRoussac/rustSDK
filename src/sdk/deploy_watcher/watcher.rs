@@ -409,7 +409,7 @@ impl DeployWatcher {
 
         for data_item in data_stream {
             let trimmed_item = data_item.trim();
-            let deploy_processed_str = EventName::DeployProcessed.to_string();
+            let deploy_processed_str = EventName::TransactionProcessed.to_string();
 
             if !trimmed_item.contains(&deploy_processed_str) {
                 continue;
@@ -419,13 +419,14 @@ impl DeployWatcher {
                 let deploy = parsed_json.get(deploy_processed_str);
                 if let Some(deploy_processed) = deploy.and_then(|deploy| deploy.as_object()) {
                     if let Some(deploy_hash_processed) = deploy_processed
-                        .get("deploy_hash")
+                        .get("transaction_hash")
+                        .and_then(|transaction_hash| transaction_hash.get("Deploy"))
                         .and_then(|deploy_hash| deploy_hash.as_str())
                     {
                         let mut deploy_hash_found = target_deploy_hash
                             .map_or(false, |target_hash| target_hash == deploy_hash_processed);
 
-                        let deploy_processed: Option<DeployProcessed> =
+                        let deploy_processed: Option<TransactionProcessed> =
                             serde_json::from_value(deploy.unwrap().clone()).ok();
 
                         let body = Some(Body { deploy_processed });
@@ -614,14 +615,26 @@ impl DeploySubscription {
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
 pub struct Failure {
+    pub cost: String,
     pub error_message: String,
 }
 
 /// Represents a success response containing a cost value.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
-pub struct Success {
+pub struct Version2 {
+    pub initiator: PublicKeyString,
+    pub error_message: Option<String>,
+    pub limit: String,
+    pub consumed: String,
     pub cost: String,
+    // pub payment: Vec<Payment>,
+}
+
+#[derive(Debug, Deserialize, Clone, Default, Serialize)]
+#[wasm_bindgen(getter_with_clone)]
+pub struct Payment {
+    pub source: String,
 }
 
 /// Represents the result of an execution, either Success or Failure.
@@ -629,36 +642,71 @@ pub struct Success {
 #[wasm_bindgen(getter_with_clone)]
 pub struct ExecutionResult {
     /// Optional Success information.
-    #[serde(rename = "Success")]
+    #[serde(rename = "Version2")]
     #[wasm_bindgen(js_name = "Success")]
-    pub success: Option<Success>,
+    pub success: Option<Version2>,
     /// Optional Failure information.
     #[serde(rename = "Failure")]
     #[wasm_bindgen(js_name = "Failure")]
     pub failure: Option<Failure>,
 }
 
+#[derive(Debug, Deserialize, Clone, Serialize, Default)]
+#[wasm_bindgen(getter_with_clone)]
+pub struct DeployString {
+    #[serde(rename = "Deploy")]
+    #[wasm_bindgen(js_name = "Deploy")]
+    pub deploy: String,
+}
+
+#[derive(Debug, Deserialize, Clone, Serialize, Default)]
+#[wasm_bindgen(getter_with_clone)]
+pub struct PublicKeyString {
+    #[serde(rename = "PublicKey")]
+    #[wasm_bindgen(js_name = "PublicKey")]
+    pub public_key: String,
+}
+
+#[derive(Debug, Deserialize, Clone, Serialize, Default)]
+#[wasm_bindgen(getter_with_clone)]
+pub struct Message {
+    #[serde(rename = "String")]
+    #[wasm_bindgen(js_name = "String")]
+    pub string: String,
+}
+
+#[derive(Debug, Deserialize, Clone, Serialize, Default)]
+#[wasm_bindgen(getter_with_clone)]
+pub struct Messages {
+    pub entity_hash: String,
+    pub message: Message,
+    pub topic_name: String,
+    pub topic_name_hash: String,
+    pub topic_index: u32,
+    pub block_index: u64,
+}
+
 /// Represents processed deploy information.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
-pub struct DeployProcessed {
-    pub deploy_hash: String,
-    pub account: String,
+pub struct TransactionProcessed {
+    pub transaction_hash: DeployString,
+    pub initiator_addr: PublicKeyString,
     pub timestamp: String,
     pub ttl: String,
-    pub dependencies: Vec<String>,
     pub block_hash: String,
     /// Result of the execution, either Success or Failure.
     pub execution_result: ExecutionResult,
+    pub messages: Vec<Messages>,
 }
 
 /// Represents the body of an event, containing processed deploy information.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
 pub struct Body {
-    #[serde(rename = "DeployProcessed")]
-    #[wasm_bindgen(js_name = "DeployProcessed")]
-    pub deploy_processed: Option<DeployProcessed>,
+    #[serde(rename = "TransactionProcessed")]
+    #[wasm_bindgen(js_name = "TransactionProcessed")]
+    pub deploy_processed: Option<TransactionProcessed>,
 }
 
 /// Represents the result of parsing an event, containing error information and the event body.
@@ -673,9 +721,10 @@ pub struct EventParseResult {
 #[derive(Debug, Deserialize, Clone, Serialize)]
 enum EventName {
     BlockAdded,
-    DeployProcessed,
-    DeployAccepted,
-    BlockFinalized,
+    TransactionAccepted,
+    TransactionExpired,
+    TransactionProcessed,
+    Step,
     FinalitySignature,
     Fault,
 }
@@ -685,9 +734,10 @@ impl fmt::Display for EventName {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             EventName::BlockAdded => write!(f, "BlockAdded"),
-            EventName::DeployProcessed => write!(f, "DeployProcessed"),
-            EventName::DeployAccepted => write!(f, "DeployAccepted"),
-            EventName::BlockFinalized => write!(f, "BlockFinalized"),
+            EventName::TransactionAccepted => write!(f, "TransactionAccepted"),
+            EventName::TransactionExpired => write!(f, "TransactionExpired"),
+            EventName::TransactionProcessed => write!(f, "TransactionProcessed"),
+            EventName::Step => write!(f, "Step"),
             EventName::FinalitySignature => write!(f, "FinalitySignature"),
             EventName::Fault => write!(f, "Fault"),
         }
@@ -704,7 +754,7 @@ mod tests {
     #[test]
     fn test_new() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
@@ -723,7 +773,7 @@ mod tests {
     #[test]
     fn test_new_default_timeout() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
 
         // Act
         let deploy_watcher = DeployWatcher::new(events_url.clone(), None);
@@ -753,7 +803,7 @@ mod tests {
     #[tokio::test]
     async fn test_process_events() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let deploy_watcher = DeployWatcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
@@ -772,13 +822,13 @@ mod tests {
 
         let body = event_parse_result.body.as_ref().unwrap();
         let deploy_processed = body.deploy_processed.as_ref().unwrap();
-        assert_eq!(deploy_processed.deploy_hash, deploy_hash);
+        assert_eq!(deploy_processed.transaction_hash.deploy, deploy_hash);
     }
 
     #[tokio::test]
     async fn test_start_timeout() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let deploy_watcher = DeployWatcher::new(events_url, Some(1));
 
         // Act
@@ -795,7 +845,7 @@ mod tests {
     #[test]
     fn test_stop() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let deploy_watcher = DeployWatcher::new(events_url, None);
         assert!(*deploy_watcher.active.borrow());
 
@@ -809,7 +859,7 @@ mod tests {
     #[test]
     fn test_subscribe() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let mut deploy_watcher = DeployWatcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
@@ -839,7 +889,7 @@ mod tests {
     #[test]
     fn test_unsubscribe() {
         // Arrange
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let mut deploy_watcher = DeployWatcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
@@ -869,7 +919,7 @@ mod tests {
     fn test_sdk_watch_deploy_retunrs_instance() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let timeout_duration = 5000;
 
         // Act
@@ -889,7 +939,7 @@ mod tests {
     async fn test_wait_deploy_timeout() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, events_url, _) = get_network_constants();
+        let (_, events_url, _, _) = get_network_constants();
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
         let timeout_duration = Some(5000);
 

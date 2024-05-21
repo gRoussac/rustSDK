@@ -64,12 +64,12 @@ mod tests {
     async fn test_sign_deploy_with_valid_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
@@ -100,12 +100,13 @@ mod tests {
     async fn test_sign_deploy_with_invalid_signature() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _,_, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
+        dbg!(private_key.clone());
         let account = public_key_from_secret_key(&private_key).unwrap();
-
-        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
+        dbg!(account.clone());
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
@@ -122,8 +123,8 @@ mod tests {
         let signed_deploy = sdk.sign_deploy(deploy, "test_wrong_signature");
 
         // Assert
+        assert!(signed_deploy.has_valid_hash());
         assert!(!signed_deploy.is_valid());
-        assert!(!signed_deploy.has_valid_hash());
         assert!(!signed_deploy
             .compute_approvals_hash()
             .unwrap()

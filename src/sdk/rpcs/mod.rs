@@ -6,6 +6,7 @@ pub mod get_block_transfers;
 pub mod get_chainspec;
 pub mod get_deploy;
 pub mod get_dictionary_item;
+pub mod get_entity;
 pub mod get_era_info;
 pub mod get_era_summary;
 pub mod get_node_status;

@@ -1,5 +1,5 @@
 use self::intern::{create_test_sdk, install_cep78};
-use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY};
+use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS};
 use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_PRIVATE_KEY_NAME,
     DEFAULT_PRIVATE_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
@@ -44,7 +44,6 @@ pub(crate) mod intern {
                 dictionary_item_str_params::DictionaryItemStrParams,
                 payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
             },
-            uref::URef,
         },
         SDK,
     };
@@ -56,8 +55,8 @@ pub(crate) mod intern {
     }
 
     pub async fn get_main_purse(account_identifier_as_string: &str, node_address: &str) -> String {
-        let purse_uref = create_test_sdk(None)
-            .get_account(
+        let entity_result = create_test_sdk(None)
+            .get_entity(
                 None,
                 Some(account_identifier_as_string.to_owned()),
                 None,
@@ -67,9 +66,13 @@ pub(crate) mod intern {
             .await
             .unwrap()
             .result
-            .account
+            .entity_result;
+
+        let purse_uref = entity_result
+            .addressable_entity()
+            .unwrap()
+            .entity
             .main_purse();
-        let purse_uref: URef = purse_uref.into();
         purse_uref.to_formatted_string()
     }
 
@@ -161,6 +164,7 @@ pub(crate) mod intern {
             Some(private_key.to_string()),
             None,
             None,
+            None,
         );
         let session_params = SessionStrParams::default();
         session_params.set_session_args_json(ARGS_JSON);
@@ -205,7 +209,10 @@ pub(crate) mod intern {
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
-        assert_eq!(deploy_processed.deploy_hash, deploy_hash_as_string);
+        assert_eq!(
+            deploy_processed.transaction_hash.deploy,
+            deploy_hash_as_string
+        );
 
         let get_deploy = sdk
             .get_deploy(
@@ -222,14 +229,21 @@ pub(crate) mod intern {
     }
 }
 
-pub fn get_network_constants() -> (String, String, String) {
+pub fn get_network_constants() -> (String, String, String, String) {
     let default_node_address =
         env::var("NODE_ADDRESS").unwrap_or_else(|_| DEFAULT_NODE_ADDRESS.to_string());
     let default_event_address =
         env::var("EVENT_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENT_ADDRESS.to_string());
+    let default_speculative_address =
+        env::var("SPECULATIVE_ADDRESS").unwrap_or_else(|_| SPECULATIVE_ADDRESS.to_string());
     let chain_name = env::var("CHAIN_NAME").unwrap_or_else(|_| DEFAULT_CHAIN_NAME.to_string());
 
-    (default_node_address, default_event_address, chain_name)
+    (
+        default_node_address,
+        default_event_address,
+        default_speculative_address,
+        chain_name,
+    )
 }
 
 pub fn get_user_private_key(user: Option<&str>) -> Result<String, std::io::Error> {
@@ -370,6 +384,7 @@ pub async fn mint_nft(
         Some(private_key.to_string()),
         None,
         None,
+        None,
     );
     let mut session_params = SessionStrParams::default();
     session_params.set_session_hash(contract_cep78_hash);
@@ -408,7 +423,10 @@ pub async fn mint_nft(
         .await
         .unwrap();
     let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
-    assert_eq!(deploy_processed.deploy_hash, deploy_hash_as_string);
+    assert_eq!(
+        deploy_processed.transaction_hash.deploy,
+        deploy_hash_as_string
+    );
 }
 
 pub async fn get_block(node_address: &str) -> (String, u64) {

@@ -9,7 +9,8 @@ use std::time::{self, Duration};
 use tokio::sync::Mutex;
 
 pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
+pub const SPECULATIVE_ADDRESS: &str = "http://127.0.0.1:25101";
 pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
 pub const DEFAULT_PRIVATE_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
@@ -61,6 +62,7 @@ pub struct TestConfig {
     pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
     pub event_address: String,
+    pub speculative_address: String,
     pub chain_name: String,
     pub private_key: String,
     pub account: String,
@@ -89,7 +91,8 @@ pub async fn initialize_test_config(
 
     dotenv().ok();
 
-    let (default_node_address, event_address, chain_name) = get_network_constants();
+    let (default_node_address, default_event_address, default_speculative_address, chain_name) =
+        get_network_constants();
 
     let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
     if *block_hash_initialized_guard {
@@ -101,8 +104,8 @@ pub async fn initialize_test_config(
     let target_account = public_key_from_secret_key(&private_key_target_account).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    let purse_uref = get_main_purse(&account, &default_node_address).await;
 
+    let mut purse_uref = String::from("");
     let mut deploy_hash = String::from("");
     let mut contract_cep78_hash = String::from("");
     let mut contract_cep78_package_hash = String::from("");
@@ -110,12 +113,14 @@ pub async fn initialize_test_config(
     let mut dictionary_uref = String::from("");
 
     if !skip_install {
+        purse_uref = get_main_purse(&account, &default_node_address).await;
+
         println!("install_cep78");
         deploy_hash = install_cep78_if_needed(
             &account,
             &private_key,
             None,
-            (&default_node_address, &event_address, &chain_name),
+            (&default_node_address, &default_event_address, &chain_name),
         )
         .await
         .unwrap();
@@ -133,7 +138,7 @@ pub async fn initialize_test_config(
             &account,
             &account_hash,
             &private_key,
-            (&default_node_address, &event_address, &chain_name),
+            (&default_node_address, &default_event_address, &chain_name),
         )
         .await;
 
@@ -160,7 +165,8 @@ pub async fn initialize_test_config(
     let config = TestConfig {
         node_address: Some(default_node_address.to_string()),
         verbosity: Some(Verbosity::High),
-        event_address,
+        event_address: default_event_address,
+        speculative_address: default_speculative_address,
         account,
         private_key,
         chain_name,

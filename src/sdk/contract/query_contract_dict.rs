@@ -86,7 +86,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `SuccessResponse<GetDictionaryItemResult>` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `SuccessResponse<_GetDictionaryItemResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_dict(
         &self,
         state_root_hash: impl ToDigest,
@@ -140,7 +140,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         let dictionary_item = get_dictionary_item(false).await;
 
@@ -172,7 +172,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -184,7 +184,6 @@ mod tests {
                 Some(node_address),
             )
             .await;
-
         // Assert
         assert!(result.is_ok());
     }
@@ -194,7 +193,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -216,7 +215,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -238,7 +237,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key";

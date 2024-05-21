@@ -94,6 +94,9 @@ pub enum SdkError {
     #[error("Failed to parse account identifier")]
     FailedToParseAccountIdentifier,
 
+    #[error("Failed to parse entity identifier")]
+    FailedToParseEntityIdentifier,
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 

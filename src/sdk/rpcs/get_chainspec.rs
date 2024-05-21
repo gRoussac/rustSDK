@@ -99,7 +99,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `GetChainspecResult` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `_GetChainspecResult` or a `SdkError` in case of an error.
     pub async fn get_chainspec(
         &self,
         verbosity: Option<Verbosity>,
@@ -140,7 +140,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk.get_chainspec(verbosity, Some(node_address)).await;

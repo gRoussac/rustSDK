@@ -86,7 +86,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing the result of the transfer or a `SdkError` in case of an error.
+    /// A `Result` containing the result a `SuccessResponse<_PutDeployResult>` of the transfer or a `SdkError` in case of an error.
     #[allow(clippy::too_many_arguments)]
     pub async fn transfer(
         &self,
@@ -141,13 +141,13 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (node_address, _,_, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -173,14 +173,14 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (node_address, _,_, chain_name) = get_network_constants();
 
         let error_message = "Invalid Deploy";
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
-        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
+        let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -208,14 +208,14 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, chain_name) = get_network_constants();
+        let (node_address, _,_, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 

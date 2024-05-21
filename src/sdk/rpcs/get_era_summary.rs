@@ -153,7 +153,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `GetEraSummaryResult` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `_GetEraSummaryResult` or a `SdkError` in case of an error.
     ///
     /// # Errors
     ///
@@ -221,7 +221,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let result = sdk
             .get_block(None, verbosity, Some(node_address.clone()))
             .await;
@@ -235,6 +235,7 @@ mod tests {
                 .hash(),
         )
         .to_string();
+
         let block_identifier = BlockIdentifierInput::String(block_hash.to_string());
 
         // Act
@@ -251,9 +252,9 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -263,7 +264,6 @@ mod tests {
                 Some(node_address.clone()),
             )
             .await;
-
         // Assert
         assert!(result.is_ok());
     }

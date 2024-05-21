@@ -80,7 +80,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `SuccessResponse<QueryGlobalStateResult>` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `SuccessResponse<_QueryGlobalStateResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_key(
         &self,
         query_params: QueryGlobalStateParams,
@@ -165,7 +165,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         let key = get_key_input().await;
         let (_, block_height) = get_block(&node_address.clone()).await;
@@ -193,7 +193,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
@@ -224,7 +224,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         let key = get_key_input().await;
 

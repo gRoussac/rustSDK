@@ -381,6 +381,7 @@ impl SDK {
                     Some(self.get_node_address(node_address.clone())),
                 )
                 .await;
+
             let state_root_hash_as_string: String = match state_root_hash {
                 Ok(state_root_hash) => {
                     let state_root_hash: Digest =
@@ -389,6 +390,7 @@ impl SDK {
                 }
                 Err(_) => "".to_string(),
             };
+
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
@@ -421,7 +423,7 @@ mod tests {
     async fn test_query_global_state_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message = "builder error";
+        let error_message = "Failed to parse state identifier";
 
         // Act
         let result = sdk
@@ -474,7 +476,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -498,7 +500,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, verbosity, Some(node_address.clone()))
             .await
@@ -529,7 +531,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -553,13 +555,16 @@ mod tests {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
+        dbg!(get_key_input());
         // Act
         let result = sdk
             .query_global_state(QueryGlobalStateParams {
                 key: get_key_input(),
                 path: None,
                 maybe_global_state_identifier: None,
-                state_root_hash: None,
+                state_root_hash: Some(
+                    "588ee7aacb2d3d31476a2d2fb7800ced453926024b97788f8d8cc5cd56b45bf0".to_string(),
+                ),
                 maybe_block_id: None,
                 verbosity: None,
                 node_address: None,

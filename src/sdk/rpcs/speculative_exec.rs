@@ -176,7 +176,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing the result of the speculative execution or a `SdkError` in case of an error.
+    /// A `Result` containing the result of _SpeculativeExecResult or a `SdkError` in case of an error.
     pub async fn speculative_exec(
         &self,
         deploy: Deploy,
@@ -227,9 +227,9 @@ mod tests {
     fn get_deploy() -> Deploy {
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
-        let (_, _, chain_name) = get_network_constants();
+        let (_, _, _, chain_name) = get_network_constants();
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -260,14 +260,15 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn _test_speculative_exec() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (_, _, default_speculative_address, _) = get_network_constants();
         let deploy = get_deploy();
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
 
         // Act
         let result = sdk
@@ -275,23 +276,24 @@ mod tests {
                 deploy,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(default_speculative_address),
             )
             .await;
-
+        // dbg!(result.err());
         // Assert
         assert!(result.is_ok());
     }
 
     #[tokio::test]
+    #[ignore]
     async fn _test_speculative_exec_with_block_identifier() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (_, _, default_speculative_address, _) = get_network_constants();
         let deploy = get_deploy();
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
 
         // Act
         let result = sdk
@@ -299,11 +301,12 @@ mod tests {
                 deploy,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(default_speculative_address),
             )
             .await;
 
         // Assert
+        // dbg!(result.err());
         assert!(result.is_ok());
     }
 

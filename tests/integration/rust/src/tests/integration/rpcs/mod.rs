@@ -24,9 +24,11 @@ pub mod test_module {
 
     pub async fn test_get_peers() {
         let config: TestConfig = get_config(true).await;
+
         let peers = create_test_sdk(None)
             .get_peers(None, config.node_address)
             .await;
+
         let peers = peers.unwrap();
         assert!(!peers.result.api_version.to_string().is_empty());
         assert!(peers.result.peers.is_empty() || peers.result.peers.first().is_some());
@@ -35,8 +37,7 @@ pub mod test_module {
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config(true).await;
         let public_key = PublicKey::new(&config.account).unwrap();
-        let account_identifier =
-            AccountIdentifier::from_account_account_under_public_key(public_key);
+        let account_identifier = AccountIdentifier::from_account_under_public_key(public_key);
         let get_account = create_test_sdk(Some(config))
             .get_account(
                 Some(account_identifier),
@@ -390,7 +391,10 @@ pub mod test_module {
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
-        assert_eq!(deploy_processed.deploy_hash, deploy_hash_as_string);
+        assert_eq!(
+            deploy_processed.transaction_hash.deploy,
+            deploy_hash_as_string
+        );
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(config.to_owned().account_hash),
@@ -450,13 +454,12 @@ mod tests {
     pub async fn test_get_account_with_account_hash_test() {
         test_get_account_with_account_hash(None).await;
     }
-    // TODO Remove
-    #[should_panic]
+
     #[test]
     pub async fn test_get_auction_info_test() {
         test_get_auction_info(None).await;
     }
-    #[should_panic]
+
     #[test]
     pub async fn test_get_auction_info_test_with_block_identifier() {
         let config: TestConfig = get_config(true).await;

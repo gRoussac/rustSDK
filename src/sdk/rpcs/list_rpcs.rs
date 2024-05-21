@@ -106,7 +106,7 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `ListRpcsResult` or an `Error` in case of an error.
+    /// A `Result` containing either a `_ListRpcsResult` or an `Error` in case of an error.
     ///
     /// # Errors
     ///
@@ -151,7 +151,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk.list_rpcs(verbosity, Some(node_address)).await;
