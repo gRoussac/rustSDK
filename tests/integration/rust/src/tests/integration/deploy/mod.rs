@@ -183,15 +183,11 @@ mod tests {
         test_transfer().await;
     }
 
-    // TODO Remove
-    #[should_panic]
     #[test]
     pub async fn test_speculative_deploy_test() {
         test_speculative_deploy().await;
     }
 
-    // TODO Remove
-    #[should_panic]
     #[test]
     pub async fn test_speculative_transfer_test() {
         test_speculative_transfer().await;
