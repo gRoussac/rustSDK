@@ -105,7 +105,8 @@ pub async fn initialize_test_config(
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
 
-    let mut purse_uref = String::from("");
+    let purse_uref = get_main_purse(&account, &default_node_address).await;
+
     let mut deploy_hash = String::from("");
     let mut contract_cep78_hash =
         String::from("fd5b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
@@ -115,8 +116,6 @@ pub async fn initialize_test_config(
     let mut dictionary_uref = String::from("");
 
     if !skip_install {
-        purse_uref = get_main_purse(&account, &default_node_address).await;
-
         println!("install_cep78");
         deploy_hash = install_cep78_if_needed(
             &account,

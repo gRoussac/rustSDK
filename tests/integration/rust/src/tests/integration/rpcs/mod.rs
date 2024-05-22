@@ -559,8 +559,7 @@ mod tests {
     pub async fn test_get_chainspec_test() {
         test_get_chainspec().await;
     }
-    // TODO Remove
-    #[should_panic]
+
     #[test]
     pub async fn test_get_deploy_test() {
         test_get_deploy().await;
