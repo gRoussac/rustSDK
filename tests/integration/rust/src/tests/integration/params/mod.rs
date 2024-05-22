@@ -45,7 +45,7 @@ pub mod test_module {
     }
 
     pub async fn test_session_params() {
-        let config: TestConfig = get_config(false).await;
+        let config: TestConfig = get_config(true).await;
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(&config.contract_cep78_hash);
         session_params.set_session_entry_point(ENTRYPOINT_MINT);

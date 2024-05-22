@@ -12,7 +12,7 @@ use super::{
 #[cfg(target_arch = "wasm32")]
 use crate::helpers::insert_js_value_arg;
 use crate::{
-    debug::error,
+    debug::{error, log},
     helpers::{
         get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
         secret_key_from_pem,
@@ -321,7 +321,7 @@ impl Deploy {
         match deploy.is_valid() {
             Ok(()) => true,
             Err(err) => {
-                error(&format!("Deploy is not valid: {:?}", err));
+                log(&format!("Warning Deploy is not valid: {:?}", err));
                 false
             }
         }
@@ -330,8 +330,11 @@ impl Deploy {
     #[wasm_bindgen(getter)]
     pub fn hash(&self) -> DeployHash {
         let deploy: _Deploy = self.0.clone();
-        let deploy_hash = (*deploy.hash()).to_string();
-        match DeployHash::new(&deploy_hash) {
+        // TODO check why fmt is giving a short version and not debug
+        // dbg!(format!("{:?}", (*deploy.hash().inner()).clone()));
+        let deploy_hash: DeployHash = (*deploy.hash()).into();
+
+        match DeployHash::new(&deploy_hash.to_string()) {
             Ok(deploy_hash) => deploy_hash,
             Err(err) => {
                 error(&format!("Deploy has not a valid hash: {:?}", err));
