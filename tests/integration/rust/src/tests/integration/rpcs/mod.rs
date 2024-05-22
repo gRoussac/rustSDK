@@ -9,6 +9,7 @@ pub mod test_module {
     use casper_rust_wasm_sdk::helpers::cl_value_to_json;
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
+    use casper_rust_wasm_sdk::types::entity_identifier::EntityIdentifier;
     use casper_rust_wasm_sdk::{
         rpcs::{
             get_balance::GetBalanceInput,
@@ -57,6 +58,34 @@ pub mod test_module {
             .is_empty());
     }
 
+    pub async fn test_get_entity(maybe_block_identifier: Option<BlockIdentifierInput>) {
+        let config: TestConfig = get_config(true).await;
+        let public_key = PublicKey::new(&config.account).unwrap();
+        let account_identifier = EntityIdentifier::from_entity_under_public_key(public_key);
+        let get_entity = create_test_sdk(Some(config))
+            .get_entity(
+                Some(account_identifier),
+                None,
+                maybe_block_identifier,
+                None,
+                None,
+            )
+            .await;
+        let get_entity = get_entity.unwrap();
+        assert!(!get_entity.result.api_version.to_string().is_empty());
+        assert!(!get_entity
+            .result
+            .entity_result
+            .addressable_entity()
+            .unwrap()
+            .entity
+            .kind()
+            .maybe_account_hash()
+            .unwrap()
+            .to_string()
+            .is_empty());
+    }
+
     pub async fn test_get_account_with_account_hash(
         maybe_block_identifier: Option<BlockIdentifierInput>,
     ) {
@@ -78,6 +107,36 @@ pub mod test_module {
             .result
             .account
             .account_hash()
+            .to_string()
+            .is_empty());
+    }
+
+    pub async fn test_get_entity_with_account_hash(
+        maybe_block_identifier: Option<BlockIdentifierInput>,
+    ) {
+        let config: TestConfig = get_config(true).await;
+        let account_hash = AccountHash::from_formatted_str(&config.account_hash).unwrap();
+        let account_identifier = EntityIdentifier::from_entity_under_account_hash(account_hash);
+        let get_entity = create_test_sdk(Some(config))
+            .get_entity(
+                Some(account_identifier),
+                None,
+                maybe_block_identifier,
+                None,
+                None,
+            )
+            .await;
+        let get_entity = get_entity.unwrap();
+        assert!(!get_entity.result.api_version.to_string().is_empty());
+        assert!(!get_entity
+            .result
+            .entity_result
+            .addressable_entity()
+            .unwrap()
+            .entity
+            .kind()
+            .maybe_account_hash()
+            .unwrap()
             .to_string()
             .is_empty());
     }
@@ -441,20 +500,36 @@ mod tests {
         test_get_peers().await;
     }
     #[test]
-    pub async fn test_get_account_test() {
+    #[ignore]
+    pub async fn _test_get_account_test() {
         test_get_account(None).await;
     }
     #[test]
-    pub async fn test_get_account_test_with_block_identifier() {
+    #[ignore]
+    pub async fn _test_get_account_test_with_block_identifier() {
         let config: TestConfig = get_config(true).await;
         let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
         test_get_account(maybe_block_identifier).await;
     }
     #[test]
-    pub async fn test_get_account_with_account_hash_test() {
+    #[ignore]
+    pub async fn _test_get_account_with_account_hash_test() {
         test_get_account_with_account_hash(None).await;
     }
-
+    #[test]
+    pub async fn test_get_entity_test() {
+        test_get_entity(None).await;
+    }
+    #[test]
+    pub async fn test_get_entity_test_with_block_identifier() {
+        let config: TestConfig = get_config(true).await;
+        let maybe_block_identifier = Some(BlockIdentifierInput::String(config.block_hash));
+        test_get_entity(maybe_block_identifier).await;
+    }
+    #[test]
+    pub async fn test_get_entity_with_account_hash_test() {
+        test_get_entity_with_account_hash(None).await;
+    }
     #[test]
     pub async fn test_get_auction_info_test() {
         test_get_auction_info(None).await;
