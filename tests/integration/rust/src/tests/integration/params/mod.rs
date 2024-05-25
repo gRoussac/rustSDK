@@ -66,7 +66,7 @@ pub mod test_module {
     }
 
     pub async fn test_dictionary_item_params() {
-        let config: TestConfig = get_config(false).await;
+        let config: TestConfig = get_config(true).await;
         let mut dictionary_item_params = DictionaryItemStrParams::default();
         //  dictionary_item_params.
         assert!(dictionary_item_params.account_named_key().is_none());
@@ -87,6 +87,7 @@ pub mod test_module {
         );
         assert!(dictionary_item_params.contract_named_key().is_some());
         dictionary_item_params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
+
         assert!(dictionary_item_params.uref().is_some());
         dictionary_item_params.set_dictionary(&config.dictionary_key);
         assert!(dictionary_item_params.dictionary().is_some());

@@ -312,7 +312,13 @@ pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
         .replace("tests/integration/rust", "");
     let mut relative_path_buf = PathBuf::from(relative_path.clone());
     relative_path_buf.push(file_path);
-    let mut file = File::open(relative_path_buf)?;
+    let mut file = match File::open(&relative_path_buf) {
+        Ok(file) => file,
+        Err(err) => {
+            eprintln!("{err} {file_path}");
+            panic!();
+        }
+    };
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
     Ok(buffer)

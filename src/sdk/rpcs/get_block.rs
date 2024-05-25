@@ -274,7 +274,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(100));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, _) = get_network_constants();
 

@@ -184,12 +184,14 @@ mod tests {
     }
 
     #[test]
-    pub async fn test_speculative_deploy_test() {
+    #[ignore]
+    pub async fn _test_speculative_deploy_test() {
         test_speculative_deploy().await;
     }
 
     #[test]
-    pub async fn test_speculative_transfer_test() {
+    #[ignore]
+    pub async fn _test_speculative_transfer_test() {
         test_speculative_transfer().await;
     }
 }

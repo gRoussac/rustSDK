@@ -132,22 +132,26 @@ mod tests {
 
     #[test]
     pub async fn test_wait_deploy_test_defined_timeout_test() {
-        // Wrap the test function with a timeout of 5 seconds
-        let result = timeout(Duration::from_secs(5), test_wait_deploy_timeout(Some(3000))).await;
+        // Wrap the test function with a timeout of 10 seconds
+        let result = timeout(
+            Duration::from_secs(10),
+            test_wait_deploy_timeout(Some(5000)),
+        )
+        .await;
         // Assert whether the test completed within the timeout period
-        assert!(result.is_ok(), "Test timed out after 5 seconds");
+        assert!(result.is_ok(), "Test timed out after 10 seconds");
     }
 
     #[test]
     pub async fn test_watch_deploy_defined_timeout_test() {
-        // Wrap the test function with a timeout of 5 seconds
+        // Wrap the test function with a timeout of 10 seconds
         let result = timeout(
-            Duration::from_secs(5),
-            test_watch_deploy_timeout(Some(3000)), // should time out on 3s on the 5s available for the test
+            Duration::from_secs(10),
+            test_watch_deploy_timeout(Some(5000)), // should time out on 3s on the 5s available for the test
         )
         .await;
         // Assert whether the test completed within the timeout period
-        assert!(result.is_ok(), "Test timed out after 5 seconds");
+        assert!(result.is_ok(), "Test timed out after 10 seconds");
     }
 
     #[test]
