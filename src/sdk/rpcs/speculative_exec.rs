@@ -268,7 +268,7 @@ mod tests {
         let (_, _, default_speculative_address, _) = get_network_constants();
         let deploy = get_deploy();
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
         // Act
         let result = sdk
@@ -293,7 +293,7 @@ mod tests {
         let (_, _, default_speculative_address, _) = get_network_constants();
         let deploy = get_deploy();
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
         // Act
         let result = sdk

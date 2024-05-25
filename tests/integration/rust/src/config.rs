@@ -109,11 +109,13 @@ pub async fn initialize_test_config(
 
     let mut deploy_hash = String::from("");
     let mut contract_cep78_hash =
-        String::from("fd5b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
+        String::from("015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
     let mut contract_cep78_package_hash =
-        String::from("7d418948cabaf6a700773f724e690338945167eac4ee67b6f11abd72562b1a44");
-    let mut dictionary_key = String::from("");
-    let mut dictionary_uref = String::from("");
+        String::from("02418948cabaf6a700773f724e690338945167eac4ee67b6f11abd72562b1a44");
+    let mut dictionary_key =
+        String::from("035b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
+    let mut dictionary_uref =
+        String::from("uref-045b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7-001");
 
     if !skip_install {
         println!("install_cep78");

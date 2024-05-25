@@ -200,7 +200,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
         let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(11));
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
