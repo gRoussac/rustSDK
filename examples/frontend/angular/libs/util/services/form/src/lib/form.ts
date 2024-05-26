@@ -69,9 +69,22 @@ const accountIdentifier: InputField = {
   label: 'Account identifier',
   name: 'account_identifier',
   controlName: 'accountIdentifier',
-  placeholder: 'Public Key, AccountHash, Purse URef',
+  placeholder: 'Public Key, AccountHash',
   e2e: 'accountIdentifierElt',
-  state_name: ['account_hash', 'public_key', 'main_purse'],
+  state_name: ['account_hash', 'public_key'],
+};
+
+const entityIdentifier: InputField = {
+  id: 'entityIdentifierElt',
+  type: 'search',
+  wrap_class: 'col-lg-9',
+  class: 'form-control',
+  label: 'Entity identifier',
+  name: 'entity_identifier',
+  controlName: 'entityIdentifier',
+  placeholder: 'Public Key, AccountHash, Entity',
+  e2e: 'entityIdentifierElt',
+  state_name: ['account_hash', 'public_key', 'entity'],
 };
 
 const stateRootHash: InputField = {
@@ -430,6 +443,11 @@ const getAccountFields: InputContainer[][] = [
   [{ input: accountIdentifier, required: true }],
 ];
 
+const getEntityFields: InputContainer[][] = [
+  ...getBlockFields,
+  [{ input: entityIdentifier, required: true }],
+];
+
 const getBalanceFields: InputContainer[][] = [
   [{ input: stateRootHash }],
   [{ input: purseUref, required: true }],
@@ -535,6 +553,7 @@ const formFields = new Map<string, InputContainer[][]>([
   ['call_entrypoint', callEntrypointFields],
   ['deploy', makeDeployFields],
   ['get_account', getAccountFields],
+  ['get_entity', getEntityFields],
   ['get_balance', getBalanceFields],
   ['get_block', getBlockFields],
   ['get_block_transfers', getBlockFields],

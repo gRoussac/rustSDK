@@ -176,6 +176,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.get_dictionary_item();
   }
 
+  private async get_entity(entity_identifier_param: string) {
+    return await this.clientService.get_entity(entity_identifier_param);
+  }
+
   private async get_era_info() {
     return await this.clientService.get_era_info();
   }

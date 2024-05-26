@@ -4,6 +4,7 @@ export type State = {
   node_address?: string;
   chain_name?: string;
   account_hash?: string;
+  enity?: string;
   main_purse?: string;
   state_root_hash?: string;
   action?: string;

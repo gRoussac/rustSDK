@@ -1,8 +1,11 @@
 use super::public_key::PublicKey;
+#[cfg(target_arch = "wasm32")]
 use crate::debug::error;
+#[cfg(target_arch = "wasm32")]
+use casper_types::account::ACCOUNT_HASH_LENGTH;
 use casper_types::{
-    account::{AccountHash as _AccountHash, ACCOUNT_HASH_LENGTH},
-    bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
+    account::AccountHash as _AccountHash,
+    bytesrepr::{self, FromBytes, ToBytes},
     crypto,
 };
 #[cfg(target_arch = "wasm32")]
@@ -16,6 +19,7 @@ pub struct AccountHash(_AccountHash);
 
 #[wasm_bindgen]
 impl AccountHash {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
     pub fn new(account_hash_hex_str: &str) -> Result<AccountHash, JsValue> {
         let bytes = hex::decode(account_hash_hex_str)
@@ -29,6 +33,7 @@ impl AccountHash {
         Ok(account_hash.into())
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
     pub fn from_formatted_str(formatted_str: &str) -> Result<AccountHash, JsValue> {
         let account_hash = _AccountHash::from_formatted_str(formatted_str)
@@ -97,7 +102,7 @@ impl ToBytes for AccountHash {
     }
 
     fn serialized_length(&self) -> usize {
-        U8_SERIALIZED_LENGTH + self.0.value().len() * U8_SERIALIZED_LENGTH
+        self.0.serialized_length()
     }
 
     fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {

@@ -93,6 +93,7 @@ impl SDK {
     // JavaScript alias for `get_validator_changes`
     #[wasm_bindgen(js_name = "info_get_validator_changes")]
     #[deprecated(note = "This function is an alias. Please use `get_validator_changes` instead.")]
+    #[allow(deprecated)]
     pub async fn info_get_validator_changes_js_alias(
         &self,
         verbosity: Option<Verbosity>,

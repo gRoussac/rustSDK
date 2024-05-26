@@ -169,6 +169,7 @@ impl SDK {
     // JavaScript alias for `get_node_status`
     #[wasm_bindgen(js_name = "info_get_status")]
     #[deprecated(note = "This function is an alias. Please use `get_node_status` instead.")]
+    #[allow(deprecated)]
     pub async fn info_get_status_js_alias(
         &self,
         verbosity: Option<Verbosity>,

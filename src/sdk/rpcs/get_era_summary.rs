@@ -144,6 +144,7 @@ impl SDK {
     // JavaScript alias for `get_era_summary`
     #[wasm_bindgen(js_name = "chain_get_era_summary")]
     #[deprecated(note = "This function is an alias. Please use `get_era_summary` instead.")]
+    #[allow(deprecated)]
     pub async fn chain_get_era_summary_js_alias(
         &self,
         options: Option<GetEraSummaryOptions>,
