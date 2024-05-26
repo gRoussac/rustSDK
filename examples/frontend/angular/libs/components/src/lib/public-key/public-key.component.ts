@@ -83,12 +83,16 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
   }
 
   private async updateAccount() {
-    const get_account = await this.clientService.get_account(this.public_key);
-    if (!get_account.account) {
+    const get_entity = await this.clientService.get_entity(this.public_key);
+    if (!get_entity.entity_result) {
       return;
     }
-    const account_hash = get_account?.account?.account_hash;
-    const main_purse = get_account?.account?.main_purse;
+    // TODO Fix this camelcase syntax with helpers
+    // const account_hash = get_account?.account?.account_hash;
+    // const main_purse = get_account?.account?.main_purse;
+    const account_hash = get_entity?.entity_result?.AddressableEntity?.entity.entity_kind.Account;
+    const main_purse = get_entity?.entity_result?.AddressableEntity?.entity.main_purse;
+
     this.stateService.setState({
       account_hash,
       main_purse
