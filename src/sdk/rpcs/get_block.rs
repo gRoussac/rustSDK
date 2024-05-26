@@ -142,7 +142,7 @@ impl SDK {
         }
     }
 
-    /// JS Alias for the `get_block` method to maintain compatibility.
+    /// JavaScript Alias for the `get_block`.
     ///
     /// # Arguments
     ///
@@ -156,6 +156,7 @@ impl SDK {
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "chain_get_block")]
+    #[deprecated(note = "This function is an alias. Please use `get_block` instead.")]
     pub async fn chain_get_block_js_alias(
         &self,
         options: Option<GetBlockOptions>,

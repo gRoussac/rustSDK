@@ -69,7 +69,7 @@ impl PutDeployResult {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// JavaScript alias for deploying with deserialized parameters.
+    /// JavaScript function for deploying with deserialized parameters.
     ///
     /// # Arguments
     ///

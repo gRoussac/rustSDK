@@ -47,10 +47,9 @@ impl SDK {
         }
     }
 
-    /// JS Alias for `put_deploy_js_alias`.
-    ///
-    /// This function provides an alternative name for `put_deploy_js_alias`.
+    /// JavaScript Alias for `put_deploy`.
     #[wasm_bindgen(js_name = "account_put_deploy")]
+    #[deprecated(note = "This function is an alias. Please use `put_deploy` instead.")]
     pub async fn account_put_deploy_js_alias(
         &self,
         deploy: Deploy,
@@ -112,7 +111,7 @@ mod tests {
     fn get_deploy() -> Deploy {
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
-        let (_, _,_, chain_name) = get_network_constants();
+        let (_, _, _, chain_name) = get_network_constants();
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
         let payment_params = PaymentStrParams::default();

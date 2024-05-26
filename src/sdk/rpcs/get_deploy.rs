@@ -162,8 +162,9 @@ impl SDK {
         }
     }
 
-    /// Retrieves deploy information using the provided options, alias for `get_deploy_js_alias`.
+    /// Retrieves deploy information using the provided options, alias for `get_deploy`.
     #[wasm_bindgen(js_name = "info_get_deploy")]
+    #[deprecated(note = "This function is an alias. Please use `get_deploy` instead.")]
     pub async fn info_get_deploy_js_alias(
         &self,
         options: Option<GetDeployOptions>,
@@ -256,7 +257,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _,_, chain_name) = get_network_constants();
+        let (node_address, _, _, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
@@ -294,7 +295,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _,_, chain_name) = get_network_constants();
+        let (node_address, _, _, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();

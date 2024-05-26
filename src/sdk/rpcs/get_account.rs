@@ -96,7 +96,28 @@ impl SDK {
         }
     }
 
-    // JavaScript alias for `get_account` function
+    /// Retrieves account information using the provided options.
+    ///
+    /// This function is an asynchronous JavaScript binding for the Rust `get_account` method.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetAccountOptions` struct containing retrieval options, such as:
+    ///   - `account_identifier`: Identifier for the account.
+    ///   - `account_identifier_as_string`: String representation of the account identifier.
+    ///   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+    ///   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+    ///   - `verbosity`: Verbosity level for the output.
+    ///   - `node_address`: Address of the node to query.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetAccountResult` on success or a `JsError` on failure.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+    /// ```
     #[wasm_bindgen(js_name = "get_account")]
     pub async fn get_account_js_alias(
         &self,
@@ -138,7 +159,7 @@ impl SDK {
         }
     }
 
-    // JavaScript alias for `get_account_js_alias`
+    // JavaScript alias for `get_account`
     #[wasm_bindgen(js_name = "state_get_account_info")]
     pub async fn state_get_account_info_js_alias(
         &self,

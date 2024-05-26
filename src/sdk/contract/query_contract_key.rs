@@ -52,7 +52,7 @@ impl SDK {
         }
     }
 
-    /// JavaScript alias for query_contract_key with deserialized options.
+    /// JavaScript function for query_contract_key with deserialized options.
     #[wasm_bindgen(js_name = "query_contract_key")]
     pub async fn query_contract_key_js_alias(
         &self,
