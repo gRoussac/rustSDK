@@ -1,7 +1,4 @@
-use crate::{
-    debug::error,
-    types::{account_hash::AccountHash, purse_identifier::PurseIdentifier, uref::URef},
-};
+use crate::types::{account_hash::AccountHash, purse_identifier::PurseIdentifier, uref::URef};
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     PublicKey as _PublicKey,
@@ -12,29 +9,63 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use wasm_bindgen::prelude::*;
 
+use super::sdk_error::SdkError;
+
 #[wasm_bindgen]
 #[derive(Debug, Deserialize, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PublicKey(_PublicKey);
 
-#[wasm_bindgen]
 impl PublicKey {
-    #[wasm_bindgen(constructor)]
-    pub fn new(public_key_hex_str: &str) -> Result<PublicKey, JsValue> {
-        let bytes = hex::decode(public_key_hex_str).map_err(|err| {
-            error(&format!("PublicKey decode {:?}", err));
-            JsValue::null()
-        })?;
-        let (public_key, _) = _PublicKey::from_bytes(&bytes).map_err(|err| {
-            error(&format!("PublicKey from bytes {:?}", err));
-            JsValue::null()
-        })?;
+    pub fn new(public_key_hex_str: &str) -> Result<PublicKey, SdkError> {
+        let bytes = match hex::decode(public_key_hex_str) {
+            Ok(bytes) => bytes,
+            Err(err) => {
+                return Err(SdkError::FailedToDecodeHex {
+                    context: "PublicKey::new",
+                    error: format!("{:?}", err),
+                });
+            }
+        };
+
+        // Convert the bytes to the public key
+        let (public_key, _) = match _PublicKey::from_bytes(&bytes) {
+            Ok(result) => result,
+            Err(err) => {
+                return Err(SdkError::FailedToParsePublicKeyBytes {
+                    context: "PublicKey::new",
+                    error: err,
+                });
+            }
+        };
+
+        // Create the PublicKey
         Ok(PublicKey(public_key))
     }
+}
 
+#[wasm_bindgen]
+impl PublicKey {
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(public_key_hex_str: &str) -> Result<PublicKey, JsValue> {
+        Self::new(public_key_hex_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse PublicKey from hex string: {:?}",
+                err
+            ))
+        })
+    }
+
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromUint8Array")]
-    pub fn from_bytes(bytes: Vec<u8>) -> PublicKey {
-        let (public_key, _) = _PublicKey::from_bytes(&bytes).unwrap();
-        PublicKey(public_key)
+    pub fn from_bytes_js_alias(bytes: Vec<u8>) -> Result<PublicKey, JsValue> {
+        match Self::from_bytes(&bytes) {
+            Ok((public_key, _)) => Ok(public_key),
+            Err(err) => Err(JsValue::from_str(&format!(
+                "Failed to parse PublicKey: {:?}",
+                err
+            ))),
+        }
     }
 
     #[wasm_bindgen(js_name = "toAccountHash")]

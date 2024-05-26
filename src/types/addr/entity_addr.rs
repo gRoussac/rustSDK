@@ -1,5 +1,4 @@
-#[cfg(target_arch = "wasm32")]
-use crate::debug::error;
+use crate::types::sdk_error::SdkError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     EntityAddr as _EntityAddr,
@@ -12,6 +11,18 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct EntityAddr(_EntityAddr);
+
+impl EntityAddr {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<EntityAddr, SdkError> {
+        let entity_addr = _EntityAddr::from_formatted_str(formatted_str).map_err(|error| {
+            SdkError::FailedToParseEntity {
+                context: "EntityAddr::from_formatted_str",
+                error,
+            }
+        })?;
+        Ok(EntityAddr(entity_addr))
+    }
+}
 
 #[wasm_bindgen]
 impl EntityAddr {
@@ -31,16 +42,13 @@ impl EntityAddr {
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(formatted_str: &str) -> Result<EntityAddr, JsValue> {
-        let entity_addr = _EntityAddr::from_formatted_str(formatted_str)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse EntityAddr from formatted string: {:?}",
-                    err
-                ))
-            })
-            .unwrap();
-        Ok(EntityAddr(entity_addr))
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<EntityAddr, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse Entity from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]

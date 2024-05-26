@@ -22,10 +22,24 @@ impl AccountIdentifier {
     #[wasm_bindgen(js_name = "fromFormattedStr")]
     pub fn from_formatted_str(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
         if formatted_str.contains("account-hash") {
-            let account_hash = AccountHash::from_formatted_str(formatted_str)?;
+            let account_hash = AccountHash::from_formatted_str(formatted_str)
+                .map_err(|err| {
+                    JsValue::from_str(&format!(
+                        "Failed to parse AccountHash from formatted string: {:?}",
+                        err
+                    ));
+                })
+                .unwrap();
             Ok(Self::from_account_under_account_hash(account_hash))
         } else {
-            let public_key = PublicKey::new(formatted_str)?;
+            let public_key = PublicKey::new(formatted_str)
+                .map_err(|err| {
+                    JsValue::from_str(&format!(
+                        "Failed to parse PublicKey from formatted string: {:?}",
+                        err
+                    ));
+                })
+                .unwrap();
             Ok(Self::from_account_under_public_key(public_key))
         }
     }
