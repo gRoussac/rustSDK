@@ -12,11 +12,13 @@ pub struct AccountIdentifier(_AccountIdentifier);
 
 #[wasm_bindgen]
 impl AccountIdentifier {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
     pub fn new(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
         Self::from_formatted_str(formatted_str)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
     pub fn from_formatted_str(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
         if formatted_str.contains("account-hash") {

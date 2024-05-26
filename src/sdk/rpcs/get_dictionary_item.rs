@@ -178,6 +178,7 @@ impl SDK {
     /// JavaScript Alias for `get_dictionary_item`
     #[wasm_bindgen(js_name = "state_get_dictionary_item")]
     #[deprecated(note = "This function is an alias. Please use `get_dictionary_item` instead.")]
+    #[allow(deprecated)]
     pub async fn state_get_dictionary_item_js_alias(
         &self,
         options: Option<GetDictionaryItemOptions>,

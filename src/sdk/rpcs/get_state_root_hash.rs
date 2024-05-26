@@ -176,6 +176,7 @@ impl SDK {
     /// Returns a `JsError` if there is an error during the retrieval process.
     #[wasm_bindgen(js_name = "chain_get_state_root_hash")]
     #[deprecated(note = "This function is an alias. Please use `get_state_root_hash` instead.")]
+    #[allow(deprecated)]
     pub async fn chain_get_state_root_hash_js_alias(
         &self,
         options: Option<GetStateRootHashOptions>,

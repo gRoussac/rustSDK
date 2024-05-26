@@ -85,6 +85,8 @@ pub struct GetAccountOptions {
 impl SDK {
     // Deserialize options for `get_account` from a JavaScript object
     #[wasm_bindgen(js_name = "get_account_options")]
+    #[deprecated(note = "prefer 'get_entity_options'")]
+    #[allow(deprecated)]
     pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {
         let options_result = options.into_serde::<GetAccountOptions>();
         match options_result {
@@ -119,6 +121,8 @@ impl SDK {
     /// Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
     /// ```
     #[wasm_bindgen(js_name = "get_account")]
+    #[deprecated(note = "prefer 'get_entity'")]
+    #[allow(deprecated)]
     pub async fn get_account_js_alias(
         &self,
         options: Option<GetAccountOptions>,
@@ -161,6 +165,8 @@ impl SDK {
 
     // JavaScript alias for `get_account`
     #[wasm_bindgen(js_name = "state_get_account_info")]
+    #[deprecated(note = "prefer 'get_entity'")]
+    #[allow(deprecated)]
     pub async fn state_get_account_info_js_alias(
         &self,
         options: Option<GetAccountOptions>,
@@ -187,6 +193,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `SdkError` if there is an error during the retrieval process.
+    #[deprecated(note = "prefer 'get_entity'")]
+    #[allow(deprecated)]
     pub async fn get_account(
         &self,
         account_identifier: Option<AccountIdentifier>,
@@ -263,6 +271,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_account_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -281,6 +290,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_account_with_missing_account() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -296,6 +306,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     #[ignore]
     async fn _test_get_account_with_account_identifier() {
         // Arrange
@@ -319,6 +330,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     #[ignore]
     async fn _test_get_account_with_account_identifier_as_string() {
         // Arrange
@@ -343,6 +355,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     #[ignore]
     async fn _test_get_account_with_block_identifier() {
         // Arrange
@@ -369,6 +382,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_account_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);

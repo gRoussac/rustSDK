@@ -165,6 +165,7 @@ impl SDK {
     /// Retrieves deploy information using the provided options, alias for `get_deploy`.
     #[wasm_bindgen(js_name = "info_get_deploy")]
     #[deprecated(note = "This function is an alias. Please use `get_deploy` instead.")]
+    #[allow(deprecated)]
     pub async fn info_get_deploy_js_alias(
         &self,
         options: Option<GetDeployOptions>,

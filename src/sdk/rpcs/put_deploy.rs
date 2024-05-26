@@ -50,6 +50,7 @@ impl SDK {
     /// JavaScript Alias for `put_deploy`.
     #[wasm_bindgen(js_name = "account_put_deploy")]
     #[deprecated(note = "This function is an alias. Please use `put_deploy` instead.")]
+    #[allow(deprecated)]
     pub async fn account_put_deploy_js_alias(
         &self,
         deploy: Deploy,

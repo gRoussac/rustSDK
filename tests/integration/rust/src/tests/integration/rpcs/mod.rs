@@ -35,6 +35,7 @@ pub mod test_module {
         assert!(peers.result.peers.is_empty() || peers.result.peers.first().is_some());
     }
 
+    #[allow(deprecated)]
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config(true).await;
         let public_key = PublicKey::new(&config.account).unwrap();
@@ -86,6 +87,7 @@ pub mod test_module {
             .is_empty());
     }
 
+    #[allow(deprecated)]
     pub async fn test_get_account_with_account_hash(
         maybe_block_identifier: Option<BlockIdentifierInput>,
     ) {
@@ -512,6 +514,7 @@ mod tests {
         test_get_account(maybe_block_identifier).await;
     }
     #[test]
+    #[allow(deprecated)]
     #[ignore]
     pub async fn _test_get_account_with_account_hash_test() {
         test_get_account_with_account_hash(None).await;

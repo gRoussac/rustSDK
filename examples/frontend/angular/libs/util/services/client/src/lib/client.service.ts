@@ -96,6 +96,39 @@ export class ClientService {
     }
   }
 
+  async get_entity(entity_identifier_param: string) {
+    let entity_identifier!: string;
+    if (!entity_identifier_param) {
+      entity_identifier = this.getIdentifier('entityIdentifier')?.value?.trim();
+    } else {
+      entity_identifier = entity_identifier_param;
+    }
+    if (!entity_identifier) {
+      const err = "entity_identifier is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const get_entity_options = this.sdk.get_entity_options({
+      entity_identifier_as_string: entity_identifier
+    });
+    if (!get_entity_options) {
+      const err = "get_entity_options is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    this.getIdentifieBlock(get_entity_options);
+    try {
+      const get_entity = await this.sdk.get_entity(get_entity_options);
+      if (!entity_identifier_param) {
+        this.resultService.setResult(get_entity.toJson());
+      }
+      return get_entity;
+    } catch (err: any) {
+      this.errorService.setError(err.toString());
+      return err;
+    }
+  }
+
   async get_peers() {
     let peers: any;
     try {
