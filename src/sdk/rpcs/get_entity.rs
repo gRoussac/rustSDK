@@ -97,7 +97,28 @@ impl SDK {
         }
     }
 
-    // JavaScript alias for `get_entity` function
+    /// Retrieves entity information using the provided options.
+    ///
+    /// This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
+    ///   - `entity_identifier`: Identifier for the entity.
+    ///   - `entity_identifier_as_string`: String representation of the entity identifier.
+    ///   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+    ///   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+    ///   - `verbosity`: Verbosity level for the output.
+    ///   - `node_address`: Address of the node to query.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+    /// ```
     #[wasm_bindgen(js_name = "get_entity")]
     pub async fn get_entity_js_alias(
         &self,
@@ -137,6 +158,15 @@ impl SDK {
                 Err(JsError::new(err))
             }
         }
+    }
+
+    // JavaScript alias for `get_entity`
+    #[wasm_bindgen(js_name = "state_get_entity")]
+    pub async fn state_get_entity_js_alias(
+        &self,
+        options: Option<GetEntityOptions>,
+    ) -> Result<GetAddressableEntityResult, JsError> {
+        self.get_entity_js_alias(options).await
     }
 }
 

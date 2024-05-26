@@ -55,7 +55,7 @@ impl SDK {
         }
     }
 
-    /// JavaScript alias for query_contract_dict with deserialized options.
+    /// JavaScript function for query_contract_dict with deserialized options.
     #[wasm_bindgen(js_name = "query_contract_dict")]
     pub async fn query_contract_dict_js_alias(
         &self,

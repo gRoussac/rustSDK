@@ -26,7 +26,7 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// JS Alias for speculative transfer.
+    /// JS function for speculative transfer.
     ///
     /// # Arguments
     ///

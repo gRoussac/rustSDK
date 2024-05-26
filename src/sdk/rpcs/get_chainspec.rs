@@ -86,6 +86,17 @@ impl SDK {
             }
         }
     }
+
+    // JavaScript alias for `get_chainspec`.
+    #[wasm_bindgen(js_name = "info_get_chainspec")]
+    #[deprecated(note = "This function is an alias. Please use `get_chainspec` instead.")]
+    pub async fn info_get_chainspec_js_alias(
+        &self,
+        verbosity: Option<Verbosity>,
+        node_address: Option<String>,
+    ) -> Result<GetChainspecResult, JsError> {
+        self.get_chainspec_js_alias(verbosity, node_address).await
+    }
 }
 
 /// Implementations for the `SDK` struct.

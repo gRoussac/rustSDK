@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
-    /// JS Alias for `sign_deploy`.
+    /// JS function for `sign_deploy`.
     ///
     /// # Arguments
     ///
@@ -64,7 +64,7 @@ mod tests {
     async fn test_sign_deploy_with_valid_params() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _,_, chain_name) = get_network_constants();
+        let (_, _, _, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
@@ -100,7 +100,7 @@ mod tests {
     async fn test_sign_deploy_with_invalid_signature() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (_, _,_, chain_name) = get_network_constants();
+        let (_, _, _, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
         dbg!(private_key.clone());
