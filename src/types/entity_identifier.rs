@@ -1,5 +1,11 @@
-use super::{account_hash::AccountHash, addr::entity_addr::EntityAddr, public_key::PublicKey};
+use super::{
+    account_hash::AccountHash, addr::entity_addr::EntityAddr, public_key::PublicKey,
+    sdk_error::SdkError,
+};
 use casper_client::rpcs::EntityIdentifier as _EntityIdentifier;
+use casper_types::{
+    account::ACCOUNT_HASH_FORMATTED_STRING_PREFIX, addressable_entity::ENTITY_PREFIX,
+};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
@@ -10,46 +16,52 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct EntityIdentifier(_EntityIdentifier);
 
-#[wasm_bindgen]
 impl EntityIdentifier {
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(constructor)]
-    pub fn new(formatted_str: &str) -> Result<EntityIdentifier, JsValue> {
+    pub fn new(formatted_str: &str) -> Result<Self, SdkError> {
         Self::from_formatted_str(formatted_str)
     }
 
-    #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(formatted_str: &str) -> Result<EntityIdentifier, JsValue> {
-        use casper_types::{
-            account::ACCOUNT_HASH_FORMATTED_STRING_PREFIX, addressable_entity::ENTITY_PREFIX,
-        };
-
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
         if formatted_str.starts_with(ACCOUNT_HASH_FORMATTED_STRING_PREFIX) {
             let account_hash = AccountHash::from_formatted_str(formatted_str)?;
             Ok(Self::from_entity_under_account_hash(account_hash))
         } else if formatted_str.starts_with(ENTITY_PREFIX) {
-            let account_hash = AccountHash::from_formatted_str(formatted_str)?;
-            Ok(Self::from_entity_under_account_hash(account_hash))
+            let entity_addr = EntityAddr::from_formatted_str(formatted_str)?;
+            Ok(Self::from_entity_under_entity_addr(entity_addr))
         } else {
             let public_key = PublicKey::new(formatted_str)?;
             Ok(Self::from_entity_under_public_key(public_key))
         }
     }
+}
+
+#[wasm_bindgen]
+impl EntityIdentifier {
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(formatted_str: &str) -> Result<EntityIdentifier, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| JsValue::from_str(&err.to_string()))
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<EntityIdentifier, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| JsValue::from_str(&err.to_string()))
+    }
 
     #[wasm_bindgen(js_name = "fromPublicKey")]
     pub fn from_entity_under_public_key(key: PublicKey) -> Self {
-        EntityIdentifier(_EntityIdentifier::PublicKey(key.into()))
+        Self(_EntityIdentifier::PublicKey(key.into()))
     }
 
     #[wasm_bindgen(js_name = "fromAccountHash")]
     pub fn from_entity_under_account_hash(account_hash: AccountHash) -> Self {
-        EntityIdentifier(_EntityIdentifier::AccountHash(account_hash.into()))
+        Self(_EntityIdentifier::AccountHash(account_hash.into()))
     }
 
     #[wasm_bindgen(js_name = "fromEntityAddr")]
     pub fn from_entity_under_entity_addr(entity_addr: EntityAddr) -> Self {
-        EntityIdentifier(_EntityIdentifier::EntityAddr(entity_addr.into()))
+        Self(_EntityIdentifier::EntityAddr(entity_addr.into()))
     }
 
     #[cfg(target_arch = "wasm32")]
@@ -77,7 +89,7 @@ impl From<EntityIdentifier> for _EntityIdentifier {
 
 impl From<_EntityIdentifier> for EntityIdentifier {
     fn from(account_identifier: _EntityIdentifier) -> Self {
-        EntityIdentifier(account_identifier)
+        Self(account_identifier)
     }
 }
 
@@ -110,18 +122,18 @@ impl From<EntityIdentifier> for EntityAddr {
 
 impl From<PublicKey> for EntityIdentifier {
     fn from(key: PublicKey) -> Self {
-        EntityIdentifier(_EntityIdentifier::PublicKey(key.into()))
+        Self(_EntityIdentifier::PublicKey(key.into()))
     }
 }
 
 impl From<AccountHash> for EntityIdentifier {
     fn from(account_hash: AccountHash) -> Self {
-        EntityIdentifier(_EntityIdentifier::AccountHash(account_hash.into()))
+        Self(_EntityIdentifier::AccountHash(account_hash.into()))
     }
 }
 
 impl From<EntityAddr> for EntityIdentifier {
     fn from(entity_addr: EntityAddr) -> Self {
-        EntityIdentifier(_EntityIdentifier::EntityAddr(entity_addr.into()))
+        Self(_EntityIdentifier::EntityAddr(entity_addr.into()))
     }
 }

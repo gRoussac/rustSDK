@@ -4,8 +4,8 @@ use casper_client::{
     Error,
 };
 use casper_types::{
-    addressable_entity::FromStrError, CLValueError, DigestError, KeyFromStrError, UIntParseError,
-    URefFromStrError,
+    addressable_entity::FromStrError, bytesrepr, CLValueError, DigestError, KeyFromStrError,
+    UIntParseError, URefFromStrError,
 };
 use humantime::{DurationError, TimestampError};
 use std::{num::ParseIntError, str::ParseBoolError};
@@ -20,6 +20,12 @@ pub enum SdkError {
     },
 
     #[error("Failed to parse {context} as a public key: {error}")]
+    FailedToParsePublicKeyBytes {
+        context: &'static str,
+        error: bytesrepr::Error,
+    },
+
+    #[error("Failed to parse {context} as a public key: {error}")]
     FailedToParsePublicKey {
         context: String,
         error: casper_types::crypto::Error,
@@ -30,6 +36,21 @@ pub enum SdkError {
         context: &'static str,
         error: FromStrError,
     },
+
+    #[error("Failed to parse {context} as an entity: {error}")]
+    FailedToParseEntity {
+        context: &'static str,
+        error: FromStrError,
+    },
+
+    #[error("Failed to decode hex string: {context}, error: {error}")]
+    FailedToDecodeHex {
+        context: &'static str,
+        error: String,
+    },
+
+    #[error("Failed to parse {context} as an account hash")]
+    FailedToParseAccountHashLength { context: &'static str },
 
     #[error("Failed to parse '{context}' as a uref: {error}")]
     FailedToParseURef {

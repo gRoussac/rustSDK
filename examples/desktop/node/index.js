@@ -309,7 +309,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
         switch (_d.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
-                events_address = 'http://127.0.0.1:18101/events/main';
+                events_address = 'http://127.0.0.1:18101/events';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
                 private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
@@ -348,8 +348,8 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 return [4 /*yield*/, sdk.waitDeploy(events_address, install_result_as_json.deploy_hash)];
             case 3:
                 eventParseResult = _d.sent();
-                cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.DeployProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
-                //  console.log(eventParseResult.body.DeployProcessed);
+                cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.TransactionProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
+                //  console.log(eventParseResult.body.TransactionProcessed);
                 console.log("install cost ".concat(cost));
                 return [2 /*return*/];
         }
@@ -362,7 +362,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
         switch (_a.label) {
             case 0:
                 node_address = 'http://127.0.0.1:11101';
-                events_address = 'http://127.0.0.1:18101/events/main';
+                events_address = 'http://127.0.0.1:18101/events';
                 sdk = new casper_sdk_1.SDK(node_address);
                 chain_name = 'casper-net-1';
                 private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
@@ -390,12 +390,12 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                         if (eventParseResult.err) {
                             return false;
                         }
-                        else if ((_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.DeployProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) {
-                            console.log((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.DeployProcessed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
+                        else if ((_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.TransactionProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) {
+                            console.log((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.TransactionProcessed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
                             return true;
                         }
                         else {
-                            console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.DeployProcessed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
+                            console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.TransactionProcessed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
                             return false;
                         }
                         ;
