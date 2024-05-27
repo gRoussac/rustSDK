@@ -88,10 +88,9 @@ impl SDK {
     }
 
     // JavaScript alias for `get_chainspec`.
-    #[wasm_bindgen(js_name = "info_get_chainspec")]
     #[deprecated(note = "This function is an alias. Please use `get_chainspec` instead.")]
     #[allow(deprecated)]
-    pub async fn info_get_chainspec_js_alias(
+    pub async fn info_get_chainspec(
         &self,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,

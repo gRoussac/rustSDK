@@ -85,10 +85,9 @@ impl SDK {
     }
 
     // JavaScript alias for `get_peers`
-    #[wasm_bindgen(js_name = "info_get_peers")]
     #[deprecated(note = "This function is an alias. Please use `get_peers` instead.")]
     #[allow(deprecated)]
-    pub async fn info_get_peers_js_alias(
+    pub async fn info_get_peers(
         &self,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,

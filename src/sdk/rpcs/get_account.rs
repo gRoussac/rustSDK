@@ -167,7 +167,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "state_get_account_info")]
     #[deprecated(note = "prefer 'get_entity'")]
     #[allow(deprecated)]
-    pub async fn state_get_account_info_js_alias(
+    pub async fn state_get_account_info(
         &self,
         options: Option<GetAccountOptions>,
     ) -> Result<GetAccountResult, JsError> {

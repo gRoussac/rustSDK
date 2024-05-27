@@ -149,6 +149,17 @@ impl SDK {
             }
         }
     }
+
+    // JavaScript alias for `get_block_transfers`.
+    #[wasm_bindgen(js_name = "chain_get_block_transfers")]
+    #[deprecated(note = "This function is an alias. Please use `get_block_transfers` instead.")]
+    #[allow(deprecated)]
+    pub async fn chain_get_block_transfers(
+        &self,
+        options: Option<GetBlockTransfersOptions>,
+    ) -> Result<GetBlockTransfersResult, JsError> {
+        self.get_block_transfers_js_alias(options).await
+    }
 }
 
 impl SDK {

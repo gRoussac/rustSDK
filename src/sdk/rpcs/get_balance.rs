@@ -184,7 +184,7 @@ impl SDK {
     #[wasm_bindgen(js_name = "state_get_balance")]
     #[deprecated(note = "This function is an alias. Please use `get_balance` instead.")]
     #[allow(deprecated)]
-    pub async fn state_get_balance_js_alias(
+    pub async fn state_get_balance(
         &self,
         options: Option<GetBalanceOptions>,
     ) -> Result<GetBalanceResult, JsError> {

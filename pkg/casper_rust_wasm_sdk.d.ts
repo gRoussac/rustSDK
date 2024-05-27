@@ -1,6 +1,11 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {Uint8Array} key
+* @returns {TransferAddr}
+*/
+export function fromTransfer(key: Uint8Array): TransferAddr;
+/**
 * Converts a hexadecimal string to a regular string.
 *
 * # Arguments
@@ -169,11 +174,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
 * @returns {string}
 */
 export function makeDictionaryItemKey(key: Key, value: string): string;
-/**
-* @param {Uint8Array} key
-* @returns {TransferAddr}
-*/
-export function fromTransfer(key: Uint8Array): TransferAddr;
 /**
 */
 export enum Verbosity {
@@ -1795,6 +1795,32 @@ export class PutDeployResult {
 }
 /**
 */
+export class QueryBalanceDetailsResult {
+  free(): void;
+/**
+* Converts the QueryBalanceDetailsResult to a JsValue.
+* @returns {any}
+*/
+  toJson(): any;
+/**
+* Gets the API version as a JsValue.
+*/
+  readonly api_version: any;
+/**
+*/
+  readonly available_balance: any;
+/**
+*/
+  readonly holds: any;
+/**
+*/
+  readonly total_balance: any;
+/**
+*/
+  readonly total_balance_proof: any;
+}
+/**
+*/
 export class QueryBalanceResult {
   free(): void;
 /**
@@ -1841,6 +1867,323 @@ export class QueryGlobalStateResult {
 */
 export class SDK {
   free(): void;
+/**
+* Parses auction info options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing auction info options to be parsed.
+*
+* # Returns
+*
+* Parsed auction info options as a `GetAuctionInfoOptions` struct.
+* @param {any} options
+* @returns {getAuctionInfoOptions}
+*/
+  get_auction_info_options(options: any): getAuctionInfoOptions;
+/**
+* Retrieves auction information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getAuctionInfoOptions | undefined} [options]
+* @returns {Promise<GetAuctionInfoResult>}
+*/
+  get_auction_info(options?: getAuctionInfoOptions): Promise<GetAuctionInfoResult>;
+/**
+* @param {getAuctionInfoOptions | undefined} [options]
+* @returns {Promise<GetAuctionInfoResult>}
+*/
+  state_get_auction_info_js_alias(options?: getAuctionInfoOptions): Promise<GetAuctionInfoResult>;
+/**
+* Parses balance options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing balance options to be parsed.
+*
+* # Returns
+*
+* Parsed balance options as a `GetBalanceOptions` struct.
+* @param {any} options
+* @returns {getBalanceOptions}
+*/
+  get_balance_options(options: any): getBalanceOptions;
+/**
+* Retrieves balance information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getBalanceOptions | undefined} [options]
+* @returns {Promise<GetBalanceResult>}
+*/
+  get_balance(options?: getBalanceOptions): Promise<GetBalanceResult>;
+/**
+* JavaScript Alias for `get_balance`.
+*
+* # Arguments
+*
+* * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+* @param {getBalanceOptions | undefined} [options]
+* @returns {Promise<GetBalanceResult>}
+*/
+  state_get_balance(options?: getBalanceOptions): Promise<GetBalanceResult>;
+/**
+* Parses block options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing block options to be parsed.
+*
+* # Returns
+*
+* Parsed block options as a `GetBlockOptions` struct.
+* @param {any} options
+* @returns {getBlockOptions}
+*/
+  get_block_options(options: any): getBlockOptions;
+/**
+* Retrieves block information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getBlockOptions | undefined} [options]
+* @returns {Promise<GetBlockResult>}
+*/
+  get_block(options?: getBlockOptions): Promise<GetBlockResult>;
+/**
+* JavaScript Alias for the `get_block`.
+*
+* # Arguments
+*
+* * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getBlockOptions | undefined} [options]
+* @returns {Promise<GetBlockResult>}
+*/
+  chain_get_block(options?: getBlockOptions): Promise<GetBlockResult>;
+/**
+* Retrieves peers asynchronously.
+*
+* # Arguments
+*
+* * `verbosity` - Optional verbosity level.
+* * `node_address` - Optional node address.
+*
+* # Returns
+*
+* A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<GetPeersResult>}
+*/
+  get_peers(verbosity?: Verbosity, node_address?: string): Promise<GetPeersResult>;
+/**
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<GetPeersResult>}
+*/
+  info_get_peers(verbosity?: Verbosity, node_address?: string): Promise<GetPeersResult>;
+/**
+* Parses state root hash options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing state root hash options to be parsed.
+*
+* # Returns
+*
+* Parsed state root hash options as a `GetStateRootHashOptions` struct.
+* @param {any} options
+* @returns {getStateRootHashOptions}
+*/
+  get_state_root_hash_options(options: any): getStateRootHashOptions;
+/**
+* Retrieves state root hash information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getStateRootHashOptions | undefined} [options]
+* @returns {Promise<GetStateRootHashResult>}
+*/
+  get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
+/**
+* Retrieves state root hash information using the provided options (alias for `get_state_root_hash`).
+*
+* # Arguments
+*
+* * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getStateRootHashOptions | undefined} [options]
+* @returns {Promise<GetStateRootHashResult>}
+*/
+  chain_get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
+/**
+* JS function for `make_transfer`.
+*
+* # Arguments
+*
+* * `amount` - The transfer amount.
+* * `target_account` - The target account.
+* * `transfer_id` - Optional transfer identifier.
+* * `deploy_params` - The deploy parameters.
+* * `payment_params` - The payment parameters.
+*
+* # Returns
+*
+* A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @returns {Deploy}
+*/
+  make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
+/**
+* JavaScript function for deploying with deserialized parameters.
+*
+* # Arguments
+*
+* * `deploy_params` - Deploy parameters.
+* * `session_params` - Session parameters.
+* * `payment_params` - Payment parameters.
+* * `verbosity` - An optional verbosity level.
+* * `node_address` - An optional node address.
+*
+* # Returns
+*
+* A result containing PutDeployResult or a JsError.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+/**
+* Retrieves node status information using the provided options.
+*
+* # Arguments
+*
+* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+* * `node_address` - An optional string specifying the node address to use for the request.
+*
+* # Returns
+*
+* A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<GetNodeStatusResult>}
+*/
+  get_node_status(verbosity?: Verbosity, node_address?: string): Promise<GetNodeStatusResult>;
+/**
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<GetNodeStatusResult>}
+*/
+  info_get_status(verbosity?: Verbosity, node_address?: string): Promise<GetNodeStatusResult>;
+/**
+* Deserialize query_contract_key_options from a JavaScript object.
+* @param {any} options
+* @returns {queryContractKeyOptions}
+*/
+  query_contract_key_options(options: any): queryContractKeyOptions;
+/**
+* JavaScript function for query_contract_key with deserialized options.
+* @param {queryContractKeyOptions | undefined} [options]
+* @returns {Promise<QueryGlobalStateResult>}
+*/
+  query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
+/**
+* JS function for speculative transfer.
+*
+* # Arguments
+*
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `maybe_block_id_as_string` - An optional block ID as a string.
+* * `maybe_block_identifier` - An optional block identifier.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {string | undefined} [maybe_block_id_as_string]
+* @param {BlockIdentifier | undefined} [maybe_block_identifier]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<SpeculativeExecResult>}
+*/
+  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
 /**
 * Creates a new DeployWatcher instance to watch deploys (JavaScript-friendly).
 *
@@ -1899,140 +2242,6 @@ export class SDK {
 */
   setVerbosity(verbosity?: Verbosity): void;
 /**
-* Parses dictionary item options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing dictionary item options to be parsed.
-*
-* # Returns
-*
-* Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-* @param {any} options
-* @returns {getDictionaryItemOptions}
-*/
-  get_dictionary_item_options(options: any): getDictionaryItemOptions;
-/**
-* Retrieves dictionary item information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getDictionaryItemOptions | undefined} [options]
-* @returns {Promise<GetDictionaryItemResult>}
-*/
-  get_dictionary_item(options?: getDictionaryItemOptions): Promise<GetDictionaryItemResult>;
-/**
-* JavaScript Alias for `get_dictionary_item`
-* @param {getDictionaryItemOptions | undefined} [options]
-* @returns {Promise<GetDictionaryItemResult>}
-*/
-  state_get_dictionary_item(options?: getDictionaryItemOptions): Promise<GetDictionaryItemResult>;
-/**
-* @param {any} options
-* @returns {getEntityOptions}
-*/
-  get_entity_options(options: any): getEntityOptions;
-/**
-* Retrieves entity information using the provided options.
-*
-* This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
-*
-* # Arguments
-*
-* * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
-*   - `entity_identifier`: Identifier for the entity.
-*   - `entity_identifier_as_string`: String representation of the entity identifier.
-*   - `maybe_block_id_as_string`: Optional string representation of the block ID.
-*   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
-*   - `verbosity`: Verbosity level for the output.
-*   - `node_address`: Address of the node to query.
-*
-* # Returns
-*
-* A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
-* ```
-* @param {getEntityOptions | undefined} [options]
-* @returns {Promise<GetAddressableEntityResult>}
-*/
-  get_entity(options?: getEntityOptions): Promise<GetAddressableEntityResult>;
-/**
-* @param {getEntityOptions | undefined} [options]
-* @returns {Promise<GetAddressableEntityResult>}
-*/
-  state_get_entity(options?: getEntityOptions): Promise<GetAddressableEntityResult>;
-/**
-* @param {any} options
-* @returns {getEraInfoOptions}
-*/
-  get_era_info_options(options: any): getEraInfoOptions;
-/**
-* @param {getEraInfoOptions | undefined} [options]
-* @returns {Promise<GetEraInfoResult>}
-*/
-  get_era_info(options?: getEraInfoOptions): Promise<GetEraInfoResult>;
-/**
-* Parses era summary options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing era summary options to be parsed.
-*
-* # Returns
-*
-* Parsed era summary options as a `GetEraSummaryOptions` struct.
-* @param {any} options
-* @returns {getEraSummaryOptions}
-*/
-  get_era_summary_options(options: any): getEraSummaryOptions;
-/**
-* Retrieves era summary information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getEraSummaryOptions | undefined} [options]
-* @returns {Promise<GetEraSummaryResult>}
-*/
-  get_era_summary(options?: getEraSummaryOptions): Promise<GetEraSummaryResult>;
-/**
-* @param {getEraSummaryOptions | undefined} [options]
-* @returns {Promise<GetEraSummaryResult>}
-*/
-  chain_get_era_summary(options?: getEraSummaryOptions): Promise<GetEraSummaryResult>;
-/**
-* Deserialize query_contract_dict_options from a JavaScript object.
-* @param {any} options
-* @returns {queryContractDictOptions}
-*/
-  query_contract_dict_options(options: any): queryContractDictOptions;
-/**
-* JavaScript function for query_contract_dict with deserialized options.
-* @param {queryContractDictOptions | undefined} [options]
-* @returns {Promise<GetDictionaryItemResult>}
-*/
-  query_contract_dict(options?: queryContractDictOptions): Promise<GetDictionaryItemResult>;
-/**
 * This function allows executing a deploy speculatively.
 *
 * # Arguments
@@ -2059,33 +2268,100 @@ export class SDK {
 */
   speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
 /**
-* JS function for transferring funds.
+* Parses block transfers options from a JsValue.
 *
 * # Arguments
 *
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
+* * `options` - A JsValue containing block transfers options to be parsed.
 *
 * # Returns
 *
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
+* Parsed block transfers options as a `GetBlockTransfersOptions` struct.
+* @param {any} options
+* @returns {getBlockTransfersOptions}
+*/
+  get_block_transfers_options(options: any): getBlockTransfersOptions;
+/**
+* Retrieves block transfers information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getBlockTransfersOptions | undefined} [options]
+* @returns {Promise<GetBlockTransfersResult>}
+*/
+  get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
+/**
+* @param {getBlockTransfersOptions | undefined} [options]
+* @returns {Promise<GetBlockTransfersResult>}
+*/
+  chain_get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
+/**
+* Asynchronously retrieves the chainspec.
+*
+* # Arguments
+*
+* * `verbosity` - An optional `Verbosity` parameter.
+* * `node_address` - An optional node address as a string.
+*
+* # Returns
+*
+* A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
+* @returns {Promise<GetChainspecResult>}
 */
-  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
 /**
-* Retrieves node status information using the provided options.
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<GetChainspecResult>}
+*/
+  info_get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
+/**
+* Parses deploy options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing deploy options to be parsed.
+*
+* # Returns
+*
+* Parsed deploy options as a `GetDeployOptions` struct.
+* @param {any} options
+* @returns {getDeployOptions}
+*/
+  get_deploy_options(options: any): getDeployOptions;
+/**
+* Retrieves deploy information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetDeployOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetDeployResult` or an error.
+* @param {getDeployOptions | undefined} [options]
+* @returns {Promise<GetDeployResult>}
+*/
+  get_deploy(options?: getDeployOptions): Promise<GetDeployResult>;
+/**
+* Retrieves deploy information using the provided options, alias for `get_deploy`.
+* @param {getDeployOptions | undefined} [options]
+* @returns {Promise<GetDeployResult>}
+*/
+  info_get_deploy(options?: getDeployOptions): Promise<GetDeployResult>;
+/**
+* Retrieves validator changes using the provided options.
 *
 * # Arguments
 *
@@ -2094,22 +2370,22 @@ export class SDK {
 *
 * # Returns
 *
-* A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
+* A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
 *
 * # Errors
 *
 * Returns a `JsError` if there is an error during the retrieval process.
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<GetNodeStatusResult>}
+* @returns {Promise<GetValidatorChangesResult>}
 */
-  get_node_status(verbosity?: Verbosity, node_address?: string): Promise<GetNodeStatusResult>;
+  get_validator_changes(verbosity?: Verbosity, node_address?: string): Promise<GetValidatorChangesResult>;
 /**
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<GetNodeStatusResult>}
+* @returns {Promise<GetValidatorChangesResult>}
 */
-  info_get_status(verbosity?: Verbosity, node_address?: string): Promise<GetNodeStatusResult>;
+  info_get_validator_change(verbosity?: Verbosity, node_address?: string): Promise<GetValidatorChangesResult>;
 /**
 * Puts a deploy using the provided options.
 *
@@ -2209,6 +2485,178 @@ export class SDK {
 */
   sign_deploy(deploy: Deploy, secret_key: string): Deploy;
 /**
+* Installs a smart contract with the specified parameters and returns the result.
+*
+* # Arguments
+*
+* * `deploy_params` - The deploy parameters.
+* * `session_params` - The session parameters.
+* * `payment_amount` - The payment amount as a string.
+* * `node_address` - An optional node address to send the request to.
+*
+* # Returns
+*
+* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the installation.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {string} payment_amount
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+/**
+* JS function for transferring funds.
+*
+* # Arguments
+*
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+/**
+* Parses dictionary item options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing dictionary item options to be parsed.
+*
+* # Returns
+*
+* Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
+* @param {any} options
+* @returns {getDictionaryItemOptions}
+*/
+  get_dictionary_item_options(options: any): getDictionaryItemOptions;
+/**
+* Retrieves dictionary item information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getDictionaryItemOptions | undefined} [options]
+* @returns {Promise<GetDictionaryItemResult>}
+*/
+  get_dictionary_item(options?: getDictionaryItemOptions): Promise<GetDictionaryItemResult>;
+/**
+* JavaScript Alias for `get_dictionary_item`
+* @param {getDictionaryItemOptions | undefined} [options]
+* @returns {Promise<GetDictionaryItemResult>}
+*/
+  state_get_dictionary_item(options?: getDictionaryItemOptions): Promise<GetDictionaryItemResult>;
+/**
+* @param {any} options
+* @returns {getEraInfoOptions}
+*/
+  get_era_info_options(options: any): getEraInfoOptions;
+/**
+* @param {getEraInfoOptions | undefined} [options]
+* @returns {Promise<GetEraInfoResult>}
+*/
+  get_era_info(options?: getEraInfoOptions): Promise<GetEraInfoResult>;
+/**
+* @param {getEraInfoOptions | undefined} [options]
+* @returns {Promise<GetEraInfoResult>}
+*/
+  chain_get_era_info_by_switch_block(options?: getEraInfoOptions): Promise<GetEraInfoResult>;
+/**
+* Parses era summary options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing era summary options to be parsed.
+*
+* # Returns
+*
+* Parsed era summary options as a `GetEraSummaryOptions` struct.
+* @param {any} options
+* @returns {getEraSummaryOptions}
+*/
+  get_era_summary_options(options: any): getEraSummaryOptions;
+/**
+* Retrieves era summary information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {getEraSummaryOptions | undefined} [options]
+* @returns {Promise<GetEraSummaryResult>}
+*/
+  get_era_summary(options?: getEraSummaryOptions): Promise<GetEraSummaryResult>;
+/**
+* @param {getEraSummaryOptions | undefined} [options]
+* @returns {Promise<GetEraSummaryResult>}
+*/
+  chain_get_era_summary(options?: getEraSummaryOptions): Promise<GetEraSummaryResult>;
+/**
+* Parses query balance options from a JsValue.
+*
+* # Arguments
+*
+* * `options` - A JsValue containing query balance options to be parsed.
+*
+* # Returns
+*
+* Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
+* @param {any} options
+* @returns {queryBalanceDetailsOptions}
+*/
+  query_balance_details_options(options: any): queryBalanceDetailsOptions;
+/**
+* Retrieves balance information using the provided options.
+*
+* # Arguments
+*
+* * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
+*
+* # Returns
+*
+* A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the retrieval process.
+* @param {queryBalanceDetailsOptions | undefined} [options]
+* @returns {Promise<QueryBalanceDetailsResult>}
+*/
+  query_balance_details(options?: queryBalanceDetailsOptions): Promise<QueryBalanceDetailsResult>;
+/**
 * Calls a smart contract entry point with the specified parameters and returns the result.
 *
 * # Arguments
@@ -2233,57 +2681,17 @@ export class SDK {
 */
   call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
-* JavaScript function for deploying with deserialized parameters.
-*
-* # Arguments
-*
-* * `deploy_params` - Deploy parameters.
-* * `session_params` - Session parameters.
-* * `payment_params` - Payment parameters.
-* * `verbosity` - An optional verbosity level.
-* * `node_address` - An optional node address.
-*
-* # Returns
-*
-* A result containing PutDeployResult or a JsError.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
+* Deserialize query_contract_dict_options from a JavaScript object.
+* @param {any} options
+* @returns {queryContractDictOptions}
 */
-  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  query_contract_dict_options(options: any): queryContractDictOptions;
 /**
-* JS function for speculative transfer.
-*
-* # Arguments
-*
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `maybe_block_id_as_string` - An optional block ID as a string.
-* * `maybe_block_identifier` - An optional block identifier.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {string | undefined} [maybe_block_id_as_string]
-* @param {BlockIdentifier | undefined} [maybe_block_identifier]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<SpeculativeExecResult>}
+* JavaScript function for query_contract_dict with deserialized options.
+* @param {queryContractDictOptions | undefined} [options]
+* @returns {Promise<GetDictionaryItemResult>}
 */
-  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
+  query_contract_dict(options?: queryContractDictOptions): Promise<GetDictionaryItemResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
@@ -2322,119 +2730,42 @@ export class SDK {
 */
   state_get_account_info(options?: getAccountOptions): Promise<GetAccountResult>;
 /**
-* Parses block transfers options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing block transfers options to be parsed.
-*
-* # Returns
-*
-* Parsed block transfers options as a `GetBlockTransfersOptions` struct.
 * @param {any} options
-* @returns {getBlockTransfersOptions}
+* @returns {getEntityOptions}
 */
-  get_block_transfers_options(options: any): getBlockTransfersOptions;
+  get_entity_options(options: any): getEntityOptions;
 /**
-* Retrieves block transfers information using the provided options.
+* Retrieves entity information using the provided options.
+*
+* This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
 *
 * # Arguments
 *
-* * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
+* * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
+*   - `entity_identifier`: Identifier for the entity.
+*   - `entity_identifier_as_string`: String representation of the entity identifier.
+*   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+*   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+*   - `verbosity`: Verbosity level for the output.
+*   - `node_address`: Address of the node to query.
 *
 * # Returns
 *
-* A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+* A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getBlockTransfersOptions | undefined} [options]
-* @returns {Promise<GetBlockTransfersResult>}
+* Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+* ```
+* @param {getEntityOptions | undefined} [options]
+* @returns {Promise<GetAddressableEntityResult>}
 */
-  get_block_transfers(options?: getBlockTransfersOptions): Promise<GetBlockTransfersResult>;
+  get_entity(options?: getEntityOptions): Promise<GetAddressableEntityResult>;
 /**
-* Parses deploy options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing deploy options to be parsed.
-*
-* # Returns
-*
-* Parsed deploy options as a `GetDeployOptions` struct.
-* @param {any} options
-* @returns {getDeployOptions}
+* @param {getEntityOptions | undefined} [options]
+* @returns {Promise<GetAddressableEntityResult>}
 */
-  get_deploy_options(options: any): getDeployOptions;
-/**
-* Retrieves deploy information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetDeployOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetDeployResult` or an error.
-* @param {getDeployOptions | undefined} [options]
-* @returns {Promise<GetDeployResult>}
-*/
-  get_deploy(options?: getDeployOptions): Promise<GetDeployResult>;
-/**
-* Retrieves deploy information using the provided options, alias for `get_deploy`.
-* @param {getDeployOptions | undefined} [options]
-* @returns {Promise<GetDeployResult>}
-*/
-  info_get_deploy(options?: getDeployOptions): Promise<GetDeployResult>;
-/**
-* Retrieves peers asynchronously.
-*
-* # Arguments
-*
-* * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
-*
-* # Returns
-*
-* A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<GetPeersResult>}
-*/
-  get_peers(verbosity?: Verbosity, node_address?: string): Promise<GetPeersResult>;
-/**
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<GetPeersResult>}
-*/
-  info_get_peers(verbosity?: Verbosity, node_address?: string): Promise<GetPeersResult>;
-/**
-* Retrieves validator changes using the provided options.
-*
-* # Arguments
-*
-* * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `node_address` - An optional string specifying the node address to use for the request.
-*
-* # Returns
-*
-* A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<GetValidatorChangesResult>}
-*/
-  get_validator_changes(verbosity?: Verbosity, node_address?: string): Promise<GetValidatorChangesResult>;
-/**
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<GetValidatorChangesResult>}
-*/
-  info_get_validator_changes(verbosity?: Verbosity, node_address?: string): Promise<GetValidatorChangesResult>;
+  state_get_entity(options?: getEntityOptions): Promise<GetAddressableEntityResult>;
 /**
 * Lists available RPCs using the provided options.
 *
@@ -2488,223 +2819,6 @@ export class SDK {
 */
   query_global_state(options?: queryGlobalStateOptions): Promise<QueryGlobalStateResult>;
 /**
-* Parses balance options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing balance options to be parsed.
-*
-* # Returns
-*
-* Parsed balance options as a `GetBalanceOptions` struct.
-* @param {any} options
-* @returns {getBalanceOptions}
-*/
-  get_balance_options(options: any): getBalanceOptions;
-/**
-* Retrieves balance information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getBalanceOptions | undefined} [options]
-* @returns {Promise<GetBalanceResult>}
-*/
-  get_balance(options?: getBalanceOptions): Promise<GetBalanceResult>;
-/**
-* JavaScript Alias for `get_balance`.
-*
-* # Arguments
-*
-* * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-* @param {getBalanceOptions | undefined} [options]
-* @returns {Promise<GetBalanceResult>}
-*/
-  state_get_balance(options?: getBalanceOptions): Promise<GetBalanceResult>;
-/**
-* Asynchronously retrieves the chainspec.
-*
-* # Arguments
-*
-* * `verbosity` - An optional `Verbosity` parameter.
-* * `node_address` - An optional node address as a string.
-*
-* # Returns
-*
-* A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<GetChainspecResult>}
-*/
-  get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
-/**
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<GetChainspecResult>}
-*/
-  info_get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
-/**
-* Deserialize query_contract_key_options from a JavaScript object.
-* @param {any} options
-* @returns {queryContractKeyOptions}
-*/
-  query_contract_key_options(options: any): queryContractKeyOptions;
-/**
-* JavaScript function for query_contract_key with deserialized options.
-* @param {queryContractKeyOptions | undefined} [options]
-* @returns {Promise<QueryGlobalStateResult>}
-*/
-  query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
-/**
-* Parses auction info options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing auction info options to be parsed.
-*
-* # Returns
-*
-* Parsed auction info options as a `GetAuctionInfoOptions` struct.
-* @param {any} options
-* @returns {getAuctionInfoOptions}
-*/
-  get_auction_info_options(options: any): getAuctionInfoOptions;
-/**
-* Retrieves auction information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getAuctionInfoOptions | undefined} [options]
-* @returns {Promise<GetAuctionInfoResult>}
-*/
-  get_auction_info(options?: getAuctionInfoOptions): Promise<GetAuctionInfoResult>;
-/**
-* @param {getAuctionInfoOptions | undefined} [options]
-* @returns {Promise<GetAuctionInfoResult>}
-*/
-  state_get_auction_info_js_alias(options?: getAuctionInfoOptions): Promise<GetAuctionInfoResult>;
-/**
-* Parses block options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing block options to be parsed.
-*
-* # Returns
-*
-* Parsed block options as a `GetBlockOptions` struct.
-* @param {any} options
-* @returns {getBlockOptions}
-*/
-  get_block_options(options: any): getBlockOptions;
-/**
-* Retrieves block information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getBlockOptions | undefined} [options]
-* @returns {Promise<GetBlockResult>}
-*/
-  get_block(options?: getBlockOptions): Promise<GetBlockResult>;
-/**
-* JavaScript Alias for the `get_block`.
-*
-* # Arguments
-*
-* * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getBlockOptions | undefined} [options]
-* @returns {Promise<GetBlockResult>}
-*/
-  chain_get_block(options?: getBlockOptions): Promise<GetBlockResult>;
-/**
-* Parses state root hash options from a JsValue.
-*
-* # Arguments
-*
-* * `options` - A JsValue containing state root hash options to be parsed.
-*
-* # Returns
-*
-* Parsed state root hash options as a `GetStateRootHashOptions` struct.
-* @param {any} options
-* @returns {getStateRootHashOptions}
-*/
-  get_state_root_hash_options(options: any): getStateRootHashOptions;
-/**
-* Retrieves state root hash information using the provided options.
-*
-* # Arguments
-*
-* * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getStateRootHashOptions | undefined} [options]
-* @returns {Promise<GetStateRootHashResult>}
-*/
-  get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
-/**
-* Retrieves state root hash information using the provided options (alias for `get_state_root_hash`).
-*
-* # Arguments
-*
-* * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
-*
-* # Returns
-*
-* A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the retrieval process.
-* @param {getStateRootHashOptions | undefined} [options]
-* @returns {Promise<GetStateRootHashResult>}
-*/
-  chain_get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
-/**
 * JS function for `make_deploy`.
 *
 * # Arguments
@@ -2722,52 +2836,6 @@ export class SDK {
 * @returns {Deploy}
 */
   make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
-/**
-* JS function for `make_transfer`.
-*
-* # Arguments
-*
-* * `amount` - The transfer amount.
-* * `target_account` - The target account.
-* * `transfer_id` - Optional transfer identifier.
-* * `deploy_params` - The deploy parameters.
-* * `payment_params` - The payment parameters.
-*
-* # Returns
-*
-* A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @returns {Deploy}
-*/
-  make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
-/**
-* Installs a smart contract with the specified parameters and returns the result.
-*
-* # Arguments
-*
-* * `deploy_params` - The deploy parameters.
-* * `session_params` - The session parameters.
-* * `payment_amount` - The payment amount as a string.
-* * `node_address` - An optional node address to send the request to.
-*
-* # Returns
-*
-* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the installation.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {string} payment_amount
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 }
 /**
 */
@@ -3189,6 +3257,36 @@ export class getStateRootHashOptions {
 /**
 * Options for the `query_balance` method.
 */
+export class queryBalanceDetailsOptions {
+  free(): void;
+/**
+*/
+  global_state_identifier?: GlobalStateIdentifier;
+/**
+*/
+  maybe_block_id_as_string?: string;
+/**
+*/
+  node_address?: string;
+/**
+*/
+  purse_identifier?: PurseIdentifier;
+/**
+*/
+  purse_identifier_as_string?: string;
+/**
+*/
+  state_root_hash?: Digest;
+/**
+*/
+  state_root_hash_as_string?: string;
+/**
+*/
+  verbosity?: Verbosity;
+}
+/**
+* Options for the `query_balance` method.
+*/
 export class queryBalanceOptions {
   free(): void;
 /**
@@ -3315,6 +3413,272 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly __wbg_accessrights_free: (a: number) => void;
+  readonly accessrights_NONE: () => number;
+  readonly accessrights_READ: () => number;
+  readonly accessrights_WRITE: () => number;
+  readonly accessrights_ADD: () => number;
+  readonly accessrights_READ_ADD: () => number;
+  readonly accessrights_READ_WRITE: () => number;
+  readonly accessrights_ADD_WRITE: () => number;
+  readonly accessrights_READ_ADD_WRITE: () => number;
+  readonly accessrights_new: (a: number, b: number) => void;
+  readonly accessrights_from_bits: (a: number, b: number, c: number) => number;
+  readonly accessrights_is_readable: (a: number) => number;
+  readonly accessrights_is_writeable: (a: number) => number;
+  readonly accessrights_is_addable: (a: number) => number;
+  readonly accessrights_is_none: (a: number) => number;
+  readonly __wbg_dictionaryaddr_free: (a: number) => void;
+  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
+  readonly hashaddr_new: (a: number, b: number, c: number) => void;
+  readonly transferaddr_new: (a: number, b: number, c: number) => void;
+  readonly fromTransfer: (a: number, b: number) => number;
+  readonly __wbg_bytes_free: (a: number) => void;
+  readonly bytes_new: () => number;
+  readonly bytes_fromUint8Array: (a: number) => number;
+  readonly __wbg_argssimple_free: (a: number) => void;
+  readonly __wbg_deploystrparams_free: (a: number) => void;
+  readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly deploystrparams_secret_key: (a: number, b: number) => void;
+  readonly deploystrparams_set_secret_key: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_timestamp: (a: number, b: number) => void;
+  readonly deploystrparams_set_timestamp: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_setDefaultTimestamp: (a: number) => void;
+  readonly deploystrparams_ttl: (a: number, b: number) => void;
+  readonly deploystrparams_set_ttl: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_setDefaultTTL: (a: number) => void;
+  readonly deploystrparams_chain_name: (a: number, b: number) => void;
+  readonly deploystrparams_set_chain_name: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_session_account: (a: number, b: number) => void;
+  readonly deploystrparams_set_session_account: (a: number, b: number, c: number) => void;
+  readonly deploystrparams_gas_price_tolerance: (a: number, b: number) => void;
+  readonly deploystrparams_set_gas_price_tolerance: (a: number, b: number, c: number) => void;
+  readonly __wbg_paymentstrparams_free: (a: number) => void;
+  readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
+  readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_set_payment_hash: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_set_payment_name: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_set_payment_package_hash: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_set_payment_package_name: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_set_payment_path: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_args_simple: (a: number) => number;
+  readonly paymentstrparams_set_payment_args_simple: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_args_json: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_args_json: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_version: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
+  readonly paymentstrparams_payment_entry_point: (a: number, b: number) => void;
+  readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
+  readonly __wbg_eraid_free: (a: number) => void;
+  readonly eraid_new: (a: number) => number;
+  readonly eraid_value: (a: number) => number;
+  readonly __wbg_hashaddr_free: (a: number) => void;
+  readonly __wbg_transferaddr_free: (a: number) => void;
+  readonly paymentstrparams_payment_amount: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_hash: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_name: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_package_hash: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_package_name: (a: number, b: number) => void;
+  readonly paymentstrparams_payment_path: (a: number, b: number) => void;
+  readonly __wbg_accountidentifier_free: (a: number) => void;
+  readonly accountidentifier_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly accountidentifier_fromPublicKey: (a: number) => number;
+  readonly accountidentifier_fromAccountHash: (a: number) => number;
+  readonly accountidentifier_toJson: (a: number) => number;
+  readonly __wbg_entityaddr_free: (a: number) => void;
+  readonly entityaddr_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly entityaddr_toFormattedString: (a: number, b: number) => void;
+  readonly entityaddr_toHexString: (a: number, b: number) => void;
+  readonly entityaddr_toJson: (a: number) => number;
+  readonly __wbg_blockhash_free: (a: number) => void;
+  readonly blockhash_new: (a: number, b: number, c: number) => void;
+  readonly blockhash_fromDigest: (a: number, b: number) => void;
+  readonly blockhash_toJson: (a: number) => number;
+  readonly blockhash_toString: (a: number, b: number) => void;
+  readonly contracthash_fromString: (a: number, b: number, c: number) => void;
+  readonly contracthash_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly contracthash_toFormattedString: (a: number, b: number) => void;
+  readonly contracthash_fromUint8Array: (a: number, b: number) => number;
+  readonly __wbg_dictionaryitemstrparams_free: (a: number) => void;
+  readonly dictionaryitemstrparams_new: () => number;
+  readonly dictionaryitemstrparams_setAccountNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setContractNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly dictionaryitemstrparams_setUref: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly dictionaryitemstrparams_setDictionary: (a: number, b: number, c: number) => void;
+  readonly dictionaryitemstrparams_toJson: (a: number) => number;
+  readonly digest__new: (a: number, b: number, c: number) => void;
+  readonly digest_fromDigest: (a: number, b: number, c: number) => void;
+  readonly digest_toJson: (a: number) => number;
+  readonly digest_toString: (a: number, b: number) => void;
+  readonly entityidentifier_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly entityidentifier_fromEntityAddr: (a: number) => number;
+  readonly entityidentifier_toJson: (a: number) => number;
+  readonly __wbg_globalstateidentifier_free: (a: number) => void;
+  readonly globalstateidentifier_new: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
+  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
+  readonly globalstateidentifier_toJson: (a: number) => number;
+  readonly publickey_new_js_alias: (a: number, b: number, c: number) => void;
+  readonly publickey_fromUint8Array: (a: number, b: number, c: number) => void;
+  readonly publickey_toAccountHash: (a: number) => number;
+  readonly publickey_toPurseUref: (a: number) => number;
+  readonly publickey_toJson: (a: number) => number;
+  readonly uref_new: (a: number, b: number, c: number, d: number) => void;
+  readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
+  readonly uref_toFormattedString: (a: number, b: number) => void;
+  readonly uref_toJson: (a: number) => number;
+  readonly __wbg_getauctioninforesult_free: (a: number) => void;
+  readonly getauctioninforesult_api_version: (a: number) => number;
+  readonly getauctioninforesult_auction_state: (a: number) => number;
+  readonly getauctioninforesult_toJson: (a: number) => number;
+  readonly __wbg_getauctioninfooptions_free: (a: number) => void;
+  readonly __wbg_get_getauctioninfooptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getauctioninfooptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getauctioninfooptions_maybe_block_identifier: (a: number) => number;
+  readonly __wbg_set_getauctioninfooptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_getauctioninfooptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getauctioninfooptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getauctioninfooptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getauctioninfooptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_auction_info_options: (a: number, b: number) => number;
+  readonly sdk_get_auction_info: (a: number, b: number) => number;
+  readonly sdk_state_get_auction_info_js_alias: (a: number, b: number) => number;
+  readonly __wbg_getbalanceresult_free: (a: number) => void;
+  readonly getbalanceresult_api_version: (a: number) => number;
+  readonly getbalanceresult_balance_value: (a: number) => number;
+  readonly getbalanceresult_merkle_proof: (a: number, b: number) => void;
+  readonly getbalanceresult_toJson: (a: number) => number;
+  readonly __wbg_getbalanceoptions_free: (a: number) => void;
+  readonly __wbg_get_getbalanceoptions_state_root_hash_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getbalanceoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getbalanceoptions_state_root_hash: (a: number) => number;
+  readonly __wbg_set_getbalanceoptions_state_root_hash: (a: number, b: number) => void;
+  readonly __wbg_get_getbalanceoptions_purse_uref_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getbalanceoptions_purse_uref_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getbalanceoptions_purse_uref: (a: number) => number;
+  readonly __wbg_set_getbalanceoptions_purse_uref: (a: number, b: number) => void;
+  readonly __wbg_get_getbalanceoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getbalanceoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getbalanceoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getbalanceoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_balance_options: (a: number, b: number) => number;
+  readonly sdk_get_balance: (a: number, b: number) => number;
+  readonly sdk_state_get_balance: (a: number, b: number) => number;
+  readonly __wbg_getblockresult_free: (a: number) => void;
+  readonly getblockresult_api_version: (a: number) => number;
+  readonly getblockresult_block: (a: number) => number;
+  readonly getblockresult_toJson: (a: number) => number;
+  readonly sdk_get_block_options: (a: number, b: number) => number;
+  readonly sdk_get_block: (a: number, b: number) => number;
+  readonly sdk_chain_get_block: (a: number, b: number) => number;
+  readonly __wbg_getpeersresult_free: (a: number) => void;
+  readonly getpeersresult_api_version: (a: number) => number;
+  readonly getpeersresult_peers: (a: number) => number;
+  readonly getpeersresult_toJson: (a: number) => number;
+  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_info_get_peers: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_getstateroothashresult_free: (a: number) => void;
+  readonly getstateroothashresult_api_version: (a: number) => number;
+  readonly getstateroothashresult_state_root_hash: (a: number) => number;
+  readonly getstateroothashresult_state_root_hash_as_string: (a: number, b: number) => void;
+  readonly getstateroothashresult_toJson: (a: number) => number;
+  readonly sdk_get_state_root_hash_options: (a: number, b: number) => number;
+  readonly sdk_get_state_root_hash: (a: number, b: number) => number;
+  readonly sdk_chain_get_state_root_hash: (a: number, b: number) => number;
+  readonly sdk_make_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
+  readonly __wbg_getblockoptions_free: (a: number) => void;
+  readonly __wbg_getstateroothashoptions_free: (a: number) => void;
+  readonly __wbg_set_getblockoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_set_getstateroothashoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_get_getblockoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_get_getblockoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_get_getstateroothashoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_get_getstateroothashoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getblockoptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_set_getstateroothashoptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly getstateroothashresult_toString: (a: number, b: number) => void;
+  readonly entityidentifier_fromAccountHash: (a: number) => number;
+  readonly __wbg_contracthash_free: (a: number) => void;
+  readonly __wbg_digest_free: (a: number) => void;
+  readonly __wbg_entityidentifier_free: (a: number) => void;
+  readonly __wbg_publickey_free: (a: number) => void;
+  readonly __wbg_uref_free: (a: number) => void;
+  readonly accountidentifier_new: (a: number, b: number, c: number) => void;
+  readonly entityidentifier_new_js_alias: (a: number, b: number, c: number) => void;
+  readonly entityidentifier_fromPublicKey: (a: number) => number;
+  readonly __wbg_set_getblockoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getblockoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getstateroothashoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getstateroothashoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getblockoptions_verbosity: (a: number) => number;
+  readonly __wbg_get_getstateroothashoptions_verbosity: (a: number) => number;
+  readonly __wbg_get_getblockoptions_maybe_block_identifier: (a: number) => number;
+  readonly __wbg_get_getstateroothashoptions_maybe_block_identifier: (a: number) => number;
+  readonly digest_fromString: (a: number, b: number, c: number) => void;
+  readonly __wbg_blockidentifier_free: (a: number) => void;
+  readonly blockidentifier_new: (a: number) => number;
+  readonly blockidentifier_from_hash: (a: number) => number;
+  readonly blockidentifier_fromHeight: (a: number) => number;
+  readonly blockidentifier_toJson: (a: number) => number;
+  readonly __wbg_path_free: (a: number) => void;
+  readonly path_new: (a: number) => number;
+  readonly path_fromArray: (a: number) => number;
+  readonly path_toJson: (a: number) => number;
+  readonly path_toString: (a: number, b: number) => void;
+  readonly path_is_empty: (a: number) => number;
+  readonly __wbg_purseidentifier_free: (a: number) => void;
+  readonly purseidentifier_fromPublicKey: (a: number) => number;
+  readonly purseidentifier_fromAccountHash: (a: number) => number;
+  readonly purseidentifier_fromURef: (a: number) => number;
+  readonly purseidentifier_toJson: (a: number) => number;
+  readonly __wbg_putdeployresult_free: (a: number) => void;
+  readonly putdeployresult_api_version: (a: number) => number;
+  readonly putdeployresult_deploy_hash: (a: number) => number;
+  readonly putdeployresult_toJson: (a: number) => number;
+  readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly __wbg_getnodestatusresult_free: (a: number) => void;
+  readonly getnodestatusresult_api_version: (a: number) => number;
+  readonly getnodestatusresult_chainspec_name: (a: number, b: number) => void;
+  readonly getnodestatusresult_starting_state_root_hash: (a: number) => number;
+  readonly getnodestatusresult_peers: (a: number) => number;
+  readonly getnodestatusresult_last_added_block_info: (a: number) => number;
+  readonly getnodestatusresult_our_public_signing_key: (a: number) => number;
+  readonly getnodestatusresult_round_length: (a: number) => number;
+  readonly getnodestatusresult_next_upgrade: (a: number) => number;
+  readonly getnodestatusresult_build_version: (a: number, b: number) => void;
+  readonly getnodestatusresult_uptime: (a: number) => number;
+  readonly getnodestatusresult_reactor_state: (a: number) => number;
+  readonly getnodestatusresult_last_progress: (a: number) => number;
+  readonly getnodestatusresult_available_block_range: (a: number) => number;
+  readonly getnodestatusresult_block_sync: (a: number) => number;
+  readonly getnodestatusresult_toJson: (a: number) => number;
+  readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_info_get_status: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_querycontractkeyoptions_free: (a: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_global_state_identifier: (a: number) => number;
+  readonly __wbg_set_querycontractkeyoptions_global_state_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_state_root_hash_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractkeyoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_state_root_hash: (a: number) => number;
+  readonly __wbg_set_querycontractkeyoptions_state_root_hash: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractkeyoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_contract_key_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractkeyoptions_contract_key_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_contract_key: (a: number) => number;
+  readonly __wbg_set_querycontractkeyoptions_contract_key: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_path_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractkeyoptions_path_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_path: (a: number) => number;
+  readonly __wbg_set_querycontractkeyoptions_path: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractkeyoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querycontractkeyoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_querycontractkeyoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_query_contract_key_options: (a: number, b: number) => number;
+  readonly sdk_query_contract_key: (a: number, b: number) => number;
+  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => number;
   readonly sdk_watchDeploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_waitDeploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_deploywatcher_free: (a: number) => void;
@@ -3416,184 +3780,6 @@ export interface InitOutput {
   readonly __wbg_set_version2_cost: (a: number, b: number, c: number) => void;
   readonly __wbg_set_transactionprocessed_block_hash: (a: number, b: number, c: number) => void;
   readonly __wbg_set_version2_initiator: (a: number, b: number) => void;
-  readonly __wbg_accessrights_free: (a: number) => void;
-  readonly accessrights_NONE: () => number;
-  readonly accessrights_READ: () => number;
-  readonly accessrights_WRITE: () => number;
-  readonly accessrights_ADD: () => number;
-  readonly accessrights_READ_ADD: () => number;
-  readonly accessrights_READ_WRITE: () => number;
-  readonly accessrights_ADD_WRITE: () => number;
-  readonly accessrights_READ_ADD_WRITE: () => number;
-  readonly accessrights_new: (a: number, b: number) => void;
-  readonly accessrights_from_bits: (a: number, b: number, c: number) => number;
-  readonly accessrights_is_readable: (a: number) => number;
-  readonly accessrights_is_writeable: (a: number) => number;
-  readonly accessrights_is_addable: (a: number) => number;
-  readonly accessrights_is_none: (a: number) => number;
-  readonly __wbg_dictionaryaddr_free: (a: number) => void;
-  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
-  readonly hashaddr_new: (a: number, b: number, c: number) => void;
-  readonly transferaddr_new: (a: number, b: number, c: number) => void;
-  readonly fromTransfer: (a: number, b: number) => number;
-  readonly __wbg_bytes_free: (a: number) => void;
-  readonly bytes_new: () => number;
-  readonly bytes_fromUint8Array: (a: number) => number;
-  readonly __wbg_argssimple_free: (a: number) => void;
-  readonly __wbg_deploystrparams_free: (a: number) => void;
-  readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
-  readonly deploystrparams_secret_key: (a: number, b: number) => void;
-  readonly deploystrparams_set_secret_key: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_timestamp: (a: number, b: number) => void;
-  readonly deploystrparams_set_timestamp: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_setDefaultTimestamp: (a: number) => void;
-  readonly deploystrparams_ttl: (a: number, b: number) => void;
-  readonly deploystrparams_set_ttl: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_setDefaultTTL: (a: number) => void;
-  readonly deploystrparams_chain_name: (a: number, b: number) => void;
-  readonly deploystrparams_set_chain_name: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_session_account: (a: number, b: number) => void;
-  readonly deploystrparams_set_session_account: (a: number, b: number, c: number) => void;
-  readonly deploystrparams_gas_price_tolerance: (a: number, b: number) => void;
-  readonly deploystrparams_set_gas_price_tolerance: (a: number, b: number, c: number) => void;
-  readonly __wbg_paymentstrparams_free: (a: number) => void;
-  readonly paymentstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
-  readonly paymentstrparams_set_payment_amount: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_set_payment_hash: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_set_payment_name: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_set_payment_package_hash: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_set_payment_package_name: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_set_payment_path: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_args_simple: (a: number) => number;
-  readonly paymentstrparams_set_payment_args_simple: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_args_json: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_args_json: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_version: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
-  readonly paymentstrparams_payment_entry_point: (a: number, b: number) => void;
-  readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
-  readonly __wbg_hashaddr_free: (a: number) => void;
-  readonly __wbg_transferaddr_free: (a: number) => void;
-  readonly paymentstrparams_payment_amount: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_hash: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_name: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_package_hash: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_package_name: (a: number, b: number) => void;
-  readonly paymentstrparams_payment_path: (a: number, b: number) => void;
-  readonly __wbg_sessionstrparams_free: (a: number) => void;
-  readonly sessionstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
-  readonly sessionstrparams_session_hash: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_hash: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_name: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_name: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_package_hash: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_package_hash: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_package_name: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_package_name: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_path: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_path: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_bytes: (a: number) => number;
-  readonly sessionstrparams_set_session_bytes: (a: number, b: number) => void;
-  readonly sessionstrparams_session_args_simple: (a: number) => number;
-  readonly sessionstrparams_set_session_args_simple: (a: number, b: number) => void;
-  readonly sessionstrparams_session_args_json: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_args_json: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_version: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_version: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_session_entry_point: (a: number, b: number) => void;
-  readonly sessionstrparams_set_session_entry_point: (a: number, b: number, c: number) => void;
-  readonly sessionstrparams_is_session_transfer: (a: number) => number;
-  readonly sessionstrparams_set_is_session_transfer: (a: number, b: number) => void;
-  readonly __wbg_getdictionaryitemresult_free: (a: number) => void;
-  readonly getdictionaryitemresult_api_version: (a: number) => number;
-  readonly getdictionaryitemresult_dictionary_key: (a: number, b: number) => void;
-  readonly getdictionaryitemresult_stored_value: (a: number) => number;
-  readonly getdictionaryitemresult_merkle_proof: (a: number, b: number) => void;
-  readonly getdictionaryitemresult_toJson: (a: number) => number;
-  readonly __wbg_getdictionaryitemoptions_free: (a: number) => void;
-  readonly __wbg_get_getdictionaryitemoptions_state_root_hash_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getdictionaryitemoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getdictionaryitemoptions_state_root_hash: (a: number) => number;
-  readonly __wbg_set_getdictionaryitemoptions_state_root_hash: (a: number, b: number) => void;
-  readonly __wbg_get_getdictionaryitemoptions_dictionary_item_params: (a: number) => number;
-  readonly __wbg_set_getdictionaryitemoptions_dictionary_item_params: (a: number, b: number) => void;
-  readonly __wbg_get_getdictionaryitemoptions_dictionary_item_identifier: (a: number) => number;
-  readonly __wbg_set_getdictionaryitemoptions_dictionary_item_identifier: (a: number, b: number) => void;
-  readonly __wbg_get_getdictionaryitemoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getdictionaryitemoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getdictionaryitemoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getdictionaryitemoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_dictionary_item_options: (a: number, b: number) => number;
-  readonly sdk_get_dictionary_item: (a: number, b: number) => number;
-  readonly sdk_state_get_dictionary_item: (a: number, b: number) => number;
-  readonly __wbg_getaddressableentityresult_free: (a: number) => void;
-  readonly getaddressableentityresult_api_version: (a: number) => number;
-  readonly getaddressableentityresult_entity_result: (a: number) => number;
-  readonly getaddressableentityresult_merkle_proof: (a: number, b: number) => void;
-  readonly getaddressableentityresult_toJson: (a: number) => number;
-  readonly __wbg_getentityoptions_free: (a: number) => void;
-  readonly __wbg_get_getentityoptions_entity_identifier: (a: number) => number;
-  readonly __wbg_set_getentityoptions_entity_identifier: (a: number, b: number) => void;
-  readonly __wbg_get_getentityoptions_entity_identifier_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getentityoptions_entity_identifier_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getentityoptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getentityoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getentityoptions_maybe_block_identifier: (a: number) => number;
-  readonly __wbg_set_getentityoptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly __wbg_get_getentityoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getentityoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getentityoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getentityoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_entity_options: (a: number, b: number) => number;
-  readonly sdk_get_entity: (a: number, b: number) => number;
-  readonly sdk_state_get_entity: (a: number, b: number) => number;
-  readonly __wbg_geterainforesult_free: (a: number) => void;
-  readonly geterainforesult_api_version: (a: number) => number;
-  readonly geterainforesult_era_summary: (a: number) => number;
-  readonly geterainforesult_toJson: (a: number) => number;
-  readonly __wbg_geterainfooptions_free: (a: number) => void;
-  readonly __wbg_get_geterainfooptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_geterainfooptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_geterainfooptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_geterainfooptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_geterainfooptions_verbosity: (a: number) => number;
-  readonly __wbg_set_geterainfooptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_era_info_options: (a: number, b: number) => number;
-  readonly sdk_get_era_info: (a: number, b: number) => number;
-  readonly __wbg_geterasummaryresult_free: (a: number) => void;
-  readonly geterasummaryresult_api_version: (a: number) => number;
-  readonly geterasummaryresult_era_summary: (a: number) => number;
-  readonly geterasummaryresult_toJson: (a: number) => number;
-  readonly sdk_get_era_summary_options: (a: number, b: number) => number;
-  readonly sdk_get_era_summary: (a: number, b: number) => number;
-  readonly sdk_chain_get_era_summary: (a: number, b: number) => number;
-  readonly sdk_query_contract_dict_options: (a: number, b: number) => number;
-  readonly sdk_query_contract_dict: (a: number, b: number) => number;
-  readonly __wbg_geterasummaryoptions_free: (a: number) => void;
-  readonly __wbg_set_geterasummaryoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractdictoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_get_geterasummaryoptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_get_geterasummaryoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractdictoptions_state_root_hash_as_string: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractdictoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractdictoptions_state_root_hash: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractdictoptions_state_root_hash: (a: number) => number;
-  readonly __wbg_set_geterainfooptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly __wbg_set_geterasummaryoptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractdictoptions_dictionary_item_params: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractdictoptions_dictionary_item_identifier: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractdictoptions_dictionary_item_params: (a: number) => number;
-  readonly __wbg_get_querycontractdictoptions_dictionary_item_identifier: (a: number) => number;
-  readonly __wbg_set_geterasummaryoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_geterasummaryoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_querycontractdictoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_querycontractdictoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_querycontractdictoptions_free: (a: number) => void;
-  readonly __wbg_get_geterasummaryoptions_verbosity: (a: number) => number;
-  readonly __wbg_get_querycontractdictoptions_verbosity: (a: number) => number;
-  readonly __wbg_get_geterainfooptions_maybe_block_identifier: (a: number) => number;
-  readonly __wbg_get_geterasummaryoptions_maybe_block_identifier: (a: number) => number;
-  readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly __wbg_accounthash_free: (a: number) => void;
   readonly accounthash_new_js_alias: (a: number, b: number, c: number) => void;
   readonly accounthash_fromFormattedStr: (a: number, b: number, c: number) => void;
@@ -3602,15 +3788,11 @@ export interface InitOutput {
   readonly accounthash_toHexString: (a: number, b: number) => void;
   readonly accounthash_fromUint8Array: (a: number, b: number) => number;
   readonly accounthash_toJson: (a: number) => number;
-  readonly __wbg_blockidentifier_free: (a: number) => void;
-  readonly blockidentifier_new: (a: number) => number;
-  readonly blockidentifier_from_hash: (a: number) => number;
-  readonly blockidentifier_fromHeight: (a: number) => number;
-  readonly blockidentifier_toJson: (a: number) => number;
-  readonly contracthash_fromString: (a: number, b: number, c: number) => void;
-  readonly contracthash_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly contracthash_toFormattedString: (a: number, b: number) => void;
-  readonly contracthash_fromUint8Array: (a: number, b: number) => number;
+  readonly urefaddr_new: (a: number, b: number, c: number) => void;
+  readonly contractpackagehash_fromString: (a: number, b: number, c: number) => void;
+  readonly contractpackagehash_fromFormattedStr: (a: number, b: number, c: number) => void;
+  readonly contractpackagehash_toFormattedString: (a: number, b: number) => void;
+  readonly contractpackagehash_fromUint8Array: (a: number, b: number) => number;
   readonly __wbg_deploy_free: (a: number) => void;
   readonly deploy_new: (a: number) => number;
   readonly deploy_toJson: (a: number) => number;
@@ -3661,9 +3843,6 @@ export interface InitOutput {
   readonly dictionaryitemidentifier_newFromSeedUref: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly dictionaryitemidentifier_newFromDictionaryKey: (a: number, b: number, c: number) => void;
   readonly dictionaryitemidentifier_toJson: (a: number) => number;
-  readonly __wbg_eraid_free: (a: number) => void;
-  readonly eraid_new: (a: number) => number;
-  readonly eraid_value: (a: number) => number;
   readonly __wbg_key_free: (a: number) => void;
   readonly key_new: (a: number, b: number) => void;
   readonly key_toJson: (a: number) => number;
@@ -3696,25 +3875,55 @@ export interface InitOutput {
   readonly __wbg_peerentry_free: (a: number) => void;
   readonly peerentry_node_id: (a: number, b: number) => void;
   readonly peerentry_address: (a: number, b: number) => void;
-  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
-  readonly __wbg_getnodestatusresult_free: (a: number) => void;
-  readonly getnodestatusresult_api_version: (a: number) => number;
-  readonly getnodestatusresult_chainspec_name: (a: number, b: number) => void;
-  readonly getnodestatusresult_starting_state_root_hash: (a: number) => number;
-  readonly getnodestatusresult_peers: (a: number) => number;
-  readonly getnodestatusresult_last_added_block_info: (a: number) => number;
-  readonly getnodestatusresult_our_public_signing_key: (a: number) => number;
-  readonly getnodestatusresult_round_length: (a: number) => number;
-  readonly getnodestatusresult_next_upgrade: (a: number) => number;
-  readonly getnodestatusresult_build_version: (a: number, b: number) => void;
-  readonly getnodestatusresult_uptime: (a: number) => number;
-  readonly getnodestatusresult_reactor_state: (a: number) => number;
-  readonly getnodestatusresult_last_progress: (a: number) => number;
-  readonly getnodestatusresult_available_block_range: (a: number) => number;
-  readonly getnodestatusresult_block_sync: (a: number) => number;
-  readonly getnodestatusresult_toJson: (a: number) => number;
-  readonly sdk_get_node_status: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_info_get_status: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
+  readonly __wbg_getblocktransfersresult_free: (a: number) => void;
+  readonly getblocktransfersresult_api_version: (a: number) => number;
+  readonly getblocktransfersresult_block_hash: (a: number) => number;
+  readonly getblocktransfersresult_transfers: (a: number) => number;
+  readonly getblocktransfersresult_toJson: (a: number) => number;
+  readonly __wbg_getblocktransfersoptions_free: (a: number) => void;
+  readonly __wbg_get_getblocktransfersoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getblocktransfersoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getblocktransfersoptions_maybe_block_identifier: (a: number) => number;
+  readonly __wbg_set_getblocktransfersoptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_getblocktransfersoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getblocktransfersoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_get_getblocktransfersoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getblocktransfersoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly sdk_get_block_transfers_options: (a: number, b: number) => number;
+  readonly sdk_get_block_transfers: (a: number, b: number) => number;
+  readonly sdk_chain_get_block_transfers: (a: number, b: number) => number;
+  readonly __wbg_getchainspecresult_free: (a: number) => void;
+  readonly getchainspecresult_api_version: (a: number) => number;
+  readonly getchainspecresult_chainspec_bytes: (a: number) => number;
+  readonly getchainspecresult_toJson: (a: number) => number;
+  readonly sdk_get_chainspec: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_info_get_chainspec: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_getdeployresult_free: (a: number) => void;
+  readonly getdeployresult_api_version: (a: number) => number;
+  readonly getdeployresult_deploy: (a: number) => number;
+  readonly getdeployresult_execution_info: (a: number) => number;
+  readonly getdeployresult_toJson: (a: number) => number;
+  readonly __wbg_getdeployoptions_free: (a: number) => void;
+  readonly __wbg_get_getdeployoptions_deploy_hash_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getdeployoptions_deploy_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getdeployoptions_deploy_hash: (a: number) => number;
+  readonly __wbg_set_getdeployoptions_deploy_hash: (a: number, b: number) => void;
+  readonly __wbg_get_getdeployoptions_finalized_approvals: (a: number) => number;
+  readonly __wbg_set_getdeployoptions_finalized_approvals: (a: number, b: number) => void;
+  readonly __wbg_get_getdeployoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getdeployoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getdeployoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getdeployoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_deploy_options: (a: number, b: number) => number;
+  readonly sdk_get_deploy: (a: number, b: number) => number;
+  readonly sdk_info_get_deploy: (a: number, b: number) => number;
+  readonly __wbg_getvalidatorchangesresult_free: (a: number) => void;
+  readonly getvalidatorchangesresult_api_version: (a: number) => number;
+  readonly getvalidatorchangesresult_changes: (a: number) => number;
+  readonly getvalidatorchangesresult_toJson: (a: number) => number;
+  readonly sdk_get_validator_changes: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_info_get_validator_change: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_querybalanceresult_free: (a: number) => void;
@@ -3761,15 +3970,131 @@ export interface InitOutput {
   readonly sdk_speculative_exec_options: (a: number, b: number) => number;
   readonly sdk_speculative_exec: (a: number, b: number) => number;
   readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly __wbg_contracthash_free: (a: number) => void;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly __wbg_urefaddr_free: (a: number) => void;
+  readonly __wbg_contractpackagehash_free: (a: number) => void;
   readonly __wbg_deployhash_free: (a: number) => void;
-  readonly __wbg_putdeployresult_free: (a: number) => void;
-  readonly putdeployresult_api_version: (a: number) => number;
-  readonly putdeployresult_deploy_hash: (a: number) => number;
-  readonly putdeployresult_toJson: (a: number) => number;
-  readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => number;
+  readonly __wbg_sessionstrparams_free: (a: number) => void;
+  readonly sessionstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => number;
+  readonly sessionstrparams_session_hash: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_hash: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_name: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_name: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_package_hash: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_package_hash: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_package_name: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_package_name: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_path: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_path: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_bytes: (a: number) => number;
+  readonly sessionstrparams_set_session_bytes: (a: number, b: number) => void;
+  readonly sessionstrparams_session_args_simple: (a: number) => number;
+  readonly sessionstrparams_set_session_args_simple: (a: number, b: number) => void;
+  readonly sessionstrparams_session_args_json: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_args_json: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_version: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_version: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_session_entry_point: (a: number, b: number) => void;
+  readonly sessionstrparams_set_session_entry_point: (a: number, b: number, c: number) => void;
+  readonly sessionstrparams_is_session_transfer: (a: number) => number;
+  readonly sessionstrparams_set_is_session_transfer: (a: number, b: number) => void;
+  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly __wbg_getdictionaryitemresult_free: (a: number) => void;
+  readonly getdictionaryitemresult_api_version: (a: number) => number;
+  readonly getdictionaryitemresult_dictionary_key: (a: number, b: number) => void;
+  readonly getdictionaryitemresult_stored_value: (a: number) => number;
+  readonly getdictionaryitemresult_merkle_proof: (a: number, b: number) => void;
+  readonly getdictionaryitemresult_toJson: (a: number) => number;
+  readonly __wbg_getdictionaryitemoptions_free: (a: number) => void;
+  readonly __wbg_get_getdictionaryitemoptions_state_root_hash_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_getdictionaryitemoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getdictionaryitemoptions_state_root_hash: (a: number) => number;
+  readonly __wbg_set_getdictionaryitemoptions_state_root_hash: (a: number, b: number) => void;
+  readonly __wbg_get_getdictionaryitemoptions_dictionary_item_params: (a: number) => number;
+  readonly __wbg_set_getdictionaryitemoptions_dictionary_item_params: (a: number, b: number) => void;
+  readonly __wbg_get_getdictionaryitemoptions_dictionary_item_identifier: (a: number) => number;
+  readonly __wbg_set_getdictionaryitemoptions_dictionary_item_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_getdictionaryitemoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getdictionaryitemoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getdictionaryitemoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_getdictionaryitemoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_dictionary_item_options: (a: number, b: number) => number;
+  readonly sdk_get_dictionary_item: (a: number, b: number) => number;
+  readonly sdk_state_get_dictionary_item: (a: number, b: number) => number;
+  readonly __wbg_geterainforesult_free: (a: number) => void;
+  readonly geterainforesult_api_version: (a: number) => number;
+  readonly geterainforesult_era_summary: (a: number) => number;
+  readonly geterainforesult_toJson: (a: number) => number;
+  readonly __wbg_geterainfooptions_free: (a: number) => void;
+  readonly __wbg_get_geterainfooptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_geterainfooptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_geterainfooptions_maybe_block_identifier: (a: number) => number;
+  readonly __wbg_set_geterainfooptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_geterainfooptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_geterainfooptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_geterainfooptions_verbosity: (a: number) => number;
+  readonly __wbg_set_geterainfooptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_get_era_info_options: (a: number, b: number) => number;
+  readonly sdk_get_era_info: (a: number, b: number) => number;
+  readonly sdk_chain_get_era_info_by_switch_block: (a: number, b: number) => number;
+  readonly __wbg_geterasummaryresult_free: (a: number) => void;
+  readonly geterasummaryresult_api_version: (a: number) => number;
+  readonly geterasummaryresult_era_summary: (a: number) => number;
+  readonly geterasummaryresult_toJson: (a: number) => number;
+  readonly sdk_get_era_summary_options: (a: number, b: number) => number;
+  readonly sdk_get_era_summary: (a: number, b: number) => number;
+  readonly sdk_chain_get_era_summary: (a: number, b: number) => number;
+  readonly __wbg_querybalancedetailsresult_free: (a: number) => void;
+  readonly querybalancedetailsresult_api_version: (a: number) => number;
+  readonly querybalancedetailsresult_total_balance: (a: number) => number;
+  readonly querybalancedetailsresult_available_balance: (a: number) => number;
+  readonly querybalancedetailsresult_total_balance_proof: (a: number) => number;
+  readonly querybalancedetailsresult_holds: (a: number) => number;
+  readonly querybalancedetailsresult_toJson: (a: number) => number;
+  readonly __wbg_querybalancedetailsoptions_free: (a: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_purse_identifier_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querybalancedetailsoptions_purse_identifier_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_purse_identifier: (a: number) => number;
+  readonly __wbg_set_querybalancedetailsoptions_purse_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_global_state_identifier: (a: number) => number;
+  readonly __wbg_set_querybalancedetailsoptions_global_state_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_state_root_hash_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querybalancedetailsoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_state_root_hash: (a: number) => number;
+  readonly __wbg_set_querybalancedetailsoptions_state_root_hash: (a: number, b: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_set_querybalancedetailsoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_querybalancedetailsoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_querybalancedetailsoptions_verbosity: (a: number) => number;
+  readonly __wbg_set_querybalancedetailsoptions_verbosity: (a: number, b: number) => void;
+  readonly sdk_query_balance_details_options: (a: number, b: number) => number;
+  readonly sdk_query_balance_details: (a: number, b: number) => number;
+  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_query_contract_dict_options: (a: number, b: number) => number;
+  readonly sdk_query_contract_dict: (a: number, b: number) => number;
+  readonly __wbg_geterasummaryoptions_free: (a: number) => void;
+  readonly __wbg_set_geterasummaryoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractdictoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_get_geterasummaryoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_get_geterasummaryoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractdictoptions_state_root_hash_as_string: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractdictoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractdictoptions_state_root_hash: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractdictoptions_state_root_hash: (a: number) => number;
+  readonly __wbg_set_geterasummaryoptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractdictoptions_dictionary_item_params: (a: number, b: number) => void;
+  readonly __wbg_set_querycontractdictoptions_dictionary_item_identifier: (a: number, b: number) => void;
+  readonly __wbg_get_querycontractdictoptions_dictionary_item_params: (a: number) => number;
+  readonly __wbg_get_querycontractdictoptions_dictionary_item_identifier: (a: number) => number;
+  readonly __wbg_set_geterasummaryoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_geterasummaryoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_querycontractdictoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_querycontractdictoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_querycontractdictoptions_free: (a: number) => void;
+  readonly __wbg_get_geterasummaryoptions_verbosity: (a: number) => number;
+  readonly __wbg_get_querycontractdictoptions_verbosity: (a: number) => number;
+  readonly __wbg_get_geterasummaryoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_getaccountresult_free: (a: number) => void;
   readonly getaccountresult_api_version: (a: number) => number;
   readonly getaccountresult_account: (a: number) => number;
@@ -3791,51 +4116,15 @@ export interface InitOutput {
   readonly sdk_get_account_options: (a: number, b: number) => number;
   readonly sdk_get_account: (a: number, b: number) => number;
   readonly sdk_state_get_account_info: (a: number, b: number) => number;
-  readonly __wbg_getblocktransfersresult_free: (a: number) => void;
-  readonly getblocktransfersresult_api_version: (a: number) => number;
-  readonly getblocktransfersresult_block_hash: (a: number) => number;
-  readonly getblocktransfersresult_transfers: (a: number) => number;
-  readonly getblocktransfersresult_toJson: (a: number) => number;
-  readonly __wbg_getblocktransfersoptions_free: (a: number) => void;
-  readonly __wbg_get_getblocktransfersoptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getblocktransfersoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getblocktransfersoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getblocktransfersoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_get_getblocktransfersoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getblocktransfersoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly sdk_get_block_transfers_options: (a: number, b: number) => number;
-  readonly sdk_get_block_transfers: (a: number, b: number) => number;
-  readonly __wbg_getdeployresult_free: (a: number) => void;
-  readonly getdeployresult_api_version: (a: number) => number;
-  readonly getdeployresult_deploy: (a: number) => number;
-  readonly getdeployresult_execution_info: (a: number) => number;
-  readonly getdeployresult_toJson: (a: number) => number;
-  readonly __wbg_getdeployoptions_free: (a: number) => void;
-  readonly __wbg_get_getdeployoptions_deploy_hash_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getdeployoptions_deploy_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getdeployoptions_deploy_hash: (a: number) => number;
-  readonly __wbg_set_getdeployoptions_deploy_hash: (a: number, b: number) => void;
-  readonly __wbg_get_getdeployoptions_finalized_approvals: (a: number) => number;
-  readonly __wbg_set_getdeployoptions_finalized_approvals: (a: number, b: number) => void;
-  readonly __wbg_get_getdeployoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getdeployoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getdeployoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getdeployoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_deploy_options: (a: number, b: number) => number;
-  readonly sdk_get_deploy: (a: number, b: number) => number;
-  readonly sdk_info_get_deploy: (a: number, b: number) => number;
-  readonly __wbg_getpeersresult_free: (a: number) => void;
-  readonly getpeersresult_api_version: (a: number) => number;
-  readonly getpeersresult_peers: (a: number) => number;
-  readonly getpeersresult_toJson: (a: number) => number;
-  readonly sdk_get_peers: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_info_get_peers: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbg_getvalidatorchangesresult_free: (a: number) => void;
-  readonly getvalidatorchangesresult_api_version: (a: number) => number;
-  readonly getvalidatorchangesresult_changes: (a: number) => number;
-  readonly getvalidatorchangesresult_toJson: (a: number) => number;
-  readonly sdk_get_validator_changes: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_info_get_validator_changes: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbg_getaddressableentityresult_free: (a: number) => void;
+  readonly getaddressableentityresult_api_version: (a: number) => number;
+  readonly getaddressableentityresult_entity_result: (a: number) => number;
+  readonly getaddressableentityresult_toJson: (a: number) => number;
+  readonly __wbg_get_getentityoptions_entity_identifier: (a: number) => number;
+  readonly __wbg_set_getentityoptions_entity_identifier: (a: number, b: number) => void;
+  readonly sdk_get_entity_options: (a: number, b: number) => number;
+  readonly sdk_get_entity: (a: number, b: number) => number;
+  readonly sdk_state_get_entity: (a: number, b: number) => number;
   readonly __wbg_listrpcsresult_free: (a: number) => void;
   readonly listrpcsresult_api_version: (a: number) => number;
   readonly listrpcsresult_schema: (a: number) => number;
@@ -3870,183 +4159,20 @@ export interface InitOutput {
   readonly __wbg_set_queryglobalstateoptions_verbosity: (a: number, b: number) => void;
   readonly sdk_query_global_state_options: (a: number, b: number) => number;
   readonly sdk_query_global_state: (a: number, b: number) => number;
-  readonly __wbg_set_getblocktransfersoptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly listrpcsresult_name: (a: number, b: number) => void;
-  readonly __wbg_get_getblocktransfersoptions_maybe_block_identifier: (a: number) => number;
-  readonly __wbg_urefaddr_free: (a: number) => void;
-  readonly urefaddr_new: (a: number, b: number, c: number) => void;
-  readonly __wbg_globalstateidentifier_free: (a: number) => void;
-  readonly globalstateidentifier_new: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
-  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
-  readonly globalstateidentifier_toJson: (a: number) => number;
-  readonly __wbg_path_free: (a: number) => void;
-  readonly path_new: (a: number) => number;
-  readonly path_fromArray: (a: number) => number;
-  readonly path_toJson: (a: number) => number;
-  readonly path_toString: (a: number, b: number) => void;
-  readonly path_is_empty: (a: number) => number;
-  readonly __wbg_purseidentifier_free: (a: number) => void;
-  readonly purseidentifier_fromPublicKey: (a: number) => number;
-  readonly purseidentifier_fromAccountHash: (a: number) => number;
-  readonly purseidentifier_fromURef: (a: number) => number;
-  readonly purseidentifier_toJson: (a: number) => number;
-  readonly __wbg_getbalanceresult_free: (a: number) => void;
-  readonly getbalanceresult_api_version: (a: number) => number;
-  readonly getbalanceresult_balance_value: (a: number) => number;
-  readonly getbalanceresult_merkle_proof: (a: number, b: number) => void;
-  readonly getbalanceresult_toJson: (a: number) => number;
-  readonly __wbg_getbalanceoptions_free: (a: number) => void;
-  readonly __wbg_get_getbalanceoptions_state_root_hash_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getbalanceoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getbalanceoptions_state_root_hash: (a: number) => number;
-  readonly __wbg_set_getbalanceoptions_state_root_hash: (a: number, b: number) => void;
-  readonly __wbg_get_getbalanceoptions_purse_uref_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getbalanceoptions_purse_uref_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getbalanceoptions_purse_uref: (a: number) => number;
-  readonly __wbg_set_getbalanceoptions_purse_uref: (a: number, b: number) => void;
-  readonly __wbg_get_getbalanceoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getbalanceoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getbalanceoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getbalanceoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_balance_options: (a: number, b: number) => number;
-  readonly sdk_get_balance: (a: number, b: number) => number;
-  readonly sdk_state_get_balance: (a: number, b: number) => number;
-  readonly __wbg_getchainspecresult_free: (a: number) => void;
-  readonly getchainspecresult_api_version: (a: number) => number;
-  readonly getchainspecresult_chainspec_bytes: (a: number) => number;
-  readonly getchainspecresult_toJson: (a: number) => number;
-  readonly sdk_get_chainspec: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_info_get_chainspec: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbg_querycontractkeyoptions_free: (a: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_global_state_identifier: (a: number) => number;
-  readonly __wbg_set_querycontractkeyoptions_global_state_identifier: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_state_root_hash_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractkeyoptions_state_root_hash_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_state_root_hash: (a: number) => number;
-  readonly __wbg_set_querycontractkeyoptions_state_root_hash: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractkeyoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_contract_key_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractkeyoptions_contract_key_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_contract_key: (a: number) => number;
-  readonly __wbg_set_querycontractkeyoptions_contract_key: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_path_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractkeyoptions_path_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_path: (a: number) => number;
-  readonly __wbg_set_querycontractkeyoptions_path: (a: number, b: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_querycontractkeyoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_querycontractkeyoptions_verbosity: (a: number) => number;
-  readonly __wbg_set_querycontractkeyoptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_query_contract_key_options: (a: number, b: number) => number;
-  readonly sdk_query_contract_key: (a: number, b: number) => number;
-  readonly __wbg_accountidentifier_free: (a: number) => void;
-  readonly accountidentifier_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly accountidentifier_fromPublicKey: (a: number) => number;
-  readonly accountidentifier_fromAccountHash: (a: number) => number;
-  readonly accountidentifier_toJson: (a: number) => number;
-  readonly __wbg_entityaddr_free: (a: number) => void;
-  readonly entityaddr_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly entityaddr_toFormattedString: (a: number, b: number) => void;
-  readonly entityaddr_toHexString: (a: number, b: number) => void;
-  readonly entityaddr_toJson: (a: number) => number;
-  readonly __wbg_blockhash_free: (a: number) => void;
-  readonly blockhash_new: (a: number, b: number, c: number) => void;
-  readonly blockhash_fromDigest: (a: number, b: number) => void;
-  readonly blockhash_toJson: (a: number) => number;
-  readonly blockhash_toString: (a: number, b: number) => void;
-  readonly contractpackagehash_fromString: (a: number, b: number, c: number) => void;
-  readonly contractpackagehash_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly contractpackagehash_toFormattedString: (a: number, b: number) => void;
-  readonly contractpackagehash_fromUint8Array: (a: number, b: number) => number;
-  readonly __wbg_dictionaryitemstrparams_free: (a: number) => void;
-  readonly dictionaryitemstrparams_new: () => number;
-  readonly dictionaryitemstrparams_setAccountNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setContractNamedKey: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly dictionaryitemstrparams_setUref: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly dictionaryitemstrparams_setDictionary: (a: number, b: number, c: number) => void;
-  readonly dictionaryitemstrparams_toJson: (a: number) => number;
-  readonly digest__new: (a: number, b: number, c: number) => void;
-  readonly digest_fromDigest: (a: number, b: number, c: number) => void;
-  readonly digest_toJson: (a: number) => number;
-  readonly digest_toString: (a: number, b: number) => void;
-  readonly entityidentifier_fromFormattedStr: (a: number, b: number, c: number) => void;
-  readonly entityidentifier_fromEntityAddr: (a: number) => number;
-  readonly entityidentifier_toJson: (a: number) => number;
-  readonly publickey_new_js_alias: (a: number, b: number, c: number) => void;
-  readonly publickey_fromUint8Array: (a: number, b: number, c: number) => void;
-  readonly publickey_toAccountHash: (a: number) => number;
-  readonly publickey_toPurseUref: (a: number) => number;
-  readonly publickey_toJson: (a: number) => number;
-  readonly uref_new: (a: number, b: number, c: number, d: number) => void;
-  readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
-  readonly uref_toFormattedString: (a: number, b: number) => void;
-  readonly uref_toJson: (a: number) => number;
-  readonly __wbg_getauctioninforesult_free: (a: number) => void;
-  readonly getauctioninforesult_api_version: (a: number) => number;
-  readonly getauctioninforesult_auction_state: (a: number) => number;
-  readonly getauctioninforesult_toJson: (a: number) => number;
-  readonly __wbg_getauctioninfooptions_free: (a: number) => void;
-  readonly __wbg_get_getauctioninfooptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_set_getauctioninfooptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getauctioninfooptions_maybe_block_identifier: (a: number) => number;
-  readonly __wbg_set_getauctioninfooptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly __wbg_get_getauctioninfooptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getauctioninfooptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getauctioninfooptions_verbosity: (a: number) => number;
-  readonly __wbg_set_getauctioninfooptions_verbosity: (a: number, b: number) => void;
-  readonly sdk_get_auction_info_options: (a: number, b: number) => number;
-  readonly sdk_get_auction_info: (a: number, b: number) => number;
-  readonly sdk_state_get_auction_info_js_alias: (a: number, b: number) => number;
-  readonly __wbg_getblockresult_free: (a: number) => void;
-  readonly getblockresult_api_version: (a: number) => number;
-  readonly getblockresult_block: (a: number) => number;
-  readonly getblockresult_toJson: (a: number) => number;
-  readonly sdk_get_block_options: (a: number, b: number) => number;
-  readonly sdk_get_block: (a: number, b: number) => number;
-  readonly sdk_chain_get_block: (a: number, b: number) => number;
-  readonly __wbg_getstateroothashresult_free: (a: number) => void;
-  readonly getstateroothashresult_api_version: (a: number) => number;
-  readonly getstateroothashresult_state_root_hash: (a: number) => number;
-  readonly getstateroothashresult_state_root_hash_as_string: (a: number, b: number) => void;
-  readonly getstateroothashresult_toJson: (a: number) => number;
-  readonly sdk_get_state_root_hash_options: (a: number, b: number) => number;
-  readonly sdk_get_state_root_hash: (a: number, b: number) => number;
-  readonly sdk_chain_get_state_root_hash: (a: number, b: number) => number;
   readonly sdk_make_deploy: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly sdk_make_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly __wbg_getblockoptions_free: (a: number) => void;
-  readonly __wbg_getstateroothashoptions_free: (a: number) => void;
-  readonly __wbg_set_getblockoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_set_getstateroothashoptions_verbosity: (a: number, b: number) => void;
-  readonly __wbg_get_getblockoptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_get_getblockoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_get_getstateroothashoptions_maybe_block_id_as_string: (a: number, b: number) => void;
-  readonly __wbg_get_getstateroothashoptions_node_address: (a: number, b: number) => void;
-  readonly __wbg_set_getblockoptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly __wbg_set_getstateroothashoptions_maybe_block_identifier: (a: number, b: number) => void;
-  readonly getstateroothashresult_toString: (a: number, b: number) => void;
-  readonly entityidentifier_fromAccountHash: (a: number) => number;
-  readonly __wbg_contractpackagehash_free: (a: number) => void;
-  readonly __wbg_digest_free: (a: number) => void;
-  readonly __wbg_entityidentifier_free: (a: number) => void;
-  readonly __wbg_publickey_free: (a: number) => void;
-  readonly __wbg_uref_free: (a: number) => void;
-  readonly accountidentifier_new: (a: number, b: number, c: number) => void;
-  readonly entityidentifier_new_js_alias: (a: number, b: number, c: number) => void;
-  readonly entityidentifier_fromPublicKey: (a: number) => number;
-  readonly __wbg_set_getblockoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_getblockoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_getstateroothashoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
-  readonly __wbg_set_getstateroothashoptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_getblockoptions_verbosity: (a: number) => number;
-  readonly __wbg_get_getstateroothashoptions_verbosity: (a: number) => number;
-  readonly __wbg_get_getblockoptions_maybe_block_identifier: (a: number) => number;
-  readonly __wbg_get_getstateroothashoptions_maybe_block_identifier: (a: number) => number;
-  readonly digest_fromString: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getentityoptions_verbosity: (a: number, b: number) => void;
+  readonly __wbg_get_getentityoptions_entity_identifier_as_string: (a: number, b: number) => void;
+  readonly __wbg_get_getentityoptions_maybe_block_id_as_string: (a: number, b: number) => void;
+  readonly __wbg_get_getentityoptions_node_address: (a: number, b: number) => void;
+  readonly __wbg_set_getentityoptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly getaddressableentityresult_merkle_proof: (a: number, b: number) => void;
+  readonly listrpcsresult_name: (a: number, b: number) => void;
+  readonly __wbg_set_getentityoptions_entity_identifier_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getentityoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_getentityoptions_node_address: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_getentityoptions_verbosity: (a: number) => number;
+  readonly __wbg_getentityoptions_free: (a: number) => void;
+  readonly __wbg_get_getentityoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_intounderlyingsink_free: (a: number) => void;
   readonly intounderlyingsink_write: (a: number, b: number) => number;
   readonly intounderlyingsink_close: (a: number) => number;

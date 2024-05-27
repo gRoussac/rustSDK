@@ -233,6 +233,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.query_balance();
   }
 
+  private async query_balance_details() {
+    return await this.clientService.query_balance_details();
+  }
+
   private async query_contract_dict() {
     return await this.clientService.query_contract_dict();
   }
