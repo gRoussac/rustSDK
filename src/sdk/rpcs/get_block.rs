@@ -155,10 +155,9 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[wasm_bindgen(js_name = "chain_get_block")]
     #[deprecated(note = "This function is an alias. Please use `get_block` instead.")]
     #[allow(deprecated)]
-    pub async fn chain_get_block_js_alias(
+    pub async fn chain_get_block(
         &self,
         options: Option<GetBlockOptions>,
     ) -> Result<GetBlockResult, JsError> {

@@ -16,6 +16,7 @@ pub mod get_validator_changes;
 pub mod list_rpcs;
 pub mod put_deploy;
 pub mod query_balance;
+pub mod query_balance_details;
 pub mod query_global_state;
 pub mod speculative_exec;
 

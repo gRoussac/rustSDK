@@ -162,7 +162,7 @@ impl SDK {
 
     // JavaScript alias for `get_entity`
     #[wasm_bindgen(js_name = "state_get_entity")]
-    pub async fn state_get_entity_js_alias(
+    pub async fn state_get_entity(
         &self,
         options: Option<GetEntityOptions>,
     ) -> Result<GetAddressableEntityResult, JsError> {

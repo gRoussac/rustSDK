@@ -399,6 +399,26 @@ pub mod test_module {
         assert!(!query_balance.result.balance.to_string().is_empty());
     }
 
+    pub async fn test_query_balance_details(
+        maybe_global_state_identifier: Option<GlobalStateIdentifier>,
+    ) {
+        let config: TestConfig = get_config(true).await;
+        let query_balance = create_test_sdk(Some(config.clone()))
+            .query_balance_details(
+                maybe_global_state_identifier,
+                Some(config.purse_uref),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await;
+        let query_balance = query_balance.unwrap();
+        assert!(!query_balance.result.api_version.to_string().is_empty());
+        assert!(!query_balance.result.total_balance.to_string().is_empty());
+    }
+
     pub async fn test_query_global_state(
         maybe_global_state_identifier: Option<GlobalStateIdentifier>,
     ) {
@@ -622,6 +642,18 @@ mod tests {
     #[test]
     pub async fn test_query_balance_test() {
         test_query_balance(None).await;
+    }
+    #[test]
+    pub async fn test_query_balance_details_test_with_block_identifier() {
+        let config: TestConfig = get_config(true).await;
+        let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
+            BlockHash::new(&config.block_hash).unwrap(),
+        ));
+        test_query_balance_details(maybe_global_state_identifier).await;
+    }
+    #[test]
+    pub async fn test_query_balance_details_test() {
+        test_query_balance_details(None).await;
     }
     #[test]
     pub async fn test_query_global_state_key_from_account_hash_test() {

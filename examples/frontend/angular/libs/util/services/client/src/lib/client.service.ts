@@ -287,6 +287,25 @@ export class ClientService {
     }
   }
 
+  async query_balance_details() {
+    const purse_identifier_as_string: string = this.getIdentifier('purseIdentifier')?.value?.trim();
+    if (!purse_identifier_as_string) {
+      const err = "deploy_hash_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const query_balance_details_options = this.sdk.query_balance_details_options({
+      purse_identifier_as_string
+    });
+    this.getGlobalIdentifier(query_balance_details_options);
+    try {
+      const query_balance = await this.sdk.query_balance_details(query_balance_details_options);
+      query_balance && this.resultService.setResult(query_balance.toJson());
+    } catch (err) {
+      err && (this.errorService.setError(err.toString()));
+    }
+  }
+
   async query_global_state() {
     const path_as_string: string = this.getIdentifier('queryPath')?.value?.trim() || '';
     const key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();

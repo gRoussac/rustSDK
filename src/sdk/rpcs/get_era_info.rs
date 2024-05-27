@@ -109,6 +109,16 @@ impl SDK {
             }
         }
     }
+
+    // JavaScript alias for `get_era_summary`
+    #[deprecated(note = "This function is an alias. Please use `get_era_info` instead.")]
+    #[allow(deprecated)]
+    pub async fn chain_get_era_info_by_switch_block(
+        &self,
+        options: Option<GetEraInfoOptions>,
+    ) -> Result<GetEraInfoResult, JsError> {
+        self.get_era_info_js_alias(options).await
+    }
 }
 
 impl SDK {

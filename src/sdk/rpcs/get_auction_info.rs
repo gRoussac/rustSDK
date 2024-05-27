@@ -143,7 +143,7 @@ impl SDK {
 
     // JavaScript alias for `get_auction_info`
     #[wasm_bindgen(js_name = "state_get_auction_info_js_alias")]
-    pub async fn state_get_auction_info_js_alias(
+    pub async fn state_get_auction_info(
         &self,
         options: Option<GetAuctionInfoOptions>,
     ) -> Result<GetAuctionInfoResult, JsError> {

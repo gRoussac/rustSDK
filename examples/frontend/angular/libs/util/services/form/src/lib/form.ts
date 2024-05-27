@@ -567,6 +567,7 @@ const formFields = new Map<string, InputContainer[][]>([
   ['make_transfer', getTransferFields],
   ['put_deploy', putDeployFields],
   ['query_balance', queryBalanceFields],
+  ['query_balance_details', queryBalanceFields],
   ['query_contract_dict', queryContractDictFields],
   ['query_contract_key', queryContractKeyFields],
   ['query_global_state', queryGlobalStateFields],
