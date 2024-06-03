@@ -142,11 +142,8 @@ mod tests {
 
         let contract_hash = ContractHash::from_formatted_str(&get_contract_hash().await).unwrap();
 
-        // TODO fix _AddressableEntityHash conversion
-        let entity_hash: _AddressableEntityHash = contract_hash.into();
-
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash.into(), ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(contract_hash.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
