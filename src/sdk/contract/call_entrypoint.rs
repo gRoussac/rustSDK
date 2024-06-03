@@ -91,7 +91,6 @@ mod tests {
         install_cep78,
         types::{addressable_entity_hash::AddressableEntityHash, contract_hash::ContractHash},
     };
-    use casper_types::AddressableEntityHash as _AddressableEntityHash;
     use once_cell::sync::Lazy;
     use sdk_tests::{
         config::{ARGS_SIMPLE, ENTRYPOINT_MINT, PAYMENT_AMOUNT},
