@@ -182,7 +182,7 @@ pub mod test_module {
             .is_empty());
     }
 
-    pub async fn test_install() -> String {
+    pub async fn test_install_legacy() -> String {
         let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
@@ -206,7 +206,7 @@ pub mod test_module {
         session_params.set_session_args(args_simple);
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let install = create_test_sdk(Some(config))
-            .install(deploy_params, session_params, payment_params, None)
+            .install_legacy(deploy_params, session_params, payment_params, None)
             .await;
         assert!(!install
             .as_ref()
@@ -234,7 +234,7 @@ mod tests {
 
     #[test]
     pub async fn test_install_test() {
-        test_install().await;
+        test_install_legacy().await;
     }
 
     #[test]

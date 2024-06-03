@@ -445,7 +445,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     };
     session_params.set_session_bytes(module_bytes.into());
     let install = sdk
-        .install(deploy_params, session_params, payment_params, None)
+        .install_legacy(deploy_params, session_params, payment_params, None)
         .await;
 
     let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;

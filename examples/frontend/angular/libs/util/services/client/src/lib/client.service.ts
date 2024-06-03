@@ -402,7 +402,7 @@ export class ClientService {
     }
   }
 
-  async install(wasm?: Uint8Array) {
+  async install_legacy(wasm?: Uint8Array) {
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
       const err = "paymentAmount is missing";
@@ -426,7 +426,7 @@ export class ClientService {
     );
     const session_params = this.get_session_params(wasm);
     try {
-      const install = await this.sdk.install(
+      const install = await this.sdk.install_legacy(
         deploy_params,
         session_params,
         payment_amount,

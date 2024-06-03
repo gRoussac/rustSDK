@@ -209,8 +209,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.get_validator_changes();
   }
 
-  private async install() {
-    return await this.clientService.install(this.wasm);
+  private async install_legacy() {
+    return await this.clientService.install_legacy(this.wasm);
   }
 
   private async list_rpcs() {

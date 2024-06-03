@@ -185,7 +185,7 @@ pub(crate) mod intern {
         session_params.set_session_bytes(module_bytes.into());
         let sdk = create_test_sdk(None);
         let install = sdk
-            .install(
+            .install_legacy(
                 deploy_params,
                 session_params,
                 payment_params,

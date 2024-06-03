@@ -340,7 +340,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                     return [2 /*return*/];
                 }
                 session_params.session_bytes = casper_sdk_1.Bytes.fromUint8Array(wasm);
-                return [4 /*yield*/, sdk.install(deploy_params, session_params, payment_amount)];
+                return [4 /*yield*/, sdk.install_legacy(deploy_params, session_params, payment_amount)];
             case 2:
                 install_result = _d.sent();
                 install_result_as_json = install_result.toJson();

@@ -5,7 +5,7 @@ pub mod test_module {
         DICTIONARY_NAME, TEST_HELLO_KEY, TEST_HELLO_MESSAGE,
     };
     use crate::tests::helpers::intern::create_test_sdk;
-    use crate::tests::integration::contract::test_module::test_install;
+    use crate::tests::integration::contract::test_module::test_install_legacy;
     use casper_rust_wasm_sdk::helpers::cl_value_to_json;
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
@@ -465,7 +465,7 @@ pub mod test_module {
 
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let deploy_hash_as_string = test_install().await;
+        let deploy_hash_as_string = test_install_legacy().await;
 
         let event_parse_result = sdk
             .wait_deploy(&config.event_address, &deploy_hash_as_string, None)

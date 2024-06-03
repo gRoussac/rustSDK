@@ -768,12 +768,12 @@ export function sdk_put_deploy(a: number, b: number, c: number, d: number, e: nu
 export function sdk_account_put_deploy(a: number, b: number, c: number, d: number, e: number): number;
 export function sdk_speculative_transaction(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): number;
 export function sdk_make_transfer_transaction(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number): void;
-export function sdk_install(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
+export function sdk_call_entrypoint(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function __wbg_contractpackagehash_free(a: number): void;
 export function sdk_speculative_deploy(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number): number;
 export function sdk_put_transaction(a: number, b: number, c: number, d: number, e: number): number;
 export function sdk_account_put_transaction(a: number, b: number, c: number, d: number, e: number): number;
-export function sdk_install_txn(a: number, b: number, c: number, d: number, e: number): number;
+export function sdk_install(a: number, b: number, c: number, d: number, e: number): number;
 export function __wbg_getbalanceresult_free(a: number): void;
 export function getbalanceresult_api_version(a: number): number;
 export function getbalanceresult_balance_value(a: number): number;
@@ -862,7 +862,7 @@ export function sdk_list_rpcs(a: number, b: number, c: number, d: number): numbe
 export function sdk_speculative_transfer_transaction(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number): number;
 export function sdk_transfer_transaction(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number): number;
 export function sdk_sign_transaction(a: number, b: number, c: number, d: number): number;
-export function sdk_call_entrypoint(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
+export function sdk_install_legacy(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function sdk_query_contract_dict_options(a: number, b: number): number;
 export function sdk_query_contract_dict(a: number, b: number): number;
 export function __wbg_querycontractkeyoptions_free(a: number): void;
