@@ -233,9 +233,11 @@ describe('Angular App Tests', () => {
       await seletAction('get_balance');
       await test.page.waitForSelector('[e2e-id="purseUrefElt"]');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await delay(300);
     });
 
     afterEach(async () => {
+      await delay(300);
       await clear();
     });
 
