@@ -136,8 +136,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     await this.resultService.setResult('');
   }
 
-  private async call_entrypoint() {
-    return await this.clientService.call_entrypoint();
+  private async call_entrypoint_legacy() {
+    return await this.clientService.call_entrypoint_legacy();
   }
 
   private async deploy(deploy_result = true, speculative?: boolean) {

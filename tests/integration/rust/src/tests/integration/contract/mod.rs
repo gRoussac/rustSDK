@@ -27,7 +27,7 @@ pub mod test_module {
         },
     };
 
-    pub async fn test_call_entrypoint() {
+    pub async fn test_call_entrypoint_legacy() {
         let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
@@ -44,17 +44,17 @@ pub mod test_module {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let test_call_entrypoint = create_test_sdk(Some(config))
-            .call_entrypoint(deploy_params, session_params, payment_params, None)
+        let test_call_entrypoint_legacy = create_test_sdk(Some(config))
+            .call_entrypoint_legacy(deploy_params, session_params, payment_params, None)
             .await;
-        assert!(!test_call_entrypoint
+        assert!(!test_call_entrypoint_legacy
             .as_ref()
             .unwrap()
             .result
             .api_version
             .to_string()
             .is_empty());
-        assert!(!test_call_entrypoint
+        assert!(!test_call_entrypoint_legacy
             .as_ref()
             .unwrap()
             .result
@@ -238,8 +238,8 @@ mod tests {
     }
 
     #[test]
-    pub async fn test_call_entrypoint_test() {
-        test_call_entrypoint().await;
+    pub async fn test_call_entrypoint_legacy_test() {
+        test_call_entrypoint_legacy().await;
     }
     #[test]
     pub async fn test_query_contract_dict_test() {

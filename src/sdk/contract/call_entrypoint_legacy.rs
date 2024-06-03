@@ -32,8 +32,8 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the call.
-    #[wasm_bindgen(js_name = "call_entrypoint")]
-    pub async fn call_entrypoint_js_alias(
+    #[wasm_bindgen(js_name = "call_entrypoint_legacy")]
+    pub async fn call_entrypoint_legacy_js_alias(
         &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -44,7 +44,7 @@ impl SDK {
         payment_params.set_payment_amount(payment_amount);
 
         let result = self
-            .call_entrypoint(deploy_params, session_params, payment_params, node_address)
+            .call_entrypoint_legacy(deploy_params, session_params, payment_params, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -76,14 +76,14 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `SdkError` if there is an error during the call.
-    pub async fn call_entrypoint(
+    pub async fn call_entrypoint_legacy(
         &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
-        //log("call_entrypoint!");
+        //log("call_entrypoint_legacy!");
         let deploy = make_deploy(
             "",
             deploy_str_params_to_casper_client(&deploy_params),
@@ -115,7 +115,7 @@ mod tests {
     use tokio;
 
     #[tokio::test]
-    async fn test_call_entrypoint_with_none_values() {
+    async fn test_call_entrypoint_legacy_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
         let deploy_params = DeployStrParams::new("", "", None, None, None, None);
@@ -127,7 +127,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(deploy_params, session_params, payment_params, None)
+            .call_entrypoint_legacy(deploy_params, session_params, payment_params, None)
             .await;
 
         // Assert
@@ -137,7 +137,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_call_entrypoint_with_valid_input() {
+    async fn test_call_entrypoint_legacy_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, _, chain_name) = get_network_constants();
@@ -162,7 +162,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(
+            .call_entrypoint_legacy(
                 deploy_params,
                 session_params,
                 payment_params,
@@ -177,7 +177,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_call_entrypoint_with_invalid_input() {
+    async fn test_call_entrypoint_legacy_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, _, chain_name) = get_network_constants();
@@ -211,7 +211,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(
+            .call_entrypoint_legacy(
                 deploy_params,
                 session_params,
                 payment_params,
@@ -226,7 +226,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_call_entrypoint_without_private_key() {
+    async fn test_call_entrypoint_legacy_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, _, chain_name) = get_network_constants();
@@ -259,7 +259,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(
+            .call_entrypoint_legacy(
                 deploy_params,
                 session_params,
                 payment_params,
@@ -274,7 +274,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_call_entrypoint_with_error() {
+    async fn test_call_entrypoint_legacy_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let (_, _, _, chain_name) = get_network_constants();
@@ -308,7 +308,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .call_entrypoint(deploy_params, session_params, payment_params, None)
+            .call_entrypoint_legacy(deploy_params, session_params, payment_params, None)
             .await;
 
         // Assert
