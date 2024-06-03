@@ -40,10 +40,8 @@ impl SDK {
         payment_amount: &str,
         node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(payment_amount);
         let result = self
-            .install(deploy_params, session_params, payment_params, node_address)
+            .install(deploy_params, session_params, payment_amount, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -65,7 +63,7 @@ impl SDK {
     ///
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
-    /// * `payment_params` - The payment parameters.
+    /// * `payment_amount` - The payment amount as a string.
     /// * `node_address` - An optional node address to send the request to.
     ///
     /// # Returns
@@ -79,10 +77,13 @@ impl SDK {
         &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
-        payment_params: PaymentStrParams,
+        payment_amount: &str,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("install!");
+        let payment_params = PaymentStrParams::default();
+        payment_params.set_payment_amount(payment_amount);
+
         let deploy = make_deploy(
             "",
             deploy_str_params_to_casper_client(&deploy_params),
@@ -118,15 +119,12 @@ mod tests {
         let sdk = SDK::new(None, None);
         let deploy_params = DeployStrParams::new("", "", None, None, None);
         let session_params = SessionStrParams::default();
-        let payment_params = PaymentStrParams::default();
 
         let error_message =
             "Invalid argument 'is_session_transfer': requires --session-arg to be present";
 
         // Act
-        let result = sdk
-            .install(deploy_params, session_params, payment_params, None)
-            .await;
+        let result = sdk.install(deploy_params, session_params, "", None).await;
 
         // Assert
         assert!(result.is_err());
@@ -145,8 +143,7 @@ mod tests {
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
         let mut session_params = SessionStrParams::default();
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -163,7 +160,7 @@ mod tests {
             .install(
                 deploy_params,
                 session_params,
-                payment_params,
+                PAYMENT_AMOUNT,
                 Some(node_address),
             )
             .await;
@@ -193,9 +190,8 @@ mod tests {
             None,
             Some(TTL.to_string()),
         );
+
         let mut session_params = SessionStrParams::default();
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(""); // This is not valid payment amount
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -209,12 +205,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install(
-                deploy_params,
-                session_params,
-                payment_params,
-                Some(node_address),
-            )
+            .install(deploy_params, session_params, "", Some(node_address))
             .await;
 
         // Assert
@@ -235,9 +226,8 @@ mod tests {
 
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, None, None, Some(TTL.to_string()));
+
         let mut session_params = SessionStrParams::default();
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -254,7 +244,7 @@ mod tests {
             .install(
                 deploy_params,
                 session_params,
-                payment_params,
+                PAYMENT_AMOUNT,
                 Some(node_address),
             )
             .await;
@@ -279,8 +269,6 @@ mod tests {
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         let mut session_params = SessionStrParams::default();
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -294,7 +282,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install(deploy_params, session_params, payment_params, None)
+            .install(deploy_params, session_params, PAYMENT_AMOUNT, None)
             .await;
 
         // Assert

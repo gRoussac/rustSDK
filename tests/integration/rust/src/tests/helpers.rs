@@ -43,7 +43,7 @@ pub(crate) mod intern {
             deploy_params::{
                 deploy_str_params::DeployStrParams,
                 dictionary_item_str_params::DictionaryItemStrParams,
-                payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
+                session_str_params::SessionStrParams,
             },
             uref::URef,
         },
@@ -171,8 +171,6 @@ pub(crate) mod intern {
         let session_params = SessionStrParams::default();
         session_params.set_session_args_json(ARGS_JSON);
 
-        let payment_params = PaymentStrParams::default();
-        payment_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
         let path = match path {
             Some(path) => path,
             None => WASM_PATH,
@@ -190,7 +188,7 @@ pub(crate) mod intern {
             .install(
                 deploy_params,
                 session_params,
-                payment_params,
+                PAYMENT_AMOUNT_CONTRACT_CEP78,
                 Some(node_address.to_string()),
             )
             .await;
