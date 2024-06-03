@@ -12,13 +12,16 @@ pub mod get_era_summary;
 pub mod get_node_status;
 pub mod get_peers;
 pub mod get_state_root_hash;
+pub mod get_transaction;
 pub mod get_validator_changes;
 pub mod list_rpcs;
 pub mod put_deploy;
+pub mod put_transaction;
 pub mod query_balance;
 pub mod query_balance_details;
 pub mod query_global_state;
 pub mod speculative_exec;
+pub mod speculative_exec_txn;
 
 #[cfg(test)]
 use dotenv::dotenv;

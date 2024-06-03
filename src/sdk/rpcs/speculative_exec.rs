@@ -279,7 +279,7 @@ mod tests {
                 Some(default_speculative_address),
             )
             .await;
-        // dbg!(result.err());
+
         // Assert
         assert!(result.is_ok());
     }
@@ -306,7 +306,6 @@ mod tests {
             .await;
 
         // Assert
-        // dbg!(result.err());
         assert!(result.is_ok());
     }
 

@@ -303,7 +303,7 @@ mod tests {
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, _) = get_network_constants();
-        dbg!(entity_identifier.clone());
+
         // Act
         let result = sdk
             .get_entity(

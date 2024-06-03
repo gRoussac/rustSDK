@@ -1,10 +1,16 @@
 #[allow(hidden_glob_reexports)]
 pub(crate) mod deploy;
 pub mod rpcs;
+#[allow(hidden_glob_reexports)]
+pub(crate) mod transaction;
 pub use deploy::*;
+pub use transaction::*;
 
 pub(crate) mod deploy_utils;
 pub(crate) use deploy_utils::*;
+
+pub(crate) mod transaction_utils;
+pub(crate) use transaction_utils::*;
 
 pub mod deploy_watcher;
 

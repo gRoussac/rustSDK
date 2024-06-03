@@ -118,6 +118,10 @@ pub enum SdkError {
     #[error("Failed to parse entity identifier")]
     FailedToParseEntityIdentifier,
 
+    ///Failed to parse a transfer target
+    #[error("Failed to parse a transfer target")]
+    FailedToParseTransferTarget,
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 
@@ -205,6 +209,7 @@ impl From<CliError> for SdkError {
                 SdkError::FailedToParseDec { context, error }
             }
             CliError::FailedToParsePackageAddr => SdkError::FailedToParsePackageAddr,
+            CliError::FailedToParseTransferTarget => SdkError::FailedToParseTransferTarget,
         }
     }
 }

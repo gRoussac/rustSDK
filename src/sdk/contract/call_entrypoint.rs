@@ -140,7 +140,7 @@ mod tests {
     async fn test_call_entrypoint_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _,_, chain_name) = get_network_constants();
+        let (node_address, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
@@ -180,7 +180,7 @@ mod tests {
     async fn test_call_entrypoint_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _,_, chain_name) = get_network_constants();
+        let (node_address, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
@@ -229,7 +229,7 @@ mod tests {
     async fn test_call_entrypoint_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _,_, chain_name) = get_network_constants();
+        let (node_address, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
@@ -277,7 +277,7 @@ mod tests {
     async fn test_call_entrypoint_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let (_, _,_, chain_name) = get_network_constants();
+        let (_, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let account = public_key_from_secret_key(&private_key).unwrap();
 
@@ -314,7 +314,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        // dbg!(err_string);
         assert!(err_string.contains(error_message));
     }
 }
