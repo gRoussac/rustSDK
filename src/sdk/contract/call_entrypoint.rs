@@ -87,8 +87,11 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_secret_key, types::addressable_entity_hash::AddressableEntityHash,
+        helpers::public_key_from_secret_key,
+        install_cep78,
+        types::{addressable_entity_hash::AddressableEntityHash, contract_hash::ContractHash},
     };
+    use casper_types::AddressableEntityHash as _AddressableEntityHash;
     use once_cell::sync::Lazy;
     use sdk_tests::{
         config::{ARGS_SIMPLE, ENTRYPOINT_MINT, PAYMENT_AMOUNT},
@@ -99,6 +102,10 @@ mod tests {
     static ARGS: Lazy<Vec<String>> =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
+    async fn get_contract_hash() -> String {
+        install_cep78().await
+    }
+
     #[tokio::test]
     async fn test_call_entrypoint_with_none_values() {
         // Arrange
@@ -107,7 +114,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
 
         let error_message =
-            "Invalid argument 'is_session_transfer': requires --session-arg to be present";
+            "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
 
         // Act
         let result = sdk
@@ -133,13 +140,13 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
-        )
-        .unwrap();
+        let contract_hash = ContractHash::from_formatted_str(&get_contract_hash().await).unwrap();
+
+        // TODO fix _AddressableEntityHash conversion
+        let entity_hash: _AddressableEntityHash = contract_hash.into();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_hash.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -160,7 +167,7 @@ mod tests {
         let private_key = get_user_private_key(None).unwrap();
 
         let error_message =
-            "Missing a required arg - exactly one of the following must be provided";
+            "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&private_key);
         transaction_params.set_chain_name(&chain_name);
@@ -183,6 +190,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
+
         assert!(err_string.contains(error_message));
     }
 
@@ -194,7 +202,7 @@ mod tests {
         let private_key = get_user_private_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
 
-        let error_message = "the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
+        let error_message = "the transaction was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
@@ -206,6 +214,9 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
+
+        // TODO FIX pricing_mode
+        transaction_params.set_pricing_mode("fixed");
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);

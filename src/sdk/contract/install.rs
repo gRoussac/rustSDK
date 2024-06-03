@@ -209,7 +209,7 @@ mod tests {
         let private_key = get_user_private_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
 
-        let error_message = "the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
+        let error_message = "the transaction was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_initiator_addr(&initiator_addr);
@@ -237,7 +237,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-        // dbg!(err_string);
         assert!(err_string.contains(error_message));
     }
 
