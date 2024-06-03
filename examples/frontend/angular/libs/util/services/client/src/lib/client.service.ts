@@ -640,7 +640,7 @@ export class ClientService {
     await this.deploy(deploy_result, speculative, wasm);
   }
 
-  async call_entrypoint() {
+  async call_entrypoint_legacy() {
     if (!this.public_key || !this.private_key) {
       const err = "public_key or private_key is missing";
       err && (this.errorService.setError(err.toString()));
@@ -659,12 +659,12 @@ export class ClientService {
       return;
     }
     try {
-      const call_entrypoint = await this.sdk.call_entrypoint(
+      const call_entrypoint_legacy = await this.sdk.call_entrypoint_legacy(
         deploy_params,
         session_params,
         payment_amount
       );
-      call_entrypoint && this.resultService.setResult(call_entrypoint.toJson());
+      call_entrypoint_legacy && this.resultService.setResult(call_entrypoint_legacy.toJson());
     } catch (err) {
       err && (this.errorService.setError(err.toString()));
     }

@@ -176,6 +176,20 @@ export function makeDictionaryItemKey(key: Key, value: string): string;
 export function fromTransfer(key: Uint8Array): TransferAddr;
 /**
 */
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
+}
+/**
+*/
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
+}
+/**
+*/
 export enum TransactionKind {
   InvocableEntity = 0,
   InvocableEntityAlias = 1,
@@ -188,20 +202,6 @@ export enum TransactionKind {
   Undelegate = 8,
   Redelegate = 9,
   WithdrawBid = 10,
-}
-/**
-*/
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
-}
-/**
-*/
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
 }
 /**
 */
@@ -2803,7 +2803,7 @@ export class SDK {
 * @param {string | undefined} [node_address]
 * @returns {Promise<PutDeployResult>}
 */
-  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  call_entrypoint_legacy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
 * This function allows executing a deploy speculatively.
 *
@@ -4937,7 +4937,7 @@ export interface InitOutput {
   readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
   readonly sdk_make_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
-  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_call_entrypoint_legacy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_contractpackagehash_free: (a: number) => void;
   readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;

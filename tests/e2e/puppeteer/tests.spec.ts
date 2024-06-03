@@ -739,7 +739,7 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await setPrivateKey();
-      await seletAction('call_entrypoint');
+      await seletAction('call_entrypoint_legacy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');

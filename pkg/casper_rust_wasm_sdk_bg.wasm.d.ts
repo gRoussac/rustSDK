@@ -768,7 +768,7 @@ export function sdk_put_deploy(a: number, b: number, c: number, d: number, e: nu
 export function sdk_account_put_deploy(a: number, b: number, c: number, d: number, e: number): number;
 export function sdk_speculative_transaction(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): number;
 export function sdk_make_transfer_transaction(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number): void;
-export function sdk_call_entrypoint(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
+export function sdk_call_entrypoint_legacy(a: number, b: number, c: number, d: number, e: number, f: number, g: number): number;
 export function __wbg_contractpackagehash_free(a: number): void;
 export function sdk_speculative_deploy(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number): number;
 export function sdk_put_transaction(a: number, b: number, c: number, d: number, e: number): number;

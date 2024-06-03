@@ -355,9 +355,9 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
-// call_entrypoint
+// call_entrypoint_legacy
 var example12 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, events_address, sdk, chain_name, private_key, public_key, contract_hash, entry_point, token_owner, payment_amount, deploy_params, session_params, call_entrypoint_result, call_entrypoint_result_as_json, deploy_hash_results, watcher, deploySubscriptions, getEventHandlerFn, results;
+    var node_address, events_address, sdk, chain_name, private_key, public_key, contract_hash, entry_point, token_owner, payment_amount, deploy_params, session_params, call_entrypoint_legacy_result, call_entrypoint_legacy_result_as_json, deploy_hash_results, watcher, deploySubscriptions, getEventHandlerFn, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -376,11 +376,11 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 session_params.session_hash = contract_hash;
                 session_params.session_entry_point = entry_point;
                 session_params.session_args_simple = ["token_meta_data:String='test_meta_data'", "token_owner:Key='".concat(token_owner, "'")];
-                return [4 /*yield*/, sdk.call_entrypoint(deploy_params, session_params, payment_amount)];
+                return [4 /*yield*/, sdk.call_entrypoint_legacy(deploy_params, session_params, payment_amount)];
             case 1:
-                call_entrypoint_result = _a.sent();
-                call_entrypoint_result_as_json = call_entrypoint_result.toJson();
-                deploy_hash_results = [call_entrypoint_result_as_json.deploy_hash];
+                call_entrypoint_legacy_result = _a.sent();
+                call_entrypoint_legacy_result_as_json = call_entrypoint_legacy_result.toJson();
+                deploy_hash_results = [call_entrypoint_legacy_result_as_json.deploy_hash];
                 watcher = sdk.watchDeploy(events_address);
                 deploySubscriptions = [];
                 getEventHandlerFn = function (deployHash) {

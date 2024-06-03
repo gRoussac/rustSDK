@@ -409,15 +409,15 @@ pub async fn mint_nft(
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount(PAYMENT_AMOUNT);
     let sdk = create_test_sdk(None);
-    let test_call_entrypoint = sdk
-        .call_entrypoint(
+    let test_call_entrypoint_legacy = sdk
+        .call_entrypoint_legacy(
             deploy_params,
             session_params,
             payment_params,
             Some(node_address.to_string()),
         )
         .await;
-    let result = &test_call_entrypoint.as_ref().unwrap().result;
+    let result = &test_call_entrypoint_legacy.as_ref().unwrap().result;
     assert!(!result.clone().api_version.to_string().is_empty());
 
     let deploy_hash = DeployHash::from(result.deploy_hash);

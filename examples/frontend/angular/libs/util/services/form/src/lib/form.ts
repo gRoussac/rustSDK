@@ -550,7 +550,7 @@ const signDeployFields: InputContainer[][] = [
 ];
 
 const formFields = new Map<string, InputContainer[][]>([
-  ['call_entrypoint', callEntrypointFields],
+  ['call_entrypoint_legacy', callEntrypointFields],
   ['deploy', makeDeployFields],
   ['get_account', getAccountFields],
   ['get_entity', getEntityFields],
