@@ -27,7 +27,7 @@ pub mod test_module {
         },
     };
 
-    pub async fn test_call_entrypoint_legacy() {
+    pub async fn test_call_entrypoint_deploy() {
         let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
@@ -44,17 +44,17 @@ pub mod test_module {
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let test_call_entrypoint_legacy = create_test_sdk(Some(config))
-            .call_entrypoint_legacy(deploy_params, session_params, payment_params, None)
+        let test_call_entrypoint_deploy = create_test_sdk(Some(config))
+            .call_entrypoint_deploy(deploy_params, session_params, payment_params, None)
             .await;
-        assert!(!test_call_entrypoint_legacy
+        assert!(!test_call_entrypoint_deploy
             .as_ref()
             .unwrap()
             .result
             .api_version
             .to_string()
             .is_empty());
-        assert!(!test_call_entrypoint_legacy
+        assert!(!test_call_entrypoint_deploy
             .as_ref()
             .unwrap()
             .result
@@ -182,7 +182,7 @@ pub mod test_module {
             .is_empty());
     }
 
-    pub async fn test_install_legacy() -> String {
+    pub async fn test_install_deploy() -> String {
         let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
@@ -206,7 +206,7 @@ pub mod test_module {
         session_params.set_session_args(args_simple);
 
         let install = create_test_sdk(Some(config))
-            .install_legacy(deploy_params, session_params, PAYMENT_AMOUNT, None)
+            .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT, None)
             .await;
         assert!(!install
             .as_ref()
@@ -234,12 +234,12 @@ mod tests {
 
     #[test]
     pub async fn test_install_test() {
-        test_install_legacy().await;
+        test_install_deploy().await;
     }
 
     #[test]
-    pub async fn test_call_entrypoint_legacy_test() {
-        test_call_entrypoint_legacy().await;
+    pub async fn test_call_entrypoint_deploy_test() {
+        test_call_entrypoint_deploy().await;
     }
     #[test]
     pub async fn test_query_contract_dict_test() {

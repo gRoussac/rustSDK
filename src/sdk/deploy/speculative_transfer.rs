@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::rpcs::speculative_exec::SpeculativeExecResult;
+use crate::rpcs::speculative_exec_deploy::SpeculativeExecResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
@@ -138,7 +138,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec(
+        self.speculative_exec_deploy(
             deploy.unwrap().into(),
             maybe_block_identifier,
             verbosity,

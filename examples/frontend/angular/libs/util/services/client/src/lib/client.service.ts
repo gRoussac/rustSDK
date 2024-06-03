@@ -402,7 +402,7 @@ export class ClientService {
     }
   }
 
-  async install_legacy(wasm?: Uint8Array) {
+  async install_deploy(wasm?: Uint8Array) {
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
       const err = "paymentAmount is missing";
@@ -426,7 +426,7 @@ export class ClientService {
     );
     const session_params = this.get_session_params(wasm);
     try {
-      const install = await this.sdk.install_legacy(
+      const install = await this.sdk.install_deploy(
         deploy_params,
         session_params,
         payment_amount,
@@ -548,7 +548,7 @@ export class ClientService {
     return put_deploy;
   }
 
-  async speculative_exec() {
+  async speculative_exec_deploy() {
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
       const err = "signed_deploy_as_string is missing";
@@ -564,13 +564,13 @@ export class ClientService {
     //   console.error('Deploy is expired.');
     //   return;
     // }
-    const speculative_exec_options = this.sdk.speculative_exec_options({
+    const speculative_exec_deploy_options = this.sdk.speculative_exec_deploy_options({
       deploy: signed_deploy.toJson()
     });
-    this.getIdentifieBlock(speculative_exec_options);
-    const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
-    speculative_exec && this.resultService.setResult(speculative_exec.toJson());
-    return speculative_exec;
+    this.getIdentifieBlock(speculative_exec_deploy_options);
+    const speculative_exec_deploy = await this.sdk.speculative_exec_deploy(speculative_exec_deploy_options);
+    speculative_exec_deploy && this.resultService.setResult(speculative_exec_deploy.toJson());
+    return speculative_exec_deploy;
   }
 
   async sign_deploy() {
@@ -640,7 +640,7 @@ export class ClientService {
     await this.deploy(deploy_result, speculative, wasm);
   }
 
-  async call_entrypoint_legacy() {
+  async call_entrypoint_deploy() {
     if (!this.public_key || !this.private_key) {
       const err = "public_key or private_key is missing";
       err && (this.errorService.setError(err.toString()));
@@ -659,12 +659,12 @@ export class ClientService {
       return;
     }
     try {
-      const call_entrypoint_legacy = await this.sdk.call_entrypoint_legacy(
+      const call_entrypoint_deploy = await this.sdk.call_entrypoint_deploy(
         deploy_params,
         session_params,
         payment_amount
       );
-      call_entrypoint_legacy && this.resultService.setResult(call_entrypoint_legacy.toJson());
+      call_entrypoint_deploy && this.resultService.setResult(call_entrypoint_deploy.toJson());
     } catch (err) {
       err && (this.errorService.setError(err.toString()));
     }

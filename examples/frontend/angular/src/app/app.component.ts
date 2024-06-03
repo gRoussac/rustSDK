@@ -136,8 +136,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     await this.resultService.setResult('');
   }
 
-  private async call_entrypoint_legacy() {
-    return await this.clientService.call_entrypoint_legacy();
+  private async call_entrypoint_deploy() {
+    return await this.clientService.call_entrypoint_deploy();
   }
 
   private async deploy(deploy_result = true, speculative?: boolean) {
@@ -209,8 +209,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.get_validator_changes();
   }
 
-  private async install_legacy() {
-    return await this.clientService.install_legacy(this.wasm);
+  private async install_deploy() {
+    return await this.clientService.install_deploy(this.wasm);
   }
 
   private async list_rpcs() {
@@ -257,8 +257,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.speculative_deploy(this.wasm);
   }
 
-  private async speculative_exec() {
-    return await this.clientService.speculative_exec();
+  private async speculative_exec_deploy() {
+    return await this.clientService.speculative_exec_deploy();
   }
 
   private async speculative_transfer() {

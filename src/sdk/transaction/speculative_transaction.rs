@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::rpcs::speculative_exec_txn::SpeculativeExecTxnResult;
+use crate::rpcs::speculative_exec_transaction::SpeculativeExecTxnResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
@@ -116,7 +116,7 @@ impl SDK {
             return Err(SdkError::from(err));
         }
 
-        self.speculative_exec_txn(
+        self.speculative_exec_transaction(
             transaction.unwrap().into(),
             maybe_block_identifier,
             verbosity,

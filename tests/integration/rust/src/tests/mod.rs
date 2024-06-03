@@ -441,7 +441,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     };
     session_params.set_session_bytes(module_bytes.into());
     let install = sdk
-        .install_legacy(
+        .install_deploy(
             deploy_params,
             session_params,
             PAYMENT_AMOUNT_CONTRACT_CEP78,
@@ -474,7 +474,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     Ok(())
 }
 
-// call_entrypoint_legacy
+// call_entrypoint_deploy
 pub async fn _run_example_12() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -520,10 +520,10 @@ pub async fn _run_example_12() {
 
     let payment_params = PaymentStrParams::default();
     payment_params.set_payment_amount(PAYMENT_AMOUNT);
-    let call_entrypoint_legacy = sdk
-        .call_entrypoint_legacy(deploy_params, session_params, payment_params, None)
+    let call_entrypoint_deploy = sdk
+        .call_entrypoint_deploy(deploy_params, session_params, payment_params, None)
         .await;
-    let deploy_hash_result = call_entrypoint_legacy.as_ref().unwrap().result.deploy_hash;
+    let deploy_hash_result = call_entrypoint_deploy.as_ref().unwrap().result.deploy_hash;
     let deploy_hash_string = DeployHash::from(deploy_hash_result).to_string();
     println!("watch deploy_hash {deploy_hash_string}");
     let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
