@@ -1,7 +1,7 @@
 pub mod call_entrypoint;
-pub mod call_entrypoint_legacy;
+pub mod call_entrypoint_deploy;
 pub mod install;
-pub mod install_legacy;
+pub mod install_deploy;
 pub mod query_contract_dict;
 pub mod query_contract_key;
 

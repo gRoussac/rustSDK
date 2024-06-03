@@ -550,7 +550,7 @@ const signDeployFields: InputContainer[][] = [
 ];
 
 const formFields = new Map<string, InputContainer[][]>([
-  ['call_entrypoint_legacy', callEntrypointFields],
+  ['call_entrypoint_deploy', callEntrypointFields],
   ['deploy', makeDeployFields],
   ['get_account', getAccountFields],
   ['get_entity', getEntityFields],
@@ -562,7 +562,7 @@ const formFields = new Map<string, InputContainer[][]>([
   ['get_era_info', getBlockFields],
   ['get_era_summary', getBlockFields],
   ['get_state_root_hash', getBlockFields],
-  ['install', installFields],
+  ['install_deploy', installFields],
   ['make_deploy', makeDeployFields],
   ['make_transfer', getTransferFields],
   ['put_deploy', putDeployFields],
@@ -573,7 +573,7 @@ const formFields = new Map<string, InputContainer[][]>([
   ['query_global_state', queryGlobalStateFields],
   ['sign_deploy', signDeployFields],
   ['speculative_deploy', speculativeDeployFields],
-  ['speculative_exec', speculativeExecFields],
+  ['speculative_exec_deploy', speculativeExecFields],
   ['speculative_transfer', getSpeculativeTransferFields],
   ['transfer', getTransferFields],
 ]);

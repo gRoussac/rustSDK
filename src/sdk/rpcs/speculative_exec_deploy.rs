@@ -11,7 +11,7 @@ use crate::{
 };
 use casper_client::{
     rpcs::results::SpeculativeExecResult as _SpeculativeExecResult,
-    speculative_exec as speculative_exec_lib, JsonRpcId, SuccessResponse,
+    speculative_exec as speculative_exec_deploy_lib, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -72,8 +72,8 @@ impl SpeculativeExecResult {
 /// Options for speculative execution.
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(js_name = "getSpeculativeExecOptions", getter_with_clone)]
-pub struct GetSpeculativeExecOptions {
+#[wasm_bindgen(js_name = "getSpeculativeExecDeployOptions", getter_with_clone)]
+pub struct GetSpeculativeExecDeployOptions {
     /// The deploy as a JSON string.
     pub deploy_as_string: Option<String>,
 
@@ -97,14 +97,17 @@ pub struct GetSpeculativeExecOptions {
 #[wasm_bindgen]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
-    #[wasm_bindgen(js_name = "speculative_exec_options")]
-    pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecOptions {
-        let options_result = options.into_serde::<GetSpeculativeExecOptions>();
+    #[wasm_bindgen(js_name = "speculative_exec_deploy_options")]
+    pub fn get_speculative_exec_deploy_options(
+        &self,
+        options: JsValue,
+    ) -> GetSpeculativeExecDeployOptions {
+        let options_result = options.into_serde::<GetSpeculativeExecDeployOptions>();
         match options_result {
             Ok(options) => options,
             Err(err) => {
                 error(&format!("Error deserializing options: {:?}", err));
-                GetSpeculativeExecOptions::default()
+                GetSpeculativeExecDeployOptions::default()
             }
         }
     }
@@ -118,12 +121,12 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "speculative_exec")]
-    pub async fn speculative_exec_js_alias(
+    #[wasm_bindgen(js_name = "speculative_exec_deploy")]
+    pub async fn speculative_exec_deploy_js_alias(
         &self,
-        options: Option<GetSpeculativeExecOptions>,
+        options: Option<GetSpeculativeExecDeployOptions>,
     ) -> Result<SpeculativeExecResult, JsError> {
-        let GetSpeculativeExecOptions {
+        let GetSpeculativeExecDeployOptions {
             deploy_as_string,
             deploy,
             maybe_block_id_as_string,
@@ -151,7 +154,7 @@ impl SDK {
         };
 
         let result = self
-            .speculative_exec(deploy, maybe_block_identifier, verbosity, node_address)
+            .speculative_exec_deploy(deploy, maybe_block_identifier, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -177,14 +180,14 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of _SpeculativeExecResult or a `SdkError` in case of an error.
-    pub async fn speculative_exec(
+    pub async fn speculative_exec_deploy(
         &self,
         deploy: Deploy,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
-        //log("speculative_exec!");
+        //log("speculative_exec_deploy!");
 
         let maybe_block_identifier =
             if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
@@ -194,7 +197,7 @@ impl SDK {
             } else {
                 None
             };
-        speculative_exec_lib(
+        speculative_exec_deploy_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
             maybe_block_identifier.map(Into::into),
@@ -244,14 +247,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_exec_with_none_values() {
+    async fn test_speculative_exec_deploy_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
         let deploy = get_deploy();
         let error_message = "builder error";
 
         // Act
-        let result = sdk.speculative_exec(deploy, None, None, None).await;
+        let result = sdk.speculative_exec_deploy(deploy, None, None, None).await;
 
         // Assert
         assert!(result.is_err());
@@ -261,7 +264,7 @@ mod tests {
 
     #[tokio::test]
     #[ignore]
-    async fn _test_speculative_exec() {
+    async fn _test_speculative_exec_deploy() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -272,7 +275,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .speculative_exec(
+            .speculative_exec_deploy(
                 deploy,
                 Some(block_identifier),
                 verbosity,
@@ -286,7 +289,7 @@ mod tests {
 
     #[tokio::test]
     #[ignore]
-    async fn _test_speculative_exec_with_block_identifier() {
+    async fn _test_speculative_exec_deploy_with_block_identifier() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -297,7 +300,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .speculative_exec(
+            .speculative_exec_deploy(
                 deploy,
                 Some(block_identifier),
                 verbosity,
@@ -310,14 +313,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_exec_with_error() {
+    async fn test_speculative_exec_deploy_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let deploy = get_deploy();
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
-        let result = sdk.speculative_exec(deploy, None, None, None).await;
+        let result = sdk.speculative_exec_deploy(deploy, None, None, None).await;
 
         // Assert
         assert!(result.is_err());

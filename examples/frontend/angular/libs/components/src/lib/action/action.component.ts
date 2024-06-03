@@ -18,6 +18,7 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   sdk_methods!: string[];
   sdk_rpc_methods!: string[];
   sdk_contract_methods!: string[];
+  sdk_deprecated!: string[];
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
   sdk_transaction_methods!: string[];
@@ -52,7 +53,9 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
     this.sdk_transaction_methods = this.sdk_methods.filter(name => ['transaction', 'speculative_transaction', 'speculative_transfer_transaction', 'transfer_transaction'].includes(name));
     this.sdk_transaction_utils_methods = this.sdk_methods.filter(name => ['make_transaction', 'make_transfer_transaction', 'sign_transaction', 'put_transaction'].includes(name));
 
-    this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint_legacy', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
+    this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint', 'call_entrypoint_deploy', 'install', 'install_deploy', 'query_contract_dict', 'query_contract_key'].includes(name));
+
+    this.sdk_deprecated = this.sdk_methods.filter(name => ['get_account', 'get_deploy', 'get_era_info', 'put_deploy', 'speculative_exec_deploy', 'sign_deploy', 'make_deploy', 'make_transfer', 'speculative_deploy', 'speculative_transfer', 'deploy', 'transfer', 'call_entrypoint_deploy', 'install_deploy', 'get_balance'].includes(name));
 
     this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(
       this.sdk_deploy_utils_methods,

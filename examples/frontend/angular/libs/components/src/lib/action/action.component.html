@@ -12,6 +12,7 @@
       <option
         [value]="sdk_method"
         [selected]="action === sdk_method"
+        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
         *ngFor="let sdk_method of sdk_rpc_methods; index as i"
       >
         {{ sdk_method }}
@@ -21,6 +22,7 @@
       <option
         [value]="sdk_method"
         [selected]="action === sdk_method"
+        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
         *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
       >
         {{ sdk_method }}
@@ -30,6 +32,7 @@
       <option
         [value]="sdk_method"
         [selected]="action === sdk_method"
+        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
         *ngFor="let sdk_method of sdk_deploy_methods; index as i"
       >
         {{ sdk_method }}
@@ -56,6 +59,7 @@
     <optgroup label="contract">
       <option
         [value]="sdk_method"
+        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
         *ngFor="let sdk_method of sdk_contract_methods; index as i"
       >
         {{ sdk_method }}

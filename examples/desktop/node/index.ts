@@ -297,7 +297,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
   session_params.session_bytes = Bytes.fromUint8Array(wasm);
 
-  const install_result = await sdk.install_legacy(
+  const install_result = await sdk.install_deploy(
     deploy_params,
     session_params,
     payment_amount
@@ -310,7 +310,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   console.log(`install cost ${cost}`);
 };
 
-// call_entrypoint_legacy
+// call_entrypoint_deploy
 const example12 = async () => {
   const node_address = 'http://127.0.0.1:11101';
   const events_address = 'http://127.0.0.1:18101/events';
@@ -334,15 +334,15 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   session_params.session_entry_point = entry_point;
   session_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
 
-  const call_entrypoint_legacy_result = await sdk.call_entrypoint_legacy(
+  const call_entrypoint_deploy_result = await sdk.call_entrypoint_deploy(
     deploy_params,
     session_params,
     payment_amount
   );
-  const call_entrypoint_legacy_result_as_json = call_entrypoint_legacy_result.toJson();
+  const call_entrypoint_deploy_result_as_json = call_entrypoint_deploy_result.toJson();
 
   // watch deploy_hash to trigger callback
-  const deploy_hash_results = [call_entrypoint_legacy_result_as_json.deploy_hash];
+  const deploy_hash_results = [call_entrypoint_deploy_result_as_json.deploy_hash];
   const watcher = sdk.watchDeploy(events_address);
   const deploySubscriptions: DeploySubscription[] = [];
   const getEventHandlerFn = (deployHash: string) => {

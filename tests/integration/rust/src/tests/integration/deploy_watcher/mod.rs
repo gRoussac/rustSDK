@@ -3,7 +3,7 @@ pub mod test_module {
         config::{get_config, TestConfig},
         tests::{
             helpers::{get_event_handler_fn, intern::create_test_sdk},
-            integration::contract::test_module::test_install_legacy,
+            integration::contract::test_module::test_install_deploy,
         },
     };
     use casper_rust_wasm_sdk::deploy_watcher::watcher::{DeploySubscription, EventHandlerFn};
@@ -12,7 +12,7 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let deploy_hash = test_install_legacy().await;
+        let deploy_hash = test_install_deploy().await;
 
         assert!(!deploy_hash.is_empty());
 
@@ -42,7 +42,7 @@ pub mod test_module {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let deploy_hash = test_install_legacy().await;
+        let deploy_hash = test_install_deploy().await;
 
         assert!(!deploy_hash.is_empty());
 

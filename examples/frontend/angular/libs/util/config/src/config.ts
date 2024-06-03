@@ -4,7 +4,7 @@ export type EnvironmentConfig = {
   [key: string]: string | object | Verbosity;
 };
 
-const action_needs_private_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec', 'sign_deploy', 'call_entrypoint_legacy', 'install'];
+const action_needs_private_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec_deploy', 'sign_deploy', 'call_entrypoint_deploy', 'install'];
 const action_needs_public_key = ['make_deploy', 'make_transfer', ...action_needs_private_key];
 
 export const config: EnvironmentConfig = {

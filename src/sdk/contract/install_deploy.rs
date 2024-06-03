@@ -32,8 +32,10 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the installation.
-    #[wasm_bindgen(js_name = "install_legacy")]
-    pub async fn install_legacy_js_alias(
+    #[wasm_bindgen(js_name = "install_deploy")]
+    #[deprecated(note = "prefer 'install' with transaction")]
+    #[allow(deprecated)]
+    pub async fn install_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -41,7 +43,7 @@ impl SDK {
         node_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
-            .install_legacy(deploy_params, session_params, payment_amount, node_address)
+            .install_deploy(deploy_params, session_params, payment_amount, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -73,7 +75,9 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `SdkError` if there is an error during the installation.
-    pub async fn install_legacy(
+    #[deprecated(note = "prefer 'install' with transaction")]
+    #[allow(deprecated)]
+    pub async fn install_deploy(
         &self,
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
@@ -103,6 +107,7 @@ impl SDK {
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
@@ -113,7 +118,7 @@ mod tests {
     use tokio;
 
     #[tokio::test]
-    async fn test_install_legacy_with_none_values() {
+    async fn test_install_deploy_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
         let deploy_params = DeployStrParams::new("", "", None, None, None, None);
@@ -124,7 +129,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install_legacy(deploy_params, session_params, "", None)
+            .install_deploy(deploy_params, session_params, "", None)
             .await;
 
         // Assert
@@ -134,7 +139,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_install_legacy_with_valid_input() {
+    async fn test_install_deploy_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, _, chain_name) = get_network_constants();
@@ -158,7 +163,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install_legacy(
+            .install_deploy(
                 deploy_params,
                 session_params,
                 PAYMENT_AMOUNT,
@@ -174,7 +179,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_install_legacy_with_invalid_input() {
+    async fn test_install_deploy_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, _, chain_name) = get_network_constants();
@@ -207,7 +212,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install_legacy(
+            .install_deploy(
                 deploy_params,
                 session_params,
                 "", // This is not valid payment amount
@@ -222,7 +227,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_install_legacy_without_private_key() {
+    async fn test_install_deploy_without_private_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, _, chain_name) = get_network_constants();
@@ -254,7 +259,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install_legacy(
+            .install_deploy(
                 deploy_params,
                 session_params,
                 PAYMENT_AMOUNT,
@@ -269,7 +274,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_install_legacy_with_error() {
+    async fn test_install_deploy_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let (_, _, _, chain_name) = get_network_constants();
@@ -302,7 +307,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .install_legacy(deploy_params, session_params, PAYMENT_AMOUNT, None)
+            .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT, None)
             .await;
 
         // Assert

@@ -323,12 +323,12 @@ function App() {
         '9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477';
       session_params.session_entry_point = 'decimals';
 
-      const test_call_entrypoint_legacy = (await sdk.call_entrypoint_legacy(
+      const test_call_entrypoint_deploy = (await sdk.call_entrypoint_deploy(
         deploy_params,
         session_params,
         '5500000000'
       )).toJson();
-      console.log(test_call_entrypoint_legacy.deploy_hash);
+      console.log(test_call_entrypoint_deploy.deploy_hash);
 
       // state_get_dictionary_item
       stateRootHashDigest = new Digest(chain_get_state_root_hash?.toString());
@@ -407,7 +407,7 @@ function App() {
     }
     if (wasm) {
       session_params.session_bytes = Bytes.fromUint8Array(wasm);
-      const test_install = await sdkInstance.install_legacy(
+      const test_install = await sdkInstance.install_deploy(
         deploy_params,
         session_params,
         '500000000'
