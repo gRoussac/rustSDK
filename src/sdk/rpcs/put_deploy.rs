@@ -154,7 +154,6 @@ mod tests {
 
         // Act
         let result = sdk.put_deploy(deploy, verbosity, Some(node_address)).await;
-
         // Assert
         assert!(result.is_ok());
     }

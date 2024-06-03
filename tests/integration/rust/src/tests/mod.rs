@@ -373,8 +373,7 @@ pub async fn _run_example_11() -> Result<(), String> {
         types::{
             deploy_hash::DeployHash,
             deploy_params::{
-                deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-                session_str_params::SessionStrParams,
+                deploy_str_params::DeployStrParams, session_str_params::SessionStrParams,
             },
         },
     };
@@ -418,9 +417,6 @@ pub async fn _run_example_11() -> Result<(), String> {
         None,
     );
 
-    let payment_params = PaymentStrParams::default();
-    payment_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
-
     let session_params = SessionStrParams::default();
     session_params.set_session_args_json(ARGS_JSON);
 
@@ -433,7 +429,12 @@ pub async fn _run_example_11() -> Result<(), String> {
     };
     session_params.set_session_bytes(module_bytes.into());
     let install = sdk
-        .install(deploy_params, session_params, payment_params, None)
+        .install(
+            deploy_params,
+            session_params,
+            PAYMENT_AMOUNT_CONTRACT_CEP78,
+            None,
+        )
         .await;
 
     let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;

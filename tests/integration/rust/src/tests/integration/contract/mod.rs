@@ -205,8 +205,8 @@ pub mod test_module {
             None,
             Some(TTL.to_string()),
         );
+
         let mut session_params = SessionStrParams::default();
-        let payment_params = PaymentStrParams::default();
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(module_bytes) => module_bytes,
             Err(err) => {
@@ -217,9 +217,9 @@ pub mod test_module {
         session_params.set_session_bytes(module_bytes.into());
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
-        payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
         let install = create_test_sdk(Some(config))
-            .install(deploy_params, session_params, payment_params, None)
+            .install(deploy_params, session_params, PAYMENT_AMOUNT, None)
             .await;
         assert!(!install
             .as_ref()
