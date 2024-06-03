@@ -236,7 +236,7 @@ describe('Angular App Tests', () => {
     });
 
     afterEach(async () => {
-      //  await clear();
+      await clear();
     });
 
     it('should get_balance with state root hash', async () => {
@@ -298,11 +298,10 @@ describe('Angular App Tests', () => {
       await getResult();
       await seletAction('get_block_transfers');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await delay(200);
+      await delay(300);
     });
     afterEach(async () => {
-      await delay(200);
+      await delay(300);
       await clear();
     });
 
