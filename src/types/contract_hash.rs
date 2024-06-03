@@ -2,9 +2,11 @@ use crate::debug::error;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
     contracts::ContractHash as _ContractHash,
-    AddressableEntityHash,
+    AddressableEntityHash as _AddressableEntityHash,
 };
 use wasm_bindgen::prelude::*;
+
+use super::addressable_entity_hash::AddressableEntityHash;
 
 #[wasm_bindgen]
 #[derive(Debug)]
@@ -64,14 +66,20 @@ impl FromBytes for ContractHash {
     }
 }
 
-impl From<ContractHash> for AddressableEntityHash {
+impl From<ContractHash> for _AddressableEntityHash {
     fn from(contract_hash: ContractHash) -> Self {
-        AddressableEntityHash::new(contract_hash.0.value())
+        _AddressableEntityHash::new(contract_hash.0.value())
     }
 }
 
-impl From<AddressableEntityHash> for ContractHash {
-    fn from(addressable_entity_hash: AddressableEntityHash) -> Self {
+impl From<ContractHash> for AddressableEntityHash {
+    fn from(contract_hash: ContractHash) -> Self {
+        _AddressableEntityHash::new(contract_hash.0.value()).into()
+    }
+}
+
+impl From<_AddressableEntityHash> for ContractHash {
+    fn from(addressable_entity_hash: _AddressableEntityHash) -> Self {
         let bytes = addressable_entity_hash
             .to_bytes()
             .expect("Failed to convert AddressableEntityHash to bytes");
