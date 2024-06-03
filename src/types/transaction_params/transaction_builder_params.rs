@@ -122,12 +122,12 @@ impl TransactionBuilderParams {
     #[wasm_bindgen(js_name = "newInvocableEntity")]
     pub fn new_invocable_entity(
         entity_hash: AddressableEntityHash,
-        entry_point: String,
+        entry_point: &str,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
             transaction_bytes: None,
-            entry_point: Some(entry_point),
+            entry_point: Some(entry_point.to_string()),
             maybe_source: None,
             target: None,
             amount: None,
@@ -148,12 +148,12 @@ impl TransactionBuilderParams {
     #[wasm_bindgen(js_name = "newInvocableEntityAlias")]
     pub fn new_invocable_entity_alias(
         entity_alias: String,
-        entry_point: String,
+        entry_point: &str,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
             transaction_bytes: None,
-            entry_point: Some(entry_point),
+            entry_point: Some(entry_point.to_string()),
             maybe_source: None,
             target: None,
             amount: None,
@@ -175,12 +175,12 @@ impl TransactionBuilderParams {
     pub fn new_package(
         package_hash: PackageHash,
         maybe_entity_version: Option<u32>,
-        entry_point: String,
+        entry_point: &str,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Package,
             transaction_bytes: None,
-            entry_point: Some(entry_point),
+            entry_point: Some(entry_point.to_string()),
             maybe_source: None,
             target: None,
             amount: None,
@@ -202,12 +202,12 @@ impl TransactionBuilderParams {
     pub fn new_package_alias(
         package_alias: String,
         maybe_entity_version: Option<u32>,
-        entry_point: String,
+        entry_point: &str,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
             transaction_bytes: None,
-            entry_point: Some(entry_point),
+            entry_point: Some(entry_point.to_string()),
             maybe_source: None,
             target: None,
             amount: None,

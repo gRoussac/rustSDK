@@ -77,7 +77,6 @@ impl SDK {
     ///
     /// * `transaction_params` - Transaction parameters.
     /// * `builder_params` - Session parameters.
-    /// * `payment_params` - Payment parameters.
     /// * `verbosity` - An optional verbosity level.
     /// * `node_address` - An optional node address.
     ///
@@ -194,6 +193,7 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
+        // TODO FIX pricing_mode
         transaction_params.set_pricing_mode("fixed");
 
         // Act

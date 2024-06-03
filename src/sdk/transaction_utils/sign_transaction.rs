@@ -63,7 +63,7 @@ mod tests {
         },
     };
     use sdk_tests::{
-        config::PAYMENT_AMOUNT,
+        config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
         tests::helpers::{get_network_constants, get_user_private_key},
     };
 
@@ -75,7 +75,6 @@ mod tests {
 
         let private_key = get_user_private_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
-        let entry_point = "test";
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&private_key);
@@ -87,7 +86,7 @@ mod tests {
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, entry_point.to_string());
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let transaction = sdk
@@ -112,7 +111,6 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
-        let entry_point = "test";
 
         let private_key = get_user_private_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
@@ -127,7 +125,7 @@ mod tests {
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, entry_point.to_string());
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let transaction = sdk
