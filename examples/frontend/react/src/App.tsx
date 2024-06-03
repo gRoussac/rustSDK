@@ -407,7 +407,7 @@ function App() {
     }
     if (wasm) {
       session_params.session_bytes = Bytes.fromUint8Array(wasm);
-      const test_install = await sdkInstance.install(
+      const test_install = await sdkInstance.install_legacy(
         deploy_params,
         session_params,
         '500000000'

@@ -1,6 +1,6 @@
 pub mod call_entrypoint;
 pub mod install;
-pub mod install_txn;
+pub mod install_legacy;
 pub mod query_contract_dict;
 pub mod query_contract_key;
 

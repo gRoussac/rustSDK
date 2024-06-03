@@ -297,7 +297,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
   session_params.session_bytes = Bytes.fromUint8Array(wasm);
 
-  const install_result = await sdk.install(
+  const install_result = await sdk.install_legacy(
     deploy_params,
     session_params,
     payment_amount

@@ -613,13 +613,13 @@ function __wbg_adapter_1019(arg0, arg1, arg2, arg3) {
 
 /**
 */
-export const TransferTargetKind = Object.freeze({ PublicKey:0,"0":"PublicKey",AccountHash:1,"1":"AccountHash",URef:2,"2":"URef", });
-/**
-*/
 export const TransactionKind = Object.freeze({ InvocableEntity:0,"0":"InvocableEntity",InvocableEntityAlias:1,"1":"InvocableEntityAlias",Package:2,"2":"Package",PackageAlias:3,"3":"PackageAlias",Session:4,"4":"Session",Transfer:5,"5":"Transfer",AddBid:6,"6":"AddBid",Delegate:7,"7":"Delegate",Undelegate:8,"8":"Undelegate",Redelegate:9,"9":"Redelegate",WithdrawBid:10,"10":"WithdrawBid", });
 /**
 */
 export const Verbosity = Object.freeze({ Low:0,"0":"Low",Medium:1,"1":"Medium",High:2,"2":"High", });
+/**
+*/
+export const TransferTargetKind = Object.freeze({ PublicKey:0,"0":"PublicKey",AccountHash:1,"1":"AccountHash",URef:2,"2":"URef", });
 
 const AccessRightsFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
@@ -7893,7 +7893,7 @@ export class SDK {
         }
     }
     /**
-    * Installs a smart contract with the specified parameters and returns the result.
+    * Calls a smart contract entry point with the specified parameters and returns the result.
     *
     * # Arguments
     *
@@ -7908,14 +7908,14 @@ export class SDK {
     *
     * # Errors
     *
-    * Returns a `JsError` if there is an error during the installation.
+    * Returns a `JsError` if there is an error during the call.
     * @param {DeployStrParams} deploy_params
     * @param {SessionStrParams} session_params
     * @param {string} payment_amount
     * @param {string | undefined} [node_address]
     * @returns {Promise<PutDeployResult>}
     */
-    install(deploy_params, session_params, payment_amount, node_address) {
+    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -7924,7 +7924,7 @@ export class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return takeObject(ret);
     }
     /**
@@ -8036,14 +8036,14 @@ export class SDK {
     * @param {string | undefined} [node_address]
     * @returns {Promise<PutTransactionResult>}
     */
-    install_txn(transaction_params, transaction_bytes, node_address) {
+    install(transaction_params, transaction_bytes, node_address) {
         _assertClass(transaction_params, TransactionStrParams);
         var ptr0 = transaction_params.__destroy_into_raw();
         _assertClass(transaction_bytes, Bytes);
         var ptr1 = transaction_bytes.__destroy_into_raw();
         var ptr2 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install_txn(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
         return takeObject(ret);
     }
     /**
@@ -8452,7 +8452,7 @@ export class SDK {
         return Transaction.__wrap(ret);
     }
     /**
-    * Calls a smart contract entry point with the specified parameters and returns the result.
+    * Installs a smart contract with the specified parameters and returns the result.
     *
     * # Arguments
     *
@@ -8467,14 +8467,14 @@ export class SDK {
     *
     * # Errors
     *
-    * Returns a `JsError` if there is an error during the call.
+    * Returns a `JsError` if there is an error during the installation.
     * @param {DeployStrParams} deploy_params
     * @param {SessionStrParams} session_params
     * @param {string} payment_amount
     * @param {string | undefined} [node_address]
     * @returns {Promise<PutDeployResult>}
     */
-    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
+    install_legacy(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -8483,7 +8483,7 @@ export class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_install_legacy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return takeObject(ret);
     }
     /**
@@ -13656,10 +13656,6 @@ function __wbg_get_imports() {
         const ret = QueryGlobalStateResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_puttransactionresult_new = function(arg0) {
-        const ret = PutTransactionResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbg_putdeployresult_new = function(arg0) {
         const ret = PutDeployResult.__wrap(arg0);
         return addHeapObject(ret);
@@ -13674,6 +13670,10 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbg_getaddressableentityresult_new = function(arg0) {
         const ret = GetAddressableEntityResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_puttransactionresult_new = function(arg0) {
+        const ret = PutTransactionResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getnodestatusresult_new = function(arg0) {

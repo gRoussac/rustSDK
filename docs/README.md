@@ -1151,7 +1151,7 @@ let module_bytes = match read_wasm_file(file_path) {
 session_params.set_session_bytes(module_bytes.into());
 
 let install = sdk
-    .install(deploy_params, session_params, payment_params, None)
+    .install_legacy(deploy_params, session_params, payment_params, None)
     .await;
 
 let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;
@@ -1227,7 +1227,7 @@ if (!wasmBuffer) {
 
 session_params.session_bytes = Bytes.fromUint8Array(wasm);
 
-const install_result = await sdk.install(
+const install_result = await sdk.install_legacy(
   deploy_params,
   session_params,
   payment_amount
