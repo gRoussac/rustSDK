@@ -96,7 +96,7 @@ mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
-        config::PAYMENT_AMOUNT,
+        config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
         tests::helpers::{get_network_constants, get_user_private_key},
     };
 
@@ -114,7 +114,7 @@ mod tests {
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         );
-        session_params.set_session_entry_point("test");
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -138,7 +138,7 @@ mod tests {
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         );
-        session_params.set_session_entry_point("test");
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -164,7 +164,7 @@ mod tests {
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         );
-        session_params.set_session_entry_point("test");
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 
