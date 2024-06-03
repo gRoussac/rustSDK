@@ -103,9 +103,8 @@ mod tests {
         let (_, _, _, chain_name) = get_network_constants();
 
         let private_key = get_user_private_key(None).unwrap();
-        dbg!(private_key.clone());
         let account = public_key_from_secret_key(&private_key).unwrap();
-        dbg!(account.clone());
+
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(

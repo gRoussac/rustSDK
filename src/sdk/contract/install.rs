@@ -172,7 +172,6 @@ mod tests {
         assert!(result.is_ok());
         let deploy_hash = result.unwrap().result.deploy_hash;
         assert!(!deploy_hash.to_string().is_empty());
-        dbg!(deploy_hash);
     }
 
     #[tokio::test]

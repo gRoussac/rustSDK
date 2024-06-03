@@ -1,0 +1,468 @@
+use crate::{
+    debug::error,
+    types::{
+        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
+        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey, uref::URef,
+    },
+};
+use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
+use casper_types::{transaction::TransferTarget as _TransferTarget, U512};
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
+pub enum TransferTargetKind {
+    PublicKey,
+    AccountHash,
+    URef,
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Debug)]
+pub struct TransferTarget {
+    kind: TransferTargetKind,
+    public_key: Option<PublicKey>,
+    account_hash: Option<AccountHash>,
+    uref: Option<URef>,
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Debug, Default)]
+pub struct TransactionBuilderParams {
+    kind: TransactionKind,
+    transaction_bytes: Option<Bytes>,
+    maybe_source: Option<URef>,
+    target: Option<TransferTarget>,
+    amount: Option<U512>,
+    maybe_id: Option<u64>,
+    entity_hash: Option<AddressableEntityHash>,
+    entity_alias: Option<String>,
+    entry_point: Option<String>,
+    package_hash: Option<PackageHash>,
+    package_alias: Option<String>,
+    maybe_entity_version: Option<u32>,
+    public_key: Option<PublicKey>,
+    delegation_rate: Option<u8>,
+    delegator: Option<PublicKey>,
+    validator: Option<PublicKey>,
+    new_validator: Option<PublicKey>,
+}
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug, Default)]
+pub enum TransactionKind {
+    InvocableEntity,
+    InvocableEntityAlias,
+    Package,
+    PackageAlias,
+    #[default]
+    Session,
+    Transfer,
+    AddBid,
+    Delegate,
+    Undelegate,
+    Redelegate,
+    WithdrawBid,
+}
+
+#[wasm_bindgen]
+impl TransactionBuilderParams {
+    #[wasm_bindgen(js_name = "newSession")]
+    pub fn new_session(transaction_bytes: Option<Bytes>) -> TransactionBuilderParams {
+        TransactionBuilderParams {
+            kind: TransactionKind::Session,
+            transaction_bytes,
+            entry_point: None,
+            maybe_source: None,
+            target: None,
+            amount: None,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newTransfer")]
+    pub fn new_transfer(
+        maybe_source: Option<URef>,
+        target: Option<TransferTarget>,
+        amount: &str,
+        maybe_id: Option<u64>,
+    ) -> TransactionBuilderParams {
+        let amount = convert_amount(amount);
+        TransactionBuilderParams {
+            kind: TransactionKind::Transfer,
+            transaction_bytes: None,
+            entry_point: None,
+            maybe_source,
+            target,
+            amount,
+            maybe_id,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newInvocableEntity")]
+    pub fn new_invocable_entity(
+        entity_hash: AddressableEntityHash,
+        entry_point: String,
+    ) -> TransactionBuilderParams {
+        TransactionBuilderParams {
+            kind: TransactionKind::InvocableEntity,
+            transaction_bytes: None,
+            entry_point: Some(entry_point),
+            maybe_source: None,
+            target: None,
+            amount: None,
+            maybe_id: None,
+            entity_hash: Some(entity_hash),
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newInvocableEntityAlias")]
+    pub fn new_invocable_entity_alias(
+        entity_alias: String,
+        entry_point: String,
+    ) -> TransactionBuilderParams {
+        TransactionBuilderParams {
+            kind: TransactionKind::InvocableEntityAlias,
+            transaction_bytes: None,
+            entry_point: Some(entry_point),
+            maybe_source: None,
+            target: None,
+            amount: None,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: Some(entity_alias),
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newPackage")]
+    pub fn new_package(
+        package_hash: PackageHash,
+        maybe_entity_version: Option<u32>,
+        entry_point: String,
+    ) -> TransactionBuilderParams {
+        TransactionBuilderParams {
+            kind: TransactionKind::Package,
+            transaction_bytes: None,
+            entry_point: Some(entry_point),
+            maybe_source: None,
+            target: None,
+            amount: None,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: Some(package_hash),
+            package_alias: None,
+            maybe_entity_version,
+            public_key: None,
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newPackageAlias")]
+    pub fn new_package_alias(
+        package_alias: String,
+        maybe_entity_version: Option<u32>,
+        entry_point: String,
+    ) -> TransactionBuilderParams {
+        TransactionBuilderParams {
+            kind: TransactionKind::PackageAlias,
+            transaction_bytes: None,
+            entry_point: Some(entry_point),
+            maybe_source: None,
+            target: None,
+            amount: None,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: Some(package_alias),
+            maybe_entity_version,
+            public_key: None,
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newAddBid")]
+    pub fn new_add_bid(
+        public_key: PublicKey,
+        delegation_rate: u8,
+        amount: &str,
+    ) -> TransactionBuilderParams {
+        let cloned_amount = amount.to_string();
+        let amount = U512::from_dec_str(&cloned_amount)
+            .map_err(|err| {
+                error(&format!("Error converting amount: {:?}", err));
+            })
+            .ok();
+        TransactionBuilderParams {
+            kind: TransactionKind::AddBid,
+            transaction_bytes: None,
+            entry_point: None,
+            maybe_source: None,
+            target: None,
+            amount,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: Some(public_key),
+            delegation_rate: Some(delegation_rate),
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newDelegate")]
+    pub fn new_delegate(
+        delegator: PublicKey,
+        validator: PublicKey,
+        amount: &str,
+    ) -> TransactionBuilderParams {
+        let amount = convert_amount(amount);
+        TransactionBuilderParams {
+            kind: TransactionKind::Delegate,
+            transaction_bytes: None,
+            entry_point: None,
+            maybe_source: None,
+            target: None,
+            amount,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: Some(delegator),
+            validator: Some(validator),
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newUndelegate")]
+    pub fn new_undelegate(
+        delegator: PublicKey,
+        validator: PublicKey,
+        amount: &str,
+    ) -> TransactionBuilderParams {
+        let amount = convert_amount(amount);
+        TransactionBuilderParams {
+            kind: TransactionKind::Undelegate,
+            transaction_bytes: None,
+            entry_point: None,
+            maybe_source: None,
+            target: None,
+            amount,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: Some(delegator),
+            validator: Some(validator),
+            new_validator: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newRedelegate")]
+    pub fn new_redelegate(
+        delegator: PublicKey,
+        validator: PublicKey,
+        new_validator: PublicKey,
+        amount: &str,
+    ) -> TransactionBuilderParams {
+        let amount = convert_amount(amount);
+        TransactionBuilderParams {
+            kind: TransactionKind::Redelegate,
+            transaction_bytes: None,
+            entry_point: None,
+            maybe_source: None,
+            target: None,
+            amount,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: None,
+            delegation_rate: None,
+            delegator: Some(delegator),
+            validator: Some(validator),
+            new_validator: Some(new_validator),
+        }
+    }
+
+    #[wasm_bindgen(js_name = "newWithdrawBid")]
+    pub fn new_withdraw_bid(public_key: PublicKey, amount: &str) -> TransactionBuilderParams {
+        let amount = convert_amount(amount);
+        TransactionBuilderParams {
+            kind: TransactionKind::WithdrawBid,
+            transaction_bytes: None,
+            entry_point: None,
+            maybe_source: None,
+            target: None,
+            amount,
+            maybe_id: None,
+            entity_hash: None,
+            entity_alias: None,
+            package_hash: None,
+            package_alias: None,
+            maybe_entity_version: None,
+            public_key: Some(public_key),
+            delegation_rate: None,
+            delegator: None,
+            validator: None,
+            new_validator: None,
+        }
+    }
+}
+
+fn convert_amount(amount: &str) -> Option<U512> {
+    let cloned_amount = amount.to_string();
+    U512::from_dec_str(&cloned_amount)
+        .map_err(|err| {
+            error(&format!("Error converting amount: {:?}", err));
+        })
+        .ok()
+}
+
+// Convert TransactionBuilderParams to casper_client::cli::TransactionBuilderParams
+pub fn transaction_builder_params_to_casper_client(
+    transaction_params: &TransactionBuilderParams,
+) -> _TransactionBuilderParams<'_> {
+    match transaction_params.kind {
+        TransactionKind::Session => _TransactionBuilderParams::Session {
+            transaction_bytes: transaction_params
+                .transaction_bytes
+                .clone()
+                .unwrap_or_default()
+                .into(),
+        },
+        TransactionKind::Transfer => _TransactionBuilderParams::Transfer {
+            maybe_source: transaction_params.maybe_source.clone().map(Into::into),
+            target: transaction_params
+                .target
+                .as_ref()
+                .map(|transaction| match transaction.kind {
+                    TransferTargetKind::PublicKey => {
+                        _TransferTarget::PublicKey(transaction.public_key.clone().unwrap().into())
+                    }
+                    TransferTargetKind::AccountHash => _TransferTarget::AccountHash(
+                        transaction.account_hash.clone().unwrap().into(),
+                    ),
+                    TransferTargetKind::URef => {
+                        _TransferTarget::URef(transaction.uref.clone().unwrap().into())
+                    }
+                })
+                .unwrap(),
+            amount: transaction_params.amount.unwrap_or_default(),
+            maybe_id: transaction_params.maybe_id,
+        },
+        TransactionKind::InvocableEntity => _TransactionBuilderParams::InvocableEntity {
+            entity_hash: transaction_params.entity_hash.unwrap().into(),
+            entry_point: transaction_params
+                .entry_point
+                .as_deref()
+                .unwrap_or_default(),
+        },
+        TransactionKind::InvocableEntityAlias => _TransactionBuilderParams::InvocableEntityAlias {
+            entity_alias: transaction_params.entity_alias.as_deref().unwrap(),
+            entry_point: transaction_params
+                .entry_point
+                .as_deref()
+                .unwrap_or_default(),
+        },
+        TransactionKind::Package => _TransactionBuilderParams::Package {
+            package_hash: transaction_params.package_hash.unwrap().into(),
+            maybe_entity_version: transaction_params.maybe_entity_version,
+            entry_point: transaction_params
+                .entry_point
+                .as_deref()
+                .unwrap_or_default(),
+        },
+        TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAlias {
+            package_alias: transaction_params.package_alias.as_deref().unwrap(),
+            maybe_entity_version: transaction_params.maybe_entity_version,
+            entry_point: transaction_params
+                .entry_point
+                .as_deref()
+                .unwrap_or_default(),
+        },
+        TransactionKind::AddBid => _TransactionBuilderParams::AddBid {
+            public_key: transaction_params.public_key.clone().unwrap().into(),
+            delegation_rate: transaction_params.delegation_rate.unwrap(),
+            amount: transaction_params.amount.unwrap_or_default(),
+        },
+        TransactionKind::Delegate => _TransactionBuilderParams::Delegate {
+            delegator: transaction_params.delegator.clone().unwrap().into(),
+            validator: transaction_params.validator.clone().unwrap().into(),
+            amount: transaction_params.amount.unwrap_or_default(),
+        },
+        TransactionKind::Undelegate => _TransactionBuilderParams::Undelegate {
+            delegator: transaction_params.delegator.clone().unwrap().into(),
+            validator: transaction_params.validator.clone().unwrap().into(),
+            amount: transaction_params.amount.unwrap_or_default(),
+        },
+        TransactionKind::Redelegate => _TransactionBuilderParams::Redelegate {
+            delegator: transaction_params.delegator.clone().unwrap().into(),
+            validator: transaction_params.validator.clone().unwrap().into(),
+            amount: transaction_params.amount.unwrap_or_default(),
+            new_validator: transaction_params.new_validator.clone().unwrap().into(),
+        },
+        TransactionKind::WithdrawBid => _TransactionBuilderParams::WithdrawBid {
+            public_key: transaction_params.public_key.clone().unwrap().into(),
+            amount: transaction_params.amount.unwrap_or_default(),
+        },
+    }
+}

@@ -555,7 +555,6 @@ mod tests {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
-        dbg!(get_key_input());
         // Act
         let result = sdk
             .query_global_state(QueryGlobalStateParams {

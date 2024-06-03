@@ -35,6 +35,24 @@
         {{ sdk_method }}
       </option>
     </optgroup>
+    <optgroup label="transaction utils">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_transaction_utils_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+    <optgroup label="transaction">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_transaction_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
     <optgroup label="contract">
       <option
         [value]="sdk_method"

@@ -20,6 +20,8 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   sdk_contract_methods!: string[];
   sdk_deploy_methods!: string[];
   sdk_deploy_utils_methods!: string[];
+  sdk_transaction_methods!: string[];
+  sdk_transaction_utils_methods!: string[];
   action!: string;
 
   @Output() select_action: EventEmitter<string> = new EventEmitter<string>();
@@ -45,12 +47,19 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
       .sort();
 
     this.sdk_deploy_methods = this.sdk_methods.filter(name => ['deploy', 'speculative_deploy', 'speculative_transfer', 'transfer'].includes(name));
-
     this.sdk_deploy_utils_methods = this.sdk_methods.filter(name => ['make_deploy', 'make_transfer', 'sign_deploy', 'put_deploy'].includes(name));
+
+    this.sdk_transaction_methods = this.sdk_methods.filter(name => ['transaction', 'speculative_transaction', 'speculative_transfer_transaction', 'transfer_transaction'].includes(name));
+    this.sdk_transaction_utils_methods = this.sdk_methods.filter(name => ['make_transaction', 'make_transfer_transaction', 'sign_transaction', 'put_transaction'].includes(name));
 
     this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
 
-    this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(this.sdk_deploy_utils_methods, this.sdk_contract_methods).includes(name));
+    this.sdk_rpc_methods = this.sdk_methods.filter(name => !this.sdk_deploy_methods.concat(
+      this.sdk_deploy_utils_methods,
+      this.sdk_transaction_utils_methods,
+      this.sdk_transaction_methods,
+      this.sdk_contract_methods).includes(name)
+    );
     this.setStateSubscription();
   };
 
