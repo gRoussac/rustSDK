@@ -95,7 +95,7 @@ mod tests {
         helpers::public_key_from_secret_key, types::addressable_entity_hash::AddressableEntityHash,
     };
     use sdk_tests::{
-        config::PAYMENT_AMOUNT,
+        config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
         tests::helpers::{get_network_constants, get_user_private_key},
     };
 
@@ -105,7 +105,6 @@ mod tests {
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
-        let entry_point = "test";
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&private_key);
@@ -117,7 +116,7 @@ mod tests {
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, entry_point.to_string());
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -133,7 +132,6 @@ mod tests {
         let (_, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
-        let entry_point = "test";
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
@@ -145,7 +143,7 @@ mod tests {
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, entry_point.to_string());
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -161,7 +159,6 @@ mod tests {
         let (_, _, _, chain_name) = get_network_constants();
         let error_message = "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
         let private_key = get_user_private_key(None).unwrap();
-        let entry_point = "test";
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&private_key);
@@ -173,7 +170,7 @@ mod tests {
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, entry_point.to_string());
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);

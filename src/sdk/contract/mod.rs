@@ -1,3 +1,4 @@
+pub mod call_entrypoint;
 pub mod call_entrypoint_legacy;
 pub mod install;
 pub mod install_legacy;

@@ -109,8 +109,8 @@ mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
-        config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH},
-        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
+        config::{ARGS_SIMPLE, ENTRYPOINT_MINT, PAYMENT_AMOUNT, TTL},
+        tests::helpers::{get_network_constants, get_user_private_key},
     };
     use tokio;
 
@@ -146,17 +146,15 @@ mod tests {
 
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
-        let mut session_params = SessionStrParams::default();
+
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
-            Ok(module_bytes) => module_bytes,
-            Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
-                return;
-            }
-        };
-        session_params.set_session_bytes(module_bytes.into());
+
+        let mut session_params = SessionStrParams::default();
+        session_params.set_session_hash(
+            "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        );
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
 
@@ -195,17 +193,15 @@ mod tests {
             Some(TTL.to_string()),
             None,
         );
-        let mut session_params = SessionStrParams::default();
+
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
-        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
-            Ok(module_bytes) => module_bytes,
-            Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
-                return;
-            }
-        };
-        session_params.set_session_bytes(module_bytes.into());
+
+        let mut session_params = SessionStrParams::default();
+        session_params.set_session_hash(
+            "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        );
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
 
@@ -243,17 +239,14 @@ mod tests {
             Some(TTL.to_string()),
             None,
         );
-        let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
-            Ok(module_bytes) => module_bytes,
-            Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
-                return;
-            }
-        };
-        session_params.set_session_bytes(module_bytes.into());
+
+        let mut session_params = SessionStrParams::default();
+        session_params.set_session_hash(
+            "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        );
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
 
@@ -292,17 +285,14 @@ mod tests {
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 
-        let mut session_params = SessionStrParams::default();
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
-            Ok(module_bytes) => module_bytes,
-            Err(err) => {
-                eprintln!("Error reading file: {:?}", err);
-                return;
-            }
-        };
-        session_params.set_session_bytes(module_bytes.into());
+
+        let mut session_params = SessionStrParams::default();
+        session_params.set_session_hash(
+            "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        );
+        session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
 
