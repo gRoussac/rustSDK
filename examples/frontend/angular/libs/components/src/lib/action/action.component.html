@@ -18,31 +18,11 @@
         {{ sdk_method }}
       </option>
     </optgroup>
-    <optgroup label="deploy utils">
+    <optgroup label="contract">
       <option
         [value]="sdk_method"
-        [selected]="action === sdk_method"
         [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
-        *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
-      >
-        {{ sdk_method }}
-      </option>
-    </optgroup>
-    <optgroup label="deploy">
-      <option
-        [value]="sdk_method"
-        [selected]="action === sdk_method"
-        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
-        *ngFor="let sdk_method of sdk_deploy_methods; index as i"
-      >
-        {{ sdk_method }}
-      </option>
-    </optgroup>
-    <optgroup label="transaction utils">
-      <option
-        [value]="sdk_method"
-        [selected]="action === sdk_method"
-        *ngFor="let sdk_method of sdk_transaction_utils_methods; index as i"
+        *ngFor="let sdk_method of sdk_contract_methods; index as i"
       >
         {{ sdk_method }}
       </option>
@@ -56,11 +36,31 @@
         {{ sdk_method }}
       </option>
     </optgroup>
-    <optgroup label="contract">
+    <optgroup label="utils">
       <option
         [value]="sdk_method"
+        [selected]="action === sdk_method"
+        *ngFor="let sdk_method of sdk_transaction_utils_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+    <optgroup label="deploy" class="deprecated">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
         [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
-        *ngFor="let sdk_method of sdk_contract_methods; index as i"
+        *ngFor="let sdk_method of sdk_deploy_methods; index as i"
+      >
+        {{ sdk_method }}
+      </option>
+    </optgroup>
+    <optgroup label="deploy utils" class="deprecated">
+      <option
+        [value]="sdk_method"
+        [selected]="action === sdk_method"
+        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
+        *ngFor="let sdk_method of sdk_deploy_utils_methods; index as i"
       >
         {{ sdk_method }}
       </option>
