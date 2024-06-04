@@ -140,9 +140,6 @@ mod tests {
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(TRANSFER_AMOUNT);
 
-        // TODO FIX pricing_mode
-        transaction_params.set_pricing_mode("fixed");
-
         // Act
         let result = sdk
             .transfer_transaction(
@@ -176,9 +173,6 @@ mod tests {
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_initiator_addr(&initiator_addr);
         transaction_params.set_payment_amount(TRANSFER_AMOUNT);
-
-        // TODO FIX pricing_mode
-        transaction_params.set_pricing_mode("fixed");
 
         // Act
         let result = sdk

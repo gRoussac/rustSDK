@@ -11,6 +11,7 @@ export type State = {
   public_key?: string;
   private_key?: string;
   deploy_json?: string;
+  transaction_json?: string;
   verbosity?: Verbosity;
   has_wasm?: boolean;
   select_dict_identifier?: string;

@@ -92,9 +92,9 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(js_name = "newTransfer")]
     pub fn new_transfer(
-        maybe_source: Option<URef>,
-        target: Option<TransferTarget>,
+        target: TransferTarget,
         amount: &str,
+        maybe_source: Option<URef>,
         maybe_id: Option<u64>,
     ) -> TransactionBuilderParams {
         let amount = convert_amount(amount);
@@ -103,7 +103,7 @@ impl TransactionBuilderParams {
             transaction_bytes: None,
             entry_point: None,
             maybe_source,
-            target,
+            target: Some(target),
             amount,
             maybe_id,
             entity_hash: None,
@@ -120,10 +120,15 @@ impl TransactionBuilderParams {
     }
 
     #[wasm_bindgen(js_name = "newInvocableEntity")]
-    pub fn new_invocable_entity(
-        entity_hash: AddressableEntityHash,
-        entry_point: &str,
-    ) -> TransactionBuilderParams {
+    pub fn new_invocable_entity(entity_hash: &str, entry_point: &str) -> TransactionBuilderParams {
+        let addressable_entity_hash = match AddressableEntityHash::from_formatted_str(entity_hash) {
+            Ok(hash) => Some(hash),
+            Err(err) => {
+                // TODO Fix Jsvalue ret
+                //  error(&format!("Error parsing entity hash: {}", err.as_string()));
+                None
+            }
+        };
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
             transaction_bytes: None,
@@ -132,7 +137,7 @@ impl TransactionBuilderParams {
             target: None,
             amount: None,
             maybe_id: None,
-            entity_hash: Some(entity_hash),
+            entity_hash: addressable_entity_hash,
             entity_alias: None,
             package_hash: None,
             package_alias: None,
@@ -147,7 +152,7 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(js_name = "newInvocableEntityAlias")]
     pub fn new_invocable_entity_alias(
-        entity_alias: String,
+        entity_alias: &str,
         entry_point: &str,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
@@ -159,7 +164,7 @@ impl TransactionBuilderParams {
             amount: None,
             maybe_id: None,
             entity_hash: None,
-            entity_alias: Some(entity_alias),
+            entity_alias: Some(entity_alias.to_string()),
             package_hash: None,
             package_alias: None,
             maybe_entity_version: None,
@@ -173,10 +178,21 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(js_name = "newPackage")]
     pub fn new_package(
-        package_hash: PackageHash,
-        maybe_entity_version: Option<u32>,
+        package_hash: &str,
         entry_point: &str,
+        maybe_entity_version: Option<String>,
     ) -> TransactionBuilderParams {
+        let maybe_package_hash = match PackageHash::from_formatted_str(package_hash) {
+            Ok(hash) => Some(hash),
+            Err(err) => {
+                // TODO Fix Jsvalue ret
+                //  error(&format!("Error parsing entity hash: {}", err.as_string()));
+                None
+            }
+        };
+
+        let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
+
         TransactionBuilderParams {
             kind: TransactionKind::Package,
             transaction_bytes: None,
@@ -187,9 +203,9 @@ impl TransactionBuilderParams {
             maybe_id: None,
             entity_hash: None,
             entity_alias: None,
-            package_hash: Some(package_hash),
+            package_hash: maybe_package_hash,
             package_alias: None,
-            maybe_entity_version,
+            maybe_entity_version: maybe_entity_version_as_u32,
             public_key: None,
             delegation_rate: None,
             delegator: None,
@@ -200,10 +216,11 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(js_name = "newPackageAlias")]
     pub fn new_package_alias(
-        package_alias: String,
-        maybe_entity_version: Option<u32>,
+        package_alias: &str,
         entry_point: &str,
+        maybe_entity_version: Option<String>,
     ) -> TransactionBuilderParams {
+        let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
             transaction_bytes: None,
@@ -215,8 +232,8 @@ impl TransactionBuilderParams {
             entity_hash: None,
             entity_alias: None,
             package_hash: None,
-            package_alias: Some(package_alias),
-            maybe_entity_version,
+            package_alias: Some(package_alias.to_string()),
+            maybe_entity_version: maybe_entity_version_as_u32,
             public_key: None,
             delegation_rate: None,
             delegator: None,
@@ -368,15 +385,6 @@ impl TransactionBuilderParams {
     }
 }
 
-fn convert_amount(amount: &str) -> Option<U512> {
-    let cloned_amount = amount.to_string();
-    U512::from_dec_str(&cloned_amount)
-        .map_err(|err| {
-            error(&format!("Error converting amount: {:?}", err));
-        })
-        .ok()
-}
-
 // Convert TransactionBuilderParams to casper_client::cli::TransactionBuilderParams
 pub fn transaction_builder_params_to_casper_client(
     transaction_params: &TransactionBuilderParams,
@@ -417,7 +425,10 @@ pub fn transaction_builder_params_to_casper_client(
                 .unwrap_or_default(),
         },
         TransactionKind::InvocableEntityAlias => _TransactionBuilderParams::InvocableEntityAlias {
-            entity_alias: transaction_params.entity_alias.as_deref().unwrap(),
+            entity_alias: transaction_params
+                .entity_alias
+                .as_deref()
+                .unwrap_or_default(),
             entry_point: transaction_params
                 .entry_point
                 .as_deref()
@@ -432,7 +443,10 @@ pub fn transaction_builder_params_to_casper_client(
                 .unwrap_or_default(),
         },
         TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAlias {
-            package_alias: transaction_params.package_alias.as_deref().unwrap(),
+            package_alias: transaction_params
+                .package_alias
+                .as_deref()
+                .unwrap_or_default(),
             maybe_entity_version: transaction_params.maybe_entity_version,
             entry_point: transaction_params
                 .entry_point
@@ -465,4 +479,24 @@ pub fn transaction_builder_params_to_casper_client(
             amount: transaction_params.amount.unwrap_or_default(),
         },
     }
+}
+
+fn parse_maybe_entity_version(maybe_entity_version: Option<String>) -> Option<u32> {
+    maybe_entity_version.and_then(|version| {
+        version
+            .parse::<u32>()
+            .map_err(|err| {
+                error(&format!("Error parsing version: {}", err));
+            })
+            .ok()
+    })
+}
+
+fn convert_amount(amount: &str) -> Option<U512> {
+    let cloned_amount = amount.to_string();
+    U512::from_dec_str(&cloned_amount)
+        .map_err(|err| {
+            error(&format!("Error converting amount: {:?}", err));
+        })
+        .ok()
 }

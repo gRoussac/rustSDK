@@ -18,15 +18,6 @@
         {{ sdk_method }}
       </option>
     </optgroup>
-    <optgroup label="contract">
-      <option
-        [value]="sdk_method"
-        [ngClass]="{ deprecated: sdk_deprecated.includes(sdk_method) }"
-        *ngFor="let sdk_method of sdk_contract_methods; index as i"
-      >
-        {{ sdk_method }}
-      </option>
-    </optgroup>
     <optgroup label="transaction">
       <option
         [value]="sdk_method"

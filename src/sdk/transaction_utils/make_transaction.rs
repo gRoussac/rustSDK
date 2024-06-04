@@ -27,9 +27,8 @@ impl SDK {
     ///
     /// # Arguments
     ///
+    /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - The transaction parameters.
-    /// * `session_params` - The session parameters.
-    /// * `payment_params` - The payment parameters.
     ///
     /// # Returns
     ///
@@ -57,9 +56,8 @@ impl SDK {
     ///
     /// # Arguments
     ///
+    /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - The transaction parameters.
-    /// * `session_params` - The session parameters.
-    /// * `payment_params` - The payment parameters.
     ///
     /// # Returns
     ///
@@ -78,12 +76,10 @@ pub(crate) fn make_transaction(
     builder_params: TransactionBuilderParams,
     transaction_params: TransactionStrParams,
 ) -> Result<Transaction, SdkError> {
-    // log("make_transaction");
-    let transaction = client_make_transaction(
-        transaction_builder_params_to_casper_client(&builder_params),
-        transaction_str_params_to_casper_client(&transaction_params),
-        false,
-    );
+    let transaction_builder_params = transaction_builder_params_to_casper_client(&builder_params);
+    let transaction_str_params = transaction_str_params_to_casper_client(&transaction_params);
+    let transaction =
+        client_make_transaction(transaction_builder_params, transaction_str_params, false);
     transaction.map(Into::into).map_err(SdkError::from)
 }
 
@@ -115,8 +111,10 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -142,12 +140,13 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
-
         // Assert
         assert!(result.is_ok());
     }
@@ -169,8 +168,10 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
