@@ -22,7 +22,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `transaction_params` - Transaction parameters.
-    /// * `builder_params` - Session parameters.
+    /// * `builder_params` - Transaction Builder parameters.
     /// * `node_address` - An optional node address to send the request to.
     ///
     /// # Returns
@@ -140,9 +140,12 @@ mod tests {
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
         let contract_hash = ContractHash::from_formatted_str(&get_contract_hash().await).unwrap();
+        let entity_hash: AddressableEntityHash = contract_hash.into();
 
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(contract_hash.into(), ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk
@@ -175,8 +178,10 @@ mod tests {
         )
         .unwrap();
 
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk
@@ -211,11 +216,10 @@ mod tests {
         )
         .unwrap();
 
-        // TODO FIX pricing_mode
-        transaction_params.set_pricing_mode("fixed");
-
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk
@@ -248,8 +252,10 @@ mod tests {
         )
         .unwrap();
 
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
 
         // Act
         let result = sdk

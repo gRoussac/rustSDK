@@ -550,10 +550,10 @@ const signDeployFields: InputContainer[][] = [
 ];
 
 const formFields = new Map<string, InputContainer[][]>([
+  ['call_entrypoint', callEntrypointFields],
   ['call_entrypoint_deploy', callEntrypointFields],
   ['deploy', makeDeployFields],
   ['get_account', getAccountFields],
-  ['get_entity', getEntityFields],
   ['get_balance', getBalanceFields],
   ['get_block', getBlockFields],
   ['get_block_transfers', getBlockFields],
@@ -561,21 +561,31 @@ const formFields = new Map<string, InputContainer[][]>([
   ['get_dictionary_item', getDictionaryItemFields],
   ['get_era_info', getBlockFields],
   ['get_era_summary', getBlockFields],
+  ['get_entity', getEntityFields],
   ['get_state_root_hash', getBlockFields],
+  ['install', installFields],
   ['install_deploy', installFields],
   ['make_deploy', makeDeployFields],
+  ['make_transaction', makeDeployFields],
   ['make_transfer', getTransferFields],
+  ['make_transfer_transaction', getTransferFields],
   ['put_deploy', putDeployFields],
+  ['put_transaction', putDeployFields],
   ['query_balance', queryBalanceFields],
   ['query_balance_details', queryBalanceFields],
   ['query_contract_dict', queryContractDictFields],
   ['query_contract_key', queryContractKeyFields],
   ['query_global_state', queryGlobalStateFields],
   ['sign_deploy', signDeployFields],
+  ['sign_transaction', signDeployFields],
   ['speculative_deploy', speculativeDeployFields],
   ['speculative_exec_deploy', speculativeExecFields],
+  ['speculative_transaction', speculativeDeployFields],
   ['speculative_transfer', getSpeculativeTransferFields],
+  ['speculative_transfer_transaction', getSpeculativeTransferFields],
+  ['transaction', makeDeployFields],
   ['transfer', getTransferFields],
+  ['transfer_transaction', getTransferFields],
 ]);
 
 export default formFields;

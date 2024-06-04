@@ -13,7 +13,9 @@ export const config: EnvironmentConfig = {
   verbosity: Verbosity.High,
   minimum_transfer: '2500000000',
   TTL: '30m',
-  gas_fee_transfer: '100000000',
+  standard_payment_amount: '100000000',
+  default_pricing_mode: 'fixed',
+  default_gas_price_tolerance: '1',
   action_needs_private_key,
   action_needs_public_key,
   networks: {

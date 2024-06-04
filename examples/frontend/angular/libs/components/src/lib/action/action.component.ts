@@ -48,12 +48,10 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
       .sort();
 
     this.sdk_deploy_methods = this.sdk_methods.filter(name => ['deploy', 'speculative_deploy', 'speculative_transfer', 'transfer'].includes(name));
-    this.sdk_deploy_utils_methods = this.sdk_methods.filter(name => ['make_deploy', 'make_transfer', 'sign_deploy', 'put_deploy'].includes(name));
+    this.sdk_deploy_utils_methods = this.sdk_methods.filter(name => ['make_deploy', 'make_transfer', 'sign_deploy', 'put_deploy', 'call_entrypoint_deploy', 'install_deploy'].includes(name));
 
     this.sdk_transaction_methods = this.sdk_methods.filter(name => ['transaction', 'speculative_transaction', 'speculative_transfer_transaction', 'transfer_transaction'].includes(name));
-    this.sdk_transaction_utils_methods = this.sdk_methods.filter(name => ['make_transaction', 'make_transfer_transaction', 'sign_transaction', 'put_transaction'].includes(name));
-
-    this.sdk_contract_methods = this.sdk_methods.filter(name => ['call_entrypoint', 'call_entrypoint_deploy', 'install', 'install_deploy', 'query_contract_dict', 'query_contract_key'].includes(name));
+    this.sdk_transaction_utils_methods = this.sdk_methods.filter(name => ['make_transaction', 'make_transfer_transaction', 'sign_transaction', 'put_transaction', 'call_entrypoint', 'install', 'query_contract_dict', 'query_contract_key'].includes(name));
 
     this.sdk_deprecated = this.sdk_methods.filter(name => ['get_account', 'get_deploy', 'get_era_info', 'put_deploy', 'speculative_exec_deploy', 'sign_deploy', 'make_deploy', 'make_transfer', 'speculative_deploy', 'speculative_transfer', 'deploy', 'transfer', 'call_entrypoint_deploy', 'install_deploy', 'get_balance'].includes(name));
 

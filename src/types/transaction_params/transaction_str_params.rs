@@ -3,6 +3,7 @@ use crate::helpers::get_str_or_default;
 use crate::helpers::get_ttl_or_default;
 use crate::types::deploy_params::args_simple::ArgsSimple;
 use casper_client::cli::TransactionStrParams as _TransactionStrParams;
+use casper_types::DeployBuilder;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
 
@@ -17,29 +18,31 @@ pub struct TransactionStrParams {
     session_args_simple: OnceCell<ArgsSimple>,
     session_args_json: OnceCell<String>,
     pricing_mode: OnceCell<String>,
-    output_path: OnceCell<String>,
     payment_amount: OnceCell<String>,
     gas_price_tolerance: OnceCell<String>,
     receipt: OnceCell<String>,
     standard_payment: OnceCell<bool>,
 }
 
+const DEFAULT_PRICING_MODE: &str = "fixed";
+const DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
+const DEFAULT_STANDARD_PAYMENT: bool = false;
+
 impl Default for TransactionStrParams {
     fn default() -> Self {
         TransactionStrParams {
+            chain_name: OnceCell::new(),
+            initiator_addr: OnceCell::new(),
             secret_key: OnceCell::new(),
             timestamp: OnceCell::new(),
             ttl: OnceCell::new(),
-            chain_name: OnceCell::new(),
-            initiator_addr: OnceCell::new(),
             session_args_simple: OnceCell::new(),
             session_args_json: OnceCell::new(),
-            pricing_mode: OnceCell::new(),
-            output_path: OnceCell::new(),
+            pricing_mode: OnceCell::from(DEFAULT_PRICING_MODE.to_string()),
             payment_amount: OnceCell::new(),
-            gas_price_tolerance: OnceCell::new(),
+            gas_price_tolerance: OnceCell::from(DEFAULT_GAS_PRICE.to_string()),
             receipt: OnceCell::new(),
-            standard_payment: OnceCell::new(),
+            standard_payment: OnceCell::from(DEFAULT_STANDARD_PAYMENT),
         }
     }
 }
@@ -49,15 +52,14 @@ impl Default for TransactionStrParams {
 impl TransactionStrParams {
     #[wasm_bindgen(constructor)]
     pub fn new(
+        chain_name: &str,
+        initiator_addr: Option<String>,
         secret_key: Option<String>,
         timestamp: Option<String>,
         ttl: Option<String>,
-        chain_name: &str,
-        initiator_addr: Option<String>,
         session_args_simple: Option<Vec<String>>,
         session_args_json: Option<String>,
         pricing_mode: Option<String>,
-        output_path: Option<String>,
         payment_amount: Option<String>,
         gas_price_tolerance: Option<String>,
         receipt: Option<String>,
@@ -81,9 +83,6 @@ impl TransactionStrParams {
         }
         if let Some(pricing_mode) = pricing_mode {
             transaction_params.set_pricing_mode(&pricing_mode);
-        }
-        if let Some(output_path) = output_path {
-            transaction_params.set_output_path(&output_path);
         }
         if let Some(payment_amount) = payment_amount {
             transaction_params.set_payment_amount(&payment_amount);
@@ -218,16 +217,6 @@ impl TransactionStrParams {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn output_path(&self) -> Option<String> {
-        self.output_path.get().cloned()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_output_path(&self, output_path: &str) {
-        self.output_path.set(output_path.to_string()).unwrap();
-    }
-
-    #[wasm_bindgen(getter)]
     pub fn payment_amount(&self) -> Option<String> {
         self.payment_amount.get().cloned()
     }
@@ -289,11 +278,6 @@ pub fn transaction_str_params_to_casper_client(
             args_simple.args().iter().map(String::as_str).collect()
         });
 
-    let standard_payment_str = match transaction_params.standard_payment.get() {
-        Some(true) => "true",
-        _ => "false",
-    };
-
     if transaction_params.timestamp.get().is_none() {
         transaction_params.set_default_timestamp();
     }
@@ -301,29 +285,34 @@ pub fn transaction_str_params_to_casper_client(
         transaction_params.set_default_ttl();
     }
     if transaction_params.pricing_mode.get().is_none() {
-        transaction_params.set_pricing_mode("classic");
+        transaction_params.set_pricing_mode(DEFAULT_PRICING_MODE);
     }
     if transaction_params.gas_price_tolerance.get().is_none() {
-        transaction_params.set_gas_price_tolerance("1");
+        transaction_params.set_gas_price_tolerance(&DEFAULT_GAS_PRICE.to_string());
     }
     if transaction_params.standard_payment.get().is_none() {
-        transaction_params.set_standard_payment(false);
+        transaction_params.set_standard_payment(DEFAULT_STANDARD_PAYMENT);
     }
 
+    let standard_payment_str = match transaction_params.standard_payment.get() {
+        Some(true) => "true",
+        _ => "false",
+    };
+
     _TransactionStrParams {
+        chain_name: get_str_or_default(transaction_params.chain_name.get()),
+        initiator_addr: get_str_or_default(transaction_params.initiator_addr.get()).to_string(),
         secret_key: get_str_or_default(transaction_params.secret_key.get()),
         timestamp: get_str_or_default(transaction_params.timestamp.get()),
         ttl: get_str_or_default(transaction_params.ttl.get()),
-        chain_name: get_str_or_default(transaction_params.chain_name.get()),
-        initiator_addr: get_str_or_default(transaction_params.initiator_addr.get()).to_string(),
         session_args_simple,
         session_args_json: get_str_or_default(transaction_params.session_args_json.get()),
         pricing_mode: get_str_or_default(transaction_params.pricing_mode.get()),
-        output_path: get_str_or_default(transaction_params.output_path.get()),
         payment_amount: get_str_or_default(transaction_params.payment_amount.get()),
         gas_price_tolerance: get_str_or_default(transaction_params.gas_price_tolerance.get()),
         receipt: get_str_or_default(transaction_params.receipt.get()),
         standard_payment: standard_payment_str,
+        output_path: "",
     }
 }
 
@@ -358,9 +347,6 @@ mod tests {
         let pricing_mode = OnceCell::new();
         pricing_mode.set("mode".to_string()).unwrap();
 
-        let output_path = OnceCell::new();
-        output_path.set("path".to_string()).unwrap();
-
         let payment_amount = OnceCell::new();
         payment_amount.set("amount".to_string()).unwrap();
 
@@ -382,7 +368,6 @@ mod tests {
             session_args_simple,
             session_args_json,
             pricing_mode,
-            output_path,
             payment_amount,
             gas_price_tolerance,
             receipt,
@@ -399,7 +384,6 @@ mod tests {
         assert_eq!(result.session_args_simple, ["simple"]);
         assert_eq!(result.session_args_json, "json");
         assert_eq!(result.pricing_mode, "mode");
-        assert_eq!(result.output_path, "path");
         assert_eq!(result.payment_amount, "amount");
         assert_eq!(result.gas_price_tolerance, "1");
         assert_eq!(result.receipt, "receipt");

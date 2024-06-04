@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, getBalanceOptions } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,7 @@ export class ClientService {
   private public_key!: string;
   private private_key!: string | undefined;
   private deploy_json!: string;
+  private transaction_json!: string;
   private select_dict_identifier!: string;
   // TODO Verbosity from config
   private verbosity = Verbosity.High;
@@ -402,6 +403,75 @@ export class ClientService {
     }
   }
 
+  async transaction(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
+    const timestamp = getTimestamp();
+    const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
+    if (!this.public_key) {
+      const err = "public_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    const builder_params = this.get_builder_params(wasm);
+
+    let transaction_params = new TransactionStrParams(
+      this.chain_name,
+      this.public_key,
+      this.private_key,
+      timestamp,
+      ttl
+    );
+
+    const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
+    if (!payment_amount) {
+      const err = "paymentAmount is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    transaction_params.payment_amount = payment_amount;
+    transaction_params = this.addTransactionArgs(transaction_params);
+
+    try {
+      let result;
+      if (speculative) {
+        const maybe_block_options = {
+          maybe_block_id_as_string: undefined,
+          maybe_block_identifier: undefined,
+        };
+        this.getIdentifieBlock(maybe_block_options);
+        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
+        result = await this.sdk.speculative_transaction(
+          builder_params,
+          transaction_params,
+          maybe_block_id_as_string,
+          maybe_block_identifier
+        );
+      }
+      else if (deploy_result) {
+        result = await this.sdk.transaction(
+          builder_params,
+          transaction_params,
+        );
+      } else {
+        result = this.sdk.make_transaction(
+          builder_params,
+          transaction_params,
+        );
+      }
+      if (result) {
+        const result_json = result.toJson();
+        this.transaction_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
+        this.transaction_json && this.resultService.setResult(result_json);
+        !deploy_result && this.updateDeployJson(this.transaction_json);
+      }
+      return result;
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
+    }
+  }
+
   async install_deploy(wasm?: Uint8Array) {
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
@@ -454,7 +524,7 @@ export class ClientService {
       ttl
     );
     const payment_params = new PaymentStrParams();
-    payment_params.payment_amount = this.config['gas_fee_transfer'].toString();
+    payment_params.payment_amount = this.config['standard_payment_amount'].toString();
     const transfer_amount: string = this.getIdentifier('transferAmount')?.value?.trim();
     const target_account: string = this.getIdentifier('targetAccount')?.value?.trim();
     if (!transfer_amount || !target_account) {
@@ -520,6 +590,83 @@ export class ClientService {
     }
   }
 
+  async transfer_transaction(deploy_result = true, speculative?: boolean) {
+    const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
+    const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
+    if (!this.public_key) {
+      const err = "public_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    const transaction_params = new TransactionStrParams(
+      this.chain_name,
+      this.public_key,
+      this.private_key,
+      timestamp,
+      ttl
+    );
+
+    const transfer_amount: string = this.getIdentifier('transferAmount')?.value?.trim();
+    const target_account: string = this.getIdentifier('targetAccount')?.value?.trim();
+    if (!transfer_amount || !target_account) {
+      const err = "transfer_amount or target_account is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    const standard_payment_amount: string = this.config['standard_payment_amount'].toString();
+    transaction_params.payment_amount = standard_payment_amount;
+    transaction_params.standard_payment = true;
+
+    try {
+      let result;
+      if (speculative) {
+        const maybe_block_options = {
+          maybe_block_id_as_string: undefined,
+          maybe_block_identifier: undefined,
+        };
+        this.getIdentifieBlock(maybe_block_options);
+        const { maybe_block_id_as_string, maybe_block_identifier } = maybe_block_options;
+        result = await this.sdk.speculative_transfer_transaction(
+          undefined,
+          target_account,
+          transfer_amount,
+          transaction_params,
+          undefined, // transfer_id
+          maybe_block_id_as_string,
+          maybe_block_identifier
+        );
+      }
+      else if (deploy_result) {
+        result = await this.sdk.transfer_transaction(
+          undefined,
+          target_account,
+          transfer_amount,
+          transaction_params,
+        );
+      } else {
+        result = await this.sdk.make_transfer_transaction(
+          undefined,
+          target_account,
+          transfer_amount,
+          transaction_params,
+        );
+      }
+      if (result) {
+        const result_json = result.toJson();
+        this.deploy_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
+        this.deploy_json && this.resultService.setResult(result_json);
+        !deploy_result && this.updateDeployJson(this.deploy_json);
+      }
+      return result;
+    } catch (err) {
+      err && this.errorService.setError(err as string);
+      return;
+    }
+  }
+
+
   async put_deploy() {
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
@@ -547,6 +694,35 @@ export class ClientService {
     put_deploy && this.resultService.setResult(put_deploy.toJson());
     return put_deploy;
   }
+
+  async put_transaction() {
+    const signed_transaction_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
+    if (!signed_transaction_as_string) {
+      const err = "deployJson is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const signed_transaction = new Transaction(JSON.parse(signed_transaction_as_string));
+    // if (!signed_transaction.isValid()) {
+    //   console.error('Deploy is not valid.');
+    //   return;
+    // }
+    // if (signed_transaction.isExpired()) {
+    //   console.error('Deploy is expired.');
+    //   return;
+    // }
+    // the deploy hash is correct (should be the hash of the header), and
+    // the body hash is correct (should be the hash of the body), and
+    // approvals are non empty, and
+    // all approvals are valid signatures of the deploy hash
+
+    const put_transaction = await this.sdk.put_transaction(
+      signed_transaction,
+    );
+    put_transaction && this.resultService.setResult(put_transaction.toJson());
+    return put_transaction;
+  }
+
 
   async speculative_exec_deploy() {
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
@@ -623,10 +799,22 @@ export class ClientService {
     await this.deploy(deploy_result, speculative, wasm);
   }
 
+  async make_transaction(wasm?: Uint8Array) {
+    const deploy_result = false;
+    const speculative = false;
+    await this.transaction(deploy_result, speculative, wasm);
+  }
+
   async make_transfer() {
     const deploy_result = false;
     await this.transfer(deploy_result);
   }
+
+  async make_transfer_transaction() {
+    const deploy_result = false;
+    await this.transfer_transaction(deploy_result);
+  }
+
 
   async speculative_transfer() {
     const speculative = true;
@@ -888,5 +1076,48 @@ export class ClientService {
       session_params.session_version = version;
     }
     return session_params;
+  }
+
+  private get_builder_params(wasm?: Uint8Array): TransactionBuilderParams {
+    let builder_params: TransactionBuilderParams = new TransactionBuilderParams();
+
+    const session_hash: string = this.getIdentifier('sessionHash')?.value?.trim();
+    const session_name: string = this.getIdentifier('sessionName')?.value?.trim();
+    const entry_point: string = this.getIdentifier('entryPoint')?.value?.trim();
+    const call_package: boolean = this.getIdentifier('callPackage')?.value;
+
+    if (!call_package) {
+      if (session_hash) {
+        builder_params = TransactionBuilderParams.newInvocableEntity(session_hash, entry_point);
+      } else if (session_name) {
+        builder_params = TransactionBuilderParams.newInvocableEntityAlias(session_name, entry_point);
+      }
+    } else {
+      const version: string = this.getIdentifier('version')?.value?.trim();
+      if (session_hash) {
+        builder_params = TransactionBuilderParams.newPackage(session_hash, entry_point, version);
+      } else if (session_name) {
+        builder_params = TransactionBuilderParams.newPackageAlias(session_name, entry_point, version);
+      }
+    }
+    if (wasm) {
+      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm));
+    }
+    return builder_params;
+  }
+
+  private addTransactionArgs(transaction_params: TransactionStrParams): TransactionStrParams {
+    const args_simple: [string] = this.getIdentifier('argsSimple')?.value?.trim()
+      .split(',')
+      .map((item: string) => item.trim())
+      .filter((item: string) => item !== '');
+    const args_json: string = this.getIdentifier('argsJson')?.value?.trim();
+    if (args_simple?.length) {
+      transaction_params.session_args_simple = args_simple;
+    }
+    else if (args_json) {
+      transaction_params.session_args_json = args_json;
+    }
+    return transaction_params;
   }
 }

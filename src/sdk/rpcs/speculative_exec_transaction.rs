@@ -240,9 +240,6 @@ mod tests {
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(TRANSFER_AMOUNT);
 
-        // TODO FIX pricing_mode
-        transaction_params.set_pricing_mode("fixed");
-
         Transaction::new_transfer(
             None,
             &initiator_addr, // self transfer

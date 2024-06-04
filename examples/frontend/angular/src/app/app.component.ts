@@ -75,10 +75,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const no_mark_for_check = true;
     const action = this.storageService.get('action') || this.config['default_action'].toString();
     try {
-      const get_node_status = await this.get_node_status();
-      if (get_node_status) {
-        await this.get_state_root_hash(no_mark_for_check);
+      if (action == this.config['default_action'].toString()) {
+        await this.get_node_status();
       }
+      await this.get_state_root_hash(no_mark_for_check);
+
     } catch (error) {
       console.error(error);
       this.errorService.setError(error as string);
@@ -221,12 +222,24 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.make_deploy(this.wasm);
   }
 
+  private async make_transaction() {
+    return await this.clientService.make_transaction(this.wasm);
+  }
+
   private async make_transfer() {
     return await this.clientService.make_transfer();
   }
 
+  private async make_transfer_transaction() {
+    return await this.clientService.make_transfer_transaction();
+  }
+
   private async put_deploy() {
     return await this.clientService.put_deploy();
+  }
+
+  private async put_transaction() {
+    return await this.clientService.put_transaction();
   }
 
   private async query_balance() {

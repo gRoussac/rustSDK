@@ -193,9 +193,6 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        // TODO FIX pricing_mode
-        transaction_params.set_pricing_mode("fixed");
-
         // Act
         let result = sdk
             .transaction(
@@ -219,7 +216,7 @@ mod tests {
         let (node_address, _, _, chain_name) = get_network_constants();
         let private_key = get_user_private_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
-        let error_message = "Invalid params";
+        let error_message = "Invalid transaction";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
