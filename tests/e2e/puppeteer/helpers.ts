@@ -32,7 +32,7 @@ export async function clear() {
   await variables.page.click('[e2e-id="clear result"]');
   await variables.page.waitForFunction(() => !document.querySelector('[e2e-id="clear result"]'));
   // wait for document to refresh
-  await delay(75);
+  await delay(300);
   let result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
@@ -78,7 +78,7 @@ export async function seletAction(action: string) {
   });
   expect(action_selected).toBe(action);
   // wait for document to refresh
-  await delay(75);
+  await delay(300);
 }
 
 export async function setPrivateKey() {
