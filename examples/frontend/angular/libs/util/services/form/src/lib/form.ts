@@ -16,6 +16,7 @@ export type InputField = {
   placeholder?: string;
   e2e: string;
   state_name?: string[];
+  storage_name?: string;
   config_name?: string;
   maxlength?: string,
   pattern?: string,
@@ -190,6 +191,21 @@ const sessionHash: InputField = {
   disabled_when: ['has_wasm', 'sessionName.value']
 };
 
+const entityHash: InputField = {
+  id: 'entityHashElt',
+  type: 'search',
+  wrap_class: 'col-xl-6 mb-2',
+  class: 'form-control',
+  label: 'Entity hash or Package hash',
+  name: 'entity_hash',
+  controlName: 'entityHash',
+  placeholder: 'Entity Hash or Package Hash',
+  e2e: 'entityHashElt',
+  disabled_when: ['has_wasm', 'entityAlias.value']
+};
+
+
+
 const callPackage: InputField = {
   id: 'callPackageElt',
   type: 'checkbox',
@@ -230,6 +246,19 @@ const sessionNameInput: InputField = {
   disabled_when: ['has_wasm', 'sessionHash.value']
 };
 
+const entityAlias: InputField = {
+  id: 'entityAliasElt',
+  type: 'search',
+  wrap_class: 'col-xl-8 mb-2',
+  class: 'form-control',
+  label: 'Entity alias or Package alias',
+  name: 'entity_alias',
+  controlName: 'entityAlias',
+  placeholder: 'Counter',
+  e2e: 'entityElt',
+  disabled_when: ['has_wasm', 'entityHash.value']
+};
+
 const entryPointInput: InputField = {
   id: 'entryPointElt',
   type: 'search',
@@ -253,7 +282,8 @@ const argsSimpleInput: InputField = {
   controlName: 'argsSimple',
   placeholder: 'foo:Bool=\'true\', bar:String=\'value\'',
   e2e: 'argsSimpleElt',
-  disabled_when: ['argsJson.value']
+  disabled_when: ['argsJson.value'],
+  storage_name: 'args_simple',
 };
 
 const argsJson: InputField = {
@@ -266,7 +296,8 @@ const argsJson: InputField = {
   controlName: 'argsJson',
   placeholder: '[{ "name": "foo", "type": "U256", "value": 1 }]',
   e2e: 'argsJsonElt',
-  disabled_when: ['argsSimple.value']
+  disabled_when: ['argsSimple.value'],
+  storage_name: 'args_json',
 };
 
 const deployHash: InputField = {
@@ -279,6 +310,18 @@ const deployHash: InputField = {
   controlName: 'deployHash',
   placeholder: '0x',
   e2e: 'deployHashElt',
+};
+
+const transactionHash: InputField = {
+  id: 'transactionHashElt',
+  type: 'search',
+  wrap_class: 'col-xl-7',
+  class: 'form-control',
+  label: 'Transaction Hash',
+  name: 'transaction_hash',
+  controlName: 'transactionHash',
+  placeholder: '0x',
+  e2e: 'transactionHashElt',
 };
 
 const finalizedApprovals: InputField = {
@@ -415,6 +458,19 @@ const deployJson: InputField = {
   state_name: ['deploy_json'],
 };
 
+const transactionJson: InputField = {
+  id: 'transactionJsonElt',
+  type: 'textarea',
+  wrap_class: 'col-lg-12',
+  class: 'form-control',
+  label: 'Transaction as Json string',
+  name: 'transaction_json',
+  controlName: 'transactionJson',
+  placeholder: 'Transaction as Json string',
+  e2e: 'transactionJsonElt',
+  state_name: ['transaction_json'],
+};
+
 const selectDictIdentifier: InputField = {
   id: 'selectDictIdentifierElt',
   type: 'textarea',
@@ -494,6 +550,10 @@ const getDeployFields: InputContainer[][] = [
   [{ input: deployHash, required: true }, { input: finalizedApprovals }],
 ];
 
+const getTransactionFields: InputContainer[][] = [
+  [{ input: transactionHash, required: true }, { input: finalizedApprovals }],
+];
+
 const getTransferFields: InputContainer[][] = [
   [{ input: transferAmount, required: true }, { input: ttlInput }],
   [{ input: targetAccount, required: true }],
@@ -519,12 +579,32 @@ const makeDeployFields: InputContainer[][] = [
   [{ input: argsJson }],
 ];
 
+const makeTransactionFields: InputContainer[][] = [
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { wasm_button: true }],
+  [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
+  [{ input: entityAlias, required: true }],
+  [{ input: entryPointInput, required: true }],
+  [{ input: argsSimpleInput }],
+  [{ input: argsJson }],
+];
+
+
+
 const speculativeDeployFields: InputContainer[][] = [
   ...getBlockFields,
   ...makeDeployFields
 ];
 
 const callEntrypointFields: InputContainer[][] = [
+  [{ input: paymentAmount, required: true }, { input: ttlInput }],
+  [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
+  [{ input: entityAlias }],
+  [{ input: entryPointInput }],
+  [{ input: argsSimpleInput }],
+  [{ input: argsJson }],
+];
+
+const callEntrypointFieldsDeploy: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }],
   [{ input: sessionHash }, { input: callPackage }, { input: versionInput }],
   [{ input: sessionNameInput }],
@@ -544,14 +624,24 @@ const putDeployFields: InputContainer[][] = [
   [{ textarea: deployJson, required: true }],
 ];
 
+const putTransactionFields: InputContainer[][] = [
+  [{ file_button: true }],
+  [{ textarea: transactionJson, required: true }],
+];
+
 const signDeployFields: InputContainer[][] = [
   [{ file_button: true }],
   [{ textarea: deployJson, required: true }],
 ];
 
+const signTransactionFields: InputContainer[][] = [
+  [{ file_button: true }],
+  [{ textarea: transactionJson, required: true }],
+];
+
 const formFields = new Map<string, InputContainer[][]>([
   ['call_entrypoint', callEntrypointFields],
-  ['call_entrypoint_deploy', callEntrypointFields],
+  ['call_entrypoint_deploy', callEntrypointFieldsDeploy],
   ['deploy', makeDeployFields],
   ['get_account', getAccountFields],
   ['get_balance', getBalanceFields],
@@ -563,21 +653,22 @@ const formFields = new Map<string, InputContainer[][]>([
   ['get_era_summary', getBlockFields],
   ['get_entity', getEntityFields],
   ['get_state_root_hash', getBlockFields],
+  ['get_transaction', getTransactionFields],
   ['install', installFields],
   ['install_deploy', installFields],
   ['make_deploy', makeDeployFields],
-  ['make_transaction', makeDeployFields],
+  ['make_transaction', makeTransactionFields],
   ['make_transfer', getTransferFields],
   ['make_transfer_transaction', getTransferFields],
   ['put_deploy', putDeployFields],
-  ['put_transaction', putDeployFields],
+  ['put_transaction', putTransactionFields],
   ['query_balance', queryBalanceFields],
   ['query_balance_details', queryBalanceFields],
   ['query_contract_dict', queryContractDictFields],
   ['query_contract_key', queryContractKeyFields],
   ['query_global_state', queryGlobalStateFields],
   ['sign_deploy', signDeployFields],
-  ['sign_transaction', signDeployFields],
+  ['sign_transaction', signTransactionFields],
   ['speculative_deploy', speculativeDeployFields],
   ['speculative_exec_deploy', speculativeExecFields],
   ['speculative_transaction', speculativeDeployFields],

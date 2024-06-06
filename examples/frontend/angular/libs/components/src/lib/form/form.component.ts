@@ -7,7 +7,7 @@ import { FormService, InputContainer } from '@util/form';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { State, StateService } from '@util/state';
 import { Subscription } from 'rxjs';
-import { Deploy, Verbosity, jsonPrettyPrint } from 'casper-sdk';
+import { Deploy, Transaction, Verbosity, jsonPrettyPrint } from 'casper-sdk';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 
 const imports = [
@@ -73,9 +73,20 @@ export class FormComponent implements AfterViewInit, OnDestroy {
     this.updateDeployJson(deploy_json);
   }
 
+  async onTransactionFileSelected(transaction_json: string) {
+    transaction_json = transaction_json && jsonPrettyPrint(new Transaction(transaction_json).toJson(), this.verbosity as Verbosity);
+    this.updateTransactionJson(transaction_json);
+  }
+
   updateDeployJson(deploy_json: string) {
     deploy_json && this.stateService.setState({
       deploy_json
+    });
+  }
+
+  updateTransactionJson(transaction_json: string) {
+    transaction_json && this.stateService.setState({
+      transaction_json
     });
   }
 }

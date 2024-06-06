@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { State, StateService } from '@util/state';
 import formFields from './form';
 import { CONFIG, EnvironmentConfig } from '@util/config';
+import { StorageService } from '@util/storage';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,7 @@ export class FormService {
     @Inject(CONFIG) public readonly config: EnvironmentConfig,
     private readonly formBuilder: FormBuilder,
     private readonly stateService: StateService,
+    private readonly storageService: StorageService,
   ) {
     this.stateService.getState().subscribe((state: State) => {
       this.has_wasm = !!state?.has_wasm;
@@ -70,7 +72,9 @@ export class FormService {
           if (!control) { return; }
           const state = field.input?.state_name || field.textarea?.state_name || field.select?.state_name || [];
           const stateName = state && state.find(name => this.state[name as keyof State]);
-          const defaultValue = stateName ? this.state[stateName as keyof State] : '';
+          const storageName = field.input?.storage_name || field.textarea?.storage_name || field.select?.storage_name || "";
+          let defaultValue = stateName ? this.state[stateName as keyof State] : '';
+          defaultValue = storageName ? this.storageService.get(storageName as keyof State) : defaultValue;
 
           if (defaultValue) {
             defaultValue && control.setValue(defaultValue);
@@ -99,11 +103,11 @@ export class FormService {
     const disabledTargets: string[] = [];
     fields.forEach((row) => {
       row.forEach(({ input, textarea }) => {
-        const name = input?.controlName || textarea?.controlName;
-        if (!name) {
+        const controlName = input?.controlName || textarea?.controlName;
+        if (!controlName) {
           return;
         }
-        const control = this.form.get(name);
+        const control = this.form.get(controlName);
         if (!control) {
           return;
         }
@@ -112,7 +116,8 @@ export class FormService {
           const state = textarea?.state_name || [];
           const stateName = state && state.find(name => this.state[name as keyof State]);
           const updateValue = stateName ? this.state[stateName as keyof State] : '';
-          control.setValue(updateValue);
+          console.log(state, controlName, stateName, updateValue);
+          updateValue && control.setValue(updateValue);
         }
         else if (input && input.enabled_when) {
           if (this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
@@ -135,6 +140,12 @@ export class FormService {
           } else if (!disabledTargets.includes(input.controlName)) {
             control.enable();
           }
+        }
+        if (input) {
+          const storageName = input?.storage_name || "";
+          storageName && this.storageService.setState({
+            [storageName]: control.value
+          });
         }
       });
     });

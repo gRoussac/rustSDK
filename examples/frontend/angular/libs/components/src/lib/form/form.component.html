@@ -26,6 +26,7 @@
             [parentForm]="form"
             [inputField]="field.textarea"
             (update_deploy_json)="updateDeployJson($event)"
+            (update_transaction_json)="updateTransactionJson($event)"
           ></ui-textarea>
           <ng-container
             *ngTemplateOutlet="
@@ -59,7 +60,9 @@
         <ng-container *ngIf="field.file_button">
           <comp-submit-file
             #submitTemplate
-            (select_file)="onDeployFileSelected($event)"
+            (select_deploy)="onDeployFileSelected($event)"
+            (select_transaction)="onTransactionFileSelected($event)"
+            [type]="action.includes('transaction') ? 'transaction' : 'deploy'"
           ></comp-submit-file>
           <ng-container
             *ngTemplateOutlet="submitTemplate.template"

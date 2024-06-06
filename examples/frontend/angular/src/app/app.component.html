@@ -12,7 +12,7 @@
         class="w-100"
       ></comp-action>
       <comp-submit-action
-        *ngIf="!['sign_deploy'].includes(action)"
+        *ngIf="!['sign_deploy', 'sign_transaction'].includes(action)"
         (submit_action)="submitAction($event)"
         [class]="'btn-success ms-1 ms-sm-2 ms-xl-3'"
         [e2e]="'submit'"
@@ -30,7 +30,7 @@
   </div>
   <comp-form [form]="form" (wasm_selected)="onWasmSelected($event)"></comp-form>
   <comp-submit-action
-    *ngIf="['sign_deploy'].includes(action)"
+    *ngIf="['sign_deploy', 'sign_transaction'].includes(action)"
     (submit_action)="submitAction($event)"
     [class]="'btn-warning mt-3'"
     [e2e]="'sign'"

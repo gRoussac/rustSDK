@@ -141,8 +141,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.call_entrypoint_deploy();
   }
 
+  private async call_entrypoint() {
+    return await this.clientService.call_entrypoint();
+  }
+
   private async deploy(deploy_result = true, speculative?: boolean) {
     return await this.clientService.deploy(deploy_result, speculative, this.wasm);
+  }
+
+  private async transaction(deploy_result = true, speculative?: boolean) {
+    return await this.clientService.transaction(deploy_result, speculative, this.wasm);
   }
 
   private async get_account(account_identifier_param: string) {
@@ -172,6 +180,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private async get_deploy() {
     return await this.clientService.get_deploy();
   }
+
+  private async get_transaction() {
+    return await this.clientService.get_transaction();
+  }
+
 
   private async get_dictionary_item() {
     return await this.clientService.get_dictionary_item();
@@ -212,6 +225,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async install_deploy() {
     return await this.clientService.install_deploy(this.wasm);
+  }
+
+  private async install() {
+    return await this.clientService.install(this.wasm);
   }
 
   private async list_rpcs() {
@@ -266,20 +283,39 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.sign_deploy();
   }
 
+  private async sign_transaction() {
+    return await this.clientService.sign_transaction();
+  }
+
   private async speculative_deploy() {
     return await this.clientService.speculative_deploy(this.wasm);
+  }
+
+  private async speculative_transaction() {
+    return await this.clientService.speculative_transaction(this.wasm);
   }
 
   private async speculative_exec_deploy() {
     return await this.clientService.speculative_exec_deploy();
   }
 
+  private async speculative_exec_transaction() {
+    return await this.clientService.speculative_exec_transaction();
+  }
+
   private async speculative_transfer() {
     return await this.clientService.speculative_transfer();
+  }
+
+  private async speculative_transfer_transaction() {
+    return await this.clientService.speculative_transfer_transaction();
   }
 
   private async transfer(deploy_result = true, speculative?: boolean) {
     return await this.clientService.transfer(deploy_result, speculative);
   }
 
+  private async transfer_transaction(transaction_result = true, speculative?: boolean) {
+    return await this.clientService.transfer_transaction(transaction_result, speculative);
+  }
 }
