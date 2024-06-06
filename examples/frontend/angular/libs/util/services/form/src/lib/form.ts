@@ -16,6 +16,7 @@ export type InputField = {
   placeholder?: string;
   e2e: string;
   state_name?: string[];
+  storage_name?: string;
   config_name?: string;
   maxlength?: string,
   pattern?: string,
@@ -240,7 +241,8 @@ const argsSimpleInput: InputField = {
   controlName: 'argsSimple',
   placeholder: 'foo:Bool=\'true\', bar:String=\'value\'',
   e2e: 'argsSimpleElt',
-  disabled_when: ['argsJson.value']
+  disabled_when: ['argsJson.value'],
+  storage_name: 'args_simple'
 };
 
 const argsJson: InputField = {
@@ -253,7 +255,8 @@ const argsJson: InputField = {
   controlName: 'argsJson',
   placeholder: '[{ "name": "foo", "type": "U256", "value": 1 }]',
   e2e: 'argsJsonElt',
-  disabled_when: ['argsSimple.value']
+  disabled_when: ['argsSimple.value'],
+  storage_name: 'args_json'
 };
 
 const deployHash: InputField = {
