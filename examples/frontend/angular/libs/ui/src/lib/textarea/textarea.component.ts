@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InputField } from '@util/form';
+import { FormService, InputField } from '@util/form';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -11,7 +11,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   styleUrls: ['./textarea.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TextareaComponent {
+export class TextareaComponent implements OnInit, AfterViewInit {
 
   @Input() inputField!: InputField;
   @Input() parentForm!: FormGroup;
@@ -19,14 +19,66 @@ export class TextareaComponent {
 
   @ViewChild('template', { static: true }) template!: TemplateRef<never>;
 
+  currentPlaceholder!: string;
+  private originalPlaceholder!: string;
+  private readonly jsonPattern = /\[\{.*?\}\]/g;
+
+  constructor(
+    private readonly formService: FormService,
+  ) { }
+
+  ngOnInit() {
+    this.originalPlaceholder = this.inputField.placeholder || '';
+  }
+
+  ngAfterViewInit() {
+    this.initializePlaceholder();
+  }
+
   isInvalid(controlName: string): boolean {
     const control = this.parentForm?.get(controlName);
     return !!this.parentForm?.touched && !!control?.invalid;
   }
 
-  updateState($event: Event) {
-    const deploy_json = ($event.target as HTMLInputElement).value;
-    this.update_deploy_json.emit(deploy_json);
+  onChange($event: Event, inputField: InputField) {
+    const elt = $event.target as HTMLInputElement;
+    if (elt.name.includes('deploy_json')) {
+      this.update_deploy_json.emit(elt.value);
+    } else {
+      this.updateForm(inputField);
+    }
+  }
+
+  onFocus($event: Event) {
+    const elt = $event.target as HTMLTextAreaElement;
+    this.currentPlaceholder = this.removeJsonParts(elt.placeholder);
+  }
+
+  onBlur($event: Event) {
+    const elt = $event.target as HTMLTextAreaElement;
+    if (!elt.value) {
+      this.currentPlaceholder = this.originalPlaceholder;
+    }
+  }
+
+  updateForm(inputField: InputField) {
+    const control = this.parentForm?.get(inputField.controlName);
+    const fieldName = control && inputField.disabled_when?.find(field => field.includes('value'));
+    fieldName && this.formService.updateForm();
+  }
+
+  private removeJsonParts(input: string) {
+    const result = input.replace(this.jsonPattern, '').trim();
+    return result;
+  }
+
+  private initializePlaceholder() {
+    const control = this.parentForm.get(this.inputField.controlName);
+    if (control && control.value) {
+      this.currentPlaceholder = this.removeJsonParts(this.originalPlaceholder);
+    } else {
+      this.currentPlaceholder = this.originalPlaceholder;
+    }
   }
 
 }
