@@ -84,7 +84,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   private async updateAccount() {
     const get_account = await this.clientService.get_account(this.public_key);
-    if (!get_account.account) {
+    if (get_account && !get_account.account) {
       return;
     }
     const account_hash = get_account?.account?.account_hash;
