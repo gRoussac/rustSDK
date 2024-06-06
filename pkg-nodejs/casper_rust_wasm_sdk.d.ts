@@ -191,17 +191,17 @@ export enum TransactionKind {
 }
 /**
 */
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
-}
-/**
-*/
 export enum Verbosity {
   Low = 0,
   Medium = 1,
   High = 2,
+}
+/**
+*/
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
 }
 /**
 */

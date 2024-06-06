@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, getBalanceOptions } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -351,13 +351,14 @@ export class ClientService {
   async deploy(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
     const timestamp = getTimestamp();
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (deploy_result && !this.private_key) {
-      const err = "private_key is missing";
-      err && (this.errorService.setError(err.toString()));
-      return;
-    } else if (!this.public_key) {
+    if (!deploy_result && !this.public_key) {
       const err = "public_key is missing";
-      err && (this.errorService.setError(err.toString()));
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (deploy_result && !this.private_key) {
+      const err = "private_key is missing";
+      this.errorService.setError(err.toString());
       return;
     }
     const deploy_params = new DeployStrParams(
@@ -430,18 +431,18 @@ export class ClientService {
   async transaction(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
     const timestamp = getTimestamp();
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (deploy_result && !this.private_key) {
-      const err = "private_key is missing";
+    if (!deploy_result && !this.public_key) {
+      const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
-    } else if (!this.public_key) {
-      const err = "public_key is missing";
+    }
+    else if (deploy_result && !this.private_key) {
+      const err = "private_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
 
     const builder_params = this.get_builder_params(wasm);
-
     let transaction_params = new TransactionStrParams(
       this.chain_name,
       this.public_key,
@@ -660,9 +661,14 @@ export class ClientService {
   async transfer_transaction(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (!this.private_key) {
+    if (!deploy_result && !this.public_key) {
+      const err = "public_key is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (deploy_result && !this.private_key) {
       const err = "private_key is missing";
-      err && (this.errorService.setError(err.toString()));
+      this.errorService.setError(err.toString());
       return;
     }
 
@@ -770,19 +776,6 @@ export class ClientService {
       return;
     }
     const signed_transaction = new Transaction(JSON.parse(signed_transaction_as_string));
-    // if (!signed_transaction.isValid()) {
-    //   console.error('Deploy is not valid.');
-    //   return;
-    // }
-    // if (signed_transaction.isExpired()) {
-    //   console.error('Deploy is expired.');
-    //   return;
-    // }
-    // the deploy hash is correct (should be the hash of the header), and
-    // the body hash is correct (should be the hash of the body), and
-    // approvals are non empty, and
-    // all approvals are valid signatures of the deploy hash
-
     const put_transaction = await this.sdk.put_transaction(
       signed_transaction,
     );
@@ -1252,23 +1245,23 @@ export class ClientService {
   private get_builder_params(wasm?: Uint8Array): TransactionBuilderParams {
     let builder_params: TransactionBuilderParams = new TransactionBuilderParams();
 
-    const session_hash: string = this.getIdentifier('sessionHash')?.value?.trim();
-    const session_name: string = this.getIdentifier('sessionName')?.value?.trim();
+    const entity_hash: string = this.getIdentifier('entityHash')?.value?.trim();
+    const entity_name: string = this.getIdentifier('entityAlias')?.value?.trim();
     const entry_point: string = this.getIdentifier('entryPoint')?.value?.trim();
     const call_package: boolean = this.getIdentifier('callPackage')?.value;
 
     if (!call_package) {
-      if (session_hash) {
-        builder_params = TransactionBuilderParams.newInvocableEntity(session_hash, entry_point);
-      } else if (session_name) {
-        builder_params = TransactionBuilderParams.newInvocableEntityAlias(session_name, entry_point);
+      if (entity_hash) {
+        builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+      } else if (entity_name) {
+        builder_params = TransactionBuilderParams.newInvocableEntityAlias(entity_name, entry_point);
       }
     } else {
       const version: string = this.getIdentifier('version')?.value?.trim();
-      if (session_hash) {
-        builder_params = TransactionBuilderParams.newPackage(session_hash, entry_point, version);
-      } else if (session_name) {
-        builder_params = TransactionBuilderParams.newPackageAlias(session_name, entry_point, version);
+      if (entity_hash) {
+        builder_params = TransactionBuilderParams.newPackage(entity_hash, entry_point, version);
+      } else if (entity_name) {
+        builder_params = TransactionBuilderParams.newPackageAlias(entity_name, entry_point, version);
       }
     }
     if (wasm) {
