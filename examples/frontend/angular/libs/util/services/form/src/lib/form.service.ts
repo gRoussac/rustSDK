@@ -120,7 +120,8 @@ export class FormService {
           updateValue && control.setValue(updateValue);
         }
         else if (input && input.enabled_when) {
-          if (this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
+          if (this.action === 'get_dictionary_item' &&
+            this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
             control.disable();
           } else if (this.select_dict_identifier) {
             control.enable();
