@@ -6,17 +6,19 @@
           [id]="inputField.id"
           [name]="inputField.name"
           [formControlName]="inputField.controlName"
-          [placeholder]="inputField.placeholder || ''"
+          [placeholder]="currentPlaceholder || inputField.placeholder || ''"
           [attr.e2e-id]="inputField.e2e"
           [ngClass]="[
             inputField.class || 'form-control',
-            isInvalid(inputField.controlName) ? 'is-invalid' : ''
+            isInvalid(inputField.controlName) ? 'is-invalid' : '',
           ]"
-          (change)="updateState($event)"
+          (change)="onChange($event, inputField)"
+          (focus)="onFocus($event)"
+          (blur)="onBlur($event)"
         >
         </textarea>
         <label *ngIf="inputField.placeholder" [for]="inputField.id">{{
-          inputField.placeholder
+          currentPlaceholder || inputField.placeholder
         }}</label>
       </ng-container>
     </div>
