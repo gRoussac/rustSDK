@@ -228,7 +228,7 @@ const versionInput: InputField = {
   label: 'Version',
   name: 'version',
   controlName: 'version',
-  placeholder: 'e.g.1, empty for last version',
+  placeholder: '1, empty for last version',
   e2e: 'versionElt',
   disabled_when: ['has_wasm']
 };
@@ -288,13 +288,13 @@ const argsSimpleInput: InputField = {
 
 const argsJson: InputField = {
   id: 'argsJsonElt',
-  type: 'search',
+  type: 'textarea',
   wrap_class: 'col-lg-8 mb-2',
   class: 'form-control',
   label: 'Args Json',
   name: 'args_json',
   controlName: 'argsJson',
-  placeholder: '[{ "name": "foo", "type": "U256", "value": 1 }]',
+  placeholder: 'Args as Json [{ "name": "foo", "type": "U256", "value": 1 }]',
   e2e: 'argsJsonElt',
   disabled_when: ['argsSimple.value'],
   storage_name: 'args_json',
@@ -567,7 +567,7 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 const installFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { wasm_button: true }],
   [{ input: argsSimpleInput }],
-  [{ input: argsJson }],
+  [{ textarea: argsJson }],
 ];
 
 const makeDeployFields: InputContainer[][] = [
@@ -576,7 +576,7 @@ const makeDeployFields: InputContainer[][] = [
   [{ input: sessionNameInput, required: true }],
   [{ input: entryPointInput, required: true }],
   [{ input: argsSimpleInput }],
-  [{ input: argsJson }],
+  [{ textarea: argsJson }],
 ];
 
 const makeTransactionFields: InputContainer[][] = [
@@ -585,7 +585,7 @@ const makeTransactionFields: InputContainer[][] = [
   [{ input: entityAlias, required: true }],
   [{ input: entryPointInput, required: true }],
   [{ input: argsSimpleInput }],
-  [{ input: argsJson }],
+  [{ textarea: argsJson }],
 ];
 
 
@@ -601,7 +601,7 @@ const callEntrypointFields: InputContainer[][] = [
   [{ input: entityAlias }],
   [{ input: entryPointInput }],
   [{ input: argsSimpleInput }],
-  [{ input: argsJson }],
+  [{ textarea: argsJson }],
 ];
 
 const callEntrypointFieldsDeploy: InputContainer[][] = [
@@ -610,7 +610,7 @@ const callEntrypointFieldsDeploy: InputContainer[][] = [
   [{ input: sessionNameInput }],
   [{ input: entryPointInput }],
   [{ input: argsSimpleInput }],
-  [{ input: argsJson }],
+  [{ textarea: argsJson }],
 ];
 
 const speculativeExecFields: InputContainer[][] = [

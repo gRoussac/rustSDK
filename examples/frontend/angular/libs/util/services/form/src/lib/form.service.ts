@@ -116,8 +116,21 @@ export class FormService {
           const state = textarea?.state_name || [];
           const stateName = state && state.find(name => this.state[name as keyof State]);
           const updateValue = stateName ? this.state[stateName as keyof State] : '';
-          console.log(state, controlName, stateName, updateValue);
           updateValue && control.setValue(updateValue);
+
+          if (textarea.disabled_when) {
+            const fieldName: string = control.value && textarea.disabled_when?.find(field => field.includes('value'));
+            const targetControlName = fieldName && fieldName.split('.')[0];
+            const targetControl = targetControlName && this.form?.get(targetControlName);
+            if (targetControl) {
+              targetControl.disable();
+              disabledTargets.push(targetControlName);
+            }
+            if (!disabledTargets.includes(textarea.controlName)) {
+              control.enable();
+            }
+          }
+
         }
         else if (input && input.enabled_when) {
           if (this.action === 'get_dictionary_item' &&
@@ -142,8 +155,8 @@ export class FormService {
             control.enable();
           }
         }
-        if (input) {
-          const storageName = input?.storage_name || "";
+        if (input || textarea) {
+          const storageName = input?.storage_name || textarea?.storage_name || "";
           storageName && this.storageService.setState({
             [storageName]: control.value
           });
