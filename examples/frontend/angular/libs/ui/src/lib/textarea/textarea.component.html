@@ -10,9 +10,8 @@
           [attr.e2e-id]="inputField.e2e"
           [ngClass]="[
             inputField.class || 'form-control',
-            isInvalid(inputField.controlName) ? 'is-invalid' : ''
+            isInvalid(inputField.controlName) ? 'is-invalid' : '',
           ]"
-          (change)="updateState($event)"
         >
         </textarea>
         <label *ngIf="inputField.placeholder" [for]="inputField.id">{{

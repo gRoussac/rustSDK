@@ -1,5 +1,5 @@
 <ng-template #template>
-  <div class="col-sm-2 mt-2">
+  <div class="col-sm-2 mt-2" *ngIf="type === 'deploy'">
     <input
       class="visually-hidden"
       name="deploy_file"
@@ -12,6 +12,21 @@
     />
     <button class="btn btn-secondary" (click)="deployFileClick()">
       Load deploy file
+    </button>
+  </div>
+  <div class="col-sm-2 mt-2" *ngIf="type === 'transaction'">
+    <input
+      class="visually-hidden"
+      name="transaction_file"
+      #transactionFileElt
+      type="file"
+      id="transactionFileElt"
+      (change)="onTransactionFileSelected($event)"
+      accept=".json, .txt, .deploy"
+      e2e-id="transactionFileElt"
+    />
+    <button class="btn btn-secondary" (click)="transactionFileClick()">
+      Load transaction file
     </button>
   </div>
 </ng-template>

@@ -15,4 +15,6 @@ export type State = {
   verbosity?: Verbosity;
   has_wasm?: boolean;
   select_dict_identifier?: string;
+  args_simple?: string;
+  args_json?: string;
 };

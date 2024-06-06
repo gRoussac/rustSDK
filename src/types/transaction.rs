@@ -60,13 +60,6 @@ impl Transaction {
             .into_serde()
             .map_err(|err| error(&format!("Failed to deserialize Transaction: {:?}", err)))
             .unwrap();
-        let transaction = match transaction.verify() {
-            Ok(()) => transaction,
-            Err(err) => {
-                error(&format!("Transaction has not a valid size: {:?}", err));
-                transaction
-            }
-        };
         transaction.into()
     }
 

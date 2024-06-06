@@ -97,6 +97,26 @@ export class ClientService {
     }
   }
 
+  async get_transaction() {
+    const finalized_approvals = this.getIdentifier('finalizedApprovals')?.value;
+    const transaction_hash_as_string: string = this.getIdentifier('transactionHash')?.value?.trim();
+    if (!transaction_hash_as_string) {
+      const err = "transaction_hash_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const get_transaction_options = this.sdk.get_transaction_options({
+      transaction_hash_as_string
+    });
+    get_transaction_options.finalized_approvals = finalized_approvals;
+    try {
+      const get_transaction = await this.sdk.get_transaction(get_transaction_options);
+      get_transaction && this.resultService.setResult(get_transaction.toJson());
+    } catch (err) {
+      err && (this.errorService.setError(err.toString()));
+    }
+  }
+
   async get_entity(entity_identifier_param: string) {
     let entity_identifier!: string;
     if (!entity_identifier_param) {
@@ -331,7 +351,11 @@ export class ClientService {
   async deploy(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
     const timestamp = getTimestamp();
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (!this.public_key) {
+    if (deploy_result && !this.private_key) {
+      const err = "private_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    } else if (!this.public_key) {
       const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
@@ -406,7 +430,11 @@ export class ClientService {
   async transaction(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
     const timestamp = getTimestamp();
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (!this.public_key) {
+    if (deploy_result && !this.private_key) {
+      const err = "private_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    } else if (!this.public_key) {
       const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
@@ -463,7 +491,7 @@ export class ClientService {
         const result_json = result.toJson();
         this.transaction_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
         this.transaction_json && this.resultService.setResult(result_json);
-        !deploy_result && this.updateDeployJson(this.transaction_json);
+        !deploy_result && this.updateTransactionJson(this.transaction_json);
       }
       return result;
     } catch (err) {
@@ -479,8 +507,8 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    if (!this.public_key || !this.private_key) {
-      const err = "public_key or private_key is missing";
+    if (!this.private_key) {
+      const err = "private_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -507,11 +535,50 @@ export class ClientService {
     }
   }
 
+
+  async install(wasm?: Uint8Array) {
+    const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
+    if (!payment_amount) {
+      const err = "paymentAmount is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    if (!this.private_key) {
+      const err = "private_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const wasmBuffer = wasm?.buffer;
+    if (!wasmBuffer) {
+      const err = "wasmBuffer is missing";
+      err && (this.errorService.setError(err.toString()));
+    }
+
+    let transaction_params = new TransactionStrParams(
+      this.chain_name,
+      this.public_key,
+      this.private_key,
+    );
+    transaction_params.payment_amount = payment_amount;
+    transaction_params = this.addTransactionArgs(transaction_params);
+
+    try {
+      const install = wasm && await this.sdk.install(
+        transaction_params,
+        Bytes.fromUint8Array(wasm)
+      );
+      install && this.resultService.setResult(install.toJson());
+    } catch (err) {
+      err && (this.errorService.setError(err.toString()));
+    }
+  }
+
+
   async transfer(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (!this.public_key) {
-      const err = "public_key is missing";
+    if (!this.private_key) {
+      const err = "private_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -593,8 +660,8 @@ export class ClientService {
   async transfer_transaction(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (!this.public_key) {
-      const err = "public_key is missing";
+    if (!this.private_key) {
+      const err = "private_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -696,7 +763,7 @@ export class ClientService {
   }
 
   async put_transaction() {
-    const signed_transaction_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
+    const signed_transaction_as_string: string = this.getIdentifier('transactionJson')?.value?.trim();
     if (!signed_transaction_as_string) {
       const err = "deployJson is missing";
       err && (this.errorService.setError(err.toString()));
@@ -749,6 +816,23 @@ export class ClientService {
     return speculative_exec_deploy;
   }
 
+  async speculative_exec_transaction() {
+    const signed_transaction_as_string: string = this.getIdentifier('transactionJson')?.value?.trim();
+    if (!signed_transaction_as_string) {
+      const err = "signed_transaction_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const signed_transaction = new Transaction(JSON.parse(signed_transaction_as_string));
+    const speculative_exec_transaction_options = this.sdk.speculative_exec_transaction_options({
+      transaction: signed_transaction.toJson()
+    });
+    this.getIdentifieBlock(speculative_exec_transaction_options);
+    const speculative_exec_transaction = await this.sdk.speculative_exec_transaction(speculative_exec_transaction_options);
+    speculative_exec_transaction && this.resultService.setResult(speculative_exec_transaction.toJson());
+    return speculative_exec_transaction;
+  }
+
   async sign_deploy() {
     if (!this.private_key) {
       const err = "private_key is missing";
@@ -787,9 +871,48 @@ export class ClientService {
     this.updateDeployJson(this.deploy_json);
   }
 
+  async sign_transaction() {
+    if (!this.private_key) {
+      const err = "private_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    const signed_transaction_as_string: string = this.getIdentifier('transactionJson')?.value?.trim();
+    if (!signed_transaction_as_string) {
+      const err = "signed_transaction_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    let signed_transaction;
+    try {
+      signed_transaction = new Transaction(JSON.parse(signed_transaction_as_string));
+    }
+    catch {
+      const err = "Error parsing transaction";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    if (!signed_transaction) {
+      const err = "signed_transaction_as_string is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    signed_transaction = signed_transaction.sign(this.private_key);
+    this.transaction_json = jsonPrettyPrint(signed_transaction.toJson(), this.verbosity as Verbosity);
+    this.getIdentifier('transactionJson')?.setValue(this.transaction_json);
+    this.updateTransactionJson(this.transaction_json);
+  }
+
   private updateDeployJson(deploy_json: string) {
     deploy_json && this.stateService.setState({
       deploy_json
+    });
+  }
+
+  private updateTransactionJson(transaction_json: string) {
+    transaction_json && this.stateService.setState({
+      transaction_json
     });
   }
 
@@ -822,15 +945,27 @@ export class ClientService {
     await this.transfer(deploy_result, speculative);
   }
 
+  async speculative_transfer_transaction() {
+    const speculative = true;
+    const transaction_result = !speculative;
+    await this.transfer(transaction_result, speculative);
+  }
+
   async speculative_deploy(wasm?: Uint8Array) {
     const speculative = true;
     const deploy_result = !speculative;
     await this.deploy(deploy_result, speculative, wasm);
   }
 
+  async speculative_transaction(wasm?: Uint8Array) {
+    const speculative = true;
+    const deploy_result = !speculative;
+    await this.transaction(deploy_result, speculative, wasm);
+  }
+
   async call_entrypoint_deploy() {
-    if (!this.public_key || !this.private_key) {
-      const err = "public_key or private_key is missing";
+    if (!this.private_key) {
+      const err = "private_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -857,6 +992,42 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
     }
   }
+
+  async call_entrypoint() {
+    if (!this.private_key) {
+      const err = "private_key is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+
+    let transaction_params = new TransactionStrParams(
+      this.chain_name,
+      this.public_key,
+      this.private_key,
+    );
+
+    const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
+    if (!payment_amount) {
+      const err = "paymentAmount is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
+    transaction_params.payment_amount = payment_amount;
+    transaction_params = this.addTransactionArgs(transaction_params);
+
+    const builder_params = this.get_builder_params();
+
+    try {
+      const call_entrypoint = await this.sdk.call_entrypoint(
+        builder_params,
+        transaction_params,
+      );
+      call_entrypoint && this.resultService.setResult(call_entrypoint.toJson());
+    } catch (err) {
+      err && (this.errorService.setError(err.toString()));
+    }
+  }
+
 
   async query_contract_dict() {
     const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();

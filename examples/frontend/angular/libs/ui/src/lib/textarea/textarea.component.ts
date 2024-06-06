@@ -16,6 +16,7 @@ export class TextareaComponent {
   @Input() inputField!: InputField;
   @Input() parentForm!: FormGroup;
   @Output() update_deploy_json: EventEmitter<string> = new EventEmitter<string>();
+  @Output() update_transaction_json: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('template', { static: true }) template!: TemplateRef<never>;
 
@@ -25,8 +26,13 @@ export class TextareaComponent {
   }
 
   updateState($event: Event) {
-    const deploy_json = ($event.target as HTMLInputElement).value;
-    this.update_deploy_json.emit(deploy_json);
+    const name_elt = ($event.target as HTMLInputElement).value;
+    const json = ($event.target as HTMLInputElement).value;
+    if (name_elt.includes('deploy')) {
+      this.update_deploy_json.emit(json);
+    } else if (name_elt.includes('transaction')) {
+      this.update_transaction_json.emit(json);
+    }
   }
 
 }
