@@ -31,7 +31,8 @@ export async function clear() {
   await variables.page.waitForSelector('[e2e-id="clear result"]');
   await variables.page.click('[e2e-id="clear result"]');
   await variables.page.waitForFunction(() => !document.querySelector('[e2e-id="clear result"]'));
-  await delay(100);
+  // wait for document to refresh
+  await delay(75);
   let result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
   });
@@ -43,7 +44,8 @@ export async function clearInput(id: string) {
   await variables.page.$eval(id, (input: HTMLInputElement) => {
     input.value = '';
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    // input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('blur', { bubbles: true }));
   });
 }
 
@@ -75,7 +77,8 @@ export async function seletAction(action: string) {
     return (document.querySelector('[e2e-id="selectActionElt"]') as HTMLSelectElement).value;
   });
   expect(action_selected).toBe(action);
-  await delay(100);
+  // wait for document to refresh
+  await delay(75);
 }
 
 export async function setPrivateKey() {
