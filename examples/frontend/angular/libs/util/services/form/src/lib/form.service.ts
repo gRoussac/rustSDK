@@ -116,7 +116,6 @@ export class FormService {
           const state = textarea?.state_name || [];
           const stateName = state && state.find(name => this.state[name as keyof State]);
           const updateValue = stateName ? this.state[stateName as keyof State] : '';
-          console.log(state, controlName, stateName, updateValue);
           updateValue && control.setValue(updateValue);
         }
         else if (input && input.enabled_when) {
