@@ -260,13 +260,6 @@ impl TransactionStrParams {
     }
 }
 
-// impl TransactionStrParams {
-//     pub fn set_session_args(&mut self, session_args_simple: Vec<String>) {
-//         let args_simple = ArgsSimple::from(session_args_simple);
-//         self.session_args_simple.set(args_simple).unwrap();
-//     }
-// }
-
 // Convert TransactionStrParams to casper_client::cli::TransactionStrParams
 pub fn transaction_str_params_to_casper_client(
     transaction_params: &TransactionStrParams,

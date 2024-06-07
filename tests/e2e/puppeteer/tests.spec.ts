@@ -111,11 +111,13 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await getResult();
-      await seletAction('install');
+      await seletAction('install_deploy');
       await setPrivateKey();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
       await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
     });
 
     it('should install hello contract', async () => {
@@ -140,7 +142,6 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
       await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
       await setWasm(config.contract_cep78);
-
       await submit();
       await test.page.waitForSelector('[e2e-id="result"]');
       let deploy = await test.page.evaluate(() => {
@@ -236,7 +237,7 @@ describe('Angular App Tests', () => {
     });
 
     afterEach(async () => {
-      //  await clear();
+      await clear();
     });
 
     it('should get_balance with state root hash', async () => {
@@ -298,25 +299,22 @@ describe('Angular App Tests', () => {
       await getResult();
       await seletAction('get_block_transfers');
       await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await delay(200);
     });
     afterEach(async () => {
-      await delay(200);
       await clear();
     });
 
     it('should get_block_transfers', async () => {
       await submit();
       await getResult();
-    }, 10000);
+    });
 
     it('should get_block_transfers with block height', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
       await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
       await submit();
       await getResult();
-    }, 10000);
+    });
 
     it('should get_block_transfers with block hash', async () => {
       await clearInput('[e2e-id="blockIdentifierHeightElt"]');
@@ -324,7 +322,7 @@ describe('Angular App Tests', () => {
       await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
       await submit();
       await getResult();
-    }, 10000);
+    });
   });
 
   describe('Rpc call get_chainspec', () => {
@@ -347,6 +345,8 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await seletAction('get_era_info');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
     });
 
     afterEach(async () => {
@@ -744,7 +744,9 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
       await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
     });
     afterEach(async () => {
       await clear();
@@ -859,7 +861,9 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
       await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
       await test.page.waitForSelector('[e2e-id="TTLElt"]');
     });
     afterEach(async () => {
@@ -875,7 +879,7 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(make_deploy).toBeDefined();
-    }, 10000);
+    });
 
     it('should make_deploy with contract name', async () => {
       await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
@@ -1088,7 +1092,9 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
       await test.page.waitForSelector('[e2e-id="entryPointElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
       await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
     });
     afterEach(async () => {
       await clear();

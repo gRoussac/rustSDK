@@ -123,7 +123,7 @@ impl TransactionBuilderParams {
     pub fn new_invocable_entity(entity_hash: &str, entry_point: &str) -> TransactionBuilderParams {
         let addressable_entity_hash = match AddressableEntityHash::from_formatted_str(entity_hash) {
             Ok(hash) => Some(hash),
-            Err(err) => {
+            Err(_err) => {
                 // TODO Fix Jsvalue ret
                 //  error(&format!("Error parsing entity hash: {}", err.as_string()));
                 None
@@ -184,7 +184,7 @@ impl TransactionBuilderParams {
     ) -> TransactionBuilderParams {
         let maybe_package_hash = match PackageHash::from_formatted_str(package_hash) {
             Ok(hash) => Some(hash),
-            Err(err) => {
+            Err(_err) => {
                 // TODO Fix Jsvalue ret
                 //  error(&format!("Error parsing entity hash: {}", err.as_string()));
                 None

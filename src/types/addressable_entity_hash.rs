@@ -4,6 +4,7 @@ use casper_types::{
         AddressableEntityHash as _AddressableEntityHash, ADDRESSABLE_ENTITY_STRING_PREFIX,
     },
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
+    HashAddr,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -77,5 +78,14 @@ impl ToBytes for AddressableEntityHash {
 
     fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
         self.0.write_bytes(bytes)
+    }
+}
+
+impl From<HashAddr> for AddressableEntityHash {
+    fn from(bytes: HashAddr) -> Self {
+        _AddressableEntityHash::from_bytes(&bytes)
+            .map(|(hash, _)| hash)
+            .expect("Failed to convert bytes to AddressableEntityHash")
+            .into()
     }
 }

@@ -690,7 +690,6 @@ export class ClientService {
 
     const standard_payment_amount: string = this.config['standard_payment_amount'].toString();
     transaction_params.payment_amount = standard_payment_amount;
-    transaction_params.standard_payment = true;
 
     try {
       let result;

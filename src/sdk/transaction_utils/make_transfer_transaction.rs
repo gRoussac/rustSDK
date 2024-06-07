@@ -120,6 +120,9 @@ pub(crate) fn make_transfer_transaction(
         amount,
         maybe_id: Some(id),
     };
+
+    transaction_params.set_standard_payment(true);
+
     let transaction = client_make_transaction(
         builder_params,
         transaction_str_params_to_casper_client(&transaction_params),

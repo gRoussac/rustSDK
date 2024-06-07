@@ -31,6 +31,7 @@ export async function clear() {
   await variables.page.waitForSelector('[e2e-id="clear result"]');
   await variables.page.click('[e2e-id="clear result"]');
   await variables.page.waitForFunction(() => !document.querySelector('[e2e-id="clear result"]'));
+  // wait for document to refresh
   await delay(100);
   let result = await variables.page.evaluate(() => {
     return document.querySelector('[e2e-id="result"]')?.textContent;
@@ -43,7 +44,8 @@ export async function clearInput(id: string) {
   await variables.page.$eval(id, (input: HTMLInputElement) => {
     input.value = '';
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    // input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('blur', { bubbles: true }));
   });
 }
 
@@ -75,6 +77,7 @@ export async function seletAction(action: string) {
     return (document.querySelector('[e2e-id="selectActionElt"]') as HTMLSelectElement).value;
   });
   expect(action_selected).toBe(action);
+  // wait for document to refresh
   await delay(100);
 }
 
@@ -223,6 +226,6 @@ async function get_block() {
     node_address: config.node_address
   });
   const block_result = await variables.sdk.get_block(chain_get_block_options);
-  variables.block_hash = block_result?.block?.hash;
-  variables.block_height = block_result?.block?.header.height.toString();
+  variables.block_hash = block_result?.block?.Version2?.hash;
+  variables.block_height = block_result?.block?.Version2?.header.height.toString();
 }

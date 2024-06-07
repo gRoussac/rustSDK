@@ -1,7 +1,7 @@
 use crate::debug::error;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
-    PackageHash as _PackageHash,
+    PackageAddr, PackageHash as _PackageHash,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -75,5 +75,14 @@ impl ToBytes for PackageHash {
 
     fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {
         self.0.write_bytes(bytes)
+    }
+}
+
+impl From<PackageAddr> for PackageHash {
+    fn from(bytes: PackageAddr) -> Self {
+        _PackageHash::from_bytes(&bytes)
+            .map(|(hash, _)| hash)
+            .expect("Failed to convert bytes to PackageHash")
+            .into()
     }
 }
