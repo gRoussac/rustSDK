@@ -25,15 +25,16 @@ use crate::{
 use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
     transaction::Transaction as _Transaction,
-    ApprovalsHash, AsymmetricType, Deploy, InitiatorAddr, PricingMode, RuntimeArgs, SecretKey,
-    TimeDiff, Timestamp, TransactionHeader, TransactionSessionKind, TransactionV1,
-    TransactionV1Body, TransactionV1Builder,
+    Approval, ApprovalsHash, AsymmetricType, Deploy, InitiatorAddr, PricingMode, RuntimeArgs,
+    SecretKey, TimeDiff, Timestamp, TransactionHeader, TransactionV1, TransactionV1Body,
+    TransactionV1Builder,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::collections::BTreeSet;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
@@ -174,16 +175,10 @@ impl Transaction {
 
     #[wasm_bindgen(js_name = "withEntryPoint")]
     pub fn with_entry_point(&self, entry_point: &str, secret_key: Option<String>) -> Transaction {
-        let transaction = self.0.clone();
-        let body = match transaction {
-            _Transaction::Deploy(_deploy) => todo!("deploy with_entry_point in transaction"),
-            _Transaction::V1(ref transaction_v1) => transaction_v1.body().clone(),
-        };
-
         self.build(BuildParams {
             secret_key,
             body: Some(modify_body(
-                &body,
+                &self.body(),
                 NewBodyParams {
                     new_entry_point: Some(entry_point.to_string()),
                     ..Default::default()
@@ -193,67 +188,62 @@ impl Transaction {
         })
     }
 
-    // #[wasm_bindgen(js_name = "withHash")]
-    // pub fn with_hash(&self, hash: ContractHash, secret_key: Option<String>) -> Transaction {
-    //     let transaction = self.0.clone();
-    //     let body = transaction.body();
+    #[wasm_bindgen(js_name = "withHash")]
+    pub fn with_hash(
+        &self,
+        hash: AddressableEntityHash,
+        secret_key: Option<String>,
+    ) -> Transaction {
+        self.build(BuildParams {
+            secret_key,
+            body: Some(modify_body(
+                &self.body(),
+                NewBodyParams {
+                    new_hash: Some(hash),
+                    ..Default::default()
+                },
+            )),
+            ..Default::default()
+        })
+    }
 
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         body: Some(modify_body(
-    //             body,
-    //             NewBodyParams {
-    //                 new_hash: Some(hash),
-    //                 ..Default::default()
-    //             },
-    //         )),
-    //         ..Default::default()
-    //     })
-    // }
+    #[wasm_bindgen(js_name = "withPackageHash")]
+    pub fn with_package_hash(
+        &self,
+        package_hash: PackageHash,
+        secret_key: Option<String>,
+    ) -> Transaction {
+        self.build(BuildParams {
+            secret_key,
+            body: Some(modify_body(
+                &self.body(),
+                NewBodyParams {
+                    new_package_hash: Some(package_hash),
+                    ..Default::default()
+                },
+            )),
+            ..Default::default()
+        })
+    }
 
-    // #[wasm_bindgen(js_name = "withPackageHash")]
-    // pub fn with_package_hash(
-    //     &self,
-    //     package_hash: ContractPackageHash,
-    //     secret_key: Option<String>,
-    // ) -> Transaction {
-    //     let transaction = self.0.clone();
-    //     let body = transaction.body();
-
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         body: Some(modify_body(
-    //             body,
-    //             NewBodyParams {
-    //                 new_package_hash: Some(package_hash),
-    //                 ..Default::default()
-    //             },
-    //         )),
-    //         ..Default::default()
-    //     })
-    // }
-
-    // #[wasm_bindgen(js_name = "withModuleBytes")]
-    // pub fn with_module_bytes(
-    //     &self,
-    //     module_bytes: Bytes,
-    //     secret_key: Option<String>,
-    // ) -> Transaction {
-    //     let transaction = self.0.clone();
-    //     let body = transaction.body();
-
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         body: Some(modify_body(
-    //             body,
-    //             NewBodyParams {
-    //                 new_module_bytes: Some(&module_bytes),
-    //                 ..Default::default()
-    //             },
-    //         )),
-    //         ..Default::default()
-    //     })
-    // }
+    #[wasm_bindgen(js_name = "withModuleBytes")]
+    pub fn with_module_bytes(
+        &self,
+        module_bytes: Bytes,
+        secret_key: Option<String>,
+    ) -> Transaction {
+        self.build(BuildParams {
+            secret_key,
+            body: Some(modify_body(
+                &self.body(),
+                NewBodyParams {
+                    new_module_bytes: Some(&module_bytes),
+                    ..Default::default()
+                },
+            )),
+            ..Default::default()
+        })
+    }
 
     #[wasm_bindgen(js_name = "withSecretKey")]
     pub fn with_secret_key(&self, secret_key: Option<String>) -> Transaction {
@@ -262,42 +252,6 @@ impl Transaction {
             ..Default::default()
         })
     }
-
-    // #[wasm_bindgen(js_name = "withStandardPayment")]
-    // pub fn with_standard_payment(&self, amount: &str, secret_key: Option<String>) -> Transaction {
-    //     let cloned_amount = amount.to_string();
-    //     let amount = U512::from_dec_str(&cloned_amount);
-    //     if let Err(err) = amount {
-    //         error(&format!("Error converting amount: {:?}", err));
-    //         return self.0.clone().into();
-    //     }
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         payment: Some(TransactionV1Body::new_standard_payment(
-    //             amount.unwrap(),
-    //         )),
-    //         ..Default::default()
-    //     })
-    // }
-
-    // // Load payment from json
-    // #[cfg(target_arch = "wasm32")]
-    // #[wasm_bindgen(js_name = "withPayment")]
-    // pub fn with_payment(&self, payment: JsValue, secret_key: Option<String>) -> Transaction {
-    //     let payment_item_result = payment.into_serde();
-
-    //     match payment_item_result {
-    //         Ok(payment_item) => self.build(BuildParams {
-    //             secret_key,
-    //             payment: Some(payment_item),
-    //             ..Default::default()
-    //         }),
-    //         Err(err) => {
-    //             error(&format!("Error parsing payment: {}", err));
-    //             self.0.clone().into()
-    //         }
-    //     }
-    // }
 
     // Load body from json
     #[cfg(target_arch = "wasm32")]
@@ -318,22 +272,9 @@ impl Transaction {
         }
     }
 
-    // #[wasm_bindgen(js_name = "validateTransactionSize")]
-    // pub fn validate_transaction_size(&self) -> bool {
-    //     let transaction: Transaction = self.0.clone();
-    //     match transaction.is_valid_size(MAX_SERIALIZED_SIZE_OF_DEPLOY) {
-    //         Ok(()) => true,
-    //         Err(err) => {
-    //             error(&format!("Transaction has not a valid size: {:?}", err));
-    //             false
-    //         }
-    //     }
-    // }
-
     #[wasm_bindgen(js_name = "verify")]
     pub fn verify(&self) -> bool {
-        let transaction: _Transaction = self.0.clone();
-        match transaction.verify() {
+        match self.0.clone().verify() {
             Ok(()) => true,
             Err(err) => {
                 log(&format!("Warning Transaction is not valid: {:?}", err));
@@ -344,10 +285,9 @@ impl Transaction {
 
     #[wasm_bindgen(getter)]
     pub fn hash(&self) -> TransactionHash {
-        let transaction: _Transaction = self.0.clone();
         // TODO check why fmt is giving a short version and not debug
         // dbg!(format!("{:?}", (*transaction.hash().inner()).clone()));
-        let transaction_hash = transaction.hash();
+        let transaction_hash = self.0.clone().hash();
 
         match TransactionHash::new(&transaction_hash.to_string()) {
             Ok(transaction_hash) => transaction_hash,
@@ -358,29 +298,55 @@ impl Transaction {
         }
     }
 
-    // #[wasm_bindgen(js_name = "hasValidHash")]
-    // pub fn has_valid_hash(&self) -> bool {
-    //     let transaction: _Transaction = self.0.clone();
-    //     match transaction.has_valid_hash() {
-    //         Ok(()) => true,
-    //         Err(err) => {
-    //             error(&format!("Transaction has not a valid hash: {:?}", err));
-    //             false
-    //         }
-    //     }
-    // }
-
-    #[wasm_bindgen(js_name = "isExpired")]
+    #[wasm_bindgen(js_name = "expired")]
     pub fn expired(&self) -> bool {
-        let transaction: _Transaction = self.0.clone();
         let now: DateTime<Utc> = Utc::now();
         let now_millis = now.timestamp_millis() as u64;
         let timestamp = Timestamp::from(now_millis);
-        match transaction.expired(timestamp) {
+        match self.0.clone().expired(timestamp) {
             false => false,
             true => {
                 error("Transaction has expired");
                 true
+            }
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "expires")]
+    pub fn expires_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.expires()) {
+            Ok(expires) => expires,
+            Err(err) => {
+                error(&format!("Error serializing expires to JSON: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "signers")]
+    pub fn signers_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.signers()) {
+            Ok(signers) => signers,
+            Err(err) => {
+                error(&format!("Error serializing signers to JSON: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "authorization_keys")]
+    pub fn authorization_keys_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.authorization_keys()) {
+            Ok(authorization_keys) => authorization_keys,
+            Err(err) => {
+                error(&format!(
+                    "Error serializing authorization_keys to JSON: {:?}",
+                    err
+                ));
+                JsValue::null()
             }
         }
     }
@@ -415,6 +381,30 @@ impl Transaction {
         }
     }
 
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "approvals")]
+    pub fn approvals_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.approvals()) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!("Error serializing approvals to JSON: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "header")]
+    pub fn header_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.header()) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!("Error serializing header to JSON: {:?}", err));
+                JsValue::null()
+            }
+        }
+    }
+
     #[wasm_bindgen(js_name = "isNative")]
     pub fn is_native(&self) -> bool {
         self.0.clone().is_native()
@@ -425,34 +415,19 @@ impl Transaction {
         self.0.clone().is_standard_payment()
     }
 
-    // #[wasm_bindgen(js_name = "isStoredContract")]
-    // pub fn is_stored_contract(&self) -> bool {
-    //     self.0.clone().body().is_stored_contract()
-    // }
-
-    // #[wasm_bindgen(js_name = "isStoredContractPackage")]
-    // pub fn is_stored_contract_package(&self) -> bool {
-    //     self.0.clone().body().is_stored_contract_package()
-    // }
-
-    // #[wasm_bindgen(js_name = "isModuleBytes")]
-    // pub fn is_module_bytes(&self) -> bool {
-    //     self.0.clone().body().is_module_bytes()
-    // }
-
-    // #[wasm_bindgen(js_name = "isByName")]
-    // pub fn is_by_name(&self) -> bool {
-    //     self.0.clone().body().is_by_name()
-    // }
-
-    // #[wasm_bindgen(js_name = "byName")]
-    // pub fn by_name(&self) -> Option<String> {
-    //     self.0.clone().body().by_name()
-    // }
-
-    #[wasm_bindgen(js_name = "entryPoint")]
-    pub fn entry_point(&self) -> String {
-        self.0.clone().entry_point().to_string()
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "session_args")]
+    pub fn session_args_js_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.session_args()) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!(
+                    "Error serializing session_args to JSON: {:?}",
+                    err
+                ));
+                JsValue::null()
+            }
+        }
     }
 
     #[wasm_bindgen(js_name = "addSignature")]
@@ -497,6 +472,11 @@ impl Transaction {
         updated_transaction
     }
 
+    #[wasm_bindgen(js_name = "entryPoint")]
+    pub fn entry_point(&self) -> String {
+        self.0.clone().entry_point().to_string()
+    }
+
     #[wasm_bindgen(js_name = "TTL")]
     pub fn ttl(&self) -> String {
         self.0.clone().ttl().to_string()
@@ -505,6 +485,11 @@ impl Transaction {
     #[wasm_bindgen(js_name = "timestamp")]
     pub fn timestamp(&self) -> String {
         self.0.clone().timestamp().to_string()
+    }
+
+    #[wasm_bindgen(js_name = "size_estimate")]
+    pub fn size_estimate(&self) -> usize {
+        self.0.clone().size_estimate()
     }
 
     #[wasm_bindgen(js_name = "chain_name")]
@@ -530,80 +515,61 @@ impl Transaction {
         initiator_addr.account_hash().into()
     }
 
-    // #[wasm_bindgen(js_name = "paymentAmount")]
-    // pub fn payment_amount(&self, conv_rate: u8) -> String {
-    //     self.0
-    //         .clone()
-    //         .payment()
-    //         .payment_amount(conv_rate)
-    //         .unwrap()
-    //         .to_string()
-    // }
-
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "session_args")]
-    pub fn session_args_js_alias(&self) -> JsValue {
-        match JsValue::from_serde(&self.0.clone().session_args()) {
-            Ok(json) => json,
-            Err(err) => {
-                error(&format!(
-                    "Error serializing session_args to JSON: {:?}",
-                    err
-                ));
-                JsValue::null()
-            }
-        }
+    #[wasm_bindgen(js_name = "addArg")]
+    pub fn add_arg_js_alias(
+        &mut self,
+        js_value_arg: JsValue,
+        secret_key: Option<String>,
+    ) -> Transaction {
+        let mut args = self.0.clone().session_args().clone();
+        let new_args = insert_js_value_arg(&mut args, js_value_arg);
+        let new_body = modify_body(
+            &self.body(),
+            NewBodyParams {
+                new_args: Some(new_args),
+                ..Default::default()
+            },
+        );
+
+        self.build(BuildParams {
+            secret_key,
+            body: Some(new_body),
+            ..Default::default()
+        })
     }
-
-    // #[cfg(target_arch = "wasm32")]
-    // #[wasm_bindgen(js_name = "addArg")]
-    // pub fn add_arg_js_alias(
-    //     &mut self,
-    //     js_value_arg: JsValue,
-    //     secret_key: Option<String>,
-    // ) -> Transaction {
-    //     let transaction = self.0.clone();
-    //     let mut args = transaction.body_args().clone();
-    //     let new_args = insert_js_value_arg(&mut args, js_value_arg);
-    //     let new_body = modify_body(
-    //         body,
-    //         NewBodyParams {
-    //             new_args: Some(new_args),
-    //             ..Default::default()
-    //         },
-    //     );
-
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         body: Some(new_body),
-    //         ..Default::default()
-    //     })
-    // }
 }
 
 impl Transaction {
-    pub fn args(&self) -> RuntimeArgs {
+    pub fn session_args(&self) -> RuntimeArgs {
         self.0.clone().session_args().clone()
     }
 
-    // pub fn add_arg(&mut self, new_value_arg: String, secret_key: Option<String>) -> Transaction {
-    //     let transaction = self.0.clone();
-    //     let mut args = transaction.body_args().clone();
-    //     let new_args = insert_arg(&mut args, new_value_arg);
-    //     let new_body = modify_body(
-    //         body,
-    //         NewBodyParams {
-    //             new_args: Some(new_args),
-    //             ..Default::default()
-    //         },
-    //     );
+    fn body(&self) -> TransactionV1Body {
+        let body = match self.0.clone() {
+            _Transaction::Deploy(_deploy) => todo!("deploy body in transaction"),
+            _Transaction::V1(ref transaction_v1) => transaction_v1.body().clone(),
+        };
+        body
+    }
 
-    //     self.build(BuildParams {
-    //         secret_key,
-    //         body: Some(new_body),
-    //         ..Default::default()
-    //     })
-    // }
+    pub fn add_arg(&mut self, new_value_arg: String, secret_key: Option<String>) -> Transaction {
+        let mut args = self.0.clone().session_args().clone();
+        let new_args = insert_arg(&mut args, new_value_arg);
+        let new_body = modify_body(
+            &self.body(),
+            NewBodyParams {
+                new_args: Some(new_args),
+                ..Default::default()
+            },
+        );
+
+        self.build(BuildParams {
+            secret_key,
+            body: Some(new_body),
+            ..Default::default()
+        })
+    }
 
     pub fn to_json_string(&self) -> Result<String, String> {
         let result = serde_json::to_string(&self.0);
@@ -618,8 +584,37 @@ impl Transaction {
     }
 
     pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
-        let transaction: _Transaction = self.0.clone();
-        transaction.compute_approvals_hash()
+        self.0.clone().compute_approvals_hash()
+    }
+
+    pub fn approvals(&self) -> BTreeSet<Approval> {
+        self.0.clone().approvals()
+    }
+
+    pub fn header(&self) -> TransactionHeader {
+        self.0.clone().header()
+    }
+
+    pub fn expires(&self) -> Timestamp {
+        self.0.clone().expires()
+    }
+
+    pub fn signers(&self) -> BTreeSet<AccountHash> {
+        self.0
+            .clone()
+            .signers()
+            .into_iter()
+            .map(Into::into)
+            .collect()
+    }
+
+    pub fn authorization_keys(&self) -> BTreeSet<AccountHash> {
+        self.0
+            .clone()
+            .authorization_keys()
+            .into_iter()
+            .map(Into::into)
+            .collect()
     }
 
     fn build(&self, transaction_params: BuildParams) -> Transaction {
@@ -632,7 +627,7 @@ impl Transaction {
             pricing_mode,
             secret_key,
         } = transaction_params;
-        let transaction: _Transaction = self.0.clone();
+        let transaction = self.0.clone();
         let chain_name = if let Some(chain_name) = chain_name {
             chain_name
         } else {
@@ -727,13 +722,52 @@ fn modify_body(
         new_module_bytes,
     }: NewBodyParams,
 ) -> TransactionV1Body {
+    let runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
+    let entry_point = body.entry_point().to_string();
     match body.target() {
-        casper_types::TransactionTarget::Native => todo!(),
-        casper_types::TransactionTarget::Stored { id, runtime } => todo!(),
+        casper_types::TransactionTarget::Native => {
+            unimplemented!("native transfer not implemented!")
+        }
+        casper_types::TransactionTarget::Stored { id, runtime: _ } => match id {
+            casper_types::TransactionInvocationTarget::ByHash(hash) => {
+                TransactionV1Builder::new_targeting_invocable_entity(
+                    new_hash.unwrap_or((*hash).into()).into(),
+                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
+                )
+                .with_runtime_args(runtime_args)
+                .body
+            }
+            casper_types::TransactionInvocationTarget::ByName(alias) => {
+                TransactionV1Builder::new_targeting_invocable_entity_via_alias(
+                    new_alias.unwrap_or_else(|| alias.clone()),
+                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
+                )
+                .with_runtime_args(runtime_args)
+                .body
+            }
+            casper_types::TransactionInvocationTarget::ByPackageHash { addr, version } => {
+                TransactionV1Builder::new_targeting_package(
+                    new_package_hash.unwrap_or((*addr).into()).into(),
+                    Some(new_version.unwrap_or(version.unwrap_or(1))),
+                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
+                )
+                .with_runtime_args(runtime_args)
+                .body
+            }
+            casper_types::TransactionInvocationTarget::ByPackageName { name, version } => {
+                TransactionV1Builder::new_targeting_package_via_alias(
+                    new_alias.unwrap_or_else(|| name.clone()),
+                    Some(new_version.unwrap_or(version.unwrap_or(1))),
+                    new_entry_point.unwrap_or_else(|| entry_point.clone()),
+                )
+                .with_runtime_args(runtime_args)
+                .body
+            }
+        },
         casper_types::TransactionTarget::Session {
             kind,
             module_bytes,
-            runtime,
+            runtime: _,
         } => {
             let default: _Bytes = module_bytes.clone();
             let new_bytes = new_module_bytes.unwrap();
@@ -747,61 +781,10 @@ fn modify_body(
                 }
             };
 
-            let args = new_args.cloned().unwrap_or_else(|| body.args().clone());
-            let transaction_kind = match body.transaction_kind() {
-                0 => TransactionSessionKind::Standard,
-                1 => TransactionSessionKind::Installer,
-                2 => TransactionSessionKind::Upgrader,
-                3 => TransactionSessionKind::Isolated,
-                _ => unimplemented!("transaction_kind in transaction"),
-            };
-
-            TransactionV1Builder::new_session(transaction_kind, new_module_bytes)
-                .with_runtime_args(args)
+            TransactionV1Builder::new_session(*kind, new_module_bytes)
+                .with_runtime_args(runtime_args)
                 .body
-        } // TransactionV1Body::StoredContractByHash {
-          //     hash,
-          //     entry_point,
-          //     args,
-          // } => TransactionV1Body::StoredContractByHash {
-          //     hash: new_hash.unwrap_or((*hash).into()).into(),
-          //     entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
-          //     args: new_args.cloned().unwrap_or_else(|| args.clone()),
-          // },
-          // TransactionV1Body::StoredContractByName {
-          //     name,
-          //     entry_point,
-          //     args,
-          // } => TransactionV1Body::StoredContractByName {
-          //     name: new_name.unwrap_or_else(|| name.clone()),
-          //     entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
-          //     args: new_args.cloned().unwrap_or_else(|| args.clone()),
-          // },
-          // TransactionV1Body::StoredVersionedContractByHash {
-          //     hash,
-          //     version,
-          //     entry_point,
-          //     args,
-          // } => TransactionV1Body::StoredVersionedContractByHash {
-          //     hash: new_package_hash.unwrap_or((*hash).into()).into(),
-          //     version: Some(new_version.unwrap_or(version.unwrap_or(1))),
-          //     entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
-          //     args: new_args.cloned().unwrap_or_else(|| args.clone()),
-          // },
-          // TransactionV1Body::StoredVersionedContractByName {
-          //     name,
-          //     version,
-          //     entry_point,
-          //     args,
-          // } => TransactionV1Body::StoredVersionedContractByName {
-          //     name: new_name.unwrap_or_else(|| name.clone()),
-          //     version: Some(new_version.unwrap_or(version.unwrap_or(1))),
-          //     entry_point: new_entry_point.unwrap_or_else(|| entry_point.clone()),
-          //     args: new_args.cloned().unwrap_or_else(|| args.clone()),
-          // },
-          // TransactionV1Body::Transfer { args } => TransactionV1Body::Transfer {
-          //     args: new_args.cloned().unwrap_or_else(|| args.clone()),
-          // },
+        }
     }
 }
 
