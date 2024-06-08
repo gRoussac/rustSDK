@@ -5,7 +5,7 @@ use futures_util::StreamExt;
 use gloo_utils::format::JsValueSerdeExt;
 #[cfg(target_arch = "wasm32")]
 use js_sys::Promise;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::{
     cell::RefCell,
@@ -371,7 +371,7 @@ impl Watcher {
         let client = reqwest::Client::new();
         let url = self.events_url.clone();
 
-        let deploy_watcher = Rc::new(RefCell::new(self.clone()));
+        let watcher = Rc::new(RefCell::new(self.clone()));
 
         let start_time = Utc::now();
         let timeout_duration = self.timeout_duration;
@@ -396,7 +396,7 @@ impl Watcher {
             while let Some(chunk) = bytes_stream.next().await {
                 match chunk {
                     Ok(bytes) => {
-                        let this_clone = Rc::clone(&deploy_watcher);
+                        let this_clone = Rc::clone(&watcher);
                         if !*this_clone.borrow_mut().active.borrow() {
                             return None;
                         }
@@ -415,9 +415,9 @@ impl Watcher {
                             let message = buffer.drain(..=index).collect::<Vec<_>>();
 
                             if let Ok(message) = std::str::from_utf8(&message) {
-                                let deploy_watcher_clone = this_clone.borrow_mut().clone();
-                                let result = deploy_watcher_clone
-                                    .process_events(message, target_hash.as_deref());
+                                let watcher_clone = this_clone.borrow_mut().clone();
+                                let result =
+                                    watcher_clone.process_events(message, target_hash.as_deref());
                                 match result {
                                     Some(event_parse_result) => return Some(event_parse_result),
                                     None => {
@@ -745,12 +745,56 @@ pub struct ExecutionResult {
     pub failure: Option<Failure>,
 }
 
-#[derive(Debug, Deserialize, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize, Default)]
 #[wasm_bindgen(getter_with_clone)]
-pub struct DeployString {
-    #[serde(rename = "Deploy")]
-    #[wasm_bindgen(js_name = "Deploy")]
-    pub deploy: String,
+pub struct HashString {
+    pub hash: String,
+}
+
+impl HashString {
+    fn from_hash(hash: String) -> Self {
+        HashString { hash }
+    }
+}
+
+impl<'de> Deserialize<'de> for HashString {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let map: std::collections::HashMap<String, String> =
+            Deserialize::deserialize(deserializer)?;
+
+        if let Some(hash) = map.get("Version1").or_else(|| map.get("Deploy")) {
+            Ok(HashString::from_hash(hash.clone()))
+        } else {
+            Err(serde::de::Error::missing_field("Deploy or Version1"))
+        }
+    }
+}
+
+#[wasm_bindgen]
+impl HashString {
+    #[wasm_bindgen(getter, js_name = "Deploy")]
+    pub fn deploy(&self) -> String {
+        self.hash.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = "Version1")]
+    pub fn version1(&self) -> String {
+        self.hash.clone()
+    }
+
+    #[wasm_bindgen(js_name = "toString")]
+    pub fn to_string_js(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl fmt::Display for HashString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.hash)
+    }
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
@@ -784,7 +828,8 @@ pub struct Messages {
 #[derive(Debug, Deserialize, Clone, Default, Serialize)]
 #[wasm_bindgen(getter_with_clone)]
 pub struct TransactionProcessed {
-    pub transaction_hash: DeployString,
+    #[serde(alias = "transaction_hash")]
+    pub hash: HashString,
     pub initiator_addr: PublicKeyString,
     pub timestamp: String,
     pub ttl: String,
@@ -856,7 +901,7 @@ impl fmt::Display for EventName {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::watcher::deploy_mock::DEPLOY_MOCK;
+    use crate::watcher::{deploy_mock::DEPLOY_MOCK, transaction_mock::TRANSACTION_MOCK};
     use sdk_tests::tests::helpers::get_network_constants;
     use tokio;
 
@@ -867,14 +912,14 @@ mod tests {
         let timeout_duration = 5000;
 
         // Act
-        let deploy_watcher = Watcher::new(events_url.clone(), Some(timeout_duration));
+        let watcher = Watcher::new(events_url.clone(), Some(timeout_duration));
 
         // Assert
-        assert_eq!(deploy_watcher.events_url, events_url);
-        assert_eq!(deploy_watcher.subscriptions.len(), 0);
-        assert!(*deploy_watcher.active.borrow());
+        assert_eq!(watcher.events_url, events_url);
+        assert_eq!(watcher.subscriptions.len(), 0);
+        assert!(*watcher.active.borrow());
         assert_eq!(
-            deploy_watcher.timeout_duration,
+            watcher.timeout_duration,
             Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
         );
     }
@@ -885,14 +930,14 @@ mod tests {
         let (_, events_url, _, _) = get_network_constants();
 
         // Act
-        let deploy_watcher = Watcher::new(events_url.clone(), None);
+        let watcher = Watcher::new(events_url.clone(), None);
 
         // Assert
-        assert_eq!(deploy_watcher.events_url, events_url);
-        assert_eq!(deploy_watcher.subscriptions.len(), 0);
-        assert!(*deploy_watcher.active.borrow());
+        assert_eq!(watcher.events_url, events_url);
+        assert_eq!(watcher.subscriptions.len(), 0);
+        assert!(*watcher.active.borrow());
         assert_eq!(
-            deploy_watcher.timeout_duration,
+            watcher.timeout_duration,
             Duration::try_milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap()).unwrap()
         );
     }
@@ -910,16 +955,17 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_process_events() {
+    #[allow(deprecated)]
+    async fn test_process_events_legacy() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let deploy_watcher = Watcher::new(events_url, None);
+        let watcher = Watcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         let target_deploy_hash = Some(deploy_hash);
 
         // Act
-        let result = deploy_watcher.process_events(DEPLOY_MOCK, target_deploy_hash);
+        let result = watcher.process_events(DEPLOY_MOCK, target_deploy_hash);
 
         // Assert
         assert!(result.is_some());
@@ -930,18 +976,43 @@ mod tests {
         assert!(event_parse_result.err.is_none());
 
         let body = event_parse_result.body.as_ref().unwrap();
-        let transaction_processed = body.transaction_processed.as_ref().unwrap();
-        assert_eq!(transaction_processed.transaction_hash.deploy, deploy_hash);
+        let get_deploy_processed = body.get_deploy_processed().unwrap();
+        assert_eq!(get_deploy_processed.hash.to_string(), deploy_hash);
+    }
+
+    #[tokio::test]
+    async fn test_process_events() {
+        // Arrange
+        let (_, events_url, _, _) = get_network_constants();
+        let watcher = Watcher::new(events_url, None);
+        let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
+
+        let target_transaction_hash = Some(transaction_hash);
+
+        // Act
+        let result = watcher.process_events(TRANSACTION_MOCK, target_transaction_hash);
+
+        // Assert
+        assert!(result.is_some());
+        let results = result.unwrap();
+        assert_eq!(results.len(), 1);
+
+        let event_parse_result = &results[0];
+        assert!(event_parse_result.err.is_none());
+
+        let body = event_parse_result.body.as_ref().unwrap();
+        let transaction_processed = body.get_transaction_processed().unwrap();
+        assert_eq!(transaction_processed.hash.to_string(), transaction_hash);
     }
 
     #[tokio::test]
     async fn test_start_timeout() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let deploy_watcher = Watcher::new(events_url, Some(1));
+        let watcher = Watcher::new(events_url, Some(1));
 
         // Act
-        let result = deploy_watcher.start().await;
+        let result = watcher.start().await;
 
         // Assert
         assert!(result.is_some());
@@ -955,36 +1026,37 @@ mod tests {
     fn test_stop() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let deploy_watcher = Watcher::new(events_url, None);
-        assert!(*deploy_watcher.active.borrow());
+        let watcher = Watcher::new(events_url, None);
+        assert!(*watcher.active.borrow());
 
         // Act
-        deploy_watcher.stop();
+        watcher.stop();
 
         // Assert
-        assert!(!(*deploy_watcher.active.borrow()));
+        assert!(!(*watcher.active.borrow()));
     }
 
     #[test]
     fn test_subscribe() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let mut deploy_watcher = Watcher::new(events_url, None);
-        let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
+        let mut watcher = Watcher::new(events_url, None);
+        let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
 
         // Create a subscription
-        let subscription = Subscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+        let subscription =
+            Subscription::new(transaction_hash.to_string(), EventHandlerFn::default());
 
         // Act
-        let result = deploy_watcher.subscribe(vec![subscription]);
+        let result = watcher.subscribe(vec![subscription]);
 
         // Assert
         assert!(result.is_ok());
 
         // Try subscribing to the same deploy hash again
         let duplicate_subscription =
-            Subscription::new(deploy_hash.to_string(), EventHandlerFn::default());
-        let result_duplicate = deploy_watcher.subscribe(vec![duplicate_subscription]);
+            Subscription::new(transaction_hash.to_string(), EventHandlerFn::default());
+        let result_duplicate = watcher.subscribe(vec![duplicate_subscription]);
 
         // Assert
         assert!(result_duplicate.is_err());
@@ -998,29 +1070,31 @@ mod tests {
     fn test_unsubscribe() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let mut deploy_watcher = Watcher::new(events_url, None);
-        let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
+        let mut watcher = Watcher::new(events_url, None);
+        let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
 
-        // Subscribe to a deploy hash
-        let deploy_hash_to_subscribe = deploy_hash.to_string();
-        let subscription =
-            Subscription::new(deploy_hash_to_subscribe.clone(), EventHandlerFn::default());
-        let _ = deploy_watcher.subscribe(vec![subscription]);
+        // Subscribe to a transaction hash
+        let transaction_hash_to_subscribe = transaction_hash.to_string();
+        let subscription = Subscription::new(
+            transaction_hash_to_subscribe.clone(),
+            EventHandlerFn::default(),
+        );
+        let _ = watcher.subscribe(vec![subscription]);
 
         // Assert that the deploy hash is initially subscribed
-        assert!(deploy_watcher
+        assert!(watcher
             .subscriptions
             .iter()
-            .any(|s| s.target_hash == deploy_hash_to_subscribe));
+            .any(|s| s.target_hash == transaction_hash_to_subscribe));
 
         // Act
-        deploy_watcher.unsubscribe(deploy_hash_to_subscribe.clone());
+        watcher.unsubscribe(transaction_hash_to_subscribe.clone());
 
         // Assert that the deploy hash is unsubscribed after calling unsubscribe
-        assert!(!deploy_watcher
+        assert!(!watcher
             .subscriptions
             .iter()
-            .any(|s| s.target_hash == deploy_hash_to_subscribe));
+            .any(|s| s.target_hash == transaction_hash_to_subscribe));
     }
 
     #[test]
@@ -1032,14 +1106,34 @@ mod tests {
         let timeout_duration = 5000;
 
         // Act
-        let deploy_watcher = sdk.watch_deploy(&events_url, Some(timeout_duration));
+        let watcher = sdk.watch_deploy(&events_url, Some(timeout_duration));
 
         // Assert
-        assert_eq!(deploy_watcher.events_url, events_url);
-        assert_eq!(deploy_watcher.subscriptions.len(), 0);
-        assert!(*deploy_watcher.active.borrow());
+        assert_eq!(watcher.events_url, events_url);
+        assert_eq!(watcher.subscriptions.len(), 0);
+        assert!(*watcher.active.borrow());
         assert_eq!(
-            deploy_watcher.timeout_duration,
+            watcher.timeout_duration,
+            Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_sdk_watch_transaction_retunrs_instance() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let (_, events_url, _, _) = get_network_constants();
+        let timeout_duration = 5000;
+
+        // Act
+        let watcher = sdk.watch_transaction(&events_url, Some(timeout_duration));
+
+        // Assert
+        assert_eq!(watcher.events_url, events_url);
+        assert_eq!(watcher.subscriptions.len(), 0);
+        assert!(*watcher.active.borrow());
+        assert_eq!(
+            watcher.timeout_duration,
             Duration::try_milliseconds(timeout_duration.try_into().unwrap()).unwrap()
         );
     }
@@ -1056,6 +1150,26 @@ mod tests {
         // Act
         let result = sdk
             .wait_deploy(&events_url, deploy_hash, timeout_duration)
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+        let event_parse_result = result.unwrap();
+        assert!(event_parse_result.err.is_some());
+        assert_eq!(event_parse_result.err, Some("Timeout expired".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_wait_transaction_timeout() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let (_, events_url, _, _) = get_network_constants();
+        let transaction_hash = "8c6823d9480eee9fe0cfb5ed1fbf77f928cc6af21121298c05b4e3d87a328271";
+        let timeout_duration = Some(5000);
+
+        // Act
+        let result = sdk
+            .wait_transaction(&events_url, transaction_hash, timeout_duration)
             .await;
 
         // Assert

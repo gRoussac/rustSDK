@@ -211,10 +211,7 @@ pub(crate) mod intern {
             .unwrap()
             .get_deploy_processed()
             .unwrap();
-        assert_eq!(
-            deploy_processed.transaction_hash.deploy,
-            deploy_hash_as_string
-        );
+        assert_eq!(deploy_processed.hash.to_string(), deploy_hash_as_string);
 
         let get_deploy = sdk
             .get_deploy(
@@ -435,10 +432,7 @@ pub async fn mint_nft(
         .unwrap()
         .get_deploy_processed()
         .unwrap();
-    assert_eq!(
-        deploy_processed.transaction_hash.deploy,
-        deploy_hash_as_string
-    );
+    assert_eq!(deploy_processed.hash.to_string(), deploy_hash_as_string);
 }
 
 pub async fn get_block(node_address: &str) -> (String, u64) {

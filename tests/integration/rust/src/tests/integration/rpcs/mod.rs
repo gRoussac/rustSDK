@@ -476,10 +476,7 @@ pub mod test_module {
             .unwrap()
             .get_deploy_processed()
             .unwrap();
-        assert_eq!(
-            deploy_processed.transaction_hash.deploy,
-            deploy_hash_as_string
-        );
+        assert_eq!(deploy_processed.hash.to_string(), deploy_hash_as_string);
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(config.to_owned().account_hash),

@@ -26,7 +26,7 @@ pub mod test_module {
             .unwrap()
             .get_deploy_processed()
             .unwrap();
-        assert_eq!(deploy_processed.transaction_hash.deploy, deploy_hash);
+        assert_eq!(deploy_processed.hash.to_string(), deploy_hash);
     }
 
     #[allow(deprecated)]
@@ -76,7 +76,7 @@ pub mod test_module {
             .as_ref()
             .and_then(|result| result.body.as_ref())
             .and_then(|body| body.get_deploy_processed())
-            .map(|deploy_processed| deploy_processed.transaction_hash.deploy.clone())
+            .map(|deploy_processed| deploy_processed.hash.to_string())
             .expect("Expected deploy hash in the result");
 
         assert_eq!(actual_deploy_hash, deploy_hash);
