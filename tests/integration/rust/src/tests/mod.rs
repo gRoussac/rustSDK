@@ -4,9 +4,9 @@ pub mod integration;
 pub mod integration_tests;
 use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
 use casper_rust_wasm_sdk::{
-    deploy_watcher::watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
     helpers::public_key_from_secret_key,
     types::verbosity::Verbosity,
+    watcher::{EventHandlerFn, EventParseResult, Subscription},
     SDK,
 };
 use std::{
@@ -372,7 +372,8 @@ pub async fn _run_example_10() {
     println!("{:?}", put_deploy.as_ref().unwrap().result.deploy_hash);
 }
 
-// install
+// install_deploy
+#[allow(deprecated)]
 pub async fn _run_example_11() -> Result<(), String> {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -475,6 +476,7 @@ pub async fn _run_example_11() -> Result<(), String> {
 }
 
 // call_entrypoint_deploy
+#[allow(deprecated)]
 pub async fn _run_example_12() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -528,12 +530,12 @@ pub async fn _run_example_12() {
     println!("watch deploy_hash {deploy_hash_string}");
     let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
 
-    let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+    let mut deploy_subscriptions: Vec<Subscription> = vec![];
     let deploy_hash_results = vec![deploy_hash_string.to_string().clone()];
 
     for deploy_hash in deploy_hash_results {
         let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
-        deploy_subscriptions.push(DeploySubscription::new(
+        deploy_subscriptions.push(Subscription::new(
             deploy_hash,
             EventHandlerFn::new(event_handler_fn),
         ));

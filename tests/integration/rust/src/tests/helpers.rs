@@ -4,7 +4,6 @@ use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_PRIVATE_KEY_NAME,
     DEFAULT_PRIVATE_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
-use casper_rust_wasm_sdk::deploy_watcher::watcher::EventParseResult;
 use casper_rust_wasm_sdk::rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams};
 use casper_rust_wasm_sdk::types::block_hash::BlockHash;
 use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
@@ -12,6 +11,7 @@ use casper_rust_wasm_sdk::types::deploy_params::{
     deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
     session_str_params::SessionStrParams,
 };
+use casper_rust_wasm_sdk::watcher::EventParseResult;
 use lazy_static::lazy_static;
 use std::{
     env,
@@ -206,7 +206,11 @@ pub(crate) mod intern {
             .wait_deploy(event_address, &deploy_hash_as_string, None)
             .await
             .unwrap();
-        let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+        let deploy_processed = event_parse_result
+            .body
+            .unwrap()
+            .get_deploy_processed()
+            .unwrap();
         assert_eq!(
             deploy_processed.transaction_hash.deploy,
             deploy_hash_as_string
@@ -426,7 +430,11 @@ pub async fn mint_nft(
         .wait_deploy(event_address, &deploy_hash_as_string, None)
         .await
         .unwrap();
-    let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+    let deploy_processed = event_parse_result
+        .body
+        .unwrap()
+        .get_deploy_processed()
+        .unwrap();
     assert_eq!(
         deploy_processed.transaction_hash.deploy,
         deploy_hash_as_string
@@ -456,7 +464,9 @@ pub fn get_event_handler_fn(deploy_hash: String) -> impl Fn(EventParseResult) {
         // println!("get_event_handler_fn {}", deploy_hash);
         if let Some(err) = &event_parse_result.err {
             println!("{} {}", deploy_hash, err);
-        } else if let Some(deploy_processed) = &event_parse_result.body.unwrap().deploy_processed {
+        } else if let Some(deploy_processed) =
+            &event_parse_result.body.unwrap().get_deploy_processed()
+        {
             if let Some(success) = &deploy_processed.execution_result.success {
                 println!(
                     "Hash: {}\nBlock: {:?}\nCost: {} motes",

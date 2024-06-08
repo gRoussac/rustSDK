@@ -407,7 +407,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                     return __generator(this, function (_a) {
                         eventHandlerFn = getEventHandlerFn(deploy_hash);
                         console.log(deploy_hash);
-                        deploySubscription = new casper_sdk_1.DeploySubscription(deploy_hash, eventHandlerFn);
+                        deploySubscription = new casper_sdk_1.Subscription(deploy_hash, eventHandlerFn);
                         deploySubscriptions.push(deploySubscription);
                         return [2 /*return*/];
                     });

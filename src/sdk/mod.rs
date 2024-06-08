@@ -12,7 +12,7 @@ pub(crate) use deploy_utils::*;
 pub(crate) mod transaction_utils;
 pub(crate) use transaction_utils::*;
 
-pub mod deploy_watcher;
+pub mod watcher;
 
 pub(crate) mod contract;
 pub use contract::*;

@@ -20,40 +20,83 @@ use wasm_bindgen_futures::future_to_promise;
 const DEFAULT_TIMEOUT_MS: u64 = 60000;
 
 impl SDK {
-    /// Creates a new DeployWatcher instance to watch deploys.
+    /// Creates a new Watcher instance to watch deploys.
+    /// Legacy alias
     ///
     /// # Arguments
     ///
-    /// * `events_url` - The URL to monitor for deploy events.
+    /// * `events_url` - The URL to monitor for transaction events.
     /// * `timeout_duration` - An optional timeout duration in seconds.
     ///
     /// # Returns
     ///
-    /// A `DeployWatcher` instance.
-    pub fn watch_deploy(&self, events_url: &str, timeout_duration: Option<u64>) -> DeployWatcher {
-        DeployWatcher::new(events_url.to_string(), timeout_duration)
+    /// A `Watcher` instance.
+    #[deprecated(note = "prefer 'watch_transaction'")]
+    pub fn watch_deploy(&self, events_url: &str, timeout_duration: Option<u64>) -> Watcher {
+        Watcher::new(events_url.to_string(), timeout_duration)
     }
 
-    /// Waits for a deploy event to be processed asynchronously.
+    /// Creates a new Watcher instance to watch deploys.
     ///
     /// # Arguments
     ///
-    /// * `events_url` - The URL to monitor for deploy events.
+    /// * `events_url` - The URL to monitor for transaction events.
+    /// * `timeout_duration` - An optional timeout duration in seconds.
+    ///
+    /// # Returns
+    ///
+    /// A `Watcher` instance.
+    pub fn watch_transaction(&self, events_url: &str, timeout_duration: Option<u64>) -> Watcher {
+        Watcher::new(events_url.to_string(), timeout_duration)
+    }
+
+    /// Waits for a deploy event to be processed asynchronously.
+    /// Legacy alias
+    ///
+    /// # Arguments
+    ///
+    /// * `events_url` - The URL to monitor for transaction events.
     /// * `deploy_hash` - The deploy hash to wait for.
     /// * `timeout_duration` - An optional timeout duration in milliseconds.
     ///
     /// # Returns
     ///
     /// A `Result` containing either the processed `EventParseResult` or an error message.
+    #[deprecated(note = "prefer 'wait_transaction' with transaction")]
     pub async fn wait_deploy(
         &self,
         events_url: &str,
         deploy_hash: &str,
         timeout_duration: Option<u64>,
     ) -> Result<EventParseResult, String> {
-        Self::wait_deploy_internal(
+        Self::wait_transaction_internal(
             events_url.to_string(),
             deploy_hash.to_string(),
+            timeout_duration,
+        )
+        .await
+    }
+
+    /// Alias for wait_deploy Waits for a deploy event to be processed asynchronously.
+    ///
+    /// # Arguments
+    ///
+    /// * `events_url` - The URL to monitor for transaction events.
+    /// * `target_hash` - The transaction hash to wait for.
+    /// * `timeout_duration` - An optional timeout duration in milliseconds.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing either the processed `EventParseResult` or an error message
+    pub async fn wait_transaction(
+        &self,
+        events_url: &str,
+        target_hash: &str,
+        timeout_duration: Option<u64>,
+    ) -> Result<EventParseResult, String> {
+        Self::wait_transaction_internal(
+            events_url.to_string(),
+            target_hash.to_string(),
             timeout_duration,
         )
         .await
@@ -63,20 +106,20 @@ impl SDK {
     ///
     /// # Arguments
     ///
-    /// * `events_url` - The URL to monitor for deploy events.
-    /// * `deploy_hash` - The deploy hash to wait for.
+    /// * `events_url` - The URL to monitor for transaction events.
+    /// * `target_hash` - The transaction hash to wait for.
     /// * `timeout_duration` - An optional timeout duration in milliseconds.
     ///
     /// # Returns
     ///
     /// A `Result` containing either the processed `EventParseResult` or an error message.
-    async fn wait_deploy_internal(
+    async fn wait_transaction_internal(
         events_url: String,
-        deploy_hash: String,
+        target_hash: String,
         timeout_duration: Option<u64>,
     ) -> Result<EventParseResult, String> {
-        let watcher = DeployWatcher::new(events_url, timeout_duration);
-        let result = watcher.start_internal(Some(deploy_hash)).await;
+        let watcher = Watcher::new(events_url, timeout_duration);
+        let result = watcher.start_internal(Some(target_hash)).await;
         match result {
             Some(event_parse_results) => {
                 if let Some(event_parse_result) = event_parse_results.first() {
@@ -91,31 +134,55 @@ impl SDK {
 
 #[wasm_bindgen]
 impl SDK {
-    /// Creates a new DeployWatcher instance to watch deploys (JavaScript-friendly).
+    /// Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+    /// Legacy alias
     ///
     /// # Arguments
     ///
-    /// * `events_url` - The URL to monitor for deploy events.
+    /// * `events_url` - The URL to monitor for transaction events.
     /// * `timeout_duration` - An optional timeout duration in seconds.
     ///
     /// # Returns
     ///
-    /// A `DeployWatcher` instance.
+    /// A `Watcher` instance.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "watchDeploy")]
+    #[deprecated(note = "prefer 'watchTransaction'")]
+    #[allow(deprecated)]
     pub fn watch_deploy_js_alias(
         &self,
         events_url: &str,
         timeout_duration: Option<u32>,
-    ) -> DeployWatcher {
+    ) -> Watcher {
         self.watch_deploy(events_url, timeout_duration.map(Into::into))
     }
 
-    /// Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+    /// Creates a new Watcher instance to watch deploys (JavaScript-friendly).
     ///
     /// # Arguments
     ///
-    /// * `events_url` - The URL to monitor for deploy events.
+    /// * `events_url` - The URL to monitor for transaction events.
+    /// * `timeout_duration` - An optional timeout duration in seconds.
+    ///
+    /// # Returns
+    ///
+    /// A `Watcher` instance.
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "watchTransaction")]
+    pub fn watch_transaction_js_alias(
+        &self,
+        events_url: &str,
+        timeout_duration: Option<u32>,
+    ) -> Watcher {
+        self.watch_transaction(events_url, timeout_duration.map(Into::into))
+    }
+
+    /// Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+    /// Legacy alias
+    ///
+    /// # Arguments
+    ///
+    /// * `events_url` - The URL to monitor for transaction events.
     /// * `deploy_hash` - The deploy hash to wait for.
     /// * `timeout_duration` - An optional timeout duration in seconds.
     ///
@@ -124,18 +191,43 @@ impl SDK {
     /// A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "waitDeploy")]
+    #[deprecated(note = "prefer 'waitTransaction' with transaction")]
+    #[allow(deprecated)]
     pub async fn wait_deploy_js_alias(
         &self,
         events_url: &str,
         deploy_hash: &str,
         timeout_duration: Option<u32>,
     ) -> Promise {
+        self.wait_transaction_js_alias(events_url, deploy_hash, timeout_duration)
+            .await
+    }
+
+    /// Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+    ///
+    /// # Arguments
+    ///
+    /// * `events_url` - The URL to monitor for transaction events.
+    /// * `target_hash` - The transaction hash to wait for.
+    /// * `timeout_duration` - An optional timeout duration in seconds.
+    ///
+    /// # Returns
+    ///
+    /// A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "waitTransaction")]
+    pub async fn wait_transaction_js_alias(
+        &self,
+        events_url: &str,
+        target_hash: &str,
+        timeout_duration: Option<u32>,
+    ) -> Promise {
         let events_url = events_url.to_string();
-        let deploy_hash = deploy_hash.to_string();
+        let target_hash = target_hash.to_string();
         let future = async move {
-            let result = Self::wait_deploy_internal(
+            let result = Self::wait_transaction_internal(
                 events_url,
-                deploy_hash,
+                target_hash,
                 timeout_duration.map(Into::into),
             )
             .await;
@@ -150,39 +242,39 @@ impl SDK {
     }
 }
 
-/// Represents a deploy watcher responsible for monitoring deploy events.
+/// Represents a deploy watcher responsible for monitoring transaction events.
 ///
-/// This struct allows clients to subscribe to deploy events, start watching for events,
+/// This struct allows clients to subscribe to transaction events, start watching for events,
 /// or wait for an event and handle the received deploy event data.
 ///
 /// # Fields
 ///
-/// * `events_url` - The URL for deploy events.
-/// * `deploy_subscriptions` - Vector containing deploy subscriptions.
+/// * `events_url` - The URL for transaction events.
+/// * `subscriptions` - Vector containing deploy subscriptions.
 /// * `active` - Reference-counted cell indicating whether the deploy watcher is active.
 /// * `timeout_duration` - Duration representing the optional timeout for watching events.
 #[derive(Clone)]
 #[wasm_bindgen]
-pub struct DeployWatcher {
+pub struct Watcher {
     events_url: String,
-    deploy_subscriptions: Vec<DeploySubscription>,
+    subscriptions: Vec<Subscription>,
     active: Rc<RefCell<bool>>,
     timeout_duration: Duration,
 }
 
 #[wasm_bindgen]
-impl DeployWatcher {
-    /// Creates a new `DeployWatcher` instance.
+impl Watcher {
+    /// Creates a new `Watcher` instance.
     ///
     /// # Arguments
     ///
-    /// * `events_url` - The URL for deploy events.
+    /// * `events_url` - The URL for transaction events.
     /// * `timeout_duration` - Optional duration in milliseconds for watching events. If not provided,
     ///   a default timeout of 60,000 milliseconds (1 minute) is used.
     ///
     /// # Returns
     ///
-    /// A new `DeployWatcher` instance.
+    /// A new `Watcher` instance.
     #[wasm_bindgen(constructor)]
     pub fn new(events_url: String, timeout_duration: Option<u64>) -> Self {
         let timeout_duration = Duration::try_milliseconds(
@@ -193,50 +285,46 @@ impl DeployWatcher {
         )
         .unwrap_or_default();
 
-        DeployWatcher {
+        Watcher {
             events_url,
-            deploy_subscriptions: Vec::new(),
+            subscriptions: Vec::new(),
             active: Rc::new(RefCell::new(true)),
             timeout_duration,
         }
     }
 
-    /// Subscribes to deploy events.
+    /// Subscribes to transaction events.
     ///
     /// # Arguments
     ///
-    /// * `deploy_subscriptions` - Vector of deploy subscriptions to be added.
+    /// * `subscriptions` - Vector of deploy subscriptions to be added.
     ///
     /// # Returns
     ///
     /// Result indicating success or an error message.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "subscribe")]
-    pub fn subscribe_js_alias(
-        &mut self,
-        deploy_subscriptions: Vec<DeploySubscription>,
-    ) -> Result<(), String> {
-        self.subscribe(deploy_subscriptions)
+    pub fn subscribe_js_alias(&mut self, subscriptions: Vec<Subscription>) -> Result<(), String> {
+        self.subscribe(subscriptions)
     }
 
-    /// Unsubscribes from deploy events based on the provided deploy hash.
+    /// Unsubscribes from transaction events based on the provided transaction hash.
     ///
     /// # Arguments
     ///
-    /// * `deploy_hash` - The deploy hash to unsubscribe.
+    /// * `transaction_hash` - The transaction hash to unsubscribe.
     ///
-    /// This method removes the deploy subscription associated with the provided deploy hash.
+    /// This method removes the deploy subscription associated with the provided transaction hash.
     #[wasm_bindgen]
-    pub fn unsubscribe(&mut self, deploy_hash: String) {
-        self.deploy_subscriptions
-            .retain(|s| s.deploy_hash != deploy_hash);
+    pub fn unsubscribe(&mut self, target_hash: String) {
+        self.subscriptions.retain(|s| s.target_hash != target_hash);
     }
 
-    /// Starts watching for deploy events (JavaScript-friendly).
+    /// Starts watching for transaction events (JavaScript-friendly).
     ///
     /// # Returns
     ///
-    /// Result containing the serialized deploy events data or an error message.
+    /// Result containing the serialized transaction events data or an error message.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "start")]
     pub async fn start_js_alias(&self) -> Result<JsValue, JsValue> {
@@ -249,7 +337,7 @@ impl DeployWatcher {
         }
     }
 
-    /// Stops watching for deploy events.
+    /// Stops watching for transaction events.
     ///
     /// This method sets the deploy watcher as inactive and stops the event listener if it exists.
     #[wasm_bindgen]
@@ -258,8 +346,8 @@ impl DeployWatcher {
     }
 }
 
-impl DeployWatcher {
-    /// Asynchronously starts watching for deploy events and execute callback handler functions from deploy subscriptions
+impl Watcher {
+    /// Asynchronously starts watching for transaction events and execute callback handler functions from deploy subscriptions
     ///
     /// # Returns
     ///
@@ -268,16 +356,16 @@ impl DeployWatcher {
         self.start_internal(None).await
     }
 
-    /// Asynchronously starts watching for deploy events
+    /// Asynchronously starts watching for transaction events
     ///
     /// # Arguments
     ///
-    /// * `deploy_hash` - Optional deploy hash to directly return processed event. If provided, it directly returns matched events without executing callback handler functions from deploy subscriptions. If `None`, it executes callback handler functions from deploy subscriptions.
+    /// * `transaction_hash` - Optional transaction hash to directly return processed event. If provided, it directly returns matched events without executing callback handler functions from deploy subscriptions. If `None`, it executes callback handler functions from deploy subscriptions.
     ///
     /// # Returns
     ///
     /// An `Option` containing the serialized deploy event data or `None` if no events are received.
-    async fn start_internal(&self, deploy_hash: Option<String>) -> Option<Vec<EventParseResult>> {
+    async fn start_internal(&self, target_hash: Option<String>) -> Option<Vec<EventParseResult>> {
         *self.active.borrow_mut() = true;
 
         let client = reqwest::Client::new();
@@ -329,7 +417,7 @@ impl DeployWatcher {
                             if let Ok(message) = std::str::from_utf8(&message) {
                                 let deploy_watcher_clone = this_clone.borrow_mut().clone();
                                 let result = deploy_watcher_clone
-                                    .process_events(message, deploy_hash.as_deref());
+                                    .process_events(message, target_hash.as_deref());
                                 match result {
                                     Some(event_parse_result) => return Some(event_parse_result),
                                     None => {
@@ -364,29 +452,26 @@ impl DeployWatcher {
         None
     }
 
-    /// Subscribes to deploy events.
+    /// Subscribes to transaction events.
     ///
     /// # Arguments
     ///
-    /// * `deploy_subscriptions` - Vector of deploy subscriptions to be added.
+    /// * `subscriptions` - Vector of subscriptions to be added.
     ///
     /// # Returns
     ///
     /// Result indicating success or an error message.
-    pub fn subscribe(
-        &mut self,
-        deploy_subscriptions: Vec<DeploySubscription>,
-    ) -> Result<(), String> {
-        for new_subscription in &deploy_subscriptions {
+    pub fn subscribe(&mut self, subscriptions: Vec<Subscription>) -> Result<(), String> {
+        for new_subscription in &subscriptions {
             if self
-                .deploy_subscriptions
+                .subscriptions
                 .iter()
-                .any(|s| s.deploy_hash == new_subscription.deploy_hash)
+                .any(|s| s.target_hash == new_subscription.target_hash)
             {
                 return Err(String::from("Already subscribed to this event"));
             }
         }
-        self.deploy_subscriptions.extend(deploy_subscriptions);
+        self.subscriptions.extend(subscriptions);
         Ok(())
     }
 
@@ -395,53 +480,62 @@ impl DeployWatcher {
     /// # Arguments
     ///
     /// * `message` - The raw message received from the event stream.
-    /// * `target_deploy_hash` - Optional deploy hash to directly return. If provided, it directly returns matched events without executing callback handler functions from deploy subscriptions. If `None`, it executes callback handler functions from deploy subscriptions.
+    /// * `target_transaction_hash` - Optional transaction hash to directly return. If provided, it directly returns matched events without executing callback handler functions from subscriptions. If `None`, it executes callback handler functions from subscriptions.
     ///
     /// # Returns
     ///
-    /// An `Option` containing the serialized deploy event data or `None` if an error occurs.
+    /// An `Option` containing the serialized transaction/deploy event data or `None` if an error occurs.
     fn process_events(
         mut self,
         message: &str,
-        target_deploy_hash: Option<&str>,
+        target_hash: Option<&str>,
     ) -> Option<Vec<EventParseResult>> {
         let data_stream = Self::extract_data_stream(message);
 
         for data_item in data_stream {
             let trimmed_item = data_item.trim();
-            let deploy_processed_str = EventName::TransactionProcessed.to_string();
+            let transaction_processed_str = EventName::TransactionProcessed.to_string();
 
-            if !trimmed_item.contains(&deploy_processed_str) {
+            if !trimmed_item.contains(&transaction_processed_str) {
                 continue;
             }
 
             if let Ok(parsed_json) = serde_json::from_str::<Value>(trimmed_item) {
-                let deploy = parsed_json.get(deploy_processed_str);
-                if let Some(deploy_processed) = deploy.and_then(|deploy| deploy.as_object()) {
-                    if let Some(deploy_hash_processed) = deploy_processed
+                let transaction = parsed_json.get(transaction_processed_str);
+                if let Some(transaction_processed) =
+                    transaction.and_then(|transaction| transaction.as_object())
+                {
+                    if let Some(transaction_hash_processed) = transaction_processed
                         .get("transaction_hash")
-                        .and_then(|transaction_hash| transaction_hash.get("Deploy"))
-                        .and_then(|deploy_hash| deploy_hash.as_str())
+                        .and_then(|transaction_hash| {
+                            transaction_hash
+                                .get("Version1")
+                                .or_else(|| transaction_hash.get("Deploy"))
+                                .and_then(|transaction_hash| transaction_hash.as_str())
+                        })
                     {
-                        let mut deploy_hash_found = target_deploy_hash
-                            .map_or(false, |target_hash| target_hash == deploy_hash_processed);
+                        let mut transaction_hash_found = target_hash.map_or(false, |target_hash| {
+                            target_hash == transaction_hash_processed
+                        });
 
-                        let deploy_processed: Option<TransactionProcessed> =
-                            serde_json::from_value(deploy.unwrap().clone()).ok();
+                        let transaction_processed: Option<TransactionProcessed> =
+                            serde_json::from_value(transaction.unwrap().clone()).ok();
 
-                        let body = Some(Body { deploy_processed });
+                        let body = Some(Body {
+                            transaction_processed,
+                        });
 
                         let event_parse_result = EventParseResult { err: None, body };
 
-                        if deploy_hash_found {
-                            self.unsubscribe(target_deploy_hash.unwrap().to_string());
+                        if transaction_hash_found {
+                            self.unsubscribe(target_hash.unwrap().to_string());
                             self.stop();
                             return Some([event_parse_result].to_vec());
                         }
 
                         let mut results: Vec<EventParseResult> = [].to_vec();
-                        for subscription in self.deploy_subscriptions.clone().iter() {
-                            if deploy_hash_processed == subscription.deploy_hash {
+                        for subscription in self.subscriptions.clone().iter() {
+                            if transaction_hash_processed == subscription.target_hash {
                                 let event_handler = &subscription.event_handler_fn;
 
                                 #[cfg(not(target_arch = "wasm32"))]
@@ -458,13 +552,13 @@ impl DeployWatcher {
                                     event_handler.apply(&this, &args).unwrap();
                                 }
 
-                                self.unsubscribe(deploy_hash_processed.to_string());
-                                deploy_hash_found = true;
+                                self.unsubscribe(transaction_hash_processed.to_string());
+                                transaction_hash_found = true;
                                 results.push(event_parse_result.clone())
                             }
                         }
 
-                        if deploy_hash_found && self.deploy_subscriptions.is_empty() {
+                        if transaction_hash_found && self.subscriptions.is_empty() {
                             self.stop();
                             return Some(results);
                         }
@@ -553,59 +647,59 @@ impl Default for EventHandlerFn {
     }
 }
 
-// Define DeploySubscription struct with different configurations based on the target architecture.
+// Define Subscription struct with different configurations based on the target architecture.
 #[cfg(not(target_arch = "wasm32"))]
-/// Represents a subscription to deploy events for non-wasm32 target architecture.
+/// Represents a subscription to transaction events for non-wasm32 target architecture.
 #[derive(Debug, Clone, Default)]
-pub struct DeploySubscription {
-    /// Deploy hash to identify the subscription.
-    pub deploy_hash: String,
-    /// Handler function for deploy events.
+pub struct Subscription {
+    /// Transaction target hash to identify the subscription.
+    pub target_hash: String,
+    /// Handler function for transaction events.
     pub event_handler_fn: EventHandlerFn,
 }
 
 #[cfg(target_arch = "wasm32")]
-/// Represents a subscription to deploy events for wasm32 target architecture.
+/// Represents a subscription to transaction events for wasm32 target architecture.
 #[derive(Debug, Clone, Default)]
 #[wasm_bindgen(getter_with_clone)]
-pub struct DeploySubscription {
-    /// Deploy hash to identify the subscription.
-    #[wasm_bindgen(js_name = "deployHash")]
-    pub deploy_hash: String,
-    /// Handler function for deploy events.
+pub struct Subscription {
+    /// Transaction target hash to identify the subscription.
+    #[wasm_bindgen(js_name = "targetHash")]
+    pub target_hash: String,
+    /// Handler function for transaction events.
     #[wasm_bindgen(js_name = "eventHandlerFn")]
     pub event_handler_fn: js_sys::Function,
 }
 
-impl DeploySubscription {
-    /// Constructor for DeploySubscription for non-wasm32 target architecture.
+impl Subscription {
+    /// Constructor for Subscription for non-wasm32 target architecture.
     ///
     /// # Arguments
     ///
-    /// * `deploy_hash` - Deploy hash to identify the subscription.
-    /// * `event_handler_fn` - Handler function for deploy events.
+    /// * `target_hash` - Transaction target hash to identify the subscription.
+    /// * `event_handler_fn` - Handler function for transaction events.
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn new(deploy_hash: String, event_handler_fn: EventHandlerFn) -> Self {
+    pub fn new(target_hash: String, event_handler_fn: EventHandlerFn) -> Self {
         Self {
-            deploy_hash,
+            target_hash,
             event_handler_fn,
         }
     }
 }
 
 #[wasm_bindgen]
-impl DeploySubscription {
-    /// Constructor for DeploySubscription for wasm32 target architecture.
+impl Subscription {
+    /// Constructor for Subscription for wasm32 target architecture.
     ///
     /// # Arguments
     ///
-    /// * `deploy_hash` - Deploy hash to identify the subscription.
-    /// * `event_handler_fn` - Handler function for deploy events.
+    /// * `transaction_hash` - Transaction hash to identify the subscription.
+    /// * `event_handler_fn` - Handler function for transaction events.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new(deploy_hash: String, event_handler_fn: js_sys::Function) -> Self {
+    pub fn new(target_hash: String, event_handler_fn: js_sys::Function) -> Self {
         Self {
-            deploy_hash,
+            target_hash,
             event_handler_fn,
         }
     }
@@ -705,8 +799,23 @@ pub struct TransactionProcessed {
 #[wasm_bindgen(getter_with_clone)]
 pub struct Body {
     #[serde(rename = "TransactionProcessed")]
-    #[wasm_bindgen(js_name = "TransactionProcessed")]
-    pub deploy_processed: Option<TransactionProcessed>,
+    transaction_processed: Option<TransactionProcessed>,
+}
+
+// Implementing methods to get the field using different aliases
+#[wasm_bindgen]
+impl Body {
+    #[wasm_bindgen(getter, js_name = "DeployProcessed")]
+    #[deprecated(note = "prefer 'get_transaction_processed'")]
+    #[allow(deprecated)]
+    pub fn get_deploy_processed(&self) -> Option<TransactionProcessed> {
+        self.transaction_processed.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = "TransactionProcessed")]
+    pub fn get_transaction_processed(&self) -> Option<TransactionProcessed> {
+        self.transaction_processed.clone()
+    }
 }
 
 /// Represents the result of parsing an event, containing error information and the event body.
@@ -747,7 +856,7 @@ impl fmt::Display for EventName {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::deploy_watcher::deploy_mock::DEPLOY_MOCK;
+    use crate::watcher::deploy_mock::DEPLOY_MOCK;
     use sdk_tests::tests::helpers::get_network_constants;
     use tokio;
 
@@ -758,11 +867,11 @@ mod tests {
         let timeout_duration = 5000;
 
         // Act
-        let deploy_watcher = DeployWatcher::new(events_url.clone(), Some(timeout_duration));
+        let deploy_watcher = Watcher::new(events_url.clone(), Some(timeout_duration));
 
         // Assert
         assert_eq!(deploy_watcher.events_url, events_url);
-        assert_eq!(deploy_watcher.deploy_subscriptions.len(), 0);
+        assert_eq!(deploy_watcher.subscriptions.len(), 0);
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
@@ -776,11 +885,11 @@ mod tests {
         let (_, events_url, _, _) = get_network_constants();
 
         // Act
-        let deploy_watcher = DeployWatcher::new(events_url.clone(), None);
+        let deploy_watcher = Watcher::new(events_url.clone(), None);
 
         // Assert
         assert_eq!(deploy_watcher.events_url, events_url);
-        assert_eq!(deploy_watcher.deploy_subscriptions.len(), 0);
+        assert_eq!(deploy_watcher.subscriptions.len(), 0);
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
@@ -794,7 +903,7 @@ mod tests {
         let json_data = r#"data:segment1id:data:segment2id:data:segment3id:"#;
 
         // Act
-        let result = DeployWatcher::extract_data_stream(json_data);
+        let result = Watcher::extract_data_stream(json_data);
 
         // Assert
         assert_eq!(result, vec!["segment1", "segment2", "segment3"]);
@@ -804,7 +913,7 @@ mod tests {
     async fn test_process_events() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let deploy_watcher = DeployWatcher::new(events_url, None);
+        let deploy_watcher = Watcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         let target_deploy_hash = Some(deploy_hash);
@@ -821,15 +930,15 @@ mod tests {
         assert!(event_parse_result.err.is_none());
 
         let body = event_parse_result.body.as_ref().unwrap();
-        let deploy_processed = body.deploy_processed.as_ref().unwrap();
-        assert_eq!(deploy_processed.transaction_hash.deploy, deploy_hash);
+        let transaction_processed = body.transaction_processed.as_ref().unwrap();
+        assert_eq!(transaction_processed.transaction_hash.deploy, deploy_hash);
     }
 
     #[tokio::test]
     async fn test_start_timeout() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let deploy_watcher = DeployWatcher::new(events_url, Some(1));
+        let deploy_watcher = Watcher::new(events_url, Some(1));
 
         // Act
         let result = deploy_watcher.start().await;
@@ -846,7 +955,7 @@ mod tests {
     fn test_stop() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let deploy_watcher = DeployWatcher::new(events_url, None);
+        let deploy_watcher = Watcher::new(events_url, None);
         assert!(*deploy_watcher.active.borrow());
 
         // Act
@@ -860,12 +969,11 @@ mod tests {
     fn test_subscribe() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let mut deploy_watcher = DeployWatcher::new(events_url, None);
+        let mut deploy_watcher = Watcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         // Create a subscription
-        let subscription =
-            DeploySubscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+        let subscription = Subscription::new(deploy_hash.to_string(), EventHandlerFn::default());
 
         // Act
         let result = deploy_watcher.subscribe(vec![subscription]);
@@ -875,7 +983,7 @@ mod tests {
 
         // Try subscribing to the same deploy hash again
         let duplicate_subscription =
-            DeploySubscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+            Subscription::new(deploy_hash.to_string(), EventHandlerFn::default());
         let result_duplicate = deploy_watcher.subscribe(vec![duplicate_subscription]);
 
         // Assert
@@ -890,32 +998,33 @@ mod tests {
     fn test_unsubscribe() {
         // Arrange
         let (_, events_url, _, _) = get_network_constants();
-        let mut deploy_watcher = DeployWatcher::new(events_url, None);
+        let mut deploy_watcher = Watcher::new(events_url, None);
         let deploy_hash = "19dbf9bdcd821e55392393c74c86deede02d9434d62d0bc72ab381ce7ea1c4f2";
 
         // Subscribe to a deploy hash
         let deploy_hash_to_subscribe = deploy_hash.to_string();
         let subscription =
-            DeploySubscription::new(deploy_hash_to_subscribe.clone(), EventHandlerFn::default());
+            Subscription::new(deploy_hash_to_subscribe.clone(), EventHandlerFn::default());
         let _ = deploy_watcher.subscribe(vec![subscription]);
 
         // Assert that the deploy hash is initially subscribed
         assert!(deploy_watcher
-            .deploy_subscriptions
+            .subscriptions
             .iter()
-            .any(|s| s.deploy_hash == deploy_hash_to_subscribe));
+            .any(|s| s.target_hash == deploy_hash_to_subscribe));
 
         // Act
         deploy_watcher.unsubscribe(deploy_hash_to_subscribe.clone());
 
         // Assert that the deploy hash is unsubscribed after calling unsubscribe
         assert!(!deploy_watcher
-            .deploy_subscriptions
+            .subscriptions
             .iter()
-            .any(|s| s.deploy_hash == deploy_hash_to_subscribe));
+            .any(|s| s.target_hash == deploy_hash_to_subscribe));
     }
 
     #[test]
+    #[allow(deprecated)]
     fn test_sdk_watch_deploy_retunrs_instance() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -927,7 +1036,7 @@ mod tests {
 
         // Assert
         assert_eq!(deploy_watcher.events_url, events_url);
-        assert_eq!(deploy_watcher.deploy_subscriptions.len(), 0);
+        assert_eq!(deploy_watcher.subscriptions.len(), 0);
         assert!(*deploy_watcher.active.borrow());
         assert_eq!(
             deploy_watcher.timeout_duration,
@@ -936,6 +1045,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_wait_deploy_timeout() {
         // Arrange
         let sdk = SDK::new(None, None);

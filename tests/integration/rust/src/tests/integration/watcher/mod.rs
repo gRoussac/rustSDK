@@ -6,8 +6,9 @@ pub mod test_module {
             integration::contract::test_module::test_install_deploy,
         },
     };
-    use casper_rust_wasm_sdk::deploy_watcher::watcher::{DeploySubscription, EventHandlerFn};
+    use casper_rust_wasm_sdk::watcher::{EventHandlerFn, Subscription};
 
+    #[allow(deprecated)]
     pub async fn test_wait_deploy() {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
@@ -20,10 +21,15 @@ pub mod test_module {
             .wait_deploy(&config.event_address, &deploy_hash, None)
             .await
             .unwrap();
-        let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+        let deploy_processed = event_parse_result
+            .body
+            .unwrap()
+            .get_deploy_processed()
+            .unwrap();
         assert_eq!(deploy_processed.transaction_hash.deploy, deploy_hash);
     }
 
+    #[allow(deprecated)]
     pub async fn test_wait_deploy_timeout(timeout_duration: Option<u64>) {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
@@ -38,6 +44,7 @@ pub mod test_module {
         assert_eq!(event_parse_result.err.unwrap(), "Timeout expired");
     }
 
+    #[allow(deprecated)]
     pub async fn test_watch_deploy() {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
@@ -48,12 +55,12 @@ pub mod test_module {
 
         let mut watcher = sdk.watch_deploy(&config.event_address, None);
 
-        let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+        let mut deploy_subscriptions: Vec<Subscription> = vec![];
         let deploy_hash_results = vec![deploy_hash.clone()];
 
         for deploy_hash in deploy_hash_results {
             let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
-            deploy_subscriptions.push(DeploySubscription::new(
+            deploy_subscriptions.push(Subscription::new(
                 deploy_hash,
                 EventHandlerFn::new(event_handler_fn),
             ));
@@ -68,20 +75,21 @@ pub mod test_module {
             .first()
             .as_ref()
             .and_then(|result| result.body.as_ref())
-            .and_then(|body| body.deploy_processed.as_ref())
+            .and_then(|body| body.get_deploy_processed())
             .map(|deploy_processed| deploy_processed.transaction_hash.deploy.clone())
             .expect("Expected deploy hash in the result");
 
         assert_eq!(actual_deploy_hash, deploy_hash);
     }
 
+    #[allow(deprecated)]
     pub async fn test_watch_deploy_timeout(timeout_duration: Option<u64>) {
         let config: TestConfig = get_config(true).await;
         let sdk = create_test_sdk(Some(config.clone()));
 
         let mut watcher = sdk.watch_deploy(&config.event_address, timeout_duration);
 
-        let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+        let mut deploy_subscriptions: Vec<Subscription> = vec![];
 
         // random non existing deploy_hash
         let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
@@ -91,7 +99,7 @@ pub mod test_module {
 
         for deploy_hash in deploy_hash_results {
             let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
-            deploy_subscriptions.push(DeploySubscription::new(
+            deploy_subscriptions.push(Subscription::new(
                 deploy_hash.to_string(),
                 EventHandlerFn::new(event_handler_fn),
             ));
