@@ -40,7 +40,7 @@ export class FormService {
     formFields.forEach((fields) => {
       fields.forEach((row) => {
         row.forEach((field) => {
-          const name = field.input?.controlName || field.textarea?.controlName || '';
+          const name = field.input?.controlName || field.textarea?.controlName || field.select?.controlName || '';
           name && (formControlsConfig[name] = new FormControl());
           if (field.select?.options) {
             const select_dict_identifier = field.select?.options.find(option => option.default)?.value || '';
@@ -64,10 +64,10 @@ export class FormService {
     if (fields) {
       fields.forEach((row) => {
         row.forEach((field) => {
-          if (!field.input && !field.textarea) {
+          if (!field.input && !field.textarea && !field.select) {
             return;
           }
-          const name = field.input?.controlName || field.textarea?.controlName || '';
+          const name = field.input?.controlName || field.textarea?.controlName || field.select?.controlName || '';
           const control = this.form.get(name);
           if (!control) { return; }
           const state = field.input?.state_name || field.textarea?.state_name || field.select?.state_name || [];
@@ -83,7 +83,6 @@ export class FormService {
             defaultValue && control.setValue(defaultValue);
             defaultValue && (field.input.placeholder_config_value = defaultValue as string);
           }
-
           control.enable();
           if (field.required) {
             field.input && (field.input.required = true);
@@ -103,7 +102,7 @@ export class FormService {
     const disabledTargets: string[] = [];
     fields.forEach((row) => {
       row.forEach(({ input, textarea }) => {
-        const controlName = input?.controlName || textarea?.controlName;
+        const controlName = input?.controlName || textarea?.controlName || '';
         if (!controlName) {
           return;
         }

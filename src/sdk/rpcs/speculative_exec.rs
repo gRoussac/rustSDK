@@ -11,7 +11,7 @@ use crate::{
 };
 use casper_client::{
     rpcs::results::SpeculativeExecTxnResult as _SpeculativeExecTxnResult,
-    speculative_exec_txn as speculative_exec_transaction_lib, JsonRpcId, SuccessResponse,
+    speculative_exec_txn as speculative_exec_lib, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -97,11 +97,8 @@ pub struct GetSpeculativeExecTxnOptions {
 #[wasm_bindgen]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
-    #[wasm_bindgen(js_name = "speculative_exec_transaction_options")]
-    pub fn get_speculative_exec_transaction_options(
-        &self,
-        options: JsValue,
-    ) -> GetSpeculativeExecTxnOptions {
+    #[wasm_bindgen(js_name = "speculative_exec_options")]
+    pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecTxnOptions {
         let options_result = options.into_serde::<GetSpeculativeExecTxnOptions>();
         match options_result {
             Ok(options) => options,
@@ -121,8 +118,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-    #[wasm_bindgen(js_name = "speculative_exec_transaction")]
-    pub async fn speculative_exec_transaction_js_alias(
+    #[wasm_bindgen(js_name = "speculative_exec")]
+    pub async fn speculative_exec_js_alias(
         &self,
         options: Option<GetSpeculativeExecTxnOptions>,
     ) -> Result<SpeculativeExecTxnResult, JsError> {
@@ -154,12 +151,7 @@ impl SDK {
         };
 
         let result = self
-            .speculative_exec_transaction(
-                transaction,
-                maybe_block_identifier,
-                verbosity,
-                node_address,
-            )
+            .speculative_exec(transaction, maybe_block_identifier, verbosity, node_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -185,14 +177,14 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of _SpeculativeExecTxnResult or a `SdkError` in case of an error.
-    pub async fn speculative_exec_transaction(
+    pub async fn speculative_exec(
         &self,
         transaction: Transaction,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecTxnResult>, SdkError> {
-        //log("speculative_exec_transaction!");
+        //log("speculative_exec!");
 
         let maybe_block_identifier =
             if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
@@ -202,7 +194,7 @@ impl SDK {
             } else {
                 None
             };
-        speculative_exec_transaction_lib(
+        speculative_exec_lib(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
             &self.get_node_address(node_address),
             maybe_block_identifier.map(Into::into),
@@ -251,16 +243,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_exec_transaction_with_none_values() {
+    async fn test_speculative_exec_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
         let transaction = get_transaction();
         let error_message = "builder error";
 
         // Act
-        let result = sdk
-            .speculative_exec_transaction(transaction, None, None, None)
-            .await;
+        let result = sdk.speculative_exec(transaction, None, None, None).await;
 
         // Assert
         assert!(result.is_err());
@@ -270,7 +260,7 @@ mod tests {
 
     #[tokio::test]
     #[ignore]
-    async fn _test_speculative_exec_transaction() {
+    async fn _test_speculative_exec() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -281,7 +271,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .speculative_exec_transaction(
+            .speculative_exec(
                 transaction,
                 Some(block_identifier),
                 verbosity,
@@ -296,7 +286,7 @@ mod tests {
 
     #[tokio::test]
     #[ignore]
-    async fn _test_speculative_exec_transaction_with_block_identifier() {
+    async fn _test_speculative_exec_with_block_identifier() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -307,7 +297,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .speculative_exec_transaction(
+            .speculative_exec(
                 transaction,
                 Some(block_identifier),
                 verbosity,
@@ -320,16 +310,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_exec_transaction_with_error() {
+    async fn test_speculative_exec_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let transaction = get_transaction();
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act
-        let result = sdk
-            .speculative_exec_transaction(transaction, None, None, None)
-            .await;
+        let result = sdk.speculative_exec(transaction, None, None, None).await;
 
         // Assert
         assert!(result.is_err());

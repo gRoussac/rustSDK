@@ -431,6 +431,8 @@ export class ClientService {
   async transaction(deploy_result = true, speculative?: boolean, wasm?: Uint8Array) {
     const timestamp = getTimestamp();
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
+    const gas_price_tolerance: string = this.getIdentifier('gasPriceTolerance')?.value?.trim() || '';
+    const pricing_mode: string = this.getIdentifier('selectPricingModeIdentifier')?.value?.trim() || '';
     if (!deploy_result && !this.public_key) {
       const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
@@ -450,6 +452,9 @@ export class ClientService {
       timestamp,
       ttl
     );
+
+    gas_price_tolerance && (transaction_params.gas_price_tolerance = gas_price_tolerance);
+    pricing_mode && (transaction_params.pricing_mode = pricing_mode);
 
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
     if (!payment_amount) {
@@ -808,7 +813,7 @@ export class ClientService {
     return speculative_exec_deploy;
   }
 
-  async speculative_exec_transaction() {
+  async speculative_exec() {
     const signed_transaction_as_string: string = this.getIdentifier('transactionJson')?.value?.trim();
     if (!signed_transaction_as_string) {
       const err = "signed_transaction_as_string is missing";
@@ -816,13 +821,13 @@ export class ClientService {
       return;
     }
     const signed_transaction = new Transaction(JSON.parse(signed_transaction_as_string));
-    const speculative_exec_transaction_options = this.sdk.speculative_exec_transaction_options({
+    const speculative_exec_options = this.sdk.speculative_exec_options({
       transaction: signed_transaction.toJson()
     });
-    this.getIdentifieBlock(speculative_exec_transaction_options);
-    const speculative_exec_transaction = await this.sdk.speculative_exec_transaction(speculative_exec_transaction_options);
-    speculative_exec_transaction && this.resultService.setResult(speculative_exec_transaction.toJson());
-    return speculative_exec_transaction;
+    this.getIdentifieBlock(speculative_exec_options);
+    const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
+    speculative_exec && this.resultService.setResult(speculative_exec.toJson());
+    return speculative_exec;
   }
 
   async sign_deploy() {

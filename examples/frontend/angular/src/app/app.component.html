@@ -28,6 +28,7 @@
       </div>
     </div>
   </div>
+  <comp-error></comp-error>
   <comp-form [form]="form" (wasm_selected)="onWasmSelected($event)"></comp-form>
   <comp-submit-action
     *ngIf="['sign_deploy', 'sign_transaction'].includes(action)"
@@ -36,6 +37,6 @@
     [e2e]="'sign'"
     >Sign
   </comp-submit-action>
-  <comp-error></comp-error>
+
   <comp-result></comp-result>
 </main>

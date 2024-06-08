@@ -209,7 +209,7 @@ const entityHash: InputField = {
 const callPackage: InputField = {
   id: 'callPackageElt',
   type: 'checkbox',
-  wrap_class: 'col-lg-2 mb-2',
+  wrap_class: 'col-xl-1 col-lg-2 mb-2',
   class: 'form-check-input mt-0',
   label: 'Call Package',
   name: 'call_package',
@@ -223,15 +223,28 @@ const callPackage: InputField = {
 const versionInput: InputField = {
   id: 'versionElt',
   type: 'search',
-  wrap_class: 'col-lg-3 mb-2',
+  wrap_class: 'col-xl-3 mb-2',
   class: 'form-control',
   label: 'Version',
   name: 'version',
   controlName: 'version',
-  placeholder: '1, empty for last version',
+  placeholder: '1, empty last',
   e2e: 'versionElt',
   disabled_when: ['has_wasm']
 };
+
+const gasPriceTolerance: InputField = {
+  id: 'gasPriceToleranceElt',
+  type: 'search',
+  wrap_class: 'col-xl-2 mb-2',
+  class: 'form-control',
+  label: 'Gas Price Tolerance',
+  name: 'gas_price_tolerance',
+  controlName: 'gasPriceTolerance',
+  placeholder: '1, empty default',
+  e2e: 'gasPriceToleranceElt'
+};
+
 
 const sessionNameInput: InputField = {
   id: 'sessionNameElt',
@@ -473,7 +486,7 @@ const transactionJson: InputField = {
 
 const selectDictIdentifier: InputField = {
   id: 'selectDictIdentifierElt',
-  type: 'textarea',
+  type: 'select',
   wrap_class: 'mt-3 col-lg-5 mb-4',
   class: 'form-select form-control form-control-sm',
   label: 'Dictionary identifier',
@@ -489,6 +502,23 @@ const selectDictIdentifier: InputField = {
     { value: 'newFromDictionaryKey', label: 'From Dictionary Key' },
   ]
 };
+
+const selectPricingModeIdentifier: InputField = {
+  id: 'selectPricingModeIdentifier',
+  type: 'select',
+  wrap_class: 'mt-3 col-xl-3 mb-3',
+  class: 'form-select form-control form-control-sm',
+  label: 'Pricing mode',
+  label_class: 'input-group-text',
+  name: 'pricing_mode',
+  controlName: 'selectPricingModeIdentifier',
+  e2e: 'selectPricingModeIdentifierElt',
+  options: [
+    { value: 'classic', label: 'Classic' },
+    { value: 'fixed', label: 'Fixed', default: true },
+  ]
+};
+
 
 const getBlockFields: InputContainer[][] = [
   [{ input: blockIdentifierHeight }, { input: blockIdentifierHash }]
@@ -565,13 +595,15 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 ];
 
 const installFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { wasm_button: true }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingModeIdentifier }],
+  [{ wasm_button: true }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
 ];
 
 const makeDeployFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { wasm_button: true }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }],
+  [{ wasm_button: true }],
   [{ input: sessionHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: sessionNameInput, required: true }],
   [{ input: entryPointInput, required: true }],
@@ -580,7 +612,8 @@ const makeDeployFields: InputContainer[][] = [
 ];
 
 const makeTransactionFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { wasm_button: true }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingModeIdentifier }],
+  [{ wasm_button: true }],
   [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias, required: true }],
   [{ input: entryPointInput, required: true }],
@@ -588,15 +621,18 @@ const makeTransactionFields: InputContainer[][] = [
   [{ textarea: argsJson }],
 ];
 
-
-
 const speculativeDeployFields: InputContainer[][] = [
   ...getBlockFields,
   ...makeDeployFields
 ];
 
+const speculativeTransactionFields: InputContainer[][] = [
+  ...getBlockFields,
+  ...makeTransactionFields
+];
+
 const callEntrypointFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingModeIdentifier }],
   [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias }],
   [{ input: entryPointInput }],
@@ -605,7 +641,7 @@ const callEntrypointFields: InputContainer[][] = [
 ];
 
 const callEntrypointFieldsDeploy: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }],
   [{ input: sessionHash }, { input: callPackage }, { input: versionInput }],
   [{ input: sessionNameInput }],
   [{ input: entryPointInput }],
@@ -613,10 +649,16 @@ const callEntrypointFieldsDeploy: InputContainer[][] = [
   [{ textarea: argsJson }],
 ];
 
-const speculativeExecFields: InputContainer[][] = [
+const speculativeExecDeployFields: InputContainer[][] = [
   ...getBlockFields,
   [{ file_button: true }],
   [{ textarea: deployJson, required: true }],
+];
+
+const speculativeExecFields: InputContainer[][] = [
+  ...getBlockFields,
+  [{ file_button: true }],
+  [{ textarea: transactionJson, required: true }],
 ];
 
 const putDeployFields: InputContainer[][] = [
@@ -670,11 +712,12 @@ const formFields = new Map<string, InputContainer[][]>([
   ['sign_deploy', signDeployFields],
   ['sign_transaction', signTransactionFields],
   ['speculative_deploy', speculativeDeployFields],
-  ['speculative_exec_deploy', speculativeExecFields],
-  ['speculative_transaction', speculativeDeployFields],
+  ['speculative_exec_deploy', speculativeExecDeployFields],
+  ['speculative_exec', speculativeExecFields],
+  ['speculative_transaction', speculativeTransactionFields],
   ['speculative_transfer', getSpeculativeTransferFields],
   ['speculative_transfer_transaction', getSpeculativeTransferFields],
-  ['transaction', makeDeployFields],
+  ['transaction', makeTransactionFields],
   ['transfer', getTransferFields],
   ['transfer_transaction', getTransferFields],
 ]);

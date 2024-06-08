@@ -20,8 +20,8 @@ pub mod put_transaction;
 pub mod query_balance;
 pub mod query_balance_details;
 pub mod query_global_state;
+pub mod speculative_exec;
 pub mod speculative_exec_deploy;
-pub mod speculative_exec_transaction;
 
 #[cfg(test)]
 use dotenv::dotenv;
