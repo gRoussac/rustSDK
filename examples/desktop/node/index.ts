@@ -1,4 +1,4 @@
-import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy, EventParseResult, DeploySubscription } from 'casper-sdk';
+import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy, EventParseResult, Subscription } from 'casper-sdk';
 const fs = require('fs').promises;
 const http = require('http');
 
@@ -344,7 +344,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   // watch deploy_hash to trigger callback
   const deploy_hash_results = [call_entrypoint_deploy_result_as_json.deploy_hash];
   const watcher = sdk.watchDeploy(events_address);
-  const deploySubscriptions: DeploySubscription[] = [];
+  const deploySubscriptions: Subscription[] = [];
   const getEventHandlerFn = (deployHash: string) => {
     const eventHandlerFn = (eventParseResult: EventParseResult) => {
       console.log(`callback for ${deployHash}`);
@@ -366,7 +366,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   deploy_hash_results.map(async (deploy_hash) => {
     const eventHandlerFn = getEventHandlerFn(deploy_hash);
     console.log(deploy_hash);
-    const deploySubscription: DeploySubscription = new DeploySubscription(deploy_hash, eventHandlerFn);
+    const deploySubscription: Subscription = new Subscription(deploy_hash, eventHandlerFn);
     deploySubscriptions.push(deploySubscription);
   });
   watcher.subscribe(deploySubscriptions);

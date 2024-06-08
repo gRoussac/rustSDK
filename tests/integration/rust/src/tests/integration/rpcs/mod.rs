@@ -471,7 +471,11 @@ pub mod test_module {
             .wait_deploy(&config.event_address, &deploy_hash_as_string, None)
             .await
             .unwrap();
-        let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+        let deploy_processed = event_parse_result
+            .body
+            .unwrap()
+            .get_deploy_processed()
+            .unwrap();
         assert_eq!(
             deploy_processed.transaction_hash.deploy,
             deploy_hash_as_string

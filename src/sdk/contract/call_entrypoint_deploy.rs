@@ -176,10 +176,10 @@ mod tests {
             .await;
 
         // Assert
-        dbg!(result);
-        // assert!(result.is_ok());
-        // let deploy_hash = result.unwrap().result.deploy_hash;
-        // assert!(!deploy_hash.to_string().is_empty());
+        // dbg!(result);
+        assert!(result.is_ok());
+        let deploy_hash = result.unwrap().result.deploy_hash;
+        assert!(!deploy_hash.to_string().is_empty());
     }
 
     #[tokio::test]
