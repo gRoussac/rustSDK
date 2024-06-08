@@ -38,11 +38,11 @@ impl Default for TransactionStrParams {
             ttl: OnceCell::new(),
             session_args_simple: OnceCell::new(),
             session_args_json: OnceCell::new(),
-            pricing_mode: OnceCell::from(DEFAULT_PRICING_MODE.to_string()),
+            pricing_mode: OnceCell::new(),
             payment_amount: OnceCell::new(),
-            gas_price_tolerance: OnceCell::from(DEFAULT_GAS_PRICE.to_string()),
+            gas_price_tolerance: OnceCell::new(),
             receipt: OnceCell::new(),
-            standard_payment: OnceCell::from(DEFAULT_STANDARD_PAYMENT),
+            standard_payment: OnceCell::new(),
         }
     }
 }
@@ -311,6 +311,8 @@ pub fn transaction_str_params_to_casper_client(
 
 #[cfg(test)]
 mod tests {
+    use casper_types::Timestamp;
+
     use super::*;
 
     #[test]
@@ -371,6 +373,48 @@ mod tests {
 
         assert_eq!(result.secret_key, "secret_key");
         assert_eq!(result.timestamp, "1234567890");
+        assert_eq!(result.ttl, "30m");
+        assert_eq!(result.chain_name, "test_chain");
+        assert_eq!(result.initiator_addr, "account_id");
+        assert_eq!(result.session_args_simple, ["simple"]);
+        assert_eq!(result.session_args_json, "json");
+        assert_eq!(result.pricing_mode, "mode");
+        assert_eq!(result.payment_amount, "amount");
+        assert_eq!(result.gas_price_tolerance, "1");
+        assert_eq!(result.receipt, "receipt");
+        assert_eq!(result.standard_payment, "true");
+    }
+
+    #[test]
+    fn test_transaction_str_params_default_to_casper_client() {
+        let mut transaction_params = TransactionStrParams::default();
+        let timestamp = Timestamp::now().to_string();
+        transaction_params.set_secret_key("secret_key");
+        transaction_params.set_timestamp(Some(timestamp.clone()));
+
+        transaction_params.set_ttl(Some("30m".to_string()));
+
+        transaction_params.set_chain_name("test_chain");
+
+        transaction_params.set_initiator_addr("account_id");
+
+        let args = vec!["simple".to_string()];
+        transaction_params.set_session_args_simple(args);
+
+        transaction_params.set_session_args_json("json");
+        transaction_params.set_gas_price_tolerance("1");
+        transaction_params.set_pricing_mode("mode");
+
+        transaction_params.set_payment_amount("amount");
+
+        transaction_params.set_receipt("receipt");
+
+        transaction_params.set_standard_payment(true);
+
+        let result = transaction_str_params_to_casper_client(&transaction_params);
+
+        assert_eq!(result.secret_key, "secret_key");
+        assert_eq!(result.timestamp, &timestamp);
         assert_eq!(result.ttl, "30m");
         assert_eq!(result.chain_name, "test_chain");
         assert_eq!(result.initiator_addr, "account_id");

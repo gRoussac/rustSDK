@@ -299,8 +299,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return await this.clientService.speculative_exec_deploy();
   }
 
-  private async speculative_exec_transaction() {
-    return await this.clientService.speculative_exec_transaction();
+  private async speculative_exec() {
+    return await this.clientService.speculative_exec();
   }
 
   private async speculative_transfer() {
