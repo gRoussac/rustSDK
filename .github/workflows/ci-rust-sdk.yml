@@ -89,7 +89,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
         with:
           folder: docs/condor # The folder the action should deploy.
-          clean: true
           target-folder: condor
           commit-message: 'Deploy documentation for ${{ github.ref_name }}'
 
