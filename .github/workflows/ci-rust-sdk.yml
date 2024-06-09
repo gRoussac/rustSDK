@@ -90,8 +90,8 @@ jobs:
         with:
           folder: docs/condor # The folder the action should deploy.
           clean: true
-          target_folder: condor
-          commit_message: 'Deploy documentation for ${{ github.ref_name }}'
+          target-folder: condor
+          commit-message: 'Deploy documentation for ${{ github.ref_name }}'
 
       # - name: Install Electron
       #   run: |
