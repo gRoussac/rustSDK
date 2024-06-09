@@ -89,6 +89,8 @@ jobs:
         with:
           folder: docs/juliet # The folder the action should deploy.
           clean: true
+          target_folder: juliet
+          commit_message: 'Deploy documentation for ${{ github.ref_name }}'
 
       # - name: Install Electron
       #   run: |
