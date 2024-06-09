@@ -87,10 +87,9 @@ jobs:
       - name: Github pages 🚀
         uses: JamesIves/github-pages-deploy-action@ba1486788b0490a235422264426c45848eac35c6 #v4.4.1
         with:
-          folder: docs/juliet # The folder the action should deploy.
-          clean: true
-          target_folder: juliet
-          commit_message: 'Deploy documentation for ${{ github.ref_name }}'
+          folder: docs # The folder the action should deploy.
+          target-folder: juliet
+          commit-message: 'Deploy documentation for ${{ github.ref_name }}'
 
       # - name: Install Electron
       #   run: |
