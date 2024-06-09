@@ -40,8 +40,8 @@ e2e-test: start-app run-e2e-tests
 
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
-	cp -r target/doc/* docs/condor/api-rust/
-	npx typedoc --name api-wasm --out docs/condor/api-wasm pkg/casper_rust_wasm_sdk.d.ts
+	cp -r target/doc/* docs/api-rust/
+	npx typedoc --name api-wasm --out docs/api-wasm pkg/casper_rust_wasm_sdk.d.ts
 
 build: pack
 	cd examples/frontend/angular/ && npm install && npm run build && cd .
