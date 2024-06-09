@@ -39,31 +39,47 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var casper_sdk_1 = require("casper-sdk");
 var fs = require('fs').promises;
 var http = require('http');
-var node_address = 'https://rpc.integration.casperlabs.io';
+var node_address = 'http://localhost:11101';
 var sdk = new casper_sdk_1.SDK(node_address);
-var server = http.createServer(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var peers_object, peers_as_json;
+// const server = http.createServer(async (req, res) => {
+//   res.writeHead(200, { 'Content-Type': 'text/plain' });
+//   let peers_object = await sdk.get_peers();
+//   console.log(peers_object.peers);
+//   const peers_as_json = peers_object.toJson();
+//   console.log(peers_as_json);
+//   res.end(JSON.stringify(peers_as_json));
+// });
+var PORT = process.env.PORT || 3000;
+// server.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
+// get_transaction
+var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var transaction_hash_as_string, finalized_approvals, get_transaction_options, transaction_result, transaction, timestamp, header, hash;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                return [4 /*yield*/, sdk.get_peers()];
+                transaction_hash_as_string = '94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668';
+                finalized_approvals = true;
+                get_transaction_options = sdk.get_transaction_options({
+                    transaction_hash_as_string: transaction_hash_as_string,
+                    finalized_approvals: finalized_approvals,
+                });
+                return [4 /*yield*/, sdk.get_transaction(get_transaction_options)];
             case 1:
-                peers_object = _a.sent();
-                console.log(peers_object.peers);
-                peers_as_json = peers_object.toJson();
-                console.log(peers_as_json);
-                res.end(JSON.stringify(peers_as_json));
+                transaction_result = _a.sent();
+                transaction = transaction_result.transaction;
+                timestamp = transaction.timestamp();
+                header = transaction.header();
+                hash = transaction.hash.toString();
+                console.log(timestamp, header, hash);
                 return [2 /*return*/];
         }
     });
-}); });
-var PORT = process.env.PORT || 3000;
-server.listen(PORT, function () {
-    console.log("Server is running on port ".concat(PORT));
-});
+}); };
+example1();
 // get_deploy
-var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example1_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;
     return __generator(this, function (_a) {
         switch (_a.label) {

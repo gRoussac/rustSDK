@@ -330,7 +330,7 @@ impl Deploy {
     #[wasm_bindgen(getter)]
     pub fn hash(&self) -> DeployHash {
         let deploy: _Deploy = self.0.clone();
-        // TODO check why fmt is giving a short version and not debug
+        // TODO check why fmt is giving a short version in types
         // dbg!(format!("{:?}", (*deploy.hash().inner()).clone()));
         let deploy_hash: DeployHash = (*deploy.hash()).into();
 
