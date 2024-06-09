@@ -17,15 +17,41 @@ use std::{
 
 pub async fn run_tests_or_examples() {
     // Run a specific test ?
-    integration::rpcs::test_module::test_get_peers().await;
+    //  integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_3().await;
+    let _ = _run_example_1().await;
+}
+
+// get_transaction
+pub async fn _run_example_1() {
+    let sdk = SDK::new(
+        Some("http://localhost:11101".to_string()),
+        Some(Verbosity::High),
+    );
+    use casper_rust_wasm_sdk::types::{
+        transaction::Transaction, transaction_hash::TransactionHash,
+    };
+
+    let transaction_hash =
+        TransactionHash::new("94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668")
+            .unwrap();
+
+    let finalized_approvals = true;
+    let get_transaction = sdk
+        .get_transaction(transaction_hash, Some(finalized_approvals), None, None)
+        .await;
+
+    let transaction: Transaction = get_transaction.unwrap().result.transaction.into();
+    let timestamp = transaction.timestamp();
+    let header = transaction.header();
+    let hash = transaction.hash();
+    println!("{timestamp} {header} {hash}");
 }
 
 // get_deploy
-pub async fn _run_example_1() {
+pub async fn _run_example_1_legacy() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
     use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
@@ -48,7 +74,7 @@ pub async fn _run_example_1() {
 // get_auction_info
 pub async fn _run_example_2() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
 
@@ -64,7 +90,7 @@ pub async fn _run_example_2() {
 // get_peers
 pub async fn _run_example_3() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
 
@@ -79,7 +105,7 @@ pub async fn _run_example_3() {
 // get_block
 pub async fn _run_example_4() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
 
@@ -98,7 +124,7 @@ pub async fn _run_example_4() {
 // make_transfer
 pub async fn _run_example_5() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
 
@@ -190,7 +216,7 @@ pub async fn _run_example_6() {
 // make_deploy
 pub async fn _run_example_7() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
 

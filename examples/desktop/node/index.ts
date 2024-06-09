@@ -1,27 +1,49 @@
-import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy, EventParseResult, Subscription } from 'casper-sdk';
+import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, privateToPublicKey, Bytes, Deploy, EventParseResult, Subscription, Transaction } from 'casper-sdk';
 const fs = require('fs').promises;
 const http = require('http');
 
-const node_address = 'https://rpc.integration.casperlabs.io';
+const node_address = 'http://localhost:11101';
 const sdk = new SDK(node_address);
 
-const server = http.createServer(async (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  let peers_object = await sdk.get_peers();
-  console.log(peers_object.peers);
-  const peers_as_json = peers_object.toJson();
-  console.log(peers_as_json);
-  res.end(JSON.stringify(peers_as_json));
-});
+// const server = http.createServer(async (req, res) => {
+//   res.writeHead(200, { 'Content-Type': 'text/plain' });
+//   let peers_object = await sdk.get_peers();
+//   console.log(peers_object.peers);
+//   const peers_as_json = peers_object.toJson();
+//   console.log(peers_as_json);
+//   res.end(JSON.stringify(peers_as_json));
+// });
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// server.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
+
+// get_transaction
+const example1 = async () => {
+  const transaction_hash_as_string =
+    '94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668';
+  const finalized_approvals = true;
+
+  const get_transaction_options = sdk.get_transaction_options({
+    transaction_hash_as_string,
+    finalized_approvals,
+  });
+
+  const transaction_result = await sdk.get_transaction(get_transaction_options);
+
+  const transaction: Transaction = transaction_result.transaction;
+  const timestamp = transaction.timestamp();
+  const header = transaction.header();
+  const hash = transaction.hash.toString();
+  console.log(timestamp, header, hash);
+};
+
+// example1();
 
 // get_deploy
-const example1 = async () => {
+const example1_legacy = async () => {
   const deploy_hash_as_string =
     'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
   const finalized_approvals = true;
