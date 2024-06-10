@@ -71,7 +71,7 @@ pub struct TestConfig {
     pub target_account: String,
     pub block_height: u64,
     pub block_hash: String,
-    pub deploy_hash: String,
+    pub transaction_hash: String,
     pub dictionary_key: String,
     pub dictionary_uref: String,
     pub contract_cep78_hash: String,
@@ -107,7 +107,7 @@ pub async fn initialize_test_config(
 
     let purse_uref = get_main_purse(&account, &default_node_address).await;
 
-    let mut deploy_hash = String::from("");
+    let mut transaction_hash = String::from("");
     let mut contract_cep78_hash =
         String::from("015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
     let mut contract_cep78_package_hash =
@@ -119,7 +119,7 @@ pub async fn initialize_test_config(
 
     if !skip_install {
         println!("install_cep78");
-        deploy_hash = install_cep78_if_needed(
+        transaction_hash = install_cep78_if_needed(
             &account,
             &private_key,
             None,
@@ -178,7 +178,7 @@ pub async fn initialize_test_config(
         purse_uref,
         account_hash,
         target_account,
-        deploy_hash,
+        transaction_hash,
         contract_cep78_hash,
         contract_cep78_package_hash,
         dictionary_key,

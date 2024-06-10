@@ -49,6 +49,7 @@ pub async fn _run_example_1() {
 }
 
 // get_deploy
+#[allow(deprecated)]
 pub async fn _run_example_1_legacy() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
@@ -492,7 +493,7 @@ pub async fn _run_example_11() -> Result<(), String> {
         .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    let result = json_pretty_print(&get_deploy.result.deploy.approvals(), Some(Verbosity::Low));
+    let result = json_pretty_print(get_deploy.result.deploy.approvals(), Some(Verbosity::Low));
     println!("approvals {result}");
 
     let deploy_hash = *get_deploy.result.deploy.hash();
