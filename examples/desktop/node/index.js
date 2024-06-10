@@ -77,7 +77,7 @@ var example1 = function () { return __awaiter(void 0, void 0, void 0, function (
         }
     });
 }); };
-example1();
+// example1();
 // get_deploy
 var example1_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;

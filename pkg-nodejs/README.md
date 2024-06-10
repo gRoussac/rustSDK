@@ -396,7 +396,8 @@ const transaction_result = await sdk.get_transaction(get_transaction_options);
 const transaction: Transaction = transaction_result.transaction;
 const timestamp = transaction.timestamp();
 const header = transaction.header();
-console.log(timestamp, header);
+const hash = transaction.hash.toString();
+console.log(timestamp, header, hash);
 ```
 
 #### Get deploy by deploy hash (legacy)
@@ -460,7 +461,7 @@ You can find more examples in the [Angular example app](examples/frontend/angula
 ### More examples
 
 <details>
-  <summary><strong><code>Deploys and Transfers</code></strong></summary>
+  <summary><strong><code>Deploys and Transfers (Legacy)</code></strong></summary>
 <br>
 <details>
     <summary>Making a Transfer</summary>
@@ -1133,7 +1134,7 @@ console.log(results);
 </details>
 
 <details>
-    <summary><strong><code>CEP-78</code></strong></summary>
+    <summary><strong><code>CEP-78 (Legacy)</code></strong></summary>
 
 #### Install
 
@@ -1195,7 +1196,7 @@ let module_bytes = match read_wasm_file(file_path) {
 session_params.set_session_bytes(module_bytes.into());
 
 let install = sdk
-    .install(deploy_params, session_params, PAYMENT_AMOUNT_CONTRACT_CEP78, None)
+    .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT_CONTRACT_CEP78, None)
     .await;
 
 let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;
@@ -1271,7 +1272,7 @@ if (!wasmBuffer) {
 
 session_params.session_bytes = Bytes.fromUint8Array(wasm);
 
-const install_result = await sdk.install(
+const install_result = await sdk.install_deploy(
   deploy_params,
   session_params,
   payment_amount
@@ -1330,7 +1331,7 @@ session_params.set_session_args(args);
 let payment_params = PaymentStrParams::default();
 payment_params.set_payment_amount(PAYMENT_AMOUNT);
 let call_entrypoint = sdk
-    .call_entrypoint(deploy_params, session_params, payment_params, None)
+    .call_entrypoint_deploy(deploy_params, session_params, payment_params, None)
     .await;
 let deploy_hash_result = call_entrypoint.as_ref().unwrap().result.deploy_hash;
 println!("{:?}", deploy_hash_result);
@@ -1363,7 +1364,7 @@ session_params.session_hash = contract_hash;
 session_params.session_entry_point = entry_point;
 session_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
 
-const call_entrypoint_result = await sdk.call_entrypoint(
+const call_entrypoint_result = await sdk.call_entrypoint_deploy(
   deploy_params,
   session_params,
   payment_amount
@@ -1419,19 +1420,19 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [RPC List](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
 
-### Deploy Params
+### Deploy Params (Legacy)
 
 - [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
 
-### Deploy
+### Deploy (Legacy)
 
 - [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
-### Deploy Watcher
+### Transaction Watcher
 
-- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/deploy_watcher/index.html)
-- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.DeploySubscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.EventParseResult.html)
+- [Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/index.html)
+- [Subscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
 
 ### Types
 
@@ -1449,21 +1450,21 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [SDK Class and methods](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SDK.html)
 
-### Deploy Params
+### Deploy Params (Legacy)
 
 - [Deploy Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeployStrParams.html)
 - [Session Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SessionStrParams.html)
 - [Payment Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/PaymentStrParams.html)
 - [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DictionaryItemStrParams.html)
 
-### Deploy
+### Deploy (Legacy)
 
 - [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Deploy.html)
 
-### Deploy Watcher
+### Transaction Watcher
 
-- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeployWatcher.html)
-- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeploySubscription.html)
+- [Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Watcher.html)
+- [Subscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Subscription.html)
 - [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/EventParseResult.html)
 
 ### Types
