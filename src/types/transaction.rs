@@ -728,38 +728,42 @@ fn modify_body(
         }
         casper_types::TransactionTarget::Stored { id, runtime: _ } => match id {
             casper_types::TransactionInvocationTarget::ByHash(hash) => {
-                TransactionV1Builder::new_targeting_invocable_entity(
+                (*TransactionV1Builder::new_targeting_invocable_entity(
                     new_hash.unwrap_or((*hash).into()).into(),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
             casper_types::TransactionInvocationTarget::ByName(alias) => {
-                TransactionV1Builder::new_targeting_invocable_entity_via_alias(
+                (*TransactionV1Builder::new_targeting_invocable_entity_via_alias(
                     new_alias.unwrap_or_else(|| alias.clone()),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
             casper_types::TransactionInvocationTarget::ByPackageHash { addr, version } => {
-                TransactionV1Builder::new_targeting_package(
+                (*TransactionV1Builder::new_targeting_package(
                     new_package_hash.unwrap_or((*addr).into()).into(),
                     Some(new_version.unwrap_or(version.unwrap_or(1))),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
             casper_types::TransactionInvocationTarget::ByPackageName { name, version } => {
-                TransactionV1Builder::new_targeting_package_via_alias(
+                (*TransactionV1Builder::new_targeting_package_via_alias(
                     new_alias.unwrap_or_else(|| name.clone()),
                     Some(new_version.unwrap_or(version.unwrap_or(1))),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
         },
         casper_types::TransactionTarget::Session {
@@ -779,9 +783,10 @@ fn modify_body(
                 }
             };
 
-            TransactionV1Builder::new_session(*kind, new_module_bytes)
+            (*TransactionV1Builder::new_session(*kind, new_module_bytes)
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+            .clone()
         }
     }
 }
