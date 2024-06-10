@@ -87,6 +87,8 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
+    #[deprecated(note = "prefer 'get_transaction_options'")]
+    #[allow(deprecated)]
     #[wasm_bindgen(js_name = "get_deploy_options")]
     pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
         let options_result = options.into_serde::<GetDeployOptions>();
@@ -114,6 +116,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `GetDeployResult` or an error.
+    #[deprecated(note = "prefer 'get_transaction'")]
+    #[allow(deprecated)]
     #[wasm_bindgen(js_name = "get_deploy")]
     pub async fn get_deploy_js_alias(
         &self,
@@ -163,7 +167,7 @@ impl SDK {
     }
 
     /// Retrieves deploy information using the provided options, alias for `get_deploy`.
-    #[deprecated(note = "This function is an alias. Please use `get_deploy` instead.")]
+    #[deprecated(note = "This function is an alias. Please use `get_transaction` instead.")]
     #[allow(deprecated)]
     pub async fn info_get_deploy(
         &self,
@@ -186,6 +190,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `_GetDeployResult` or an error.
+    #[deprecated(note = "prefer 'get_transaction'")]
+    #[allow(deprecated)]
     pub async fn get_deploy(
         &self,
         deploy_hash: DeployHash,
@@ -220,6 +226,7 @@ mod tests {
     };
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_deploy_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -236,6 +243,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_deploy_with_invalid_deploy_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -253,6 +261,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_deploy_with_valid_deploy_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -291,6 +300,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_deploy_with_finalized_approvals() {
         // Arrange
         let sdk = SDK::new(None, None);
@@ -335,6 +345,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[allow(deprecated)]
     async fn test_get_deploy_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);

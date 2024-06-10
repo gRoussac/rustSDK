@@ -10,6 +10,7 @@ pub mod test_module {
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
     use casper_rust_wasm_sdk::types::entity_identifier::EntityIdentifier;
+    use casper_rust_wasm_sdk::types::transaction_hash::TransactionHash;
     use casper_rust_wasm_sdk::{
         rpcs::{
             get_balance::GetBalanceInput,
@@ -229,11 +230,12 @@ pub mod test_module {
         assert!(!get_chainspec.result.chainspec_bytes.to_string().is_empty());
     }
 
+    #[allow(deprecated)]
     pub async fn test_get_deploy() {
         let config: TestConfig = get_config(false).await;
         let get_deploy = create_test_sdk(Some(config.clone()))
             .get_deploy(
-                DeployHash::new(&config.deploy_hash).unwrap(),
+                DeployHash::new(&config.transaction_hash).unwrap(),
                 Some(true),
                 None,
                 None,
@@ -242,6 +244,26 @@ pub mod test_module {
         let get_deploy = get_deploy.unwrap();
         assert!(!get_deploy.result.api_version.to_string().is_empty());
         assert!(!get_deploy.result.deploy.to_string().is_empty());
+    }
+
+    pub async fn test_get_transaction() {
+        let config: TestConfig = get_config(false).await;
+        let get_transaction = create_test_sdk(Some(config.clone()))
+            .get_transaction(
+                TransactionHash::new(&config.transaction_hash).unwrap(),
+                Some(true),
+                None,
+                None,
+            )
+            .await;
+        let get_transaction = get_transaction.unwrap();
+        assert!(!get_transaction.result.api_version.to_string().is_empty());
+        assert!(!get_transaction
+            .result
+            .transaction
+            .hash()
+            .to_string()
+            .is_empty());
     }
 
     pub async fn test_get_dictionary_item() {
@@ -465,18 +487,21 @@ pub mod test_module {
 
         let sdk = create_test_sdk(Some(config.clone()));
 
-        let deploy_hash_as_string = test_install_deploy().await;
+        let transaction_hash_as_string = test_install_deploy().await;
 
         let event_parse_result = sdk
-            .wait_deploy(&config.event_address, &deploy_hash_as_string, None)
+            .wait_transaction(&config.event_address, &transaction_hash_as_string, None)
             .await
             .unwrap();
-        let deploy_processed = event_parse_result
+        let transaction_processed = event_parse_result
             .body
             .unwrap()
-            .get_deploy_processed()
+            .get_transaction_processed()
             .unwrap();
-        assert_eq!(deploy_processed.hash.to_string(), deploy_hash_as_string);
+        assert_eq!(
+            transaction_processed.hash.to_string(),
+            transaction_hash_as_string
+        );
 
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
             key: KeyIdentifierInput::String(config.to_owned().account_hash),
@@ -583,10 +608,14 @@ mod tests {
     pub async fn test_get_chainspec_test() {
         test_get_chainspec().await;
     }
-
     #[test]
+    #[allow(deprecated)]
     pub async fn test_get_deploy_test() {
         test_get_deploy().await;
+    }
+    #[test]
+    pub async fn test_get_transaction_test() {
+        test_get_transaction().await;
     }
     #[test]
     pub async fn test_get_dictionary_item_test() {

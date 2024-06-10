@@ -4,14 +4,18 @@ use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_PRIVATE_KEY_NAME,
     DEFAULT_PRIVATE_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
-use casper_rust_wasm_sdk::rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams};
-use casper_rust_wasm_sdk::types::block_hash::BlockHash;
-use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
-use casper_rust_wasm_sdk::types::deploy_params::{
-    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-    session_str_params::SessionStrParams,
+use casper_rust_wasm_sdk::{
+    rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
+    types::{
+        block_hash::BlockHash,
+        transaction_hash::TransactionHash,
+        transaction_params::{
+            transaction_builder_params::TransactionBuilderParams,
+            transaction_str_params::TransactionStrParams,
+        },
+    },
+    watcher::EventParseResult,
 };
-use casper_rust_wasm_sdk::watcher::EventParseResult;
 use lazy_static::lazy_static;
 use std::{
     env,
@@ -38,12 +42,9 @@ pub(crate) mod intern {
             query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
         },
         types::{
-            deploy_hash::DeployHash,
-            deploy_params::{
-                deploy_str_params::DeployStrParams,
-                dictionary_item_str_params::DictionaryItemStrParams,
-                session_str_params::SessionStrParams,
-            },
+            deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
+            transaction_hash::TransactionHash,
+            transaction_params::transaction_str_params::TransactionStrParams,
         },
         SDK,
     };
@@ -145,7 +146,7 @@ pub(crate) mod intern {
     }
 
     pub async fn install_cep78(
-        account: &str,
+        initiator_addr: &str,
         private_key: &str,
         path: Option<&str>,
         network_constants: (&str, &str, &str),
@@ -158,35 +159,30 @@ pub(crate) mod intern {
 
         let (node_address, event_address, chain_name) = network_constants;
 
-        let deploy_params = DeployStrParams::new(
-            chain_name,
-            account,
-            Some(private_key.to_string()),
-            None,
-            None,
-            None,
-        );
-        let session_params = SessionStrParams::default();
-        session_params.set_session_args_json(ARGS_JSON);
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(chain_name);
+        transaction_params.set_initiator_addr(initiator_addr);
+        transaction_params.set_secret_key(private_key);
+        transaction_params.set_session_args_json(ARGS_JSON);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
 
         let path = match path {
             Some(path) => path,
             None => WASM_PATH,
         };
         let file_path = &format!("{path}{CEP78_CONTRACT}");
-        let module_bytes = match read_wasm_file(file_path) {
-            Ok(module_bytes) => module_bytes,
+        let transaction_bytes = match read_wasm_file(file_path) {
+            Ok(transaction_bytes) => transaction_bytes,
             Err(err) => {
                 return Err(format!("Error reading file {}: {:?}", file_path, err).into());
             }
         };
-        session_params.set_session_bytes(module_bytes.into());
+
         let sdk = create_test_sdk(None);
         let install = sdk
-            .install_deploy(
-                deploy_params,
-                session_params,
-                PAYMENT_AMOUNT_CONTRACT_CEP78,
+            .install(
+                transaction_params,
+                transaction_bytes.into(),
                 Some(node_address.to_string()),
             )
             .await;
@@ -198,33 +194,39 @@ pub(crate) mod intern {
             .to_string()
             .is_empty());
 
-        let deploy_hash = DeployHash::from(install.as_ref().unwrap().result.deploy_hash);
-        let deploy_hash_as_string = deploy_hash.to_string();
-        assert!(!deploy_hash_as_string.is_empty());
+        let transaction_hash =
+            TransactionHash::from(install.as_ref().unwrap().result.transaction_hash);
+        let transaction_hash_as_string = transaction_hash.to_string();
+        assert!(!transaction_hash_as_string.is_empty());
 
         let event_parse_result = sdk
-            .wait_deploy(event_address, &deploy_hash_as_string, None)
+            .wait_transaction(event_address, &transaction_hash_as_string, None)
             .await
             .unwrap();
-        let deploy_processed = event_parse_result
+        let transaction = event_parse_result
             .body
             .unwrap()
-            .get_deploy_processed()
+            .get_transaction_processed()
             .unwrap();
-        assert_eq!(deploy_processed.hash.to_string(), deploy_hash_as_string);
+        assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
 
-        let get_deploy = sdk
-            .get_deploy(
-                deploy_hash,
+        let get_transaction = sdk
+            .get_transaction(
+                transaction_hash,
                 Some(true),
                 None,
                 Some(node_address.to_string()),
             )
             .await;
-        let get_deploy = get_deploy.unwrap();
-        assert!(!get_deploy.result.api_version.to_string().is_empty());
-        assert!(!get_deploy.result.deploy.to_string().is_empty());
-        Ok(deploy_hash_as_string)
+        let get_transaction = get_transaction.unwrap();
+        assert!(!get_transaction.result.api_version.to_string().is_empty());
+        assert!(!get_transaction
+            .result
+            .transaction
+            .hash()
+            .to_string()
+            .is_empty());
+        Ok(transaction_hash_as_string)
     }
 }
 
@@ -377,62 +379,61 @@ pub async fn get_contract_cep78_hash_keys(
 
 pub async fn mint_nft(
     contract_cep78_hash: &str,
-    account: &str,
-    account_hash: &str,
+    initiator_addr: &str,
+    target_account_hash: &str,
     private_key: &str,
     network_constants: (&str, &str, &str),
 ) {
     let (node_address, event_address, chain_name) = network_constants;
-    let deploy_params = DeployStrParams::new(
-        chain_name,
-        account,
-        Some(private_key.to_string()),
-        None,
-        None,
-        None,
-    );
-    let mut session_params = SessionStrParams::default();
-    session_params.set_session_hash(contract_cep78_hash);
-    session_params.set_session_entry_point(ENTRYPOINT_MINT);
+
+    let mut transaction_params = TransactionStrParams::default();
+    transaction_params.set_chain_name(chain_name);
+    transaction_params.set_initiator_addr(initiator_addr);
+    transaction_params.set_secret_key(private_key);
+    transaction_params.set_payment_amount(PAYMENT_AMOUNT);
     // Two ways to build args, either simple or json
     // let args_json_vec: Vec<String> = vec![
     //     r#"{"name": "token_meta_data", "type": "String", "value": "test_meta_data"}"#.to_string(),
-    //     format!(r#"{{"name": "token_owner", "type": "Key", "value": "{account_hash}"}}"#),
+    //     format!(r#"{{"name": "token_owner", "type": "Key", "value": "{target_account_hash}"}}"#),
     // ];
     // let args_json: String = format!("[{}]", args_json_vec.join(", "));
     let args = Vec::from([
         "token_meta_data:String='test_meta_data'".to_string(),
-        format!("token_owner:Key='{account_hash}'").to_string(),
+        format!("token_owner:Key='{target_account_hash}'").to_string(),
     ]);
-    session_params.set_session_args(args);
-    let payment_params = PaymentStrParams::default();
-    payment_params.set_payment_amount(PAYMENT_AMOUNT);
+    transaction_params.set_session_args_simple(args);
+
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(contract_cep78_hash, ENTRYPOINT_MINT);
+
     let sdk = create_test_sdk(None);
     let test_call_entrypoint_deploy = sdk
-        .call_entrypoint_deploy(
-            deploy_params,
-            session_params,
-            payment_params,
+        .call_entrypoint(
+            builder_params,
+            transaction_params,
             Some(node_address.to_string()),
         )
         .await;
     let result = &test_call_entrypoint_deploy.as_ref().unwrap().result;
     assert!(!result.clone().api_version.to_string().is_empty());
 
-    let deploy_hash = DeployHash::from(result.deploy_hash);
-    let deploy_hash_as_string = deploy_hash.to_string();
-    assert!(!deploy_hash_as_string.is_empty());
+    let transaction_hash = TransactionHash::from(result.transaction_hash);
+    let transaction_hash_as_string = transaction_hash.to_string();
+    assert!(!transaction_hash_as_string.is_empty());
 
     let event_parse_result = sdk
-        .wait_deploy(event_address, &deploy_hash_as_string, None)
+        .wait_transaction(event_address, &transaction_hash_as_string, None)
         .await
         .unwrap();
-    let deploy_processed = event_parse_result
+    let transaction_processed = event_parse_result
         .body
         .unwrap()
-        .get_deploy_processed()
+        .get_transaction_processed()
         .unwrap();
-    assert_eq!(deploy_processed.hash.to_string(), deploy_hash_as_string);
+    assert_eq!(
+        transaction_processed.hash.to_string(),
+        transaction_hash_as_string
+    );
 }
 
 pub async fn get_block(node_address: &str) -> (String, u64) {
@@ -453,28 +454,28 @@ pub async fn get_block(node_address: &str) -> (String, u64) {
     }
 }
 
-pub fn get_event_handler_fn(deploy_hash: String) -> impl Fn(EventParseResult) {
+pub fn get_event_handler_fn(transaction_hash: String) -> impl Fn(EventParseResult) {
     move |event_parse_result: EventParseResult| {
-        // println!("get_event_handler_fn {}", deploy_hash);
+        // println!("get_event_handler_fn {}", transaction_hash);
         if let Some(err) = &event_parse_result.err {
-            println!("{} {}", deploy_hash, err);
-        } else if let Some(deploy_processed) =
-            &event_parse_result.body.unwrap().get_deploy_processed()
+            println!("{} {}", transaction_hash, err);
+        } else if let Some(transaction_processed) =
+            &event_parse_result.body.unwrap().get_transaction_processed()
         {
-            if let Some(success) = &deploy_processed.execution_result.success {
+            if let Some(success) = &transaction_processed.execution_result.success {
                 println!(
                     "Hash: {}\nBlock: {:?}\nCost: {} motes",
-                    deploy_hash, deploy_processed.block_hash, success.cost
+                    transaction_hash, transaction_processed.block_hash, success.cost
                 );
                 return;
-            } else if let Some(failure) = &deploy_processed.execution_result.failure {
+            } else if let Some(failure) = &transaction_processed.execution_result.failure {
                 println!(
                     "Hash: {}\nBlock: {:?}\nError: \"{}\"",
-                    deploy_hash, deploy_processed.block_hash, failure.error_message
+                    transaction_hash, transaction_processed.block_hash, failure.error_message
                 );
                 return;
             }
         }
-        println!("No information available for {}", deploy_hash);
+        println!("No information available for {}", transaction_hash);
     }
 }
