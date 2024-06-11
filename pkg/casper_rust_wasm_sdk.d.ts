@@ -1,6 +1,11 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {Uint8Array} key
+* @returns {TransferAddr}
+*/
+export function fromTransfer(key: Uint8Array): TransferAddr;
+/**
 * Converts a hexadecimal string to a regular string.
 *
 * # Arguments
@@ -170,18 +175,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
 */
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
-* @param {Uint8Array} key
-* @returns {TransferAddr}
-*/
-export function fromTransfer(key: Uint8Array): TransferAddr;
-/**
-*/
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
-}
-/**
 */
 export enum TransactionKind {
   InvocableEntity = 0,
@@ -202,6 +195,13 @@ export enum Verbosity {
   Low = 0,
   Medium = 1,
   High = 2,
+}
+/**
+*/
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
 }
 /**
 */
@@ -2107,6 +2107,24 @@ export class SDK {
 */
   list_rpcs(verbosity?: Verbosity, node_address?: string): Promise<ListRpcsResult>;
 /**
+* JS function for `make_deploy`.
+*
+* # Arguments
+*
+* * `deploy_params` - The deploy parameters.
+* * `session_params` - The session parameters.
+* * `payment_params` - The payment parameters.
+*
+* # Returns
+*
+* A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @returns {Deploy}
+*/
+  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
+/**
 * Deserialize query_contract_dict_options from a JavaScript object.
 * @param {any} options
 * @returns {queryContractDictOptions}
@@ -2272,36 +2290,6 @@ export class SDK {
 */
   make_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams): Deploy;
 /**
-* JS function for speculative transfer.
-*
-* # Arguments
-*
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `maybe_block_id_as_string` - An optional block ID as a string.
-* * `maybe_block_identifier` - An optional block identifier.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {string | undefined} [maybe_block_id_as_string]
-* @param {BlockIdentifier | undefined} [maybe_block_identifier]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<SpeculativeExecResult>}
-*/
-  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
-/**
 * Asynchronously retrieves the chainspec.
 *
 * # Arguments
@@ -2324,86 +2312,13 @@ export class SDK {
 */
   info_get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
 /**
-* Puts a transaction using the provided options.
+* Puts a deploy using the provided options.
 *
 * # Arguments
 *
-* * `transaction` - The `Transaction` object to be sent.
+* * `deploy` - The `Deploy` object to be sent.
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
 * * `node_address` - An optional string specifying the node address to use for the request.
-*
-* # Returns
-*
-* A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the transaction process.
-* @param {Transaction} transaction
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutTransactionResult>}
-*/
-  put_transaction(transaction: Transaction, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
-/**
-* JavaScript Alias for `put_transaction`.
-* @param {Transaction} transaction
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutTransactionResult>}
-*/
-  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
-/**
-* This function allows executing a transaction speculatively.
-*
-* # Arguments
-*
-* * `builder_params` - Transaction Builder parameters.
-* * `transaction_params` - Transactionment parameters for the transaction.
-* * `maybe_block_id_as_string` - An optional block ID as a string.
-* * `maybe_block_identifier` - Optional block identifier.
-* * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
-*
-* # Returns
-*
-* A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-* @param {TransactionBuilderParams} builder_params
-* @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [maybe_block_id_as_string]
-* @param {BlockIdentifier | undefined} [maybe_block_identifier]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<SpeculativeExecTxnResult>}
-*/
-  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecTxnResult>;
-/**
-* JS function for `make_deploy`.
-*
-* # Arguments
-*
-* * `deploy_params` - The deploy parameters.
-* * `session_params` - The session parameters.
-* * `payment_params` - The payment parameters.
-*
-* # Returns
-*
-* A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @returns {Deploy}
-*/
-  make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
-/**
-* Calls a smart contract entry point with the specified parameters and returns the result.
-*
-* # Arguments
-*
-* * `deploy_params` - The deploy parameters.
-* * `session_params` - The session parameters.
-* * `payment_amount` - The payment amount as a string.
-* * `node_address` - An optional node address to send the request to.
 *
 * # Returns
 *
@@ -2411,14 +2326,145 @@ export class SDK {
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the call.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {string} payment_amount
+* Returns a `JsError` if there is an error during the deploy process.
+* @param {Deploy} deploy
+* @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
 * @returns {Promise<PutDeployResult>}
 */
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+/**
+* JavaScript Alias for `put_deploy`.
+* @param {Deploy} deploy
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  account_put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+/**
+* JS function for speculative transfer transaction.
+*
+* # Arguments
+*
+* * `maybe_source` - Optional transfer source uref.
+* * `target_account` - The target account.
+* * `amount` - The amount to transfer.
+* * `maybe_id` - An optional transfer ID (defaults to a random number).
+* * `transaction_params` - The transactionment parameters.
+* * `maybe_block_id_as_string` - An optional block ID as a string.
+* * `maybe_block_identifier` - An optional block identifier.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+* @param {URef | undefined} maybe_source
+* @param {string} target_account
+* @param {string} amount
+* @param {TransactionStrParams} transaction_params
+* @param {string | undefined} [maybe_id]
+* @param {string | undefined} [maybe_block_id_as_string]
+* @param {BlockIdentifier | undefined} [maybe_block_identifier]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<SpeculativeExecTxnResult>}
+*/
+  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecTxnResult>;
+/**
+* JavaScript function for transactioning with deserialized parameters.
+*
+* # Arguments
+*
+* * `transaction_params` - Transaction parameters.
+* * `builder_params` - Session parameters.
+* * `verbosity` - An optional verbosity level.
+* * `node_address` - An optional node address.
+*
+* # Returns
+*
+* A result containing PutTransactionResult or a JsError.
+* @param {TransactionBuilderParams} builder_params
+* @param {TransactionStrParams} transaction_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutTransactionResult>}
+*/
+  transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+/**
+* JS function for transaction transferring funds.
+*
+* # Arguments
+*
+* * `maybe_source` - Optional transfer source uref.
+* * `target_account` - The target account.
+* * `amount` - The amount to transfer.
+* * `transaction_params` - The transaction parameters.
+* * `maybe_id` - An optional transfer ID (defaults to a random number).
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {URef | undefined} maybe_source
+* @param {string} target_account
+* @param {string} amount
+* @param {TransactionStrParams} transaction_params
+* @param {string | undefined} [maybe_id]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutTransactionResult>}
+*/
+  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+/**
+* Installs a smart contract with the specified parameters and returns the result.
+*
+* # Arguments
+*.
+* * `transaction_params` - Transaction parameters.
+* * `transaction_bytes` - Transaction Bytes to install
+* * `node_address` - An optional node address to send the request to.
+*
+* # Returns
+*
+* A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the installation.
+* @param {TransactionStrParams} transaction_params
+* @param {Bytes} transaction_bytes
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutTransactionResult>}
+*/
+  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, node_address?: string): Promise<PutTransactionResult>;
+/**
+* JS function for transferring funds.
+*
+* # Arguments
+*
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
@@ -2598,31 +2644,21 @@ export class SDK {
 */
   speculative_exec_deploy(options?: getSpeculativeExecDeployOptions): Promise<SpeculativeExecResult>;
 /**
-* JS function for transaction transferring funds.
+* JS function for `sign_deploy`.
 *
 * # Arguments
 *
-* * `maybe_source` - Optional transfer source uref.
-* * `target_account` - The target account.
-* * `amount` - The amount to transfer.
-* * `transaction_params` - The transaction parameters.
-* * `maybe_id` - An optional transfer ID (defaults to a random number).
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
+* * `deploy` - The deploy to sign.
+* * `secret_key` - The secret key for signing.
 *
 * # Returns
 *
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {URef | undefined} maybe_source
-* @param {string} target_account
-* @param {string} amount
-* @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [maybe_id]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutTransactionResult>}
+* The signed `Deploy`.
+* @param {Deploy} deploy
+* @param {string} secret_key
+* @returns {Deploy}
 */
-  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+  sign_deploy(deploy: Deploy, secret_key: string): Deploy;
 /**
 * JS function for `sign_transaction`.
 *
@@ -2640,29 +2676,33 @@ export class SDK {
 */
   sign_transaction(transaction: Transaction, secret_key: string): Transaction;
 /**
-* Installs a smart contract with the specified parameters and returns the result.
+* This function allows executing a deploy speculatively.
 *
 * # Arguments
-*.
-* * `transaction_params` - Transaction parameters.
-* * `transaction_bytes` - Transaction Bytes to install
-* * `node_address` - An optional node address to send the request to.
+*
+* * `deploy_params` - Deployment parameters for the deploy.
+* * `session_params` - Session parameters for the deploy.
+* * `payment_params` - Payment parameters for the deploy.
+* * `maybe_block_id_as_string` - An optional block ID as a string.
+* * `maybe_block_identifier` - Optional block identifier.
+* * `verbosity` - Optional verbosity level.
+* * `node_address` - Optional node address.
 *
 * # Returns
 *
-* A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-*
-* # Errors
-*
-* Returns a `JsError` if there is an error during the installation.
-* @param {TransactionStrParams} transaction_params
-* @param {Bytes} transaction_bytes
+* A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {PaymentStrParams} payment_params
+* @param {string | undefined} [maybe_block_id_as_string]
+* @param {BlockIdentifier | undefined} [maybe_block_identifier]
+* @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<PutTransactionResult>}
+* @returns {Promise<SpeculativeExecResult>}
 */
-  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, node_address?: string): Promise<PutTransactionResult>;
+  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
 /**
-* JS function for transferring funds.
+* JS function for speculative transfer.
 *
 * # Arguments
 *
@@ -2671,32 +2711,6 @@ export class SDK {
 * * `transfer_id` - An optional transfer ID (defaults to a random number).
 * * `deploy_params` - The deployment parameters.
 * * `payment_params` - The payment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
-/**
-* JS function for speculative transfer transaction.
-*
-* # Arguments
-*
-* * `maybe_source` - Optional transfer source uref.
-* * `target_account` - The target account.
-* * `amount` - The amount to transfer.
-* * `maybe_id` - An optional transfer ID (defaults to a random number).
-* * `transaction_params` - The transactionment parameters.
 * * `maybe_block_id_as_string` - An optional block ID as a string.
 * * `maybe_block_identifier` - An optional block identifier.
 * * `verbosity` - The verbosity level for logging (optional).
@@ -2705,18 +2719,42 @@ export class SDK {
 * # Returns
 *
 * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-* @param {URef | undefined} maybe_source
-* @param {string} target_account
 * @param {string} amount
-* @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [maybe_id]
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
 * @param {string | undefined} [maybe_block_id_as_string]
 * @param {BlockIdentifier | undefined} [maybe_block_identifier]
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<SpeculativeExecTxnResult>}
+* @returns {Promise<SpeculativeExecResult>}
 */
-  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecTxnResult>;
+  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
+/**
+* Calls a smart contract entry point with the specified parameters and returns the result.
+*
+* # Arguments
+*
+* * `deploy_params` - The deploy parameters.
+* * `session_params` - The session parameters.
+* * `payment_amount` - The payment amount as a string.
+* * `node_address` - An optional node address to send the request to.
+*
+* # Returns
+*
+* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+*
+* # Errors
+*
+* Returns a `JsError` if there is an error during the call.
+* @param {DeployStrParams} deploy_params
+* @param {SessionStrParams} session_params
+* @param {string} payment_amount
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
 * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
 * Legacy alias
@@ -2788,26 +2826,6 @@ export class SDK {
 */
   waitTransaction(events_url: string, target_hash: string, timeout_duration?: number): Promise<Promise<any>>;
 /**
-* JavaScript function for transactioning with deserialized parameters.
-*
-* # Arguments
-*
-* * `transaction_params` - Transaction parameters.
-* * `builder_params` - Session parameters.
-* * `verbosity` - An optional verbosity level.
-* * `node_address` - An optional node address.
-*
-* # Returns
-*
-* A result containing PutTransactionResult or a JsError.
-* @param {TransactionBuilderParams} builder_params
-* @param {TransactionStrParams} transaction_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutTransactionResult>}
-*/
-  transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
-/**
 * Calls a smart contract entry point with the specified parameters and returns the result.
 *
 * # Arguments
@@ -2851,32 +2869,6 @@ export class SDK {
 * @returns {Promise<PutDeployResult>}
 */
   deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
-/**
-* This function allows executing a deploy speculatively.
-*
-* # Arguments
-*
-* * `deploy_params` - Deployment parameters for the deploy.
-* * `session_params` - Session parameters for the deploy.
-* * `payment_params` - Payment parameters for the deploy.
-* * `maybe_block_id_as_string` - An optional block ID as a string.
-* * `maybe_block_identifier` - Optional block identifier.
-* * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
-*
-* # Returns
-*
-* A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
-* @param {DeployStrParams} deploy_params
-* @param {SessionStrParams} session_params
-* @param {PaymentStrParams} payment_params
-* @param {string | undefined} [maybe_block_id_as_string]
-* @param {BlockIdentifier | undefined} [maybe_block_identifier]
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<SpeculativeExecResult>}
-*/
-  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
 /**
 * Parses block options from a JsValue.
 *
@@ -2996,35 +2988,35 @@ export class SDK {
 */
   info_get_transaction(options?: getTransactionOptions): Promise<GetTransactionResult>;
 /**
-* Puts a deploy using the provided options.
+* Puts a transaction using the provided options.
 *
 * # Arguments
 *
-* * `deploy` - The `Deploy` object to be sent.
+* * `transaction` - The `Transaction` object to be sent.
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
 * * `node_address` - An optional string specifying the node address to use for the request.
 *
 * # Returns
 *
-* A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+* A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the deploy process.
-* @param {Deploy} deploy
+* Returns a `JsError` if there is an error during the transaction process.
+* @param {Transaction} transaction
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
+* @returns {Promise<PutTransactionResult>}
 */
-  put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  put_transaction(transaction: Transaction, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
 /**
-* JavaScript Alias for `put_deploy`.
-* @param {Deploy} deploy
+* JavaScript Alias for `put_transaction`.
+* @param {Transaction} transaction
 * @param {Verbosity | undefined} [verbosity]
 * @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
+* @returns {Promise<PutTransactionResult>}
 */
-  account_put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
 /**
 * Parses query balance options from a JsValue.
 *
@@ -3078,21 +3070,29 @@ export class SDK {
 */
   speculative_exec(options?: getSpeculativeExecTxnOptions): Promise<SpeculativeExecTxnResult>;
 /**
-* JS function for `sign_deploy`.
+* This function allows executing a transaction speculatively.
 *
 * # Arguments
 *
-* * `deploy` - The deploy to sign.
-* * `secret_key` - The secret key for signing.
+* * `builder_params` - Transaction Builder parameters.
+* * `transaction_params` - Transactionment parameters for the transaction.
+* * `maybe_block_id_as_string` - An optional block ID as a string.
+* * `maybe_block_identifier` - Optional block identifier.
+* * `verbosity` - Optional verbosity level.
+* * `node_address` - Optional node address.
 *
 * # Returns
 *
-* The signed `Deploy`.
-* @param {Deploy} deploy
-* @param {string} secret_key
-* @returns {Deploy}
+* A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+* @param {TransactionBuilderParams} builder_params
+* @param {TransactionStrParams} transaction_params
+* @param {string | undefined} [maybe_block_id_as_string]
+* @param {BlockIdentifier | undefined} [maybe_block_identifier]
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<SpeculativeExecTxnResult>}
 */
-  sign_deploy(deploy: Deploy, secret_key: string): Deploy;
+  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, maybe_block_id_as_string?: string, maybe_block_identifier?: BlockIdentifier, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecTxnResult>;
 /**
 * JS function for `make_transaction`.
 *
@@ -3397,22 +3397,6 @@ export class Transaction {
 */
   verify(): boolean;
 /**
-* @returns {boolean}
-*/
-  expired(): boolean;
-/**
-* @returns {any}
-*/
-  expires(): any;
-/**
-* @returns {any}
-*/
-  signers(): any;
-/**
-* @returns {any}
-*/
-  authorization_keys(): any;
-/**
 * @param {string} secret_key
 * @returns {Transaction}
 */
@@ -3424,22 +3408,6 @@ export class Transaction {
 /**
 * @returns {any}
 */
-  approvals(): any;
-/**
-* @returns {any}
-*/
-  header(): any;
-/**
-* @returns {boolean}
-*/
-  isNative(): boolean;
-/**
-* @returns {boolean}
-*/
-  isStandardPayment(): boolean;
-/**
-* @returns {any}
-*/
   session_args(): any;
 /**
 * @param {string} public_key
@@ -3448,34 +3416,6 @@ export class Transaction {
 */
   addSignature(public_key: string, signature: string): Transaction;
 /**
-* @returns {string}
-*/
-  entryPoint(): string;
-/**
-* @returns {string}
-*/
-  TTL(): string;
-/**
-* @returns {string}
-*/
-  timestamp(): string;
-/**
-* @returns {number}
-*/
-  size_estimate(): number;
-/**
-* @returns {string}
-*/
-  chain_name(): string;
-/**
-* @returns {string}
-*/
-  initiator_addr(): string;
-/**
-* @returns {AccountHash}
-*/
-  account_hash(): AccountHash;
-/**
 * @param {any} js_value_arg
 * @param {string | undefined} [secret_key]
 * @returns {Transaction}
@@ -3483,7 +3423,52 @@ export class Transaction {
   addArg(js_value_arg: any, secret_key?: string): Transaction;
 /**
 */
+  readonly account_hash: AccountHash;
+/**
+*/
+  readonly approvals: any;
+/**
+*/
+  readonly authorization_keys: any;
+/**
+*/
+  readonly chain_name: string;
+/**
+*/
+  readonly entry_point: string;
+/**
+*/
+  readonly expired: boolean;
+/**
+*/
+  readonly expires: any;
+/**
+*/
   readonly hash: TransactionHash;
+/**
+*/
+  readonly header: any;
+/**
+*/
+  readonly initiator_addr: string;
+/**
+*/
+  readonly is_native: boolean;
+/**
+*/
+  readonly is_standard_payment: boolean;
+/**
+*/
+  readonly signers: any;
+/**
+*/
+  readonly size_estimate: number;
+/**
+*/
+  readonly timestamp: string;
+/**
+*/
+  readonly ttl: string;
 }
 /**
 */
@@ -3532,9 +3517,11 @@ export class TransactionBuilderParams {
 * @param {PublicKey} public_key
 * @param {number} delegation_rate
 * @param {string} amount
+* @param {bigint} minimum_delegation_amount
+* @param {bigint} maximum_delegation_amount
 * @returns {TransactionBuilderParams}
 */
-  static newAddBid(public_key: PublicKey, delegation_rate: number, amount: string): TransactionBuilderParams;
+  static newAddBid(public_key: PublicKey, delegation_rate: number, amount: string, minimum_delegation_amount: bigint, maximum_delegation_amount: bigint): TransactionBuilderParams;
 /**
 * @param {PublicKey} delegator
 * @param {PublicKey} validator
@@ -4286,6 +4273,41 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly __wbg_dictionaryaddr_free: (a: number) => void;
+  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
+  readonly hashaddr_new: (a: number, b: number, c: number) => void;
+  readonly transferaddr_new: (a: number, b: number, c: number) => void;
+  readonly fromTransfer: (a: number, b: number) => number;
+  readonly urefaddr_new: (a: number, b: number, c: number) => void;
+  readonly __wbg_bytes_free: (a: number) => void;
+  readonly bytes_new: () => number;
+  readonly bytes_fromUint8Array: (a: number) => number;
+  readonly __wbg_argssimple_free: (a: number) => void;
+  readonly __wbg_eraid_free: (a: number) => void;
+  readonly eraid_new: (a: number) => number;
+  readonly eraid_value: (a: number) => number;
+  readonly __wbg_globalstateidentifier_free: (a: number) => void;
+  readonly globalstateidentifier_new: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
+  readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
+  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
+  readonly globalstateidentifier_toJson: (a: number) => number;
+  readonly __wbg_transfertarget_free: (a: number) => void;
+  readonly __wbg_transactionbuilderparams_free: (a: number) => void;
+  readonly transactionbuilderparams_newSession: (a: number) => number;
+  readonly transactionbuilderparams_newTransfer: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly transactionbuilderparams_newInvocableEntity: (a: number, b: number, c: number, d: number) => number;
+  readonly transactionbuilderparams_newInvocableEntityAlias: (a: number, b: number, c: number, d: number) => number;
+  readonly transactionbuilderparams_newPackage: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly transactionbuilderparams_newPackageAlias: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly transactionbuilderparams_newAddBid: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly transactionbuilderparams_newDelegate: (a: number, b: number, c: number, d: number) => number;
+  readonly transactionbuilderparams_newUndelegate: (a: number, b: number, c: number, d: number) => number;
+  readonly transactionbuilderparams_newRedelegate: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly transactionbuilderparams_newWithdrawBid: (a: number, b: number, c: number) => number;
+  readonly __wbg_hashaddr_free: (a: number) => void;
+  readonly __wbg_transferaddr_free: (a: number) => void;
+  readonly __wbg_urefaddr_free: (a: number) => void;
   readonly __wbg_getauctioninforesult_free: (a: number) => void;
   readonly getauctioninforesult_api_version: (a: number) => number;
   readonly getauctioninforesult_auction_state: (a: number) => number;
@@ -4381,6 +4403,7 @@ export interface InitOutput {
   readonly listrpcsresult_schema: (a: number) => number;
   readonly listrpcsresult_toJson: (a: number) => number;
   readonly sdk_list_rpcs: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly sdk_query_contract_dict_options: (a: number, b: number) => number;
   readonly sdk_query_contract_dict: (a: number, b: number) => number;
   readonly __wbg_querycontractkeyoptions_free: (a: number) => void;
@@ -4531,7 +4554,6 @@ export interface InitOutput {
   readonly entityaddr_toFormattedString: (a: number, b: number) => void;
   readonly entityaddr_toHexString: (a: number, b: number) => void;
   readonly entityaddr_toJson: (a: number) => number;
-  readonly hashaddr_new: (a: number, b: number, c: number) => void;
   readonly addressableentityhash_fromString: (a: number, b: number, c: number) => void;
   readonly addressableentityhash_fromFormattedStr: (a: number, b: number, c: number) => void;
   readonly addressableentityhash_toFormattedString: (a: number, b: number) => void;
@@ -4618,18 +4640,21 @@ export interface InitOutput {
   readonly transactionstrparams_set_receipt: (a: number, b: number, c: number) => void;
   readonly transactionstrparams_standard_payment: (a: number) => number;
   readonly transactionstrparams_set_standard_payment: (a: number, b: number) => void;
-  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => number;
   readonly __wbg_getchainspecresult_free: (a: number) => void;
   readonly getchainspecresult_api_version: (a: number) => number;
   readonly getchainspecresult_chainspec_bytes: (a: number) => number;
   readonly getchainspecresult_toJson: (a: number) => number;
   readonly sdk_get_chainspec: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_info_get_chainspec: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
-  readonly sdk_make_deploy: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly sdk_call_entrypoint_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_speculative_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => number;
+  readonly __wbg_puttransactionresult_free: (a: number) => void;
+  readonly puttransactionresult_api_version: (a: number) => number;
+  readonly puttransactionresult_toJson: (a: number) => number;
+  readonly sdk_transaction: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly sdk_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly hexToString: (a: number, b: number, c: number) => void;
   readonly hexToUint8Array: (a: number, b: number, c: number) => void;
   readonly uint8ArrayToBytes: (a: number) => number;
@@ -4643,7 +4668,6 @@ export interface InitOutput {
   readonly encodeLowerBlake2b: (a: number, b: number) => number;
   readonly makeDictionaryItemKey: (a: number, b: number, c: number, d: number) => void;
   readonly entityidentifier_fromAccountHash: (a: number) => number;
-  readonly __wbg_hashaddr_free: (a: number) => void;
   readonly __wbg_addressableentityhash_free: (a: number) => void;
   readonly __wbg_contracthash_free: (a: number) => void;
   readonly __wbg_digest_free: (a: number) => void;
@@ -4684,6 +4708,9 @@ export interface InitOutput {
   readonly paymentstrparams_set_payment_version: (a: number, b: number, c: number) => void;
   readonly paymentstrparams_payment_entry_point: (a: number, b: number) => void;
   readonly paymentstrparams_set_payment_entry_point: (a: number, b: number, c: number) => void;
+  readonly __wbg_peerentry_free: (a: number) => void;
+  readonly peerentry_address: (a: number, b: number) => void;
+  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
   readonly __wbg_getaccountresult_free: (a: number) => void;
   readonly getaccountresult_api_version: (a: number) => number;
   readonly getaccountresult_account: (a: number) => number;
@@ -4785,9 +4812,8 @@ export interface InitOutput {
   readonly __wbg_set_getspeculativeexecdeployoptions_verbosity: (a: number, b: number) => void;
   readonly sdk_speculative_exec_deploy_options: (a: number, b: number) => number;
   readonly sdk_speculative_exec_deploy: (a: number, b: number) => number;
-  readonly sdk_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
+  readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
   readonly sdk_sign_transaction: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_geterainfooptions_free: (a: number) => void;
   readonly __wbg_set_getentityoptions_verbosity: (a: number, b: number) => void;
   readonly __wbg_set_geterainfooptions_verbosity: (a: number, b: number) => void;
@@ -4799,6 +4825,7 @@ export interface InitOutput {
   readonly __wbg_set_getblocktransfersoptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_set_getentityoptions_maybe_block_identifier: (a: number, b: number) => void;
   readonly __wbg_set_geterainfooptions_maybe_block_identifier: (a: number, b: number) => void;
+  readonly peerentry_node_id: (a: number, b: number) => void;
   readonly getaddressableentityresult_merkle_proof: (a: number, b: number) => void;
   readonly __wbg_set_getentityoptions_entity_identifier_as_string: (a: number, b: number, c: number) => void;
   readonly __wbg_set_getentityoptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
@@ -4811,6 +4838,9 @@ export interface InitOutput {
   readonly __wbg_get_getblocktransfersoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_get_getentityoptions_maybe_block_identifier: (a: number) => number;
   readonly __wbg_get_geterainfooptions_maybe_block_identifier: (a: number) => number;
+  readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
+  readonly sdk_speculative_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => number;
+  readonly sdk_call_entrypoint_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_blockhash_free: (a: number) => void;
   readonly blockhash_new: (a: number, b: number, c: number) => void;
   readonly blockhash_fromDigest: (a: number, b: number) => void;
@@ -4885,8 +4915,6 @@ export interface InitOutput {
   readonly key_intoURef: (a: number) => number;
   readonly key_urefToHash: (a: number) => number;
   readonly key_withdrawToUnbond: (a: number) => number;
-  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
-  readonly sdk_speculative_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => number;
   readonly sdk_watchDeploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_watchTransaction: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_waitDeploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
@@ -4949,6 +4977,7 @@ export interface InitOutput {
   readonly __wbg_set_eventparseresult_err: (a: number, b: number, c: number) => void;
   readonly __wbg_get_eventparseresult_body: (a: number) => number;
   readonly __wbg_set_eventparseresult_body: (a: number, b: number) => void;
+  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_payment_free: (a: number) => void;
   readonly __wbg_publickeystring_free: (a: number) => void;
   readonly __wbg_message_free: (a: number) => void;
@@ -4977,45 +5006,6 @@ export interface InitOutput {
   readonly __wbg_set_transactionprocessed_block_hash: (a: number, b: number, c: number) => void;
   readonly __wbg_set_version2_initiator: (a: number, b: number) => void;
   readonly body_get_transaction_processed: (a: number) => number;
-  readonly __wbg_transferaddr_free: (a: number) => void;
-  readonly transferaddr_new: (a: number, b: number, c: number) => void;
-  readonly fromTransfer: (a: number, b: number) => number;
-  readonly urefaddr_new: (a: number, b: number, c: number) => void;
-  readonly __wbg_bytes_free: (a: number) => void;
-  readonly bytes_new: () => number;
-  readonly bytes_fromUint8Array: (a: number) => number;
-  readonly __wbg_argssimple_free: (a: number) => void;
-  readonly __wbg_eraid_free: (a: number) => void;
-  readonly eraid_new: (a: number) => number;
-  readonly eraid_value: (a: number) => number;
-  readonly __wbg_globalstateidentifier_free: (a: number) => void;
-  readonly globalstateidentifier_new: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHash: (a: number) => number;
-  readonly globalstateidentifier_fromBlockHeight: (a: number) => number;
-  readonly globalstateidentifier_fromStateRootHash: (a: number) => number;
-  readonly globalstateidentifier_toJson: (a: number) => number;
-  readonly __wbg_peerentry_free: (a: number) => void;
-  readonly peerentry_node_id: (a: number, b: number) => void;
-  readonly peerentry_address: (a: number, b: number) => void;
-  readonly __wbg_transfertarget_free: (a: number) => void;
-  readonly __wbg_transactionbuilderparams_free: (a: number) => void;
-  readonly transactionbuilderparams_newSession: (a: number) => number;
-  readonly transactionbuilderparams_newTransfer: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly transactionbuilderparams_newInvocableEntity: (a: number, b: number, c: number, d: number) => number;
-  readonly transactionbuilderparams_newInvocableEntityAlias: (a: number, b: number, c: number, d: number) => number;
-  readonly transactionbuilderparams_newPackage: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly transactionbuilderparams_newPackageAlias: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly transactionbuilderparams_newAddBid: (a: number, b: number, c: number, d: number) => number;
-  readonly transactionbuilderparams_newDelegate: (a: number, b: number, c: number, d: number) => number;
-  readonly transactionbuilderparams_newUndelegate: (a: number, b: number, c: number, d: number) => number;
-  readonly transactionbuilderparams_newRedelegate: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transactionbuilderparams_newWithdrawBid: (a: number, b: number, c: number) => number;
-  readonly __wbg_puttransactionresult_free: (a: number) => void;
-  readonly puttransactionresult_api_version: (a: number) => number;
-  readonly puttransactionresult_toJson: (a: number) => number;
-  readonly sdk_transaction: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
-  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly __wbg_urefaddr_free: (a: number) => void;
   readonly __wbg_accessrights_free: (a: number) => void;
   readonly accessrights_NONE: () => number;
   readonly accessrights_READ: () => number;
@@ -5031,8 +5021,6 @@ export interface InitOutput {
   readonly accessrights_is_writeable: (a: number) => number;
   readonly accessrights_is_addable: (a: number) => number;
   readonly accessrights_is_none: (a: number) => number;
-  readonly __wbg_dictionaryaddr_free: (a: number) => void;
-  readonly dictionaryaddr_new: (a: number, b: number, c: number) => void;
   readonly __wbg_deploystrparams_free: (a: number) => void;
   readonly deploystrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
   readonly deploystrparams_secret_key: (a: number, b: number) => void;
@@ -5075,12 +5063,12 @@ export interface InitOutput {
   readonly transaction_approvalsHash: (a: number) => number;
   readonly transaction_approvals: (a: number) => number;
   readonly transaction_header: (a: number) => number;
-  readonly transaction_isNative: (a: number) => number;
-  readonly transaction_isStandardPayment: (a: number) => number;
+  readonly transaction_is_native: (a: number) => number;
+  readonly transaction_is_standard_payment: (a: number) => number;
   readonly transaction_session_args: (a: number) => number;
   readonly transaction_addSignature: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly transaction_entryPoint: (a: number, b: number) => void;
-  readonly transaction_TTL: (a: number, b: number) => void;
+  readonly transaction_entry_point: (a: number, b: number) => void;
+  readonly transaction_ttl: (a: number, b: number) => void;
   readonly transaction_timestamp: (a: number, b: number) => void;
   readonly transaction_size_estimate: (a: number) => number;
   readonly transaction_chain_name: (a: number, b: number) => void;
@@ -5092,7 +5080,6 @@ export interface InitOutput {
   readonly putdeployresult_deploy_hash: (a: number) => number;
   readonly putdeployresult_toJson: (a: number) => number;
   readonly sdk_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
-  readonly sdk_speculative_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => number;
   readonly __wbg_getblockresult_free: (a: number) => void;
   readonly getblockresult_api_version: (a: number) => number;
   readonly getblockresult_block: (a: number) => number;
@@ -5138,8 +5125,8 @@ export interface InitOutput {
   readonly sdk_get_transaction_options: (a: number, b: number) => number;
   readonly sdk_get_transaction: (a: number, b: number) => number;
   readonly sdk_info_get_transaction: (a: number, b: number) => number;
-  readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly sdk_account_put_transaction: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_querybalanceresult_free: (a: number) => void;
   readonly querybalanceresult_api_version: (a: number) => number;
   readonly querybalanceresult_balance: (a: number) => number;
@@ -5183,7 +5170,7 @@ export interface InitOutput {
   readonly __wbg_set_getspeculativeexectxnoptions_verbosity: (a: number, b: number) => void;
   readonly sdk_speculative_exec_options: (a: number, b: number) => number;
   readonly sdk_speculative_exec: (a: number, b: number) => number;
-  readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
+  readonly sdk_speculative_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => number;
   readonly sdk_make_transaction: (a: number, b: number, c: number, d: number) => void;
   readonly sdk_make_transfer_transaction: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
   readonly sdk_install_deploy: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
@@ -5218,12 +5205,12 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hd85a22a4c3a67bc6: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h90d8dcd331796d53: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h9cebdcd965c2c916: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__ha81c364041382701: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__h36bc72dc022e6a31: (a: number, b: number, c: number, d: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke2_mut__h5813a45f48301ae0: (a: number, b: number, c: number, d: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

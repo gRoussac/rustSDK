@@ -296,7 +296,7 @@ impl Transaction {
         }
     }
 
-    #[wasm_bindgen(js_name = "expired")]
+    #[wasm_bindgen(getter)]
     pub fn expired(&self) -> bool {
         let now: DateTime<Utc> = Utc::now();
         let now_millis = now.timestamp_millis() as u64;
@@ -311,7 +311,7 @@ impl Transaction {
     }
 
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "expires")]
+    #[wasm_bindgen(getter, js_name = "expires")]
     pub fn expires_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.expires()) {
             Ok(expires) => expires,
@@ -323,7 +323,7 @@ impl Transaction {
     }
 
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "signers")]
+    #[wasm_bindgen(getter, js_name = "signers")]
     pub fn signers_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.signers()) {
             Ok(signers) => signers,
@@ -335,7 +335,7 @@ impl Transaction {
     }
 
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "authorization_keys")]
+    #[wasm_bindgen(getter, js_name = "authorization_keys")]
     pub fn authorization_keys_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.authorization_keys()) {
             Ok(authorization_keys) => authorization_keys,
@@ -380,7 +380,7 @@ impl Transaction {
     }
 
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "approvals")]
+    #[wasm_bindgen(getter, js_name = "approvals")]
     pub fn approvals_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.approvals()) {
             Ok(json) => json,
@@ -392,7 +392,7 @@ impl Transaction {
     }
 
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "header")]
+    #[wasm_bindgen(getter, js_name = "header")]
     pub fn header_js_alias(&self) -> JsValue {
         match JsValue::from_serde(&self.header()) {
             Ok(json) => json,
@@ -403,12 +403,12 @@ impl Transaction {
         }
     }
 
-    #[wasm_bindgen(js_name = "isNative")]
+    #[wasm_bindgen(getter)]
     pub fn is_native(&self) -> bool {
         self.0.clone().is_native()
     }
 
-    #[wasm_bindgen(js_name = "isStandardPayment")]
+    #[wasm_bindgen(getter)]
     pub fn is_standard_payment(&self) -> bool {
         self.0.clone().is_standard_payment()
     }
@@ -470,27 +470,27 @@ impl Transaction {
         updated_transaction
     }
 
-    #[wasm_bindgen(js_name = "entryPoint")]
+    #[wasm_bindgen(getter)]
     pub fn entry_point(&self) -> String {
         self.0.clone().entry_point().to_string()
     }
 
-    #[wasm_bindgen(js_name = "TTL")]
+    #[wasm_bindgen(getter)]
     pub fn ttl(&self) -> String {
         self.0.clone().ttl().to_string()
     }
 
-    #[wasm_bindgen(js_name = "timestamp")]
+    #[wasm_bindgen(getter)]
     pub fn timestamp(&self) -> String {
         self.0.clone().timestamp().to_string()
     }
 
-    #[wasm_bindgen(js_name = "size_estimate")]
+    #[wasm_bindgen(getter)]
     pub fn size_estimate(&self) -> usize {
         self.0.clone().size_estimate()
     }
 
-    #[wasm_bindgen(js_name = "chain_name")]
+    #[wasm_bindgen(getter)]
     pub fn chain_name(&self) -> String {
         match &self.0.header() {
             TransactionHeader::Deploy(header) => header.chain_name().to_string(),
@@ -498,7 +498,7 @@ impl Transaction {
         }
     }
 
-    #[wasm_bindgen(js_name = "initiator_addr")]
+    #[wasm_bindgen(getter)]
     pub fn initiator_addr(&self) -> String {
         let initiator_addr: InitiatorAddr = self.0.clone().initiator_addr().clone();
         match initiator_addr {
@@ -507,7 +507,7 @@ impl Transaction {
         }
     }
 
-    #[wasm_bindgen(js_name = "account_hash")]
+    #[wasm_bindgen(getter)]
     pub fn account_hash(&self) -> AccountHash {
         let initiator_addr: InitiatorAddr = self.0.clone().initiator_addr().clone();
         initiator_addr.account_hash().into()

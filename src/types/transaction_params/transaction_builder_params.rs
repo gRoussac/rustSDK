@@ -46,6 +46,8 @@ pub struct TransactionBuilderParams {
     delegator: Option<PublicKey>,
     validator: Option<PublicKey>,
     new_validator: Option<PublicKey>,
+    minimum_delegation_amount: Option<u64>,
+    maximum_delegation_amount: Option<u64>,
 }
 
 #[wasm_bindgen]
@@ -87,6 +89,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -116,6 +120,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -147,6 +153,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -173,6 +181,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -211,6 +221,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -239,6 +251,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -247,6 +261,8 @@ impl TransactionBuilderParams {
         public_key: PublicKey,
         delegation_rate: u8,
         amount: &str,
+        minimum_delegation_amount: u64,
+        maximum_delegation_amount: u64,
     ) -> TransactionBuilderParams {
         let cloned_amount = amount.to_string();
         let amount = U512::from_dec_str(&cloned_amount)
@@ -272,6 +288,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: Some(minimum_delegation_amount),
+            maximum_delegation_amount: Some(maximum_delegation_amount),
         }
     }
 
@@ -300,6 +318,8 @@ impl TransactionBuilderParams {
             delegator: Some(delegator),
             validator: Some(validator),
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -328,6 +348,8 @@ impl TransactionBuilderParams {
             delegator: Some(delegator),
             validator: Some(validator),
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -357,6 +379,8 @@ impl TransactionBuilderParams {
             delegator: Some(delegator),
             validator: Some(validator),
             new_validator: Some(new_validator),
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 
@@ -381,6 +405,8 @@ impl TransactionBuilderParams {
             delegator: None,
             validator: None,
             new_validator: None,
+            minimum_delegation_amount: None,
+            maximum_delegation_amount: None,
         }
     }
 }
@@ -457,6 +483,12 @@ pub fn transaction_builder_params_to_casper_client(
             public_key: transaction_params.public_key.clone().unwrap().into(),
             delegation_rate: transaction_params.delegation_rate.unwrap(),
             amount: transaction_params.amount.unwrap_or_default(),
+            minimum_delegation_amount: transaction_params
+                .minimum_delegation_amount
+                .unwrap_or_default(),
+            maximum_delegation_amount: transaction_params
+                .maximum_delegation_amount
+                .unwrap_or_default(),
         },
         TransactionKind::Delegate => _TransactionBuilderParams::Delegate {
             delegator: transaction_params.delegator.clone().unwrap().into(),

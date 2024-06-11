@@ -394,9 +394,9 @@ const get_transaction_options = sdk.get_transaction_options({
 const transaction_result = await sdk.get_transaction(get_transaction_options);
 
 const transaction: Transaction = transaction_result.transaction;
-const timestamp = transaction.timestamp();
-const header = transaction.header();
-const hash = transaction.hash.toString();
+const timestamp = transaction.timestamp;
+const header = transaction.header;
+const hash = transaction.hash;
 console.log(timestamp, header, hash);
 ```
 

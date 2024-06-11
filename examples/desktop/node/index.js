@@ -49,7 +49,7 @@ var sdk = new casper_sdk_1.SDK(node_address);
 //   console.log(peers_as_json);
 //   res.end(JSON.stringify(peers_as_json));
 // });
-var PORT = process.env.PORT || 3000;
+//const PORT = process.env.PORT || 3000;
 // example0
 // const example0 = server.listen(PORT, () => {
 //   console.log(`Server is running on port ${PORT}`);
@@ -71,9 +71,9 @@ var example1 = function () { return __awaiter(void 0, void 0, void 0, function (
             case 1:
                 transaction_result = _a.sent();
                 transaction = transaction_result.transaction;
-                timestamp = transaction.timestamp();
-                header = transaction.header();
-                hash = transaction.hash().to_hex_string();
+                timestamp = transaction.timestamp;
+                header = transaction.header;
+                hash = transaction.hash;
                 console.log(timestamp, header, hash);
                 return [2 /*return*/];
         }
