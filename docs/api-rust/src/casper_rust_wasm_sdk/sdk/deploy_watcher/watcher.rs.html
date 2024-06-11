@@ -1,4 +1,90 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/deploy_watcher/watcher.rs`."><title>watcher.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content="rustdoc" />
+    <meta
+      name="description"
+      content="Source of the Rust file `src/sdk/deploy_watcher/watcher.rs`."
+    />
+    <title>watcher.rs - source</title>
+    <script>
+      if (window.location.protocol !== 'file:')
+        document.head.insertAdjacentHTML(
+          'beforeend',
+          'SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2'
+            .split(',')
+            .map(
+              (f) =>
+                `<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`
+            )
+            .join('')
+        );
+    </script>
+    <link
+      rel="stylesheet"
+      href="../../../../static.files/normalize-76eba96aa4d2e634.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"
+    />
+    <meta
+      name="rustdoc-vars"
+      data-root-path="../../../../"
+      data-static-root-path="../../../../static.files/"
+      data-current-crate="casper_rust_wasm_sdk"
+      data-themes=""
+      data-resource-suffix=""
+      data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)"
+      data-channel="nightly"
+      data-search-js="search-d52510db62a78183.js"
+      data-settings-js="settings-4313503d2e1961c2.js"
+    />
+    <script src="../../../../static.files/storage-118b08c4c78b968e.js"></script>
+    <script
+      defer
+      src="../../../../static.files/src-script-e66d777a5a92e9b2.js"
+    ></script>
+    <script defer src="../../../../src-files.js"></script>
+    <script
+      defer
+      src="../../../../static.files/main-20a3ad099b048cf2.js"
+    ></script>
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="../../../../static.files/noscript-df360f571f6edeae.css"
+    /></noscript>
+    <link
+      rel="alternate icon"
+      type="image/png"
+      href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../../../../static.files/favicon-2c020d218678b618.svg"
+    />
+  </head>
+  <body class="rustdoc src">
+    <!--[if lte IE 11
+      ]><div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+      </div><!
+    [endif]-->
+    <nav class="sidebar">
+      <div class="src-sidebar-title"><h2>Files</h2></div>
+    </nav>
+    <div class="sidebar-resizer"></div>
+    <main>
+      <rustdoc-search></rustdoc-search>
+      <section id="main-content" class="content">
+        <div class="example-wrap">
+          <div data-nosnippet>
+            <pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -906,7 +992,11 @@
 <a href="#906" id="906">906</a>
 <a href="#907" id="907">907</a>
 <a href="#908" id="908">908</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::SDK;
+</pre>
+          </div>
+          <pre
+            class="rust"
+          ><code><span class="kw">use </span><span class="kw">crate</span>::SDK;
 <span class="kw">use </span>chrono::{Duration, Utc};
 <span class="kw">use </span>futures_util::StreamExt;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -1066,14 +1156,14 @@
 /// # Fields
 ///
 /// * `events_url` - The URL for deploy events.
-/// * `deploy_subscriptions` - Vector containing deploy subscriptions.
+/// * `subscriptions` - Vector containing deploy subscriptions.
 /// * `active` - Reference-counted cell indicating whether the deploy watcher is active.
 /// * `timeout_duration` - Duration representing the optional timeout for watching events.
 </span><span class="attr">#[derive(Clone)]
 #[wasm_bindgen]
 </span><span class="kw">pub struct </span>DeployWatcher {
     events_url: String,
-    deploy_subscriptions: Vec&lt;DeploySubscription&gt;,
+    subscriptions: Vec&lt;Subscription&gt;,
     active: Rc&lt;RefCell&lt;bool&gt;&gt;,
     timeout_duration: Duration,
 }
@@ -1103,7 +1193,7 @@
 
         DeployWatcher {
             events_url,
-            deploy_subscriptions: Vec::new(),
+            subscriptions: Vec::new(),
             active: Rc::new(RefCell::new(<span class="bool-val">true</span>)),
             timeout_duration,
         }
@@ -1113,7 +1203,7 @@
     ///
     /// # Arguments
     ///
-    /// * `deploy_subscriptions` - Vector of deploy subscriptions to be added.
+    /// * `subscriptions` - Vector of deploy subscriptions to be added.
     ///
     /// # Returns
     ///
@@ -1122,9 +1212,9 @@
     #[wasm_bindgen(js_name = <span class="string">"subscribe"</span>)]
     </span><span class="kw">pub fn </span>subscribe_js_alias(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        deploy_subscriptions: Vec&lt;DeploySubscription&gt;,
+        subscriptions: Vec&lt;Subscription&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="self">self</span>.subscribe(deploy_subscriptions)
+        <span class="self">self</span>.subscribe(subscriptions)
     }
 
     <span class="doccomment">/// Unsubscribes from deploy events based on the provided deploy hash.
@@ -1136,7 +1226,7 @@
     /// This method removes the deploy subscription associated with the provided deploy hash.
     </span><span class="attr">#[wasm_bindgen]
     </span><span class="kw">pub fn </span>unsubscribe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, deploy_hash: String) {
-        <span class="self">self</span>.deploy_subscriptions
+        <span class="self">self</span>.subscriptions
             .retain(|s| s.deploy_hash != deploy_hash);
     }
 
@@ -1276,25 +1366,25 @@
     ///
     /// # Arguments
     ///
-    /// * `deploy_subscriptions` - Vector of deploy subscriptions to be added.
+    /// * `subscriptions` - Vector of deploy subscriptions to be added.
     ///
     /// # Returns
     ///
     /// Result indicating success or an error message.
     </span><span class="kw">pub fn </span>subscribe(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        deploy_subscriptions: Vec&lt;DeploySubscription&gt;,
+        subscriptions: Vec&lt;Subscription&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="kw">for </span>new_subscription <span class="kw">in </span><span class="kw-2">&amp;</span>deploy_subscriptions {
+        <span class="kw">for </span>new_subscription <span class="kw">in </span><span class="kw-2">&amp;</span>subscriptions {
             <span class="kw">if </span><span class="self">self
-                </span>.deploy_subscriptions
+                </span>.subscriptions
                 .iter()
                 .any(|s| s.deploy_hash == new_subscription.deploy_hash)
             {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(String::from(<span class="string">"Already subscribed to this event"</span>));
             }
         }
-        <span class="self">self</span>.deploy_subscriptions.extend(deploy_subscriptions);
+        <span class="self">self</span>.subscriptions.extend(subscriptions);
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1347,7 +1437,7 @@
                         }
 
                         <span class="kw">let </span><span class="kw-2">mut </span>results: Vec&lt;EventParseResult&gt; = [].to_vec();
-                        <span class="kw">for </span>subscription <span class="kw">in </span><span class="self">self</span>.deploy_subscriptions.clone().iter() {
+                        <span class="kw">for </span>subscription <span class="kw">in </span><span class="self">self</span>.subscriptions.clone().iter() {
                             <span class="kw">if </span>deploy_hash_processed == subscription.deploy_hash {
                                 <span class="kw">let </span>event_handler = <span class="kw-2">&amp;</span>subscription.event_handler_fn;
 
@@ -1371,7 +1461,7 @@
                             }
                         }
 
-                        <span class="kw">if </span>deploy_hash_found &amp;&amp; <span class="self">self</span>.deploy_subscriptions.is_empty() {
+                        <span class="kw">if </span>deploy_hash_found &amp;&amp; <span class="self">self</span>.subscriptions.is_empty() {
                             <span class="self">self</span>.stop();
                             <span class="kw">return </span><span class="prelude-val">Some</span>(results);
                         }
@@ -1460,11 +1550,11 @@
     }
 }
 
-<span class="comment">// Define DeploySubscription struct with different configurations based on the target architecture.
+<span class="comment">// Define Subscription struct with different configurations based on the target architecture.
 </span><span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="doccomment">/// Represents a subscription to deploy events for non-wasm32 target architecture.
 </span><span class="attr">#[derive(Debug, Clone, Default)]
-</span><span class="kw">pub struct </span>DeploySubscription {
+</span><span class="kw">pub struct </span>Subscription {
     <span class="doccomment">/// Deploy hash to identify the subscription.
     </span><span class="kw">pub </span>deploy_hash: String,
     <span class="doccomment">/// Handler function for deploy events.
@@ -1475,7 +1565,7 @@
 </span><span class="doccomment">/// Represents a subscription to deploy events for wasm32 target architecture.
 </span><span class="attr">#[derive(Debug, Clone, Default)]
 #[wasm_bindgen(getter_with_clone)]
-</span><span class="kw">pub struct </span>DeploySubscription {
+</span><span class="kw">pub struct </span>Subscription {
     <span class="doccomment">/// Deploy hash to identify the subscription.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"deployHash"</span>)]
     </span><span class="kw">pub </span>deploy_hash: String,
@@ -1484,8 +1574,8 @@
     </span><span class="kw">pub </span>event_handler_fn: js_sys::Function,
 }
 
-<span class="kw">impl </span>DeploySubscription {
-    <span class="doccomment">/// Constructor for DeploySubscription for non-wasm32 target architecture.
+<span class="kw">impl </span>Subscription {
+    <span class="doccomment">/// Constructor for Subscription for non-wasm32 target architecture.
     ///
     /// # Arguments
     ///
@@ -1501,8 +1591,8 @@
 }
 
 <span class="attr">#[wasm_bindgen]
-</span><span class="kw">impl </span>DeploySubscription {
-    <span class="doccomment">/// Constructor for DeploySubscription for wasm32 target architecture.
+</span><span class="kw">impl </span>Subscription {
+    <span class="doccomment">/// Constructor for Subscription for wasm32 target architecture.
     ///
     /// # Arguments
     ///
@@ -1621,7 +1711,7 @@
 
         <span class="comment">// Assert
         </span><span class="macro">assert_eq!</span>(deploy_watcher.events_url, events_url);
-        <span class="macro">assert_eq!</span>(deploy_watcher.deploy_subscriptions.len(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(deploy_watcher.subscriptions.len(), <span class="number">0</span>);
         <span class="macro">assert!</span>(<span class="kw-2">*</span>deploy_watcher.active.borrow());
         <span class="macro">assert_eq!</span>(
             deploy_watcher.timeout_duration,
@@ -1639,7 +1729,7 @@
 
         <span class="comment">// Assert
         </span><span class="macro">assert_eq!</span>(deploy_watcher.events_url, events_url);
-        <span class="macro">assert_eq!</span>(deploy_watcher.deploy_subscriptions.len(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(deploy_watcher.subscriptions.len(), <span class="number">0</span>);
         <span class="macro">assert!</span>(<span class="kw-2">*</span>deploy_watcher.active.borrow());
         <span class="macro">assert_eq!</span>(
             deploy_watcher.timeout_duration,
@@ -1724,7 +1814,7 @@
 
         <span class="comment">// Create a subscription
         </span><span class="kw">let </span>subscription =
-            DeploySubscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+            Subscription::new(deploy_hash.to_string(), EventHandlerFn::default());
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = deploy_watcher.subscribe(<span class="macro">vec!</span>[subscription]);
@@ -1734,7 +1824,7 @@
 
         <span class="comment">// Try subscribing to the same deploy hash again
         </span><span class="kw">let </span>duplicate_subscription =
-            DeploySubscription::new(deploy_hash.to_string(), EventHandlerFn::default());
+            Subscription::new(deploy_hash.to_string(), EventHandlerFn::default());
         <span class="kw">let </span>result_duplicate = deploy_watcher.subscribe(<span class="macro">vec!</span>[duplicate_subscription]);
 
         <span class="comment">// Assert
@@ -1755,12 +1845,12 @@
         <span class="comment">// Subscribe to a deploy hash
         </span><span class="kw">let </span>deploy_hash_to_subscribe = deploy_hash.to_string();
         <span class="kw">let </span>subscription =
-            DeploySubscription::new(deploy_hash_to_subscribe.clone(), EventHandlerFn::default());
+            Subscription::new(deploy_hash_to_subscribe.clone(), EventHandlerFn::default());
         <span class="kw">let _ </span>= deploy_watcher.subscribe(<span class="macro">vec!</span>[subscription]);
 
         <span class="comment">// Assert that the deploy hash is initially subscribed
         </span><span class="macro">assert!</span>(deploy_watcher
-            .deploy_subscriptions
+            .subscriptions
             .iter()
             .any(|s| s.deploy_hash == deploy_hash_to_subscribe));
 
@@ -1769,7 +1859,7 @@
 
         <span class="comment">// Assert that the deploy hash is unsubscribed after calling unsubscribe
         </span><span class="macro">assert!</span>(!deploy_watcher
-            .deploy_subscriptions
+            .subscriptions
             .iter()
             .any(|s| s.deploy_hash == deploy_hash_to_subscribe));
     }
@@ -1786,7 +1876,7 @@
 
         <span class="comment">// Assert
         </span><span class="macro">assert_eq!</span>(deploy_watcher.events_url, events_url);
-        <span class="macro">assert_eq!</span>(deploy_watcher.deploy_subscriptions.len(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(deploy_watcher.subscriptions.len(), <span class="number">0</span>);
         <span class="macro">assert!</span>(<span class="kw-2">*</span>deploy_watcher.active.borrow());
         <span class="macro">assert_eq!</span>(
             deploy_watcher.timeout_duration,
@@ -1814,4 +1904,9 @@
         <span class="macro">assert_eq!</span>(event_parse_result.err, <span class="prelude-val">Some</span>(<span class="string">"Timeout expired"</span>.to_string()));
     }
 }
-</code></pre></div></section></main></body></html>
+</code></pre>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -461,8 +461,895 @@ You can find more examples in the [Angular example app](examples/frontend/angula
 ### More examples
 
 <details>
+  <summary><strong><code>Transactions and Transfers</code></strong></summary>
+<br>
+
+<details>
+    <summary>Making a <strong>Transfer</strong> transaction</summary>
+
+#### Rust
+
+```rust
+use casper_rust_wasm_sdk::types::deploy_params::{
+    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+};
+
+pub const CHAIN_NAME: &str = "integration-test";
+pub const PUBLIC_KEY: &str =
+    "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PAYMENT_AMOUNT: &str = "100000000";
+pub const TRANSFER_AMOUNT: &str = "2500000000";
+pub const TTL: &str = "1h";
+pub const TARGET_ACCOUNT: &str =
+    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(PUBLIC_KEY);
+transaction_params.set_ttl(Some(TTL.to_string()));
+
+let make_transfer_transaction = sdk
+    .make_transfer_transaction(
+        None, // optional maybe_source
+        TARGET_ACCOUNT,
+        TRANSFER_AMOUNT,
+        transaction_params,
+        None, // optional transfer_id
+    )
+    .unwrap();
+println!("{:?}", make_transfer_transaction.timestamp());
+```
+
+#### Typescript
+
+```ts
+import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
+
+const chain_name = 'integration-test';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = undefined;
+const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
+const ttl = '1h'; // or undefined
+const payment_amount = '100000000';
+const transfer_amount = '2500000000';
+const target_account =
+  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+
+const transaction_params = new TransactionStrParams(
+  chain_name,
+  public_key,
+  private_key,
+  timestamp,
+  ttl
+);
+
+const make_transfer_transaction = sdk.make_transfer_transaction(
+  undefined, // Optional maybe_source
+  target_account,
+  transfer_amount,
+  transaction_params
+);
+const make_transfer_transaction_as_json = make_transfer_transaction.toJson();
+console.log(make_transfer_transaction_as_json);
+```
+
+</details>
+
+<details>
+    <summary>Sending a <strong>Transfer</strong> transaction (alias for: make + put)</summary>
+<br>
+
+Sends a [`Transfer Transaction`] to the network for execution. (Alias for make_transfer_transaction + put_transaction)
+
+#### Rust
+
+```rust
+use casper_rust_wasm_sdk::types::deploy_params::{
+    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+};
+
+pub const CHAIN_NAME: &str = "integration-test";
+pub const PUBLIC_KEY: &str =
+    "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----"#;
+pub const PAYMENT_AMOUNT: &str = "100000000";
+pub const TRANSFER_AMOUNT: &str = "2500000000";
+pub const TTL: &str = "1h";
+pub const TARGET_ACCOUNT: &str =
+    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_ttl(Some(TTL.to_string()));
+
+let transfer = sdk
+    .transfer_transaction(
+        None, // optional maybe_source
+        TARGET_ACCOUNT,
+        TRANSFER_AMOUNT,
+        transaction_params,
+        None, // optional transfer_id
+        None,
+        None,
+    )
+    .await;
+println!("{:?}", transfer.as_ref().unwrap().result.transaction_hash);
+```
+
+#### Typescript
+
+```ts
+import {
+  Transaction,
+  TransactionStrParams,
+  TransactionBuilderParams,
+  getTimestamp,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
+const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
+const ttl = '1h'; // or undefined
+const payment_amount = '100000000';
+const transfer_amount = '2500000000';
+const target_account =
+  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+
+const transaction_params = new TransactionStrParams(
+  chain_name,
+  public_key,
+  private_key,
+  timestamp,
+  ttl
+);
+
+const transfer_transaction_result = await sdk.transfer_transaction(
+  undefined, // Optional maybe_source
+  transfer_amount,
+  target_account,
+  transaction_params
+);
+const transfer_transaction_result_as_json =
+  transfer_transaction_result.toJson();
+console.log(transfer_transaction_result_as_json);
+```
+
+</details>
+
+<details>
+    <summary>Making a <strong>Session</strong> transaction</summary>
+
+#### Rust
+
+```rust
+use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+
+pub const CHAIN_NAME: &str = "integration-test";
+pub const PUBLIC_KEY: &str =
+    "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+pub const CONTRACT_HASH: &str =
+    "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+pub const ENTRY_POINT: &str = "set_variables";
+pub const TTL: &str = "1h";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(initiator_addr);
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_ttl(Some(TTL.to_string()));
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let builder_params = TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRY_POINT);
+
+let transaction = sdk
+    .transaction(builder_params, transaction_params, None, None)
+    .await;
+println!(
+    "{:?}",
+    transaction.as_ref().unwrap().result.transaction_hash
+);
+```
+
+#### Typescript
+
+```ts
+import {
+  Transaction,
+  TransactionStrParams,
+  TransactionBuilderParams,
+} from 'casper-sdk';
+
+const chain_name = 'integration-test';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const payment_amount = '5000000000';
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+
+const deploy_params = new DeployStrParams(chain_name, public_key);
+
+const session_params = new SessionStrParams();
+session_params.session_hash = contract_hash;
+session_params.session_entry_point = 'set_variables';
+
+const transaction_params = new TransactionStrParams(chain_name, public_key);
+transaction_params.payment_amount = payment_amount;
+
+let builder_params = TransactionBuilderParams.newInvocableEntity(
+  contract_hash,
+  entry_point
+);
+
+const transaction = sdk.make_transaction(builder_params, transaction_params);
+const transaction_as_json = transaction.toJson();
+console.log(transaction_as_json);
+```
+
+</details>
+
+<details>
+    <summary>Sending a <strong>Session</strong> transaction (alias for: make + put)</summary>
+<br>
+
+Sends a [`Transaction`] to the network for execution. (Alias for make_transaction + put_transaction)
+
+#### Rust
+
+```rust
+let sdk = SDK::new(
+    Some("http://127.0.0.1:11101".to_string()),
+    Some(Verbosity::High),
+);
+
+use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str =
+    "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----"#;
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+pub const CONTRACT_HASH: &str =
+    "hash-6646c99b3327954b47035bbc31343d9d96a833a9fc9c8c6d809b29f2482b0abf";
+pub const ENTRY_POINT: &str = "set_variables";
+pub const TTL: &str = "1h";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(initiator_addr);
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_ttl(Some(TTL.to_string()));
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let builder_params = TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRY_POINT);
+
+let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+
+let put_transaction = sdk.put_transaction(transaction, None, None).await;
+println!(
+    "{:?}",
+    put_transaction.as_ref().unwrap().result.transaction_hash
+);
+```
+
+#### Typescript
+
+```ts
+import {
+  Transaction,
+  TransactionStrParams,
+  TransactionBuilderParams,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
+const payment_amount = '5000000000';
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entry_point = 'set_variables';
+
+const transaction_params = new TransactionStrParams(
+  chain_name,
+  public_key,
+  private_key
+);
+transaction_params.payment_amount = payment_amount;
+let builder_params = TransactionBuilderParams.newInvocableEntity(
+  contract_hash,
+  entry_point
+);
+
+const transaction_result = await sdk.transaction(
+  builder_params,
+  transaction_params
+);
+const transaction_result_as_json = transaction_result.toJson();
+console.log(transaction_result_as_json);
+```
+
+</details>
+
+<details>
+    <summary><strong>Put</strong> Transaction</summary>
+
+#### Rust
+
+Puts a [`Transaction`] to the network for execution.
+
+```rust
+use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----"#;
+let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+pub const CONTRACT_HASH: &str =
+    "hash-6646c99b3327954b47035bbc31343d9d96a833a9fc9c8c6d809b29f2482b0abf";
+pub const ENTRY_POINT: &str = "set_variables";
+pub const TTL: &str = "1h";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(initiator_addr); // sender account
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_ttl(Some(TTL.to_string())); // optional TTL
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+
+let builder_params = TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRY_POINT);
+
+let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
+
+let put_transaction = sdk.put_transaction(transaction, None, None).await;
+println!(
+    "{:?}",
+    put_transaction.as_ref().unwrap().result.transaction_hash
+);
+```
+
+Puts a [`Transfer Transaction`] to the network for execution.
+
+```rust
+use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----"#;
+let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap()
+pub const PAYMENT_AMOUNT: &str = "100000000";
+pub const TRANSFER_AMOUNT: &str = "2500000000";
+pub const TARGET_ACCOUNT: &str =
+    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+pub const TTL: &str = "1h";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(initiator_addr);
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_ttl(TTL);
+
+let transfer_transaction = Transaction::new_transfer(
+    None,
+    TARGET_ACCOUNT,
+    TRANSFER_AMOUNT,
+    None,
+    transaction_params,
+)
+.unwrap();
+
+let put_transaction = sdk.put_transaction(transfer_transaction, None, None).await;
+println!(
+    "{:?}",
+    put_transaction.as_ref().unwrap().result.transaction_hash
+);
+```
+
+#### Typescript
+
+Puts a [`Transaction`] to the network for execution.
+
+```ts
+import {
+  Transaction,
+  TransactionStrParams,
+  TransactionBuilderParams,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
+const payment_amount = '5000000000';
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entry_point = 'set_variables';
+
+const transaction_params = new TransactionStrParams(
+  chain_name,
+  public_key,
+  private_key
+);
+transaction_params.payment_amount = payment_amount;
+
+let builder_params = TransactionBuilderParams.newInvocableEntity(
+  contract_hash,
+  entry_point
+);
+
+const transaction = Transaction.newSession(builder_params, transaction_params);
+const put_transaction_result = await sdk.put_transaction(transaction);
+const put_transaction_result_as_json = put_transaction_result.toJson();
+console.log(put_transaction_result_as_json);
+```
+
+Puts a [`Transfer Transaction`] to the network for execution.
+
+```ts
+import {
+  Transaction,
+  TransactionStrParams,
+  TransactionBuilderParams,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const public_key =
+  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
+const payment_amount = '100000000';
+const transfer_amount = '2500000000';
+const target_account =
+  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+
+const transfer_params = new TransactionStrParams(
+  chain_name,
+  public_key,
+  private_key
+);
+
+const transfer_transaction = Transaction.newTransfer(
+  undefined, // optional maybe_source
+  target_account,
+  transfer_amount,
+  undefined, // optional transfer_id
+  transfer_params
+);
+
+const put_transaction_result = await sdk.put_transaction(transfer_transaction);
+const put_transaction_result_as_json = put_transaction_result.toJson();
+console.log(put_transaction_result_as_json);
+```
+
+</details>
+
+<details>
+    <summary><strong>Sign</strong> Transaction</summary>
+
+#### Rust
+
+```rust
+pub const PRIVATE_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
+... //  same code as 'Making a Session/Transfer Transaction' example
+let unsigned_transaction = sdk.make_transaction(builder_params, transaction_params).unwrap();
+let signed_transaction = sdk.sign_transaction(unsigned_transaction, PRIVATE_KEY);
+```
+
+#### Typescript
+
+```ts
+const private_key = 'MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI';
+... //  same code as 'Making a Session/Transfer Transaction' example
+const unsigned_transaction = sdk.make_transaction(builder_params, transaction_params);
+const signed_transaction = unsigned_transaction.sign(private_key);
+```
+
+</details>
+
+<details>
+    <summary><strong>Wait</strong> Transaction</summary>
+
+#### Rust
+
+Developers using Rust can utilize the wait_transaction function to wait for a specific transaction event. This is achieved by providing the desired event URL, transaction hash, and an optional timeout duration. Once the transaction is processed, the resulting data, such as the transaction's cost, can be easily accessed and utilized in subsequent logic.
+
+```rust
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
+
+// Wait for transaction
+let event_parse_result = sdk
+    .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash, timeout_duration)
+    .await
+    .unwrap();
+let transaction_processed = event_parse_result.body.unwrap().get_transaction_processed();
+println!("{:?}", transaction_processed);
+```
+
+#### Typescript
+
+In TypeScript, the waitTransaction function provides a similar capability to wait for a specific transaction event. Developers can leverage this function by specifying the event address, transaction hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the transaction.
+
+```ts
+const events_address = 'http://127.0.0.1:18101/events/main';
+
+const transaction_hash =
+  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
+
+// Wait for transaction
+const eventParseResult: EventParseResult = await sdk.waitTransaction(
+  events_address,
+  install_result_as_json.transaction_hash,
+  timeout_duration
+);
+console.log(eventParseResult.body.transaction_processed);
+const cost =
+  eventParseResult.body?.transaction_processed?.execution_result.Success?.cost;
+console.log(`transaction cost ${cost}`);
+```
+
+</details>
+
+<details>
+    <summary><strong>Watch</strong> Transaction</summary>
+
+#### Rust
+
+The watch_transaction functionality facilitates actively monitoring transaction events. By creating a transaction watcher, developers can subscribe to specific transaction hashes and define custom callback functions to handle these events. The watcher is then started, and as transaction events occur, the specified callback functions are executed. This mechanism enables real-time responsiveness to transaction events within Rust applications.
+
+```rust
+use casper_rust_wasm_sdk::transaction_watcher::watcher::{
+    Subscription, EventHandlerFn,
+};
+
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
+
+// Creates a watcher instance
+let mut watcher = sdk.watch_transaction(DEFAULT_EVENT_ADDRESS, timeout_duration);
+
+// Create a callback function handler of your design
+let event_handler_fn = get_event_handler_fn(transaction_hash.to_string());
+
+let mut subscriptions: Vec<Subscription> = vec![];
+subscriptions.push(Subscription::new(
+    transaction_hash.to_string(),
+    EventHandlerFn::new(event_handler_fn),
+));
+
+// Subscribe and start watching
+let _ = watcher.subscribe(subscriptions);
+let results = watcher.start().await;
+watcher.stop();
+println!("{:?}", results);
+```
+
+#### Typescript
+
+Similarly, TypeScript developers can utilize the watchTransaction function to actively watch for transaction events on the Casper blockchain. By creating a transaction watcher and defining callback functions, developers can subscribe to specific transaction hashes and respond dynamically as events unfold.
+
+```ts
+import { EventParseResult, Subscription } from 'casper-sdk';
+
+const events_address = 'http://127.0.0.1:18101/events/main';
+
+const transaction_hash =
+  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+// Creates a watcher instance
+const watcher = sdk.watchTransaction(events_address);
+
+// Create a callback function handler of your design
+const getEventHandlerFn = (transactionHash: string) => {
+  const eventHandlerFn = (eventParseResult: EventParseResult) => {
+    console.log(`callback for ${transactionHash}`);
+    if (eventParseResult.err) {
+      return false;
+    } else if (
+      eventParseResult.body?.transaction_processed?.execution_result.Success
+    ) {
+      console.log(
+        eventParseResult.body?.transaction_processed?.execution_result.Success
+      );
+      return true;
+    } else {
+      console.error(
+        eventParseResult.body?.transaction_processed?.execution_result.Failure
+      );
+      return false;
+    }
+  };
+  return eventHandlerFn;
+};
+
+const eventHandlerFn = getEventHandlerFn(transaction_hash);
+
+const subscription: Subscription = new Subscription(
+  transaction_hash,
+  eventHandlerFn
+);
+const subscriptions: Subscription[] = [subscription];
+
+// Subscribe and start watching
+watcher.subscribe(subscriptions);
+const results = await watcher.start();
+watcher.stop();
+console.log(results);
+```
+
+</details>
+
+</details>
+
+<details>
+    <summary><strong><code>CEP-78</code></strong></summary>
+
+#### Install
+
+- <strong>Rust</strong>
+
+```rust
+use casper_rust_wasm_sdk::{
+    helpers::json_pretty_print,
+    types::{
+        transaction_hash::TransactionHash,
+        transaction_params::transaction_str_params::TransactionStrParams,
+    },
+};
+
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str =
+    "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----"#;
+pub const ARGS_JSON: &str = r#"[
+{"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
+{"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
+{"name": "total_token_supply", "type": "U64", "value": 10},
+{"name": "ownership_mode", "type": "U8", "value": 0},
+{"name": "nft_kind", "type": "U8", "value": 1},
+{"name": "allow_minting", "type": "Bool", "value": true},
+{"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
+{"name": "nft_metadata_kind", "type": "U8", "value": 2},
+{"name": "identifier_mode", "type": "U8", "value": 0},
+{"name": "metadata_mutability", "type": "U8", "value": 0},
+{"name": "events_mode", "type": "U8", "value": 1}
+]"#;
+pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
+pub const CEP78_CONTRACT: &str = "cep78.wasm";
+pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(PUBLIC_KEY);
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_session_args_json(ARGS_JSON);
+transaction_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
+
+let session_params = SessionStrParams::default();
+session_params.set_session_args_json(ARGS_JSON);
+
+let file_path = CEP78_CONTRACT;
+let module_bytes = match read_wasm_file(file_path) {
+    Ok(module_bytes) => module_bytes,
+    Err(err) => {
+        return Err(format!("Error reading file {}: {:?}", file_path, err));
+    }
+};
+
+session_params.set_session_bytes(module_bytes.into());
+
+let install = sdk
+    .install(transaction_params, transaction_bytes.into(), None)
+    .await;
+
+let transaction_hash_result = install.as_ref().unwrap().result.transaction_hash;
+println!("{:?}", transaction_hash_result);
+
+let transaction_hash = TransactionHash::from(transaction_hash_result);
+let transaction_hash_as_string = transaction_hash.to_string();
+println!("wait transaction_hash {}", transaction_hash_as_string);
+let event_parse_result: EventParseResult = sdk
+    .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash_as_string, None)
+    .await
+    .unwrap();
+println!("{:?}", event_parse_result);
+
+let finalized_approvals = true;
+let deploy_hash = DeployHash::from(deploy_hash_result);
+let get_transaction = sdk
+    .get_transaction(deploy_hash, Some(finalized_approvals), None, None)
+    .await.unwrap();
+let result = json_pretty_print(
+      get_transaction.result.transaction.approvals(),
+      Some(Verbosity::Low),
+  );
+println!("approvals {result}");
+
+let transaction_hash = get_transaction.result.transaction.hash();
+let result = TransactionHash::from(transaction_hash).to_string();
+println!("processed transaction hash {result}");
+```
+
+with
+
+```rust
+fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
+    let root_path = Path::new("./wasm/");
+    let path = root_path.join(file_path);
+    let mut file = File::open(path)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(buffer)
+}
+```
+
+- <strong>Typescript</strong>
+
+```ts
+import {
+  ...
+  TransactionStrParams,
+  privateToPublicKey,
+  Bytes,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+  const private_key = `-----BEGIN PRIVATE KEY-----
+-----END PRIVATE KEY-----`;
+const initiator_addr = privateToPublicKey(secret_key);
+const transaction_params = new TransactionStrParams(chain_name, initiator_addr, secret_key);
+transaction_params.session_args_json = JSON.stringify([
+  {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
+  {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
+  {"name": "total_token_supply", "type": "U64", "value": 10},
+  {"name": "ownership_mode", "type": "U8", "value": 0},
+  {"name": "nft_kind", "type": "U8", "value": 1},
+  {"name": "allow_minting", "type": "Bool", "value": true},
+  {"name": "owner_reverse_lookup_mode", "type": "U8", "value": 0},
+  {"name": "nft_metadata_kind", "type": "U8", "value": 2},
+  {"name": "identifier_mode", "type": "U8", "value": 0},
+  {"name": "metadata_mutability", "type": "U8", "value": 0},
+  {"name": "events_mode", "type": "U8", "value": 1}
+]);
+transaction_params.payment_amount = '500000000000';
+
+const buffer = await loadFile();
+const wasm = buffer && new Uint8Array(buffer);
+const wasmBuffer = wasm?.buffer;
+if (!wasmBuffer) {
+  console.error('Failed to read wasm file.');
+  return;
+}
+
+const install_result = await sdk.install(
+  transaction_params,
+  Bytes.fromUint8Array(wasm)
+);
+const install_result_as_json = install_result.toJson();
+console.log(install_result_as_json.transaction_hash);
+```
+
+with
+
+```ts
+async function loadFile() {
+  try {
+    const fileBuffer = await fs.readFile('cep78.wasm');
+    return fileBuffer.buffer; // Returns an ArrayBuffer
+  } catch (error) {
+    throw new Error('Error reading file: ' + error.message);
+  }
+}
+```
+
+#### Mint
+
+- <strong>Rust</strong>
+
+```rust
+use casper_rust_wasm_sdk::types::{
+    transaction_hash::TransactionHash,
+    transaction_params::transaction_str_params::TransactionStrParams,
+};
+
+pub const CHAIN_NAME: &str = "casper-net-1";
+pub const PUBLIC_KEY: &str =
+    "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    -----END PRIVATE KEY-----"#;
+pub const CONTRACT_HASH: &str =
+    "hash-c12808431d490e2c463c2f968d0a4eaa0f9d57842508d9041aa42e2bd21eb96c";
+pub const ENTRYPOINT_MINT: &str = "mint";
+pub const TOKEN_OWNER: &str =
+    "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
+pub const PAYMENT_AMOUNT: &str = "5000000000";
+
+let mut transaction_params = TransactionStrParams::default();
+transaction_params.set_chain_name(CHAIN_NAME);
+transaction_params.set_initiator_addr(PUBLIC_KEY);
+transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+let args = Vec::from([
+    "token_meta_data:String='test_meta_data'".to_string(),
+    format!("token_owner:Key='{TOKEN_OWNER}'").to_string(),
+]);
+transaction_params.set_session_args_simple(args);
+
+let builder_params =
+    TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRYPOINT_MINT);
+
+let call_entrypoint = sdk
+    .call_entrypoint(builder_params, transaction_params, None)
+    .await;
+let transaction_hash_result = call_entrypoint
+    .as_ref()
+    .unwrap()
+    .result
+    .transaction_hash;
+let transaction_hash_string = TransactionHash::from(transaction_hash_result).to_string();
+println!("watch transaction_hash {transaction_hash_string}");
+```
+
+- <strong>Typescript</strong>
+
+```ts
+import {
+  ...
+  TransactionStrParams,
+  privateToPublicKey,
+  Bytes,
+} from 'casper-sdk';
+
+const chain_name = 'casper-net-1';
+const private_key = '';
+const initiator_addr = privateToPublicKey(private_key);
+const contract_hash =
+  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entry_point = 'mint';
+const token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
+
+const transaction_params = new TransactionStrParams(chain_name, initiator_addr, private_key);
+transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
+transaction_params.payment_amount = payment_amount;
+
+let builder_params = TransactionBuilderParams.newInvocableEntity(contract_hash, entry_point);
+
+const call_entrypoint_result = await sdk.call_entrypoint(
+  builder_params,
+  transaction_params
+);
+const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
+console.log(call_entrypoint_result_as_json.deploy_hash);
+```
+
+</details>
+
+### More examples (Legacy)
+
+<details>
   <summary><strong><code>Deploys and Transfers (Legacy)</code></strong></summary>
 <br>
+
 <details>
     <summary>Making a Transfer</summary>
 
@@ -547,6 +1434,7 @@ console.log(transfer_deploy_as_json);
 <details>
     <summary>Transfer</summary>
 <br>
+
 Sends a [`Transfer Deploy`] to the network for execution. (Alias for make_transfer + put_deploy)
 
 #### Rust
@@ -680,7 +1568,6 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-  getTimestamp,
 } from 'casper-sdk';
 
 const chain_name = 'integration-test';
@@ -708,6 +1595,7 @@ console.log(deploy_as_json);
 <details>
     <summary>Deploy</summary>
 <br>
+
 Sends a [`Deploy`] to the network for execution. (Alias for make_deploy + put_deploy)
 
 #### Rust
@@ -762,7 +1650,6 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-  getTimestamp,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
@@ -895,7 +1782,6 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-  getTimestamp,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
@@ -935,7 +1821,6 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-  getTimestamp,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
@@ -973,7 +1858,7 @@ console.log(put_deploy_result_as_json);
 #### Rust
 
 ```rust
-pub const PRIVATE_KEY: &str = "";
+pub const PRIVATE_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
 ... //  same code as 'Making a Deploy' example
 let unsigned_deploy = sdk.make_deploy(deploy_params, session_params, payment_params).unwrap();
 let signed_deploy = sdk.sign_deploy(unsigned_deploy, PRIVATE_KEY);
@@ -982,7 +1867,7 @@ let signed_deploy = sdk.sign_deploy(unsigned_deploy, PRIVATE_KEY);
 #### Typescript
 
 ```ts
-const private_key = '';
+const private_key = 'MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI';
 ... //  same code as 'Making a Deploy' example
 const unsigned_deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
 const signed_deploy = unsigned_deploy.sign(private_key);
@@ -1048,7 +1933,7 @@ The watch_deploy functionality facilitates actively monitoring deploy events. By
 
 ```rust
 use casper_rust_wasm_sdk::deploy_watcher::watcher::{
-    DeploySubscription, EventHandlerFn,
+    Subscription, EventHandlerFn,
 };
 
 pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
@@ -1063,14 +1948,14 @@ let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
 // Create a callback function handler of your design
 let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
 
-let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
-deploy_subscriptions.push(DeploySubscription::new(
+let mut subscriptions: Vec<Subscription> = vec![];
+subscriptions.push(Subscription::new(
     deploy_hash.to_string(),
     EventHandlerFn::new(event_handler_fn),
 ));
 
 // Subscribe and start watching
-let _ = watcher.subscribe(deploy_subscriptions);
+let _ = watcher.subscribe(subscriptions);
 let results = watcher.start().await;
 watcher.stop();
 println!("{:?}", results);
@@ -1081,7 +1966,7 @@ println!("{:?}", results);
 Similarly, TypeScript developers can utilize the watchDeploy function to actively watch for deploy events on the Casper blockchain. By creating a deploy watcher and defining callback functions, developers can subscribe to specific deploy hashes and respond dynamically as events unfold.
 
 ```ts
-import { EventParseResult, DeploySubscription } from 'casper-sdk';
+import { EventParseResult, Subscription } from 'casper-sdk';
 
 const events_address = 'http://127.0.0.1:18101/events/main';
 
@@ -1116,14 +2001,14 @@ const getEventHandlerFn = (deployHash: string) => {
 
 const eventHandlerFn = getEventHandlerFn(deploy_hash);
 
-const deploySubscription: DeploySubscription = new DeploySubscription(
+const subscription: Subscription = new Subscription(
   deploy_hash,
   eventHandlerFn
 );
-const deploySubscriptions: DeploySubscription[] = [deploySubscription];
+const subscriptions: Subscription[] = [subscription];
 
 // Subscribe and start watching
-watcher.subscribe(deploySubscriptions);
+watcher.subscribe(subscriptions);
 const results = await watcher.start();
 watcher.stop();
 console.log(results);
@@ -1202,8 +2087,12 @@ let install = sdk
 let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;
 println!("{:?}", deploy_hash_result);
 
-println!("wait {:?}", DEPLOY_TIME);
-thread::sleep(DEPLOY_TIME); // Let's wait for deployment
+let event_parse_result = sdk
+    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_result)
+    .await
+    .unwrap();
+let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+println!("{:?}", deploy_processed);
 
 let finalized_approvals = true;
 let deploy_hash = DeployHash::from(deploy_hash_result);
@@ -1299,6 +2188,14 @@ async function loadFile() {
 - <strong>Rust</strong>
 
 ```rust
+use casper_rust_wasm_sdk::types::{
+    deploy_hash::DeployHash,
+    deploy_params::{
+        deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
+        session_str_params::SessionStrParams,
+    },
+};
+
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
@@ -1431,7 +2328,7 @@ You can download an alpha version of the app illustrating the SDK here:
 ### Transaction Watcher
 
 - [Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/index.html)
-- [Subscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.DeploySubscription.html)
+- [Subscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.Subscription.html)
 - [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
 
 ### Types

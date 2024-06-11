@@ -251,8 +251,7 @@ mod tests {
     pub async fn test_query_contract_dict_with_dictionary_key_test() {
         test_query_contract_dict_with_dictionary_key().await;
     }
-    // TODO Remove
-    #[should_panic]
+
     #[test]
     pub async fn test_query_contract_dict_with_dictionary_uref_test() {
         test_query_contract_dict_with_dictionary_uref().await;
