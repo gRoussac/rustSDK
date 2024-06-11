@@ -844,20 +844,20 @@ pub struct TransactionProcessed {
 #[wasm_bindgen(getter_with_clone)]
 pub struct Body {
     #[serde(rename = "TransactionProcessed")]
-    transaction_processed: Option<TransactionProcessed>,
+    pub transaction_processed: Option<TransactionProcessed>,
 }
 
 // Implementing methods to get the field using different aliases
 #[wasm_bindgen]
 impl Body {
-    #[wasm_bindgen(getter, js_name = "DeployProcessed")]
+    #[wasm_bindgen(getter, js_name = "get_deploy_processed")]
     #[deprecated(note = "prefer 'get_transaction_processed'")]
     #[allow(deprecated)]
     pub fn get_deploy_processed(&self) -> Option<TransactionProcessed> {
         self.transaction_processed.clone()
     }
 
-    #[wasm_bindgen(getter, js_name = "TransactionProcessed")]
+    #[wasm_bindgen(getter, js_name = "get_transaction_processed")]
     pub fn get_transaction_processed(&self) -> Option<TransactionProcessed> {
         self.transaction_processed.clone()
     }

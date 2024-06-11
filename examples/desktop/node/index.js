@@ -50,9 +50,11 @@ var sdk = new casper_sdk_1.SDK(node_address);
 //   res.end(JSON.stringify(peers_as_json));
 // });
 var PORT = process.env.PORT || 3000;
-// server.listen(PORT, () => {
+// example0
+// const example0 = server.listen(PORT, () => {
 //   console.log(`Server is running on port ${PORT}`);
 // });
+// get_transaction
 // get_transaction
 var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var transaction_hash_as_string, finalized_approvals, get_transaction_options, transaction_result, transaction, timestamp, header, hash;
@@ -71,32 +73,8 @@ var example1 = function () { return __awaiter(void 0, void 0, void 0, function (
                 transaction = transaction_result.transaction;
                 timestamp = transaction.timestamp();
                 header = transaction.header();
-                hash = transaction.hash.toString();
+                hash = transaction.hash().to_hex_string();
                 console.log(timestamp, header, hash);
-                return [2 /*return*/];
-        }
-    });
-}); };
-// example1();
-// get_deploy
-var example1_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                deploy_hash_as_string = 'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
-                finalized_approvals = true;
-                get_deploy_options = sdk.get_deploy_options({
-                    deploy_hash_as_string: deploy_hash_as_string,
-                    finalized_approvals: finalized_approvals,
-                });
-                return [4 /*yield*/, sdk.get_deploy(get_deploy_options)];
-            case 1:
-                deploy_result = _a.sent();
-                deploy = deploy_result.deploy;
-                timestamp = deploy.timestamp();
-                header = deploy.toJson().header;
-                console.log(timestamp, header);
                 return [2 /*return*/];
         }
     });
@@ -148,8 +126,350 @@ var example4 = function () { return __awaiter(void 0, void 0, void 0, function (
         }
     });
 }); };
-// make_transfer
+// make_transfer_transaction
 var example5 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var chain_name, public_key, private_key, timestamp, ttl, payment_amount, transfer_amount, target_account, transaction_params, make_transfer_transaction, make_transfer_transaction_as_json;
+    return __generator(this, function (_a) {
+        chain_name = 'casper-net-1';
+        public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+        private_key = undefined;
+        timestamp = (0, casper_sdk_1.getTimestamp)();
+        ttl = '1h';
+        payment_amount = '100000000';
+        transfer_amount = '2500000000';
+        target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, private_key, timestamp, ttl);
+        make_transfer_transaction = sdk.make_transfer_transaction(undefined, // Optional maybe_source
+        target_account, transfer_amount, transaction_params);
+        make_transfer_transaction_as_json = make_transfer_transaction.toJson();
+        console.log(make_transfer_transaction_as_json);
+        return [2 /*return*/];
+    });
+}); };
+// transfer_transaction
+var example6 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var node_address, sdk, chain_name, private_key, public_key, timestamp, ttl, transfer_amount, target_account, transaction_params, transfer_transaction_result, transfer_transaction_result_as_json;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                node_address = 'http://127.0.0.1:11101';
+                sdk = new casper_sdk_1.SDK(node_address);
+                chain_name = 'casper-net-1';
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
+                timestamp = (0, casper_sdk_1.getTimestamp)();
+                ttl = '1h';
+                transfer_amount = '2500000000';
+                target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, private_key, timestamp, ttl);
+                return [4 /*yield*/, sdk.transfer_transaction(undefined, // Optional maybe_source
+                    transfer_amount, target_account, transaction_params)];
+            case 1:
+                transfer_transaction_result = _a.sent();
+                transfer_transaction_result_as_json = transfer_transaction_result.toJson();
+                console.log(transfer_transaction_result_as_json);
+                return [2 /*return*/];
+        }
+    });
+}); };
+// make_transaction
+var example7 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var chain_name, public_key, payment_amount, contract_hash, entry_point, transaction_params, builder_params, transaction, transaction_as_json;
+    return __generator(this, function (_a) {
+        chain_name = 'integration-test';
+        public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+        payment_amount = '5000000000';
+        contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        entry_point = 'set_variables';
+        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key);
+        transaction_params.payment_amount = payment_amount;
+        builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(contract_hash, entry_point);
+        transaction = sdk.make_transaction(builder_params, transaction_params);
+        transaction_as_json = transaction.toJson();
+        console.log(transaction_as_json);
+        return [2 /*return*/];
+    });
+}); };
+// transaction
+var example8 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var node_address, sdk, chain_name, private_key, public_key, payment_amount, contract_hash, entry_point, transaction_params, builder_params, transaction_result, transaction_result_as_json;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                node_address = 'http://127.0.0.1:11101';
+                sdk = new casper_sdk_1.SDK(node_address);
+                chain_name = 'casper-net-1';
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
+                payment_amount = '5000000000';
+                contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+                entry_point = 'set_variables';
+                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, private_key);
+                transaction_params.payment_amount = payment_amount;
+                builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(contract_hash, entry_point);
+                return [4 /*yield*/, sdk.transaction(builder_params, transaction_params)];
+            case 1:
+                transaction_result = _a.sent();
+                transaction_result_as_json = transaction_result.toJson();
+                console.log(transaction_result_as_json);
+                return [2 /*return*/];
+        }
+    });
+}); };
+// put_transaction
+var example9 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var node_address, sdk, chain_name, private_key, public_key, payment_amount, contract_hash, entry_point, transaction_params, builder_params, transaction, put_transaction_result, put_transaction_result_as_json;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                node_address = 'http://127.0.0.1:11101';
+                sdk = new casper_sdk_1.SDK(node_address);
+                chain_name = 'casper-net-1';
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
+                payment_amount = '5000000000';
+                contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+                entry_point = 'set_variables';
+                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, private_key);
+                transaction_params.payment_amount = payment_amount;
+                builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(contract_hash, entry_point);
+                transaction = casper_sdk_1.Transaction.newSession(builder_params, transaction_params);
+                return [4 /*yield*/, sdk.put_transaction(transaction)];
+            case 1:
+                put_transaction_result = _a.sent();
+                put_transaction_result_as_json = put_transaction_result.toJson();
+                console.log(put_transaction_result_as_json);
+                return [2 /*return*/];
+        }
+    });
+}); };
+// put_transaction transfer_transaction
+var example10 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var node_address, sdk, chain_name, private_key, public_key, transfer_amount, target_account, transfer_params, transfer_transaction, put_transaction_result, put_transaction_result_as_json;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                node_address = 'http://127.0.0.1:11101';
+                sdk = new casper_sdk_1.SDK(node_address);
+                chain_name = 'casper-net-1';
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                public_key = (0, casper_sdk_1.privateToPublicKey)(private_key);
+                transfer_amount = '2500000000';
+                target_account = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+                transfer_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, private_key);
+                transfer_transaction = casper_sdk_1.Transaction.newTransfer(undefined, // optional maybe_source
+                target_account, transfer_amount, undefined, // optional transfer_id
+                transfer_params);
+                return [4 /*yield*/, sdk.put_transaction(transfer_transaction)];
+            case 1:
+                put_transaction_result = _a.sent();
+                put_transaction_result_as_json = put_transaction_result.toJson();
+                console.log(put_transaction_result_as_json);
+                return [2 /*return*/];
+        }
+    });
+}); };
+// install
+var example11 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    function loadFile() {
+        return __awaiter(this, void 0, void 0, function () {
+            var fileBuffer, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, fs.readFile(__dirname + '/../../../tests/wasm/cep78.wasm')];
+                    case 1:
+                        fileBuffer = _a.sent();
+                        return [2 /*return*/, fileBuffer.buffer]; // Returns an ArrayBuffer
+                    case 2:
+                        error_1 = _a.sent();
+                        throw new Error('Error reading file: ' + error_1.message);
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    }
+    var node_address, events_address, sdk, chain_name, secret_key, initiator_addr, transaction_params, buffer, wasm, wasmBuffer, install_result, install_result_as_json, eventParseResult, cost;
+    var _a, _b, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0:
+                node_address = 'http://127.0.0.1:11101';
+                events_address = 'http://127.0.0.1:18101/events';
+                sdk = new casper_sdk_1.SDK(node_address);
+                chain_name = 'casper-net-1';
+                secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                initiator_addr = (0, casper_sdk_1.privateToPublicKey)(secret_key);
+                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr, secret_key);
+                transaction_params.session_args_json = JSON.stringify([
+                    { "name": "collection_name", "type": "String", "value": "enhanced-nft-1" },
+                    { "name": "collection_symbol", "type": "String", "value": "ENFT-1" },
+                    { "name": "total_token_supply", "type": "U64", "value": 100 },
+                    { "name": "ownership_mode", "type": "U8", "value": 0 },
+                    { "name": "nft_kind", "type": "U8", "value": 1 },
+                    { "name": "allow_minting", "type": "Bool", "value": true },
+                    { "name": "owner_reverse_lookup_mode", "type": "U8", "value": 0 },
+                    { "name": "nft_metadata_kind", "type": "U8", "value": 2 },
+                    { "name": "identifier_mode", "type": "U8", "value": 0 },
+                    { "name": "metadata_mutability", "type": "U8", "value": 0 },
+                    { "name": "events_mode", "type": "U8", "value": 1 }
+                ]);
+                transaction_params.payment_amount = '500000000000';
+                return [4 /*yield*/, loadFile()];
+            case 1:
+                buffer = _d.sent();
+                wasm = buffer && new Uint8Array(buffer);
+                wasmBuffer = wasm === null || wasm === void 0 ? void 0 : wasm.buffer;
+                if (!wasmBuffer) {
+                    console.error('Failed to read wasm file.');
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, sdk.install(transaction_params, casper_sdk_1.Bytes.fromUint8Array(wasm))];
+            case 2:
+                install_result = _d.sent();
+                install_result_as_json = install_result.toJson();
+                console.log(install_result_as_json.transaction_hash);
+                return [4 /*yield*/, sdk.waitTransaction(events_address, install_result_as_json.transaction_hash)];
+            case 3:
+                eventParseResult = _d.sent();
+                cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.transaction_processed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
+                //  console.log(eventParseResult.body.transaction_processed);
+                console.log("install cost ".concat(cost));
+                return [2 /*return*/];
+        }
+    });
+}); };
+// call_entrypoint
+var example12 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var node_address, events_address, sdk, chain_name, private_key, initiator_addr, contract_hash, entry_point, token_owner, payment_amount, transaction_params, builder_params, call_entrypoint_result, call_entrypoint_result_as_json, transaction_hash_results, watcher, Subscriptions, getEventHandlerFn, results;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                node_address = 'http://127.0.0.1:11101';
+                events_address = 'http://127.0.0.1:18101/events';
+                sdk = new casper_sdk_1.SDK(node_address);
+                chain_name = 'casper-net-1';
+                private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+                initiator_addr = (0, casper_sdk_1.privateToPublicKey)(private_key);
+                contract_hash = 'hash-7705c58f20c445c605ba1bf5adab66686a8f891879d6012e07fe24c8bf3af3f2';
+                entry_point = 'mint';
+                token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
+                payment_amount = '5000000000';
+                transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr, private_key);
+                transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", "token_owner:Key='".concat(token_owner, "'")];
+                transaction_params.payment_amount = payment_amount;
+                builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(contract_hash, entry_point);
+                return [4 /*yield*/, sdk.call_entrypoint(builder_params, transaction_params)];
+            case 1:
+                call_entrypoint_result = _a.sent();
+                call_entrypoint_result_as_json = call_entrypoint_result.toJson();
+                transaction_hash_results = [call_entrypoint_result_as_json.transaction_hash];
+                watcher = sdk.watchTransaction(events_address);
+                Subscriptions = [];
+                getEventHandlerFn = function (transactionHash) {
+                    var eventHandlerFn = function (eventParseResult) {
+                        var _a, _b, _c, _d, _e, _f;
+                        console.log("callback for ".concat(transactionHash));
+                        if (eventParseResult.err) {
+                            return false;
+                        }
+                        else if ((_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.transaction_processed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) {
+                            console.log((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.transaction_processed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
+                            return true;
+                        }
+                        else {
+                            console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.transaction_processed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
+                            return false;
+                        }
+                        ;
+                    };
+                    return eventHandlerFn;
+                };
+                transaction_hash_results.map(function (transaction_hash) { return __awaiter(void 0, void 0, void 0, function () {
+                    var eventHandlerFn, subscription;
+                    return __generator(this, function (_a) {
+                        eventHandlerFn = getEventHandlerFn(transaction_hash);
+                        console.log(transaction_hash);
+                        subscription = new casper_sdk_1.Subscription(transaction_hash, eventHandlerFn);
+                        Subscriptions.push(subscription);
+                        return [2 /*return*/];
+                    });
+                }); });
+                watcher.subscribe(Subscriptions);
+                return [4 /*yield*/, watcher.start()];
+            case 2:
+                results = _a.sent();
+                watcher.stop();
+                console.log(results);
+                return [2 /*return*/];
+        }
+    });
+}); };
+// sign transaction
+var example13 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var chain_name, payment_amount, contract_hash, private_key, initiator_addr, transaction_params, builder_params, transaction, transaction_signed;
+    return __generator(this, function (_a) {
+        chain_name = 'integration-test';
+        payment_amount = '5000000000';
+        contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        private_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
+        initiator_addr = (0, casper_sdk_1.privateToPublicKey)(private_key);
+        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr);
+        transaction_params.payment_amount = payment_amount;
+        builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(contract_hash, 'set_variables');
+        transaction = sdk.make_transaction(builder_params, transaction_params);
+        transaction_signed = transaction.sign(private_key);
+        console.log(transaction_signed.toJson());
+        return [2 /*return*/];
+    });
+}); };
+// add signature to transaction
+var example14 = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var chain_name, payment_amount, contract_hash, public_key_kms, transaction_params, builder_params, transaction, signature_kms, transaction_signed, public_key_kms_2, signature_kms_2;
+    return __generator(this, function (_a) {
+        chain_name = 'integration-test';
+        payment_amount = '5000000000';
+        contract_hash = 'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+        transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key_kms);
+        transaction_params.payment_amount = payment_amount;
+        builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(contract_hash, 'set_variables');
+        transaction = sdk.make_transaction(builder_params, transaction_params);
+        signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';
+        transaction_signed = transaction.addSignature(public_key_kms, signature_kms);
+        public_key_kms_2 = '01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6';
+        signature_kms_2 = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980c';
+        transaction_signed = transaction_signed.addSignature(public_key_kms_2, signature_kms_2);
+        console.log(transaction_signed.toJson());
+        return [2 /*return*/];
+    });
+}); };
+// get_deploy
+var example1_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var deploy_hash_as_string, finalized_approvals, get_deploy_options, deploy_result, deploy, timestamp, header;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                deploy_hash_as_string = 'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
+                finalized_approvals = true;
+                get_deploy_options = sdk.get_deploy_options({
+                    deploy_hash_as_string: deploy_hash_as_string,
+                    finalized_approvals: finalized_approvals,
+                });
+                return [4 /*yield*/, sdk.get_deploy(get_deploy_options)];
+            case 1:
+                deploy_result = _a.sent();
+                deploy = deploy_result.deploy;
+                timestamp = deploy.timestamp();
+                header = deploy.toJson().header;
+                console.log(timestamp, header);
+                return [2 /*return*/];
+        }
+    });
+}); };
+// make_transfer
+var example5_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var chain_name, public_key, private_key, timestamp, ttl, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_deploy, transfer_deploy_as_json;
     return __generator(this, function (_a) {
         chain_name = 'casper-net-1';
@@ -170,7 +490,7 @@ var example5 = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 // transfer
-var example6 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example6_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var node_address, sdk, chain_name, private_key, public_key, timestamp, ttl, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_result, transfer_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -198,7 +518,7 @@ var example6 = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 // make_deploy
-var example7 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example7_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var chain_name, public_key, payment_amount, contract_hash, deploy_params, session_params, payment_params, deploy, deploy_as_json;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
@@ -217,7 +537,7 @@ var example7 = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 // deploy
-var example8 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example8_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var node_address, sdk, chain_name, private_key, public_key, payment_amount, contract_hash, deploy_params, session_params, payment_params, deploy_result, deploy_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -244,7 +564,7 @@ var example8 = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 // put_deploy
-var example9 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example9_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var node_address, sdk, chain_name, private_key, public_key, payment_amount, contract_hash, entry_point, deploy_params, session_params, payment_params, deploy, put_deploy_result, put_deploy_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -272,7 +592,8 @@ var example9 = function () { return __awaiter(void 0, void 0, void 0, function (
         }
     });
 }); };
-var example10 = function () { return __awaiter(void 0, void 0, void 0, function () {
+// put_deploy transfer
+var example10_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var node_address, sdk, chain_name, private_key, public_key, payment_amount, transfer_amount, target_account, deploy_params, payment_params, transfer_deploy, put_deploy_result, put_deploy_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -298,11 +619,11 @@ var example10 = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
-// install
-var example11 = function () { return __awaiter(void 0, void 0, void 0, function () {
+// install_deploy
+var example11_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     function loadFile() {
         return __awaiter(this, void 0, void 0, function () {
-            var fileBuffer, error_1;
+            var fileBuffer, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -312,8 +633,8 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                         fileBuffer = _a.sent();
                         return [2 /*return*/, fileBuffer.buffer]; // Returns an ArrayBuffer
                     case 2:
-                        error_1 = _a.sent();
-                        throw new Error('Error reading file: ' + error_1.message);
+                        error_2 = _a.sent();
+                        throw new Error('Error reading file: ' + error_2.message);
                     case 3: return [2 /*return*/];
                 }
             });
@@ -364,16 +685,16 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
                 return [4 /*yield*/, sdk.waitDeploy(events_address, install_result_as_json.deploy_hash)];
             case 3:
                 eventParseResult = _d.sent();
-                cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.TransactionProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
-                //  console.log(eventParseResult.body.TransactionProcessed);
+                cost = (_c = (_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.transaction_processed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) === null || _c === void 0 ? void 0 : _c.cost;
+                //  console.log(eventParseResult.body.transaction_processed);
                 console.log("install cost ".concat(cost));
                 return [2 /*return*/];
         }
     });
 }); };
 // call_entrypoint_deploy
-var example12 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, events_address, sdk, chain_name, private_key, public_key, contract_hash, entry_point, token_owner, payment_amount, deploy_params, session_params, call_entrypoint_deploy_result, call_entrypoint_deploy_result_as_json, deploy_hash_results, watcher, deploySubscriptions, getEventHandlerFn, results;
+var example12_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var node_address, events_address, sdk, chain_name, private_key, public_key, contract_hash, entry_point, token_owner, payment_amount, deploy_params, session_params, call_entrypoint_deploy_result, call_entrypoint_deploy_result_as_json, deploy_hash_results, watcher, subscriptions, getEventHandlerFn, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -398,7 +719,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 call_entrypoint_deploy_result_as_json = call_entrypoint_deploy_result.toJson();
                 deploy_hash_results = [call_entrypoint_deploy_result_as_json.deploy_hash];
                 watcher = sdk.watchDeploy(events_address);
-                deploySubscriptions = [];
+                subscriptions = [];
                 getEventHandlerFn = function (deployHash) {
                     var eventHandlerFn = function (eventParseResult) {
                         var _a, _b, _c, _d, _e, _f;
@@ -406,12 +727,12 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                         if (eventParseResult.err) {
                             return false;
                         }
-                        else if ((_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.TransactionProcessed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) {
-                            console.log((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.TransactionProcessed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
+                        else if ((_b = (_a = eventParseResult.body) === null || _a === void 0 ? void 0 : _a.transaction_processed) === null || _b === void 0 ? void 0 : _b.execution_result.Success) {
+                            console.log((_d = (_c = eventParseResult.body) === null || _c === void 0 ? void 0 : _c.transaction_processed) === null || _d === void 0 ? void 0 : _d.execution_result.Success);
                             return true;
                         }
                         else {
-                            console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.TransactionProcessed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
+                            console.error((_f = (_e = eventParseResult.body) === null || _e === void 0 ? void 0 : _e.transaction_processed) === null || _f === void 0 ? void 0 : _f.execution_result.Failure);
                             return false;
                         }
                         ;
@@ -419,16 +740,16 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                     return eventHandlerFn;
                 };
                 deploy_hash_results.map(function (deploy_hash) { return __awaiter(void 0, void 0, void 0, function () {
-                    var eventHandlerFn, deploySubscription;
+                    var eventHandlerFn, subscription;
                     return __generator(this, function (_a) {
                         eventHandlerFn = getEventHandlerFn(deploy_hash);
                         console.log(deploy_hash);
-                        deploySubscription = new casper_sdk_1.Subscription(deploy_hash, eventHandlerFn);
-                        deploySubscriptions.push(deploySubscription);
+                        subscription = new casper_sdk_1.Subscription(deploy_hash, eventHandlerFn);
+                        subscriptions.push(subscription);
                         return [2 /*return*/];
                     });
                 }); });
-                watcher.subscribe(deploySubscriptions);
+                watcher.subscribe(subscriptions);
                 return [4 /*yield*/, watcher.start()];
             case 2:
                 results = _a.sent();
@@ -439,7 +760,7 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
     });
 }); };
 // sign deploy
-var example13 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example13_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var chain_name, payment_amount, contract_hash, private_key, public_key, deploy_params, session_params, payment_params, deploy, deploy_signed;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
@@ -459,7 +780,7 @@ var example13 = function () { return __awaiter(void 0, void 0, void 0, function 
     });
 }); };
 // add signature to deploy
-var example14 = function () { return __awaiter(void 0, void 0, void 0, function () {
+var example14_legacy = function () { return __awaiter(void 0, void 0, void 0, function () {
     var chain_name, payment_amount, contract_hash, public_key_kms, deploy_params, session_params, payment_params, deploy, signature_kms, deploy_signed, public_key_kms_2, signature_kms_2;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
@@ -481,3 +802,4 @@ var example14 = function () { return __awaiter(void 0, void 0, void 0, function 
         return [2 /*return*/];
     });
 }); };
+// example1();

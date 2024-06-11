@@ -55,18 +55,18 @@ pub mod test_module {
 
         let mut watcher = sdk.watch_deploy(&config.event_address, None);
 
-        let mut deploy_subscriptions: Vec<Subscription> = vec![];
+        let mut subscriptions: Vec<Subscription> = vec![];
         let deploy_hash_results = vec![deploy_hash.clone()];
 
         for deploy_hash in deploy_hash_results {
             let event_handler_fn = get_event_handler_fn(deploy_hash.clone());
-            deploy_subscriptions.push(Subscription::new(
+            subscriptions.push(Subscription::new(
                 deploy_hash,
                 EventHandlerFn::new(event_handler_fn),
             ));
         }
 
-        let _ = watcher.subscribe(deploy_subscriptions);
+        let _ = watcher.subscribe(subscriptions);
         let event_parse_results = watcher.start().await;
         watcher.stop();
         let event_parse_results = event_parse_results.as_ref().unwrap();
@@ -89,7 +89,7 @@ pub mod test_module {
 
         let mut watcher = sdk.watch_deploy(&config.event_address, timeout_duration);
 
-        let mut deploy_subscriptions: Vec<Subscription> = vec![];
+        let mut subscriptions: Vec<Subscription> = vec![];
 
         // random non existing deploy_hash
         let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
@@ -99,13 +99,13 @@ pub mod test_module {
 
         for deploy_hash in deploy_hash_results {
             let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
-            deploy_subscriptions.push(Subscription::new(
+            subscriptions.push(Subscription::new(
                 deploy_hash.to_string(),
                 EventHandlerFn::new(event_handler_fn),
             ));
         }
 
-        let _ = watcher.subscribe(deploy_subscriptions);
+        let _ = watcher.subscribe(subscriptions);
         let event_parse_results = watcher.clone().start().await;
         watcher.clone().stop();
         let event_parse_results = event_parse_results.unwrap();
