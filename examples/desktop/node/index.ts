@@ -14,7 +14,7 @@ const sdk = new SDK(node_address);
 //   res.end(JSON.stringify(peers_as_json));
 // });
 
-const PORT = process.env.PORT || 3000;
+//const PORT = process.env.PORT || 3000;
 
 // example0
 // const example0 = server.listen(PORT, () => {
@@ -37,9 +37,9 @@ const example1 = async () => {
   const transaction_result = await sdk.get_transaction(get_transaction_options);
 
   const transaction = transaction_result.transaction;
-  const timestamp = transaction.timestamp();
-  const header = transaction.header();
-  const hash = transaction.hash().to_hex_string();
+  const timestamp = transaction.timestamp;
+  const header = transaction.header;
+  const hash = transaction.hash;
   console.log(timestamp, header, hash);
 };
 

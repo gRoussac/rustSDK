@@ -32,9 +32,7 @@ pub async fn _run_example_1() {
         Some("http://localhost:11101".to_string()),
         Some(Verbosity::High),
     );
-    use casper_rust_wasm_sdk::types::{
-        transaction::Transaction, transaction_hash::TransactionHash,
-    };
+    use casper_rust_wasm_sdk::types::transaction_hash::TransactionHash;
 
     let transaction_hash =
         TransactionHash::new("94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668")
