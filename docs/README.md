@@ -362,8 +362,14 @@ let get_block = sdk.get_block(None, None, None).await;
 
 let get_block = sdk.get_block(None, None, None).await;
 
-let block = get_block.unwrap().result.block.unwrap();
+let block = get_block
+    .unwrap()
+    .result
+    .block_with_signatures
+    .unwrap()
+    .block;
 let block_hash = block.hash();
+println!("{:?}", block_hash);
 println!("{:?}", block_hash);
 ```
 
@@ -470,9 +476,7 @@ You can find more examples in the [Angular example app](examples/frontend/angula
 #### Rust
 
 ```rust
-use casper_rust_wasm_sdk::types::deploy_params::{
-    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-};
+use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
 pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
@@ -548,9 +552,7 @@ Sends a [`Transfer Transaction`] to the network for execution. (Alias for make_t
 #### Rust
 
 ```rust
-use casper_rust_wasm_sdk::types::deploy_params::{
-    deploy_str_params::DeployStrParams, payment_str_params::PaymentStrParams,
-};
+use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
 pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
@@ -728,19 +730,17 @@ pub const TTL: &str = "1h";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
-transaction_params.set_initiator_addr(initiator_addr);
+transaction_params.set_initiator_addr(PUBLIC_KEY);
 transaction_params.set_secret_key(PRIVATE_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
 let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
 
-let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
-
-let put_transaction = sdk.transaction(transaction, None, None).await;
+let transaction = sdk.transaction(builder_params, transaction_params, None, None).await;
 println!(
     "{:?}",
-    put_transaction.as_ref().unwrap().result.transaction_hash
+    transaction.as_ref().unwrap().result.transaction_hash
 );
 ```
 
@@ -830,7 +830,7 @@ use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::Tra
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
-let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap()
+let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
 pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TARGET_ACCOUNT: &str =
@@ -842,14 +842,14 @@ transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(initiator_addr);
 transaction_params.set_secret_key(PRIVATE_KEY);
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
-transaction_params.set_ttl(TTL);
+transaction_params.set_ttl(Some(TTL.to_string()));
 
 let transfer_transaction = Transaction::new_transfer(
     None,
     TARGET_ACCOUNT,
     TRANSFER_AMOUNT,
-    None,
     transaction_params,
+    None,
 )
 .unwrap();
 
@@ -949,7 +949,7 @@ console.log(put_transaction_result_as_json);
 pub const PRIVATE_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
 ... //  same code as 'Making a Session/Transfer Transaction' example
 let unsigned_transaction = sdk.make_transaction(builder_params, transaction_params).unwrap();
-let signed_transaction = sdk.sign_transaction(unsigned_transaction, PRIVATE_KEY);
+let signed_transaction = unsigned_transaction.sign(PRIVATE_KEY);
 ```
 
 #### Typescript
@@ -971,7 +971,7 @@ const signed_transaction = unsigned_transaction.sign(private_key);
 Developers using Rust can utilize the wait_transaction function to wait for a specific transaction event. This is achieved by providing the desired event URL, transaction hash, and an optional timeout duration. Once the transaction is processed, the resulting data, such as the transaction's cost, can be easily accessed and utilized in subsequent logic.
 
 ```rust
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -991,7 +991,7 @@ println!("{:?}", transaction_processed);
 In TypeScript, the waitTransaction function provides a similar capability to wait for a specific transaction event. Developers can leverage this function by specifying the event address, transaction hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the transaction.
 
 ```ts
-const events_address = 'http://127.0.0.1:18101/events/main';
+const events_address = 'http://127.0.0.1:18101/events';
 
 const transaction_hash =
   'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
@@ -1020,11 +1020,11 @@ console.log(`transaction cost ${cost}`);
 The watch_transaction functionality facilitates actively monitoring transaction events. By creating a transaction watcher, developers can subscribe to specific transaction hashes and define custom callback functions to handle these events. The watcher is then started, and as transaction events occur, the specified callback functions are executed. This mechanism enables real-time responsiveness to transaction events within Rust applications.
 
 ```rust
-use casper_rust_wasm_sdk::transaction_watcher::watcher::{
+use casper_rust_wasm_sdk::watcher::{
     Subscription, EventHandlerFn,
 };
 
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
@@ -1056,7 +1056,7 @@ Similarly, TypeScript developers can utilize the watchTransaction function to ac
 ```ts
 import { EventParseResult, Subscription } from 'casper-sdk';
 
-const events_address = 'http://127.0.0.1:18101/events/main';
+const events_address = 'http://127.0.0.1:18101/events';
 
 const transaction_hash =
   'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
@@ -1122,6 +1122,8 @@ use casper_rust_wasm_sdk::{
     },
 };
 
+use std::{time, time::Duration};
+
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
@@ -1143,7 +1145,7 @@ pub const ARGS_JSON: &str = r#"[
 pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
 pub const CEP78_CONTRACT: &str = "cep78.wasm";
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
@@ -1152,18 +1154,14 @@ transaction_params.set_secret_key(PRIVATE_KEY);
 transaction_params.set_session_args_json(ARGS_JSON);
 transaction_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
 
-let session_params = SessionStrParams::default();
-session_params.set_session_args_json(ARGS_JSON);
-
 let file_path = CEP78_CONTRACT;
-let module_bytes = match read_wasm_file(file_path) {
-    Ok(module_bytes) => module_bytes,
+let transaction_bytes = match read_wasm_file(file_path) {
+    Ok(transaction_bytes) => transaction_bytes,
     Err(err) => {
-        return Err(format!("Error reading file {}: {:?}", file_path, err));
+        vec![]
+        // return Err(format!("Error reading file {}: {:?}", file_path, err));
     }
 };
-
-session_params.set_session_bytes(module_bytes.into());
 
 let install = sdk
     .install(transaction_params, transaction_bytes.into(), None)
@@ -1182,14 +1180,15 @@ let event_parse_result: EventParseResult = sdk
 println!("{:?}", event_parse_result);
 
 let finalized_approvals = true;
-let deploy_hash = DeployHash::from(deploy_hash_result);
+
 let get_transaction = sdk
-    .get_transaction(deploy_hash, Some(finalized_approvals), None, None)
-    .await.unwrap();
+    .get_transaction(transaction_hash, Some(finalized_approvals), None, None)
+    .await
+    .unwrap();
 let result = json_pretty_print(
-      get_transaction.result.transaction.approvals(),
-      Some(Verbosity::Low),
-  );
+    get_transaction.result.transaction.approvals(),
+    Some(Verbosity::Low),
+);
 println!("approvals {result}");
 
 let transaction_hash = get_transaction.result.transaction.hash();
@@ -2044,6 +2043,8 @@ use casper_rust_wasm_sdk::{
         },
     },
 };
+
+use std::{time, time::Duration};
 
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
