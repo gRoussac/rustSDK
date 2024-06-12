@@ -22,8 +22,6 @@ const sdk = new SDK(node_address);
 // });
 
 // get_transaction
-
-// get_transaction
 const example1 = async () => {
   const transaction_hash_as_string =
     '27d81df41801602f47cdb4618a814407daf38d0c39be32c7f6c109d7e39a3f4b';
