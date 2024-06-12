@@ -525,6 +525,8 @@ const transaction_params = new TransactionStrParams(
   ttl
 );
 
+transaction_params.payment_amount = payment_amount;
+
 const make_transfer_transaction = sdk.make_transfer_transaction(
   undefined, // Optional maybe_source
   target_account,
@@ -611,15 +613,20 @@ const transaction_params = new TransactionStrParams(
   ttl
 );
 
+transaction_params.payment_amount = payment_amount;
+
 const transfer_transaction_result = await sdk.transfer_transaction(
   undefined, // Optional maybe_source
-  transfer_amount,
   target_account,
+  transfer_amount,
   transaction_params
 );
 const transfer_transaction_result_as_json =
   transfer_transaction_result.toJson();
 console.log(transfer_transaction_result_as_json);
+const transaction_hash =
+  transfer_transaction_result.transaction_hash.toString();
+console.log(transaction_hash);
 ```
 
 </details>
@@ -668,8 +675,8 @@ const chain_name = 'integration-test';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
 const payment_amount = '5000000000';
-const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entity_hash =
+  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 
 const deploy_params = new DeployStrParams(chain_name, public_key);
 
@@ -681,7 +688,7 @@ const transaction_params = new TransactionStrParams(chain_name, public_key);
 transaction_params.payment_amount = payment_amount;
 
 let builder_params = TransactionBuilderParams.newInvocableEntity(
-  contract_hash,
+  entity_hash,
   entry_point
 );
 
@@ -752,8 +759,8 @@ const public_key =
 const private_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
-const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entity_hash =
+  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'set_variables';
 
 const transaction_params = new TransactionStrParams(
@@ -763,7 +770,7 @@ const transaction_params = new TransactionStrParams(
 );
 transaction_params.payment_amount = payment_amount;
 let builder_params = TransactionBuilderParams.newInvocableEntity(
-  contract_hash,
+  entity_hash,
   entry_point
 );
 
@@ -870,8 +877,8 @@ const public_key =
 const private_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
-const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entity_hash =
+  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'set_variables';
 
 const transaction_params = new TransactionStrParams(
@@ -882,7 +889,7 @@ const transaction_params = new TransactionStrParams(
 transaction_params.payment_amount = payment_amount;
 
 let builder_params = TransactionBuilderParams.newInvocableEntity(
-  contract_hash,
+  entity_hash,
   entry_point
 );
 
@@ -917,11 +924,12 @@ const transfer_params = new TransactionStrParams(
   private_key
 );
 
+transfer_params.payment_amount = payment_amount;
+
 const transfer_transaction = Transaction.newTransfer(
   undefined, // optional maybe_source
   target_account,
   transfer_amount,
-  undefined, // optional transfer_id
   transfer_params
 );
 
@@ -1322,8 +1330,8 @@ import {
 const chain_name = 'casper-net-1';
 const private_key = '';
 const initiator_addr = privateToPublicKey(private_key);
-const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entity_hash =
+  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'mint';
 const token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
 
@@ -1331,7 +1339,7 @@ const transaction_params = new TransactionStrParams(chain_name, initiator_addr, 
 transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
 transaction_params.payment_amount = payment_amount;
 
-let builder_params = TransactionBuilderParams.newInvocableEntity(contract_hash, entry_point);
+let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
 
 const call_entrypoint_result = await sdk.call_entrypoint(
   builder_params,
@@ -1515,6 +1523,7 @@ const transfer_result = await sdk.transfer(
 );
 const transfer_result_as_json = transfer_result.toJson();
 console.log(transfer_result_as_json);
+console.log(transfer_result.deploy_hash.toString());
 ```
 
 </details>

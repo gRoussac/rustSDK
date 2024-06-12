@@ -11,6 +11,8 @@ use casper_client::{
     rpcs::results::GetBlockResult as _GetBlockResult, JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
+use casper_types::Block;
+#[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
@@ -50,8 +52,14 @@ impl GetBlockResult {
     /// Gets the block information as a JsValue.
     #[wasm_bindgen(getter)]
     pub fn block(&self) -> JsValue {
-        let block = &self.0.block_with_signatures.clone().unwrap().block;
-        JsValue::from_serde(&block).unwrap()
+        let block = self.0.block_with_signatures.clone().unwrap().block;
+
+        let js_block = match block {
+            Block::V1(block_v1) => JsValue::from_serde(&block_v1).unwrap(),
+            Block::V2(block_v2) => JsValue::from_serde(&block_v2).unwrap(),
+        };
+
+        js_block
     }
 
     /// Converts the GetBlockResult to a JsValue.

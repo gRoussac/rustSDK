@@ -23,7 +23,7 @@ pub async fn run_tests_or_examples() {
     // Run a specific test ?
     //  integration::rpcs::test_module::test_get_peers().await;
     // Run an example ?
-    let _ = _run_example_1().await;
+    let _ = _run_example_4().await;
 }
 
 // get_transaction
@@ -95,7 +95,7 @@ pub async fn _run_example_4() {
         .block_with_signatures
         .unwrap()
         .block;
-    let block_hash = block.hash();
+    let block_hash = block.hash().to_hex_string();
     println!("{:?}", block_hash);
 }
 

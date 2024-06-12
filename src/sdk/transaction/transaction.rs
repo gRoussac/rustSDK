@@ -2,6 +2,7 @@ use crate::{
     debug::error,
     types::{
         sdk_error::SdkError,
+        transaction_hash::TransactionHash,
         transaction_params::{
             transaction_builder_params::{
                 transaction_builder_params_to_casper_client, TransactionBuilderParams,
@@ -55,11 +56,11 @@ impl PutTransactionResult {
         JsValue::from_serde(&self.0.api_version).unwrap()
     }
 
-    // /// Gets the transaction hash associated with this result.
-    // #[wasm_bindgen(getter)]
-    // pub fn transaction_hash(&self) -> TransactionV1Hash {
-    //     self.0.transaction_hash.into()
-    // }
+    /// Gets the transaction hash associated with this result.
+    #[wasm_bindgen(getter)]
+    pub fn transaction_hash(&self) -> TransactionHash {
+        self.0.transaction_hash.into()
+    }
 
     /// Converts PutTransactionResult to a JavaScript object.
     #[wasm_bindgen(js_name = "toJson")]
