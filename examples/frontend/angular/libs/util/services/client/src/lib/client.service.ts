@@ -583,9 +583,14 @@ export class ClientService {
   async transfer(deploy_result = true, speculative?: boolean) {
     const timestamp = getTimestamp(); // or Date.now().toString().trim(); // or undefined
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
-    if (!this.private_key) {
+    if (!deploy_result && !this.public_key) {
+      const err = "public_key is missing";
+      this.errorService.setError(err.toString());
+      return;
+    }
+    else if (deploy_result && !this.private_key) {
       const err = "private_key is missing";
-      err && (this.errorService.setError(err.toString()));
+      this.errorService.setError(err.toString());
       return;
     }
 
