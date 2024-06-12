@@ -236,8 +236,8 @@ mod tests {
             None,
             &initiator_addr, // self transfer
             TRANSFER_AMOUNT,
-            None,
             transaction_params,
+            None,
         )
         .unwrap()
     }

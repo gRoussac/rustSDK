@@ -96,8 +96,8 @@ impl Transaction {
         maybe_source: Option<URef>,
         target_account: &str,
         amount: &str,
-        maybe_id: Option<String>,
         transaction_params: TransactionStrParams,
+        maybe_id: Option<String>,
     ) -> Result<Transaction, String> {
         make_transfer_transaction(
             maybe_source,
@@ -460,7 +460,7 @@ impl Transaction {
         // Replace the approvals field in the original transaction JSON string
         let mut transaction_json: Value = serde_json::from_str(&self.to_json_string().unwrap())
             .expect("Failed to deserialize transaction JSON");
-        transaction_json["approvals"] = serde_json::from_str(&updated_approvals_str)
+        transaction_json["Version1"]["approvals"] = serde_json::from_str(&updated_approvals_str)
             .expect("Failed to deserialize updated approvals JSON");
 
         // Convert the updated transaction JSON back to a Transaction struct

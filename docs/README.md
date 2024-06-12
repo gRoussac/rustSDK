@@ -487,6 +487,7 @@ let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(PUBLIC_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
 let make_transfer_transaction = sdk
     .make_transfer_transaction(
@@ -564,6 +565,7 @@ let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_secret_key(PRIVATE_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
 let transfer = sdk
     .transfer_transaction(
@@ -576,7 +578,7 @@ let transfer = sdk
         None,
     )
     .await;
-println!("{:?}", transfer.as_ref().unwrap().result.transaction_hash);
+println!("{:?}", transfer.as_ref().unwrap().result.transaction_hash.to_hex_string());
 ```
 
 #### Typescript
@@ -634,27 +636,23 @@ pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 pub const PAYMENT_AMOUNT: &str = "5000000000";
-pub const CONTRACT_HASH: &str =
-    "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+pub const ENTITY_HASH: &str =
+    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
-transaction_params.set_initiator_addr(initiator_addr);
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_initiator_addr(PUBLIC_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let builder_params = TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRY_POINT);
+let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
 
 let transaction = sdk
-    .transaction(builder_params, transaction_params, None, None)
-    .await;
-println!(
-    "{:?}",
-    transaction.as_ref().unwrap().result.transaction_hash
-);
+    .make_transaction(builder_params, transaction_params)
+    .unwrap();
+println!("{:?}", transaction.timestamp());
 ```
 
 #### Typescript
@@ -716,8 +714,8 @@ pub const PUBLIC_KEY: &str =
 pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "5000000000";
-pub const CONTRACT_HASH: &str =
-    "hash-6646c99b3327954b47035bbc31343d9d96a833a9fc9c8c6d809b29f2482b0abf";
+pub const ENTITY_HASH: &str =
+    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
@@ -728,11 +726,11 @@ transaction_params.set_secret_key(PRIVATE_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let builder_params = TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRY_POINT);
+let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
 
 let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
-let put_transaction = sdk.put_transaction(transaction, None, None).await;
+let put_transaction = sdk.transaction(transaction, None, None).await;
 println!(
     "{:?}",
     put_transaction.as_ref().unwrap().result.transaction_hash
@@ -794,8 +792,8 @@ pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
 pub const PAYMENT_AMOUNT: &str = "5000000000";
-pub const CONTRACT_HASH: &str =
-    "hash-6646c99b3327954b47035bbc31343d9d96a833a9fc9c8c6d809b29f2482b0abf";
+pub const ENTITY_HASH: &str =
+    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
@@ -806,7 +804,7 @@ transaction_params.set_secret_key(PRIVATE_KEY);
 transaction_params.set_ttl(Some(TTL.to_string())); // optional TTL
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let builder_params = TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRY_POINT);
+let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
 
 let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
@@ -836,6 +834,7 @@ let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(initiator_addr);
 transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 transaction_params.set_ttl(TTL);
 
 let transfer_transaction = Transaction::new_transfer(
@@ -1277,8 +1276,8 @@ pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
-pub const CONTRACT_HASH: &str =
-    "hash-c12808431d490e2c463c2f968d0a4eaa0f9d57842508d9041aa42e2bd21eb96c";
+pub const ENTITY_HASH: &str =
+    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRYPOINT_MINT: &str = "mint";
 pub const TOKEN_OWNER: &str =
     "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
@@ -1296,7 +1295,7 @@ let args = Vec::from([
 transaction_params.set_session_args_simple(args);
 
 let builder_params =
-    TransactionBuilderParams::new_invocable_entity(CONTRACT_HASH, ENTRYPOINT_MINT);
+    TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRYPOINT_MINT);
 
 let call_entrypoint = sdk
     .call_entrypoint(builder_params, transaction_params, None)
@@ -1477,7 +1476,7 @@ let transfer = sdk
         None,
     )
     .await;
-println!("{:?}", transfer.as_ref().unwrap().result.deploy_hash);
+println!("{:?}", transfer.as_ref().unwrap().result.deploy_hash.to_hex_string());
 ```
 
 #### Typescript

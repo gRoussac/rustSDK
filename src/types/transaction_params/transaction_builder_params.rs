@@ -96,9 +96,9 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(js_name = "newTransfer")]
     pub fn new_transfer(
+        maybe_source: Option<URef>,
         target: TransferTarget,
         amount: &str,
-        maybe_source: Option<URef>,
         maybe_id: Option<u64>,
     ) -> TransactionBuilderParams {
         let amount = convert_amount(amount);
