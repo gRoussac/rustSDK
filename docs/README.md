@@ -373,7 +373,7 @@ println!("{:?}", block_hash);
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](tests/integration/rust/src/tests/mod.rs).
+You can find more examples by reading [Rust integration tests](../tests/integration/rust/src/tests/mod.rs).
 
 </details>
 
@@ -459,7 +459,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in [NodeJs examples](examples/desktop/node/index.ts) or in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](tests/e2e/puppeteer/tests.spec.ts).
+You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts) or in the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) or in the [React example app](../examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
