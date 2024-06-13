@@ -54,12 +54,10 @@ impl GetBlockResult {
     pub fn block(&self) -> JsValue {
         let block = self.0.block_with_signatures.clone().unwrap().block;
 
-        let js_block = match block {
+        match block {
             Block::V1(block_v1) => JsValue::from_serde(&block_v1).unwrap(),
             Block::V2(block_v2) => JsValue::from_serde(&block_v2).unwrap(),
-        };
-
-        js_block
+        }
     }
 
     /// Converts the GetBlockResult to a JsValue.
