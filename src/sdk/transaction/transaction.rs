@@ -2,7 +2,6 @@ use crate::{
     debug::error,
     types::{
         sdk_error::SdkError,
-        transaction_hash::TransactionHash,
         transaction_params::{
             transaction_builder_params::{
                 transaction_builder_params_to_casper_client, TransactionBuilderParams,
