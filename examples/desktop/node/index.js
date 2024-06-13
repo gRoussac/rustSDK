@@ -55,7 +55,6 @@ var sdk = new casper_sdk_1.SDK(node_address);
 //   console.log(`Server is running on port ${PORT}`);
 // });
 // get_transaction
-// get_transaction
 var example1 = function () { return __awaiter(void 0, void 0, void 0, function () {
     var transaction_hash_as_string, finalized_approvals, get_transaction_options, transaction_result, transaction, timestamp, header, hash;
     return __generator(this, function (_a) {
