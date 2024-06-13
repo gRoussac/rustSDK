@@ -1,3 +1,5 @@
+#[cfg(target_arch = "wasm32")]
+use crate::types::transaction_hash::TransactionHash;
 use crate::{
     debug::error,
     types::{
@@ -14,6 +16,7 @@ use crate::{
     },
     SDK,
 };
+
 use casper_client::{
     cli::make_transaction, rpcs::results::PutTransactionResult as _PutTransactionResult,
     SuccessResponse,
