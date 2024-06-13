@@ -21,7 +21,7 @@ Add the SDK as a dependency of your project:
 > Cargo.toml
 
 ```toml
-casper-rust-wasm-sdk = { version = "0.1.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
+casper-rust-wasm-sdk = { version = "1.0.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
 ```
 
 ## Usage
@@ -286,6 +286,7 @@ $ npm start
 <details>
   <summary><strong><code>Rust</code></strong></summary>
 <br>
+
 You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
@@ -343,13 +344,14 @@ let block_hash = block.hash();
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](./tests/integration/rust/).
+You can find more examples by reading [Rust integration tests](../tests/integration/rust/).
 
 </details>
 
 <details>
   <summary><strong><code>Typescript</code></strong></summary>
 <br>
+
 You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
@@ -406,7 +408,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/).
+You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts) or in the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) or in the [React example app](../examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
@@ -1429,8 +1431,16 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Testing
 
-Tests are run against NCTL by default. Alternately, you may configure another network in corresponding configurations. Testes assume a `secret_key.pem` will be located in the root `tests` directory, or one level higher at `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/`. This path can be changed in the configuration.
+Tests are run against NCTL by default. Alternately, you may configure another network in corresponding configuration. Tests assume a `secret_key.pem` will be located in the root `tests` directory, or one level higher at `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/`. This path can be changed in the configuration or .env file.
 (Rust tests must be run with `--test-threads=1`)
+
+- Unit tests can be run at root folder with
+
+```shell
+make test
+```
+
+[configured with .env](.env) or [configured in module](src/sdk/rpcs/mod.rs)
 
 - [Rust Integration tests](tests/integration/rust/) can be run with
 
@@ -1453,15 +1463,22 @@ then
 make e2e-test
 ```
 
-[configured with .env](tests/e2e/.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
+[configured with .env](.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
 
-- Unit tests can be run at root folder with
+`PRIVATE_KEY_NCTL_PATH` (alternative is direct keys `PRIVATE_KEY_USER_1` and `PRIVATE_KEY_USER_2` from [casper-node-launcher-js](https://github.com/casper-network/casper-node-launcher-js/tree/main) )
 
-```shell
-make test
+Example of .env
+
 ```
-
-[configured in module](src/sdk/rpcs/mod.rs)
+PRIVATE_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
+# PRIVATE_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+# PRIVATE_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+# NODE_ADDRESS=http://localhost:7777
+# EVENT_ADDRESS=http://localhost:9999/events/main
+# SPECULATIVE_ADDRESS=http://localhost:7778
+# CHAIN_NAME=casper-net-1
+# PRIVATE_KEY_NAME=secret_key.pem
+```
 
 ## Todo
 
