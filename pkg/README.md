@@ -287,7 +287,7 @@ $ npm start
   <summary><strong><code>Rust</code></strong></summary>
 <br>
 
-You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get transaction by transaction hash
 
@@ -381,7 +381,7 @@ You can find more examples by reading [Rust integration tests](./tests/integrati
   <summary><strong><code>Typescript</code></strong></summary>
 <br>
 
-You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get transaction by transaction hash
 
@@ -2270,7 +2270,7 @@ console.log(deploy_hash);
 
 <br>
 
-![Casper Electron App](https://casper-ecosystem.github.io/rustSDK/juliet/images/get_status-electron.png)
+![Casper Electron App](https://casper-ecosystem.github.io/rustSDK/condor/images/get_status-electron.png)
 
 The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
 
@@ -2296,72 +2296,90 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Rust API
 
-- [Modules and Structs](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/)
+- [Modules and Structs](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/)
 
-- [Full item list](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/all.html)
+- [Full item list](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/all.html)
 
 ### SDK
 
-- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
+- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
 
 ### RPC
 
-- [RPC List](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [RPC List](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+
+### Transaction Params
+
+- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/index.html)
+
+### Transaction
+
+- [Transaction Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Transaction.html)
 
 ### Deploy Params (Legacy)
 
-- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
 
 ### Deploy (Legacy)
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
 ### Transaction Watcher
 
-- [Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/index.html)
-- [Subscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.Subscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
+- [Watcher](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/watcher/index.html)
+- [Subscription](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/watcher/struct.Subscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
 
 ### Types
 
-- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/index.html)
+- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/index.html)
 
 ### Helpers functions
 
-- [Rust helpers](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/helpers/index.html)
+- [Rust helpers](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/helpers/index.html)
 
 ## Typescript API
 
-- [Full item list](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/index.html)
+- [Full item list](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/index.html)
 
 ### SDK
 
-- [SDK Class and methods](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SDK.html)
+- [SDK Class and methods](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/SDK.html)
+
+### Transaction Params
+
+- [Transaction Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/TransactionStrParams.html)
+- [Transaction Builder Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/TransactionBuilderParams.html)
+- [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/DictionaryItemStrParams.html)
+
+### Transaction
+
+- [Transaction Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Transaction.html)
 
 ### Deploy Params (Legacy)
 
-- [Deploy Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeployStrParams.html)
-- [Session Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SessionStrParams.html)
-- [Payment Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/PaymentStrParams.html)
-- [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DictionaryItemStrParams.html)
+- [Deploy Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/DeployStrParams.html)
+- [Session Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/SessionStrParams.html)
+- [Payment Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/PaymentStrParams.html)
+- [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/DictionaryItemStrParams.html)
 
 ### Deploy (Legacy)
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Deploy.html)
 
 ### Transaction Watcher
 
-- [Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Watcher.html)
-- [Subscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Subscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/EventParseResult.html)
+- [Watcher](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Watcher.html)
+- [Subscription](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Subscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/EventParseResult.html)
 
 ### Types
 
-- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/modules.html)
+- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/modules.html)
 
 ### Helpers functions
 
-- [TS helpers](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/modules.html#Functions)
+- [TS helpers](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/modules.html#Functions)
 
 ## Testing
 
