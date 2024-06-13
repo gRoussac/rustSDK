@@ -373,7 +373,7 @@ println!("{:?}", block_hash);
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](./tests/integration/rust/).
+You can find more examples by reading [Rust integration tests](/tests/integration/rust/).
 
 </details>
 
@@ -459,7 +459,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/).
+You can find more examples in [NodeJs examples](examples/desktop/node/index.ts) or in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
@@ -2310,11 +2310,12 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### Transaction Params
 
-- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/index.html)
+- [TransactionStrParams](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_str_params/index.html)
+- [TransactionBuilderParams](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_builder_params/index.html)
 
 ### Transaction
 
-- [Transaction Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Transaction.html)
+- [Transaction Type](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction/struct.Transaction.html)
 
 ### Deploy Params (Legacy)
 
@@ -2354,7 +2355,7 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### Transaction
 
-- [Transaction Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Transaction.html)
+- [Transaction Type](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Transaction.html)
 
 ### Deploy Params (Legacy)
 
