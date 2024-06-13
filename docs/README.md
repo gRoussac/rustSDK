@@ -373,7 +373,7 @@ println!("{:?}", block_hash);
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](/tests/integration/rust/).
+You can find more examples by reading [Rust integration tests](tests/integration/rust/src/tests/mod.rs).
 
 </details>
 
