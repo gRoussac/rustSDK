@@ -1927,32 +1927,6 @@ export class SDK {
 */
   waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number): Promise<Promise<any>>;
 /**
-* JS Alias for transferring funds.
-*
-* # Arguments
-*
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
-/**
 * Puts a deploy using the provided options.
 *
 * # Arguments
@@ -2138,6 +2112,32 @@ export class SDK {
 * @returns {Promise<QueryGlobalStateResult>}
 */
   query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
+/**
+* JS Alias for transferring funds.
+*
+* # Arguments
+*
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
@@ -3275,7 +3275,6 @@ export interface InitOutput {
   readonly __wbg_set_success_cost: (a: number, b: number, c: number) => void;
   readonly __wbg_set_deploysubscription_deployHash: (a: number, b: number, c: number) => void;
   readonly accountidentifier_new: (a: number, b: number, c: number) => void;
-  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
   readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly __wbg_sessionstrparams_free: (a: number) => void;
@@ -3451,6 +3450,7 @@ export interface InitOutput {
   readonly uref_fromUint8Array: (a: number, b: number, c: number) => number;
   readonly uref_toFormattedString: (a: number, b: number) => void;
   readonly uref_toJson: (a: number) => number;
+  readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => number;
   readonly __wbg_getaccountresult_free: (a: number) => void;
   readonly getaccountresult_api_version: (a: number) => number;
   readonly getaccountresult_account: (a: number) => number;
@@ -3841,12 +3841,12 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h5e61414879884c0a: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1c40c16592036fc7: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h9cebdcd965c2c916: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__ha81c364041382701: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__h41b3897ec8604519: (a: number, b: number, c: number, d: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke2_mut__h5813a45f48301ae0: (a: number, b: number, c: number, d: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

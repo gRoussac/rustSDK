@@ -1927,32 +1927,6 @@ export class SDK {
 */
   waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number): Promise<Promise<any>>;
 /**
-* JS Alias for transferring funds.
-*
-* # Arguments
-*
-* * `amount` - The amount to transfer.
-* * `target_account` - The target account.
-* * `transfer_id` - An optional transfer ID (defaults to a random number).
-* * `deploy_params` - The deployment parameters.
-* * `payment_params` - The payment parameters.
-* * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
-*
-* # Returns
-*
-* A `Result` containing the result of the transfer or a `JsError` in case of an error.
-* @param {string} amount
-* @param {string} target_account
-* @param {string | undefined} transfer_id
-* @param {DeployStrParams} deploy_params
-* @param {PaymentStrParams} payment_params
-* @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
-* @returns {Promise<PutDeployResult>}
-*/
-  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
-/**
 * Puts a deploy using the provided options.
 *
 * # Arguments
@@ -2138,6 +2112,32 @@ export class SDK {
 * @returns {Promise<QueryGlobalStateResult>}
 */
   query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
+/**
+* JS Alias for transferring funds.
+*
+* # Arguments
+*
+* * `amount` - The amount to transfer.
+* * `target_account` - The target account.
+* * `transfer_id` - An optional transfer ID (defaults to a random number).
+* * `deploy_params` - The deployment parameters.
+* * `payment_params` - The payment parameters.
+* * `verbosity` - The verbosity level for logging (optional).
+* * `node_address` - The address of the node to connect to (optional).
+*
+* # Returns
+*
+* A `Result` containing the result of the transfer or a `JsError` in case of an error.
+* @param {string} amount
+* @param {string} target_account
+* @param {string | undefined} transfer_id
+* @param {DeployStrParams} deploy_params
+* @param {PaymentStrParams} payment_params
+* @param {Verbosity | undefined} [verbosity]
+* @param {string | undefined} [node_address]
+* @returns {Promise<PutDeployResult>}
+*/
+  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
