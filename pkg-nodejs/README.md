@@ -1,4 +1,4 @@
-# Casper Rust/Wasm SDK
+# Casper Rust/Wasm SDK 1.6 Juliet
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
@@ -21,7 +21,7 @@ Add the SDK as a dependency of your project:
 > Cargo.toml
 
 ```toml
-casper-rust-wasm-sdk = { version = "0.1.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
+casper-rust-wasm-sdk = { version = "1.0.0", git = "https://github.com/casper-ecosystem/rustSDK.git" }
 ```
 
 ## Usage
@@ -286,7 +286,8 @@ $ npm start
 <details>
   <summary><strong><code>Rust</code></strong></summary>
 <br>
-You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
+
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
@@ -343,14 +344,15 @@ let block_hash = block.hash();
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](./tests/integration/rust/).
+You can find more examples by reading [Rust integration tests](../tests/integration/rust/).
 
 </details>
 
 <details>
   <summary><strong><code>Typescript</code></strong></summary>
 <br>
-You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
+
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get deploy by deploy hash
 
@@ -406,7 +408,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/).
+You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts) or in the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) or in the [React example app](../examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
@@ -1334,7 +1336,7 @@ console.log(call_entrypoint_result_as_json.deploy_hash);
 
 <br>
 
-![Casper Electron App](docs/images/get_status-electron.png)
+![Casper Electron App](https://casper-ecosystem.github.io/rustSDK/juliet/images/get_status-electron.png)
 
 The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
 
@@ -1360,77 +1362,85 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Rust API
 
-- [Modules and Structs](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/)
+- [Modules and Structs](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/)
 
-- [Full item list](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/all.html)
+- [Full item list](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/all.html)
 
 ### SDK
 
-- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
+- [SDK Struct and methods](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
 
 ### RPC
 
-- [RPC List](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [RPC List](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
 
 ### Deploy Params
 
-- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
 
 ### Deploy
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
 ### Deploy Watcher
 
-- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/index.html)
-- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.DeploySubscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.EventParseResult.html)
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/deploy_watcher/index.html)
+- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.EventParseResult.html)
 
 ### Types
 
-- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/index.html)
+- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/types/index.html)
 
 ### Helpers functions
 
-- [Rust helpers](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/helpers/index.html)
+- [Rust helpers](https://casper-ecosystem.github.io/rustSDK/juliet/api-rust/casper_rust_wasm_sdk/helpers/index.html)
 
 ## Typescript API
 
-- [Full item list](https://casper-ecosystem.github.io/rustSDK/api-wasm/index.html)
+- [Full item list](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/index.html)
 
 ### SDK
 
-- [SDK Class and methods](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SDK.html)
+- [SDK Class and methods](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SDK.html)
 
 ### Deploy Params
 
-- [Deploy Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeployStrParams.html)
-- [Session Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/SessionStrParams.html)
-- [Payment Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/PaymentStrParams.html)
-- [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DictionaryItemStrParams.html)
+- [Deploy Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeployStrParams.html)
+- [Session Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/SessionStrParams.html)
+- [Payment Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/PaymentStrParams.html)
+- [Dictionary Item Params](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DictionaryItemStrParams.html)
 
 ### Deploy
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/Deploy.html)
 
 ### Deploy Watcher
 
-- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeployWatcher.html)
-- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeploySubscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/EventParseResult.html)
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeployWatcher.html)
+- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/classes/EventParseResult.html)
 
 ### Types
 
-- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/api-wasm/modules.html)
+- [Current exposed types](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/modules.html)
 
 ### Helpers functions
 
-- [TS helpers](https://casper-ecosystem.github.io/rustSDK/api-wasm/modules.html#Functions)
+- [TS helpers](https://casper-ecosystem.github.io/rustSDK/juliet/api-wasm/modules.html#Functions)
 
 ## Testing
 
-Tests are run against NCTL by default. Alternately, you may configure another network in corresponding configurations. Testes assume a `secret_key.pem` will be located in the root `tests` directory, or one level higher at `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/`. This path can be changed in the configuration.
+Tests are run against NCTL by default. Alternately, you may configure another network in corresponding configuration. Tests assume a `secret_key.pem` will be located in the root `tests` directory, or one level higher at `../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/`. This path can be changed in the configuration or .env file.
 (Rust tests must be run with `--test-threads=1`)
+
+- Unit tests can be run at root folder with
+
+```shell
+make test
+```
+
+[configured with .env](.env) or [configured in module](src/sdk/rpcs/mod.rs)
 
 - [Rust Integration tests](tests/integration/rust/) can be run with
 
@@ -1453,15 +1463,22 @@ then
 make e2e-test
 ```
 
-[configured with .env](tests/e2e/.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
+[configured with .env](.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
 
-- Unit tests can be run at root folder with
+`PRIVATE_KEY_NCTL_PATH` (alternative is direct keys `PRIVATE_KEY_USER_1` and `PRIVATE_KEY_USER_2` from [casper-node-launcher-js](https://github.com/casper-network/casper-node-launcher-js/tree/main) )
 
-```shell
-make test
+Example of .env
+
 ```
-
-[configured in module](src/sdk/rpcs/mod.rs)
+PRIVATE_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
+# PRIVATE_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+# PRIVATE_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+# NODE_ADDRESS=http://localhost:7777
+# EVENT_ADDRESS=http://localhost:9999/events/main
+# SPECULATIVE_ADDRESS=http://localhost:7778
+# CHAIN_NAME=casper-net-1
+# PRIVATE_KEY_NAME=secret_key.pem
+```
 
 ## Todo
 
