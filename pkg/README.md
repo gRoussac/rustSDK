@@ -402,15 +402,13 @@ const transaction_result = await sdk.get_transaction(get_transaction_options);
 const transaction: Transaction = transaction_result.transaction;
 const timestamp = transaction.timestamp;
 const header = transaction.header;
-const hash = transaction.hash;
+const hash = transaction.hash.toString();
 console.log(timestamp, header, hash);
 ```
 
 #### Get deploy by deploy hash (legacy)
 
 ```ts
-import { Deploy } from 'casper-sdk';
-
 const deploy_hash_as_string =
   'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
 const finalized_approvals = true;
@@ -422,10 +420,11 @@ const get_deploy_options = sdk.get_deploy_options({
 
 const deploy_result = await sdk.get_deploy(get_deploy_options);
 
-const deploy: Deploy = deploy_result.deploy;
+const deploy = deploy_result.deploy;
 const timestamp = deploy.timestamp();
 const header = deploy.toJson().header; // DeployHeader type not being exposed right now by the SDK you can convert every type to JSON
-console.log(timestamp, header);
+const hash = deploy.hash.toString();
+console.log(timestamp, header, hash);
 ```
 
 #### Get auction state information
@@ -508,7 +507,7 @@ println!("{:?}", make_transfer_transaction.timestamp());
 #### Typescript
 
 ```ts
-import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
+import { TransactionStrParams } from 'casper-sdk';
 
 const chain_name = 'integration-test';
 const public_key =
@@ -588,12 +587,7 @@ println!("{:?}", transfer.as_ref().unwrap().result.transaction_hash.to_hex_strin
 #### Typescript
 
 ```ts
-import {
-  Transaction,
-  TransactionStrParams,
-  TransactionBuilderParams,
-  getTimestamp,
-} from 'casper-sdk';
+import { TransactionStrParams, getTimestamp } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const public_key =
@@ -667,11 +661,7 @@ println!("{:?}", transaction.timestamp());
 #### Typescript
 
 ```ts
-import {
-  Transaction,
-  TransactionStrParams,
-  TransactionBuilderParams,
-} from 'casper-sdk';
+import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
 
 const chain_name = 'integration-test';
 const public_key =
@@ -679,12 +669,7 @@ const public_key =
 const payment_amount = '5000000000';
 const entity_hash =
   'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-
-const deploy_params = new DeployStrParams(chain_name, public_key);
-
-const session_params = new SessionStrParams();
-session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'set_variables';
+const entry_point = 'set_variables';
 
 const transaction_params = new TransactionStrParams(chain_name, public_key);
 transaction_params.payment_amount = payment_amount;
@@ -747,11 +732,7 @@ println!(
 #### Typescript
 
 ```ts
-import {
-  Transaction,
-  TransactionStrParams,
-  TransactionBuilderParams,
-} from 'casper-sdk';
+import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const public_key =
@@ -865,11 +846,7 @@ println!(
 Puts a [`Transaction`] to the network for execution.
 
 ```ts
-import {
-  Transaction,
-  TransactionStrParams,
-  TransactionBuilderParams,
-} from 'casper-sdk';
+import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const public_key =
@@ -902,11 +879,7 @@ console.log(put_transaction_result_as_json);
 Puts a [`Transfer Transaction`] to the network for execution.
 
 ```ts
-import {
-  Transaction,
-  TransactionStrParams,
-  TransactionBuilderParams,
-} from 'casper-sdk';
+import { Transaction, TransactionStrParams } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const public_key =
@@ -1001,7 +974,7 @@ const timeout_duration = undefined; // 30000 for 30s instead of default timeout 
 // Wait for transaction
 const eventParseResult: EventParseResult = await sdk.waitTransaction(
   events_address,
-  install_result_as_json.transaction_hash,
+  transaction_hash,
   timeout_duration
 );
 console.log(eventParseResult.body.transaction_processed);
@@ -1220,7 +1193,7 @@ import {
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
-  const private_key = `-----BEGIN PRIVATE KEY-----
+  const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const initiator_addr = privateToPublicKey(secret_key);
 const transaction_params = new TransactionStrParams(chain_name, initiator_addr, secret_key);
@@ -1252,7 +1225,9 @@ const install_result = await sdk.install(
   Bytes.fromUint8Array(wasm)
 );
 const install_result_as_json = install_result.toJson();
-console.log(install_result_as_json.transaction_hash);
+console.log(install_result_as_json);
+const transaction_hash = install_result.transaction_hash.toString();
+console.log(transaction_hash);
 ```
 
 with
@@ -1332,6 +1307,7 @@ const initiator_addr = privateToPublicKey(private_key);
 const entity_hash =
   'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'mint';
+const payment_amount = '5000000000';
 const token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
 
 const transaction_params = new TransactionStrParams(chain_name, initiator_addr, private_key);
@@ -1345,7 +1321,9 @@ const call_entrypoint_result = await sdk.call_entrypoint(
   transaction_params
 );
 const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
-console.log(call_entrypoint_result_as_json.deploy_hash);
+console.log(call_entrypoint_result_as_json);
+const transaction_hash = call_entrypoint_result.transaction_hash.toString();
+console.log(transaction_hash);
 ```
 
 </details>
@@ -2176,7 +2154,9 @@ const install_result = await sdk.install_deploy(
   payment_amount
 );
 const install_result_as_json = install_result.toJson();
-console.log(install_result_as_json.deploy_hash);
+console.log(install_result_as_json);
+const deploy_hash = install_result.deploy_hash.toString();
+console.log(deploy_hash);
 ```
 
 with
@@ -2276,7 +2256,9 @@ const call_entrypoint_result = await sdk.call_entrypoint_deploy(
   payment_amount
 );
 const call_entrypoint_result_as_json = call_entrypoint_result.toJson();
-console.log(call_entrypoint_result_as_json.deploy_hash);
+console.log(call_entrypoint_result_as_json);
+const deploy_hash = call_entrypoint_result.deploy_hash.toString();
+console.log(deploy_hash);
 ```
 
 </details>
