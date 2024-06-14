@@ -409,6 +409,201 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
         }
     }
+
+    #[wasm_bindgen(getter)]
+    pub fn kind(&self) -> TransactionKind {
+        self.kind
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_kind(&mut self, kind: TransactionKind) {
+        self.kind = kind;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn transaction_bytes(&self) -> Option<Bytes> {
+        self.transaction_bytes.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_transaction_bytes(&mut self, transaction_bytes: Bytes) {
+        self.transaction_bytes = Some(transaction_bytes);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn maybe_source(&self) -> Option<URef> {
+        self.maybe_source.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_maybe_source(&mut self, maybe_source: URef) {
+        self.maybe_source = Some(maybe_source);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn target(&self) -> Option<TransferTarget> {
+        self.target.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_target(&mut self, target: TransferTarget) {
+        self.target = Some(target);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn amount(&self) -> Option<String> {
+        self.amount.map(|amount| amount.to_string())
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_amount(&mut self, amount: &str) {
+        let amount = U512::from_dec_str(amount)
+            .map_err(|err| {
+                error(&format!("Error converting amount: {:?}", err));
+            })
+            .ok();
+        self.amount = amount;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn maybe_id(&self) -> Option<u64> {
+        self.maybe_id
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_maybe_id(&mut self, id: u64) {
+        self.maybe_id = Some(id);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn entity_hash(&self) -> Option<AddressableEntityHash> {
+        self.entity_hash
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_entity_hash(&mut self, entity_hash: AddressableEntityHash) {
+        self.entity_hash = Some(entity_hash);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn entity_alias(&self) -> Option<String> {
+        self.entity_alias.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_entity_alias(&mut self, entity_alias: &str) {
+        self.entity_alias = Some(entity_alias.to_string());
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn entry_point(&self) -> Option<String> {
+        self.entry_point.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_entry_point(&mut self, entry_point: &str) {
+        self.entry_point = Some(entry_point.to_string());
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn package_hash(&self) -> Option<PackageHash> {
+        self.package_hash
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_package_hash(&mut self, package_hash: PackageHash) {
+        self.package_hash = Some(package_hash);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn package_alias(&self) -> Option<String> {
+        self.package_alias.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_package_alias(&mut self, package_alias: &str) {
+        self.package_alias = Some(package_alias.to_string());
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn maybe_entity_version(&self) -> Option<u32> {
+        self.maybe_entity_version
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_maybe_entity_version(&mut self, maybe_entity_version: u32) {
+        self.maybe_entity_version = Some(maybe_entity_version);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn public_key(&self) -> Option<PublicKey> {
+        self.public_key.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_public_key(&mut self, public_key: PublicKey) {
+        self.public_key = Some(public_key);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn delegation_rate(&self) -> Option<u8> {
+        self.delegation_rate
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_delegation_rate(&mut self, delegation_rate: u8) {
+        self.delegation_rate = Some(delegation_rate);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn delegator(&self) -> Option<PublicKey> {
+        self.delegator.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_delegator(&mut self, delegator: PublicKey) {
+        self.delegator = Some(delegator);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn validator(&self) -> Option<PublicKey> {
+        self.validator.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_validator(&mut self, validator: PublicKey) {
+        self.validator = Some(validator);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn new_validator(&self) -> Option<PublicKey> {
+        self.new_validator.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_new_validator(&mut self, new_validator: PublicKey) {
+        self.new_validator = Some(new_validator);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn minimum_delegation_amount(&self) -> Option<u64> {
+        self.minimum_delegation_amount
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_minimum_delegation_amount(&mut self, minimum_delegation_amount: u64) {
+        self.minimum_delegation_amount = Some(minimum_delegation_amount);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn maximum_delegation_amount(&self) -> Option<u64> {
+        self.maximum_delegation_amount
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_maximum_delegation_amount(&mut self, maximum_delegation_amount: u64) {
+        self.maximum_delegation_amount = Some(maximum_delegation_amount);
+    }
 }
 
 // Convert TransactionBuilderParams to casper_client::cli::TransactionBuilderParams

@@ -21,20 +21,20 @@ import init, {
   PaymentStrParams,
   // hexToUint8Array,
   jsonPrettyPrint,
-  privateToPublicKey,
+  publicKeyFromSecretKey,
   getTimestamp,
   Bytes,
   AccountIdentifier
 } from 'casper-sdk';
 
-const public_key_default = '0171875f35fc884264a08d4b6ac719f3b585bde0c9b085ac1a42130025e5fe9a3d';
-const private_key_default = '-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIO4wiasX4zAGgdlMAMDeSsde6XWlB+FZHDHRhtToJREu\n-----END PRIVATE KEY-----';
+const public_key_default = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
+const secret_key_default = '-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----';
 const app_address_default = 'http://localhost:3000';
 const chain_name_default = 'casper-net-1';
 const block_identifier_height_default = BigInt(1);
 
 const public_key = process.env.REACT_APP_PUBLIC_KEY || public_key_default;
-const private_key = process.env.REACT_APP_PRIVATE_KEY?.replace(/\\n/g, '\n') || private_key_default;
+const secret_key = process.env.REACT_APP_SECRET_KEY?.replace(/\\n/g, '\n') || secret_key_default;
 const app_address = process.env.REACT_APP_APP_ADDRESS || app_address_default;
 const chain_name = process.env.REACT_APP_CHAIN_NAME || chain_name_default;
 
@@ -46,7 +46,7 @@ function App() {
   );
   const [hash, setHash] = useState('');
   const [pubKey, setPubKey] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
+  const [secretKey, setSecretKey] = useState('');
   const [block, setBlock] = useState('');
   const [info_get_account_info_hash, setInfo_get_account_info_hash] =
     useState('');
@@ -97,7 +97,7 @@ function App() {
     console.log(sdk);
     console.log(public_key);
 
-    setPrivateKey(private_key);
+    setSecretKey(secret_key);
     setPubKey(public_key);
 
     try {
@@ -157,7 +157,7 @@ function App() {
       let deploy_params = new DeployStrParams(
         chain_name,
         public_key,
-        private_key,
+        secret_key,
         timestamp,
         ttl
       );
@@ -210,8 +210,8 @@ function App() {
       );
       payment_params = new PaymentStrParams();
       payment_params.payment_amount = '5500000000';
-      test_deploy = test_deploy.sign(private_key);
-      test_deploy = test_deploy.withTTL('60m', private_key);
+      test_deploy = test_deploy.sign(secret_key);
+      test_deploy = test_deploy.withTTL('60m', secret_key);
       test_deploy = test_deploy.withSession(JSON.parse('{ "StoredContractByHash": { "hash": "9d0235fe7f4ac6ba71cf251c68fdd945ecf449d0b8aecb66ab0cbc18e80b3477", "entry_point": "decimals", "args": []}}'));
       console.log(test_deploy.toJson());
 
@@ -253,7 +253,7 @@ function App() {
 
       let deploy_signed = (await sdk.sign_deploy(
         deploy_to_sign,
-        private_key
+        secret_key
       )).toJson();
       console.log('js deploy_signed two parties', deploy_signed.approvals);
       console.log(deploy_signed);
@@ -267,7 +267,7 @@ function App() {
       console.assert(deploy_to_sign.toJson().approvals.length === 0);
       deploy_signed = (await sdk.sign_deploy(
         deploy_to_sign,
-        private_key
+        secret_key
       )).toJson();
       console.log('js deploy + addArg > sign_deploy', deploy_signed.approvals);
       console.assert(deploy_signed.approvals.length === 1); // Deploy should have one approval
@@ -276,9 +276,9 @@ function App() {
       //  console.log('make_deploy footprint', deploy_to_sign.footprint());
       console.assert(deploy_to_sign.toJson().approvals.length === 0); // Deploy has no approval
       // console.log('make_deploy ApprovalsHash before', deploy_to_sign.approvalsHash());
-      deploy_signed = deploy_to_sign.addArg("test:bool='true'", private_key); // Deploy was modified has one approval
+      deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval
       console.log('make_deploy signed', deploy_signed.toJson());
-      console.log('js deploy + addArg + private_key ', deploy_signed.toJson().approvals);
+      console.log('js deploy + addArg + secret_key ', deploy_signed.toJson().approvals);
       console.assert(deploy_signed.toJson().approvals.length === 1); // Deploy should have one approval
       //  console.log('make_deploy ApprovalsHash after', deploy_signed.approvalsHash());
 
@@ -314,7 +314,7 @@ function App() {
       deploy_params = new DeployStrParams(
         chain_name,
         public_key,
-        private_key
+        secret_key
       );
       console.log(deploy_params);
       session_params = new SessionStrParams();
@@ -383,16 +383,16 @@ function App() {
   // install
   const onFileSelected = async (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (!selectedFile || !(sdk instanceof SDK) || !privateKey) {
+    if (!selectedFile || !(sdk instanceof SDK) || !secretKey) {
       return;
     }
     const sdkInstance = sdk as SDK;
     selectedFile && setSessionPath(selectedFile.name);
-    const session_account = privateToPublicKey(privateKey);
+    const session_account = publicKeyFromSecretKey(secretKey);
     const deploy_params = new DeployStrParams(
       chain_name,
       session_account,
-      privateKey
+      secretKey
     );
     console.log(deploy_params);
     const session_params = new SessionStrParams();

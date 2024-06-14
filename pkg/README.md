@@ -373,7 +373,7 @@ println!("{:?}", block_hash);
 println!("{:?}", block_hash);
 ```
 
-You can find more examples by reading [Rust integration tests](./tests/integration/rust/).
+You can find more examples by reading [Rust integration tests](../tests/integration/rust/src/tests/mod.rs).
 
 </details>
 
@@ -459,7 +459,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in the [Angular example app](examples/frontend/angular/src/app/app.component.ts) or in the [React example app](examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](./tests/e2e/).
+You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts) or in the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) or in the [React example app](../examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
@@ -484,7 +484,7 @@ pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TTL: &str = "1h";
 pub const TARGET_ACCOUNT: &str =
-    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+    "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
@@ -512,7 +512,7 @@ import { TransactionStrParams } from 'casper-sdk';
 const chain_name = 'integration-test';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = undefined;
+const secret_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
 const ttl = '1h'; // or undefined
 const payment_amount = '100000000';
@@ -523,7 +523,7 @@ const target_account =
 const transaction_params = new TransactionStrParams(
   chain_name,
   public_key,
-  private_key,
+  secret_key,
   timestamp,
   ttl
 );
@@ -556,17 +556,17 @@ use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::Tra
 pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TTL: &str = "1h";
 pub const TARGET_ACCOUNT: &str =
-    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+    "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -592,7 +592,7 @@ import { TransactionStrParams, getTimestamp } from 'casper-sdk';
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
 const ttl = '1h'; // or undefined
@@ -604,7 +604,7 @@ const target_account =
 const transaction_params = new TransactionStrParams(
   chain_name,
   public_key,
-  private_key,
+  secret_key,
   timestamp,
   ttl
 );
@@ -705,7 +705,7 @@ use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::Tra
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const ENTITY_HASH: &str =
@@ -716,7 +716,7 @@ pub const TTL: &str = "1h";
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(PUBLIC_KEY);
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -737,7 +737,7 @@ import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
 const entity_hash =
@@ -747,7 +747,7 @@ const entry_point = 'set_variables';
 const transaction_params = new TransactionStrParams(
   chain_name,
   public_key,
-  private_key
+  secret_key
 );
 transaction_params.payment_amount = payment_amount;
 let builder_params = TransactionBuilderParams.newInvocableEntity(
@@ -776,9 +776,9 @@ Puts a [`Transaction`] to the network for execution.
 use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
 pub const CHAIN_NAME: &str = "casper-net-1";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
-let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const ENTITY_HASH: &str =
     "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -788,7 +788,7 @@ pub const TTL: &str = "1h";
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(initiator_addr); // sender account
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_ttl(Some(TTL.to_string())); // optional TTL
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -809,19 +809,19 @@ Puts a [`Transfer Transaction`] to the network for execution.
 use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
 pub const CHAIN_NAME: &str = "casper-net-1";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
-let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
 pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TARGET_ACCOUNT: &str =
-    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+    "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 pub const TTL: &str = "1h";
 
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(initiator_addr);
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 transaction_params.set_ttl(Some(TTL.to_string()));
 
@@ -851,7 +851,7 @@ import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
 const entity_hash =
@@ -861,7 +861,7 @@ const entry_point = 'set_variables';
 const transaction_params = new TransactionStrParams(
   chain_name,
   public_key,
-  private_key
+  secret_key
 );
 transaction_params.payment_amount = payment_amount;
 
@@ -884,7 +884,7 @@ import { Transaction, TransactionStrParams } from 'casper-sdk';
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '100000000';
 const transfer_amount = '2500000000';
@@ -894,7 +894,7 @@ const target_account =
 const transfer_params = new TransactionStrParams(
   chain_name,
   public_key,
-  private_key
+  secret_key
 );
 
 transfer_params.payment_amount = payment_amount;
@@ -919,19 +919,19 @@ console.log(put_transaction_result_as_json);
 #### Rust
 
 ```rust
-pub const PRIVATE_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
+pub const SECRET_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
 ... //  same code as 'Making a Session/Transfer Transaction' example
 let unsigned_transaction = sdk.make_transaction(builder_params, transaction_params).unwrap();
-let signed_transaction = unsigned_transaction.sign(PRIVATE_KEY);
+let signed_transaction = unsigned_transaction.sign(SECRET_KEY);
 ```
 
 #### Typescript
 
 ```ts
-const private_key = 'MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI';
+const secret_key = 'MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI';
 ... //  same code as 'Making a Session/Transfer Transaction' example
 const unsigned_transaction = sdk.make_transaction(builder_params, transaction_params);
-const signed_transaction = unsigned_transaction.sign(private_key);
+const signed_transaction = unsigned_transaction.sign(secret_key);
 ```
 
 </details>
@@ -1100,7 +1100,7 @@ use std::{time, time::Duration};
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
@@ -1123,7 +1123,7 @@ pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events";
 let transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(PUBLIC_KEY);
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_session_args_json(ARGS_JSON);
 transaction_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
 
@@ -1188,14 +1188,14 @@ fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
 import {
   ...
   TransactionStrParams,
-  privateToPublicKey,
+  publicKeyFromSecretKey,
   Bytes,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const initiator_addr = privateToPublicKey(secret_key);
+const initiator_addr = publicKeyFromSecretKey(secret_key);
 const transaction_params = new TransactionStrParams(chain_name, initiator_addr, secret_key);
 transaction_params.session_args_json = JSON.stringify([
   {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
@@ -1256,7 +1256,7 @@ use casper_rust_wasm_sdk::types::{
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
 pub const ENTITY_HASH: &str =
     "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -1268,7 +1268,7 @@ pub const PAYMENT_AMOUNT: &str = "5000000000";
 let mut transaction_params = TransactionStrParams::default();
 transaction_params.set_chain_name(CHAIN_NAME);
 transaction_params.set_initiator_addr(PUBLIC_KEY);
-transaction_params.set_secret_key(PRIVATE_KEY);
+transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 let args = Vec::from([
     "token_meta_data:String='test_meta_data'".to_string(),
@@ -1297,20 +1297,20 @@ println!("watch transaction_hash {transaction_hash_string}");
 import {
   ...
   TransactionStrParams,
-  privateToPublicKey,
+  publicKeyFromSecretKey,
   Bytes,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
-const private_key = '';
-const initiator_addr = privateToPublicKey(private_key);
+const secret_key = '';
+const initiator_addr = publicKeyFromSecretKey(secret_key);
 const entity_hash =
   'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'mint';
 const payment_amount = '5000000000';
 const token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
 
-const transaction_params = new TransactionStrParams(chain_name, initiator_addr, private_key);
+const transaction_params = new TransactionStrParams(chain_name, initiator_addr, secret_key);
 transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
 transaction_params.payment_amount = payment_amount;
 
@@ -1351,7 +1351,7 @@ pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TTL: &str = "1h";
 pub const TARGET_ACCOUNT: &str =
-    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+    "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
@@ -1384,7 +1384,7 @@ import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
 const chain_name = 'integration-test';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = undefined;
+const secret_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
 const ttl = '1h'; // or undefined
 const payment_amount = '100000000';
@@ -1395,7 +1395,7 @@ const target_account =
 const deploy_params = new DeployStrParams(
   chain_name,
   public_key,
-  private_key,
+  secret_key,
   timestamp,
   ttl
 );
@@ -1431,18 +1431,18 @@ use casper_rust_wasm_sdk::types::deploy_params::{
 pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TTL: &str = "1h";
 pub const TARGET_ACCOUNT: &str =
-    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+    "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
     PUBLIC_KEY, // sender account
-    Some(PRIVATE_KEY.to_string()),
+    Some(SECRET_KEY.to_string()),
     None,                  // optional timestamp
     Some(TTL.to_string()), // optional TTL
 );
@@ -1472,7 +1472,7 @@ import { DeployStrParams, PaymentStrParams, getTimestamp } from 'casper-sdk';
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
 const ttl = '1h'; // or undefined
@@ -1484,7 +1484,7 @@ const target_account =
 const deploy_params = new DeployStrParams(
   chain_name,
   public_key,
-  private_key,
+  secret_key,
   timestamp,
   ttl
 );
@@ -1599,7 +1599,7 @@ use casper_rust_wasm_sdk::types::deploy_params::{
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const CONTRACT_HASH: &str =
@@ -1610,7 +1610,7 @@ pub const TTL: &str = "1h";
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
     PUBLIC_KEY, // sender account
-    Some(PRIVATE_KEY.to_string()),
+    Some(SECRET_KEY.to_string()),
     None,                  // optional timestamp
     Some(TTL.to_string()), // optional TTL
 );
@@ -1640,13 +1640,13 @@ import {
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
 const contract_hash =
   'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 
-const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
@@ -1684,7 +1684,7 @@ use casper_rust_wasm_sdk::types::{
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const CONTRACT_HASH: &str =
@@ -1695,7 +1695,7 @@ pub const TTL: &str = "1h";
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
     PUBLIC_KEY, // sender account
-    Some(PRIVATE_KEY.to_string()),
+    Some(SECRET_KEY.to_string()),
     None,                  // optional timestamp
     Some(TTL.to_string()), // optional TTL
 );
@@ -1725,18 +1725,18 @@ use casper_rust_wasm_sdk::types::{
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "100000000";
 pub const TRANSFER_AMOUNT: &str = "2500000000";
 pub const TARGET_ACCOUNT: &str =
-    "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+    "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 pub const TTL: &str = "1h";
 
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
     PUBLIC_KEY, // sender account
-    Some(PRIVATE_KEY.to_string()),
+    Some(SECRET_KEY.to_string()),
     None,                  // optional timestamp
     Some(TTL.to_string()), // optional TTL
 );
@@ -1772,14 +1772,14 @@ import {
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
 const contract_hash =
   'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'set_variables';
 
-const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
@@ -1811,14 +1811,14 @@ import {
 const chain_name = 'casper-net-1';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const private_key = `-----BEGIN PRIVATE KEY-----
+const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '100000000';
 const transfer_amount = '2500000000';
 const target_account =
   '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
 
-const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const payment_params = new PaymentStrParams(payment_amount);
 
@@ -1843,19 +1843,19 @@ console.log(put_deploy_result_as_json);
 #### Rust
 
 ```rust
-pub const PRIVATE_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
+pub const SECRET_KEY: &str = "MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI";
 ... //  same code as 'Making a Deploy' example
 let unsigned_deploy = sdk.make_deploy(deploy_params, session_params, payment_params).unwrap();
-let signed_deploy = sdk.sign_deploy(unsigned_deploy, PRIVATE_KEY);
+let signed_deploy = sdk.sign_deploy(unsigned_deploy, SECRET_KEY);
 ```
 
 #### Typescript
 
 ```ts
-const private_key = 'MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI';
+const secret_key = 'MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI';
 ... //  same code as 'Making a Deploy' example
 const unsigned_deploy = sdk.make_deploy(deploy_params, session_params, payment_params);
-const signed_deploy = unsigned_deploy.sign(private_key);
+const signed_deploy = unsigned_deploy.sign(secret_key);
 ```
 
 </details>
@@ -2027,7 +2027,7 @@ use std::{time, time::Duration};
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
@@ -2049,7 +2049,7 @@ pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
     PUBLIC_KEY,
-    Some(PRIVATE_KEY.to_string()),
+    Some(SECRET_KEY.to_string()),
     None,
     None,
 );
@@ -2112,15 +2112,15 @@ import {
   DeployStrParams,
   SessionStrParams,
   PaymentStrParams,
-  privateToPublicKey,
+  publicKeyFromSecretKey,
   Bytes,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
-  const private_key = `-----BEGIN PRIVATE KEY-----
+  const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const public_key = privateToPublicKey(private_key);
-const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+const public_key = publicKeyFromSecretKey(secret_key);
+const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const session_params = new SessionStrParams();
 session_params.session_args_json = JSON.stringify([
@@ -2188,7 +2188,7 @@ use casper_rust_wasm_sdk::types::{
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
 pub const CONTRACT_HASH: &str =
     "hash-c12808431d490e2c463c2f968d0a4eaa0f9d57842508d9041aa42e2bd21eb96c";
@@ -2200,7 +2200,7 @@ pub const PAYMENT_AMOUNT: &str = "5000000000";
 let deploy_params = DeployStrParams::new(
     CHAIN_NAME,
     PUBLIC_KEY,
-    Some(PRIVATE_KEY.to_string()),
+    Some(SECRET_KEY.to_string()),
     None,
     None,
 );
@@ -2231,19 +2231,19 @@ import {
   DeployStrParams,
   SessionStrParams,
   PaymentStrParams,
-  privateToPublicKey,
+  publicKeyFromSecretKey,
   Bytes,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
-const private_key = '';
-const public_key = privateToPublicKey(private_key);
+const secret_key = '';
+const public_key = publicKeyFromSecretKey(secret_key);
 const contract_hash =
   'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'mint';
 const token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
 
-const deploy_params = new DeployStrParams(chain_name, public_key, private_key);
+const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
@@ -2310,11 +2310,12 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### Transaction Params
 
-- [Params and Args simple](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/index.html)
+- [TransactionStrParams](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_str_params/index.html)
+- [TransactionBuilderParams](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_builder_params/index.html)
 
 ### Transaction
 
-- [Transaction Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Transaction.html)
+- [Transaction Type](https://casper-ecosystem.github.io/rustSDK/condor/api-rust/casper_rust_wasm_sdk/types/transaction/struct.Transaction.html)
 
 ### Deploy Params (Legacy)
 
@@ -2354,7 +2355,7 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ### Transaction
 
-- [Transaction Type and static builder](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Transaction.html)
+- [Transaction Type](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/Transaction.html)
 
 ### Deploy Params (Legacy)
 
@@ -2417,19 +2418,19 @@ make e2e-test
 
 [configured with .env](.env) or [puppeteer config](tests/e2e/puppeteer/config.ts)
 
-`PRIVATE_KEY_NCTL_PATH` (alternative is direct keys `PRIVATE_KEY_USER_1` and `PRIVATE_KEY_USER_2` from [casper-node-launcher-js](https://github.com/casper-network/casper-node-launcher-js/tree/main) )
+`SECRET_KEY_NCTL_PATH` (alternative is direct keys `SECRET_KEY_USER_1` and `SECRET_KEY_USER_2` from [casper-node-launcher-js](https://github.com/casper-network/casper-node-launcher-js/tree/main) )
 
 Example of .env
 
 ```
-PRIVATE_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
-# PRIVATE_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
-# PRIVATE_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+SECRET_KEY_NCTL_PATH=/casper/casper-nctl-2-docker/assets/users/user-1/
+# SECRET_KEY_USER_1 = MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
+# SECRET_KEY_USER_2 = MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
 # NODE_ADDRESS=http://localhost:7777
 # EVENT_ADDRESS=http://localhost:9999/events/main
 # SPECULATIVE_ADDRESS=http://localhost:7778
 # CHAIN_NAME=casper-net-1
-# PRIVATE_KEY_NAME=secret_key.pem
+# SECRET_KEY_NAME=secret_key.pem
 ```
 
 ## Todo

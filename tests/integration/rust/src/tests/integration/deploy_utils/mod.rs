@@ -78,7 +78,7 @@ pub mod test_module {
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
         let signed_deploy = create_test_sdk(Some(config.clone()))
-            .sign_deploy(make_deploy, &config.to_owned().private_key);
+            .sign_deploy(make_deploy, &config.to_owned().secret_key);
         assert!(signed_deploy.is_valid());
     }
 }

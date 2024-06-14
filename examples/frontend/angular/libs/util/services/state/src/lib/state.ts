@@ -9,7 +9,7 @@ export type State = {
   state_root_hash?: string;
   action?: string;
   public_key?: string;
-  private_key?: string;
+  secret_key?: string;
   deploy_json?: string;
   transaction_json?: string;
   verbosity?: Verbosity;

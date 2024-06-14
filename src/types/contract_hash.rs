@@ -9,7 +9,7 @@ use wasm_bindgen::prelude::*;
 use super::addressable_entity_hash::AddressableEntityHash;
 
 #[wasm_bindgen]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ContractHash(_ContractHash);
 
 #[wasm_bindgen]

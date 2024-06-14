@@ -19,19 +19,19 @@ pub async fn install_cep78() -> String {
     use sdk_tests::{
         config::WASM_PATH,
         tests::helpers::{
-            get_contract_cep78_hash_keys, get_network_constants, get_user_private_key,
+            get_contract_cep78_hash_keys, get_network_constants, get_user_secret_key,
             install_cep78_if_needed,
         },
     };
 
-    let private_key = get_user_private_key(None).unwrap();
-    let account = public_key_from_secret_key(&private_key).unwrap();
+    let secret_key = get_user_secret_key(None).unwrap();
+    let account = public_key_from_secret_key(&secret_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
     let (node_address, event_address, _, chain_name) = get_network_constants();
     install_cep78_if_needed(
         &account,
-        &private_key,
+        &secret_key,
         Some(WASM_PATH),
         (&node_address, &event_address, &chain_name),
     )
@@ -42,7 +42,7 @@ pub async fn install_cep78() -> String {
 
 #[cfg(test)]
 pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     static mut CONTRACT_CEP78_HASH: Option<String> = None;
     let (node_address, event_address, _, chain_name) = get_network_constants();
@@ -50,15 +50,15 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
     unsafe {
         if CONTRACT_CEP78_HASH.is_none() {
             let contract_cep78_hash = install_cep78().await;
-            let private_key = get_user_private_key(None).unwrap();
-            let account = public_key_from_secret_key(&private_key).unwrap();
+            let secret_key = get_user_secret_key(None).unwrap();
+            let account = public_key_from_secret_key(&secret_key).unwrap();
             let public_key = PublicKey::new(&account).unwrap();
             let account_hash = public_key.to_account_hash().to_formatted_string();
             mint_nft(
                 &contract_cep78_hash,
                 &account,
                 &account_hash,
-                &private_key,
+                &secret_key,
                 (&node_address, &event_address, &chain_name),
             )
             .await;

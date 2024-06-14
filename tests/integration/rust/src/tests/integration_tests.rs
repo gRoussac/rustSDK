@@ -61,13 +61,13 @@ pub mod test_module {
 
     pub async fn test_public_key_from_secret_key() {
         let config: TestConfig = get_config(true).await;
-        let public_key = public_key_from_secret_key(&config.private_key).unwrap();
+        let public_key = public_key_from_secret_key(&config.secret_key).unwrap();
         assert_eq!(public_key, config.account);
     }
 
     pub async fn test_secret_key_from_pem() {
         let config: TestConfig = get_config(true).await;
-        let secret_key = secret_key_from_pem(&config.private_key).unwrap();
+        let secret_key = secret_key_from_pem(&config.secret_key).unwrap();
         assert_eq!(secret_key.to_string(), "SecretKey::Ed25519");
     }
 

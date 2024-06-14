@@ -572,7 +572,7 @@ mod tests {
         let result = secret_key_from_pem(pem_key);
         assert!(result.is_err());
         let pem_key =
-        "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKR3ayaSpNtpZmu9Tv3kUXi+Xq+V7bQHn+9tT0ZjH5id\n-----END PRIVATE KEY-----";
+        "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
         let result = secret_key_from_pem(pem_key);
         assert!(result.is_ok());
         assert_eq!(&result.unwrap().to_string(), "SecretKey::Ed25519");
@@ -584,12 +584,12 @@ mod tests {
         let result = public_key_from_secret_key(pem_key);
         assert!(result.is_err());
         let pem_key =
-        "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKR3ayaSpNtpZmu9Tv3kUXi+Xq+V7bQHn+9tT0ZjH5id\n-----END PRIVATE KEY-----";
+        "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI-----END PRIVATE KEY-----";
         let result = public_key_from_secret_key(pem_key);
         assert!(result.is_ok());
         assert_eq!(
             result.unwrap(),
-            "0161e40005434ba3cd9a791a2827f5fa3ee514d1475fe72b2823cbaac9c3c71483"
+            "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6"
         );
     }
 

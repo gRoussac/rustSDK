@@ -308,11 +308,11 @@ mod tests {
         helpers::public_key_from_secret_key,
         types::{digest::Digest, public_key::PublicKey},
     };
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     fn get_purse_identifier() -> PurseIdentifier {
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
         PurseIdentifier::from_main_purse_under_public_key(public_key)
     }

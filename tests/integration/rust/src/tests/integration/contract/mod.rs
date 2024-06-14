@@ -33,7 +33,7 @@ pub mod test_module {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
             None,
@@ -189,7 +189,7 @@ pub mod test_module {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
             None,
@@ -235,7 +235,7 @@ mod tests {
     use tokio::test;
 
     #[test]
-    pub async fn test_install_test() {
+    pub async fn test_install_deploy_test() {
         test_install_deploy().await;
     }
 

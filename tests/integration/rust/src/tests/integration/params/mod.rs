@@ -5,9 +5,18 @@ pub mod test_module {
         get_config, TestConfig, DEFAULT_TTL, DICTIONARY_ITEM_KEY, DICTIONARY_NAME, ENTRYPOINT_MINT,
         PAYMENT_AMOUNT, TTL,
     };
-    use casper_rust_wasm_sdk::types::deploy_params::{
-        deploy_str_params::DeployStrParams, dictionary_item_str_params::DictionaryItemStrParams,
-        payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
+    use casper_rust_wasm_sdk::types::{
+        addressable_entity_hash::AddressableEntityHash,
+        contract_hash::ContractHash,
+        deploy_params::{
+            deploy_str_params::DeployStrParams,
+            dictionary_item_str_params::DictionaryItemStrParams,
+            payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
+        },
+        transaction_params::{
+            transaction_builder_params::TransactionBuilderParams,
+            transaction_str_params::TransactionStrParams,
+        },
     };
 
     pub async fn test_deploy_params() {
@@ -92,6 +101,77 @@ pub mod test_module {
         dictionary_item_params.set_dictionary(&config.dictionary_key);
         assert!(dictionary_item_params.dictionary().is_some());
     }
+
+    pub async fn test_transaction_str_params() {
+        let config: TestConfig = get_config(true).await;
+        let transaction_params = TransactionStrParams::new(
+            &config.chain_name,
+            Some(config.account.clone()),
+            None,
+            None,
+            Some(TTL.to_string()),
+            None,
+            None,
+            Some(PAYMENT_AMOUNT.to_string()),
+            None,
+            None,
+            None,
+            None,
+        );
+        assert_eq!(transaction_params.chain_name().unwrap(), config.chain_name);
+        assert_eq!(transaction_params.ttl().unwrap(), TTL);
+        assert_eq!(transaction_params.initiator_addr().unwrap(), config.account);
+        assert_eq!(transaction_params.secret_key(), None);
+        assert!(transaction_params.timestamp().is_some());
+        assert_eq!(transaction_params.payment_amount().unwrap(), PAYMENT_AMOUNT);
+    }
+
+    pub async fn test_transaction_str_params_defaults() {
+        let config: TestConfig = get_config(true).await;
+        let transaction_str_params = TransactionStrParams::default();
+        transaction_str_params.set_chain_name(&config.chain_name);
+        transaction_str_params.set_initiator_addr(&config.account);
+        transaction_str_params.set_payment_amount(PAYMENT_AMOUNT);
+
+        assert_eq!(
+            transaction_str_params.chain_name().unwrap(),
+            config.chain_name
+        );
+        assert_eq!(
+            transaction_str_params.initiator_addr().unwrap(),
+            config.account
+        );
+        assert!(transaction_str_params.timestamp().is_none());
+        assert!(transaction_str_params.ttl().is_none());
+        assert_eq!(
+            transaction_str_params.payment_amount().unwrap(),
+            PAYMENT_AMOUNT
+        );
+
+        transaction_str_params.set_default_ttl();
+        transaction_str_params.set_default_timestamp();
+        assert!(transaction_str_params.timestamp().is_some());
+        assert_eq!(transaction_str_params.ttl().unwrap(), DEFAULT_TTL);
+    }
+
+    pub async fn test_transaction_builder_params() {
+        let config: TestConfig = get_config(true).await;
+        let contract_hash = ContractHash::new(&config.contract_cep78_hash).unwrap();
+        let entity_hash: AddressableEntityHash = contract_hash.into();
+
+        let transaction_builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
+        assert_eq!(
+            transaction_builder_params.entity_hash().unwrap(),
+            entity_hash
+        );
+        assert_eq!(
+            transaction_builder_params.entry_point().unwrap(),
+            ENTRYPOINT_MINT
+        );
+    }
 }
 
 #[cfg(test)]
@@ -121,9 +201,21 @@ mod tests_async {
     pub async fn test_deploy_params_defaults_test() {
         test_deploy_params_defaults().await;
     }
-
     #[test]
     pub async fn test_dictionary_item_params_test() {
         test_dictionary_item_params().await;
+    }
+    #[test]
+    pub async fn transaction_str_params_test() {
+        test_transaction_str_params().await;
+    }
+    #[test]
+    pub async fn transaction_str_params_defaults_test() {
+        test_transaction_str_params_defaults().await;
+    }
+
+    #[test]
+    pub async fn transaction_builder_params_test() {
+        test_transaction_builder_params().await;
     }
 }

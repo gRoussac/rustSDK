@@ -134,7 +134,7 @@ mod tests {
     use once_cell::sync::Lazy;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
-        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
+        tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
 
     static ARGS: Lazy<Vec<String>> =
@@ -169,10 +169,10 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
 
         let mut transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&private_key);
+        transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
@@ -201,10 +201,10 @@ mod tests {
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-        let private_key = get_user_private_key(None).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
 
         let mut transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&private_key);
+        transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
@@ -225,13 +225,13 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_transaction_with_valid_params_without_private_key() {
+    async fn test_speculative_transaction_with_valid_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
@@ -261,12 +261,12 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
 
         let error_message = "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
 
         let transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&private_key);
+        transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(""); // This is not valid payment amount
 

@@ -410,11 +410,11 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     fn get_key_input() -> KeyIdentifierInput {
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
         KeyIdentifierInput::String(public_key.to_account_hash().to_formatted_string())
     }

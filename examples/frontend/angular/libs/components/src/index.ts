@@ -8,4 +8,4 @@ export * from './lib/submit-action/submit-action.component';
 export * from './lib/submit-file/submit-file.component';
 export * from './lib/submit-wasm/submit-wasm.component';
 export * from "./lib/public-key/public-key.component";
-export * from "./lib/private-key/private-key.component";
+export * from "./lib/secret-key/secret-key.component";
