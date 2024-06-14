@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-#[derive(Debug, Deserialize, Clone, Serialize, Copy)]
+#[derive(Debug, Deserialize, Clone, Serialize, Copy, PartialEq, Eq)]
 pub struct AddressableEntityHash(_AddressableEntityHash);
 
 #[wasm_bindgen]

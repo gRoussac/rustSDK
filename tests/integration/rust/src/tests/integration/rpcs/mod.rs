@@ -583,7 +583,6 @@ mod tests {
     pub async fn test_get_auction_info_test() {
         test_get_auction_info(None).await;
     }
-
     #[test]
     pub async fn test_get_auction_info_test_with_block_identifier() {
         let config: TestConfig = get_config(true).await;

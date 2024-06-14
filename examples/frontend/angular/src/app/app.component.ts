@@ -3,7 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, 
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
 import { SDK, PeerEntry } from "casper-sdk";
-import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, PrivateKeyComponent, FormComponent } from '@components';
+import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, SecretKeyComponent, FormComponent } from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
 import { ResultService } from '@util/result';
@@ -24,7 +24,7 @@ const imports = [
   ActionComponent,
   SubmitActionComponent,
   PublicKeyComponent,
-  PrivateKeyComponent,
+  SecretKeyComponent,
 ];
 
 @Component({

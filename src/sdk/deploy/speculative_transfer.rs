@@ -155,7 +155,7 @@ mod tests {
     use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     #[tokio::test]
@@ -166,11 +166,11 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -202,11 +202,11 @@ mod tests {
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -229,14 +229,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_transfer_with_valid_params_without_private_key() {
+    async fn test_speculative_transfer_with_valid_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let payment_params = PaymentStrParams::default();
@@ -268,11 +268,11 @@ mod tests {
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 

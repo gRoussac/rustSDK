@@ -8,7 +8,7 @@ use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct TransactionStrParams {
     secret_key: OnceCell<String>,
     timestamp: OnceCell<String>,
@@ -27,25 +27,6 @@ pub struct TransactionStrParams {
 const DEFAULT_PRICING_MODE: &str = "fixed";
 const DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
 const DEFAULT_STANDARD_PAYMENT: bool = false;
-
-impl Default for TransactionStrParams {
-    fn default() -> Self {
-        TransactionStrParams {
-            chain_name: OnceCell::new(),
-            initiator_addr: OnceCell::new(),
-            secret_key: OnceCell::new(),
-            timestamp: OnceCell::new(),
-            ttl: OnceCell::new(),
-            session_args_simple: OnceCell::new(),
-            session_args_json: OnceCell::new(),
-            pricing_mode: OnceCell::new(),
-            payment_amount: OnceCell::new(),
-            gas_price_tolerance: OnceCell::new(),
-            receipt: OnceCell::new(),
-            standard_payment: OnceCell::new(),
-        }
-    }
-}
 
 #[allow(clippy::too_many_arguments)]
 #[wasm_bindgen]

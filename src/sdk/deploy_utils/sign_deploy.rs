@@ -57,7 +57,7 @@ mod tests {
     };
     use sdk_tests::{
         config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     #[tokio::test]
@@ -66,8 +66,8 @@ mod tests {
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let session_params = SessionStrParams::default();
@@ -83,7 +83,7 @@ mod tests {
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
 
-        let signed_deploy = sdk.sign_deploy(deploy, &private_key);
+        let signed_deploy = sdk.sign_deploy(deploy, &secret_key);
 
         // Assert
         assert!(signed_deploy.is_valid());
@@ -102,8 +102,8 @@ mod tests {
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None, None);
         let session_params = SessionStrParams::default();

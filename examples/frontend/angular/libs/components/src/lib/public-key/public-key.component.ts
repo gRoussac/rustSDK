@@ -17,7 +17,7 @@ import { StorageService } from '@util/storage';
 export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   public_key!: string;
-  private_key!: string;
+  secret_key!: string;
   action!: string;
 
   @ViewChild('publicKeyElt') publicKeyElt!: ElementRef;
@@ -52,7 +52,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
       state.action && (this.action = state.action);
       if (state.public_key && this.public_key != state.public_key) {
         state.public_key && (this.public_key = state.public_key);
-        state.private_key && (this.private_key = state.private_key);
+        state.secret_key && (this.secret_key = state.secret_key);
         await this.updateAccount();
       } else if (state.public_key) {
         state.public_key && (this.public_key = state.public_key);
@@ -64,10 +64,10 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
   async onPublicKeyChange() {
     const public_key: string = this.publicKeyElt && this.publicKeyElt.nativeElement.value.toString().trim();
     this.public_key = '';
-    const private_key = '';
+    const secret_key = '';
     this.stateService.setState({
       public_key,
-      private_key
+      secret_key
     });
     this.storageService.setState({
       public_key

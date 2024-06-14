@@ -4,8 +4,8 @@ export type EnvironmentConfig = {
   [key: string]: string | object | Verbosity;
 };
 
-const action_needs_private_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec_deploy', 'sign_deploy', 'call_entrypoint_deploy', 'install'];
-const action_needs_public_key = ['make_deploy', 'make_transfer', ...action_needs_private_key];
+const action_needs_secret_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec_deploy', 'sign_deploy', 'call_entrypoint_deploy', 'install'];
+const action_needs_public_key = ['make_deploy', 'make_transfer', ...action_needs_secret_key];
 
 export const config: EnvironmentConfig = {
   wasm_asset_path: 'assets/casper_rust_wasm_sdk_bg.wasm',
@@ -16,7 +16,7 @@ export const config: EnvironmentConfig = {
   standard_payment_amount: '100000000',
   default_pricing_mode: 'fixed',
   default_gas_price_tolerance: '1',
-  action_needs_private_key,
+  action_needs_secret_key,
   action_needs_public_key,
   networks: {
     'node-launcher': {

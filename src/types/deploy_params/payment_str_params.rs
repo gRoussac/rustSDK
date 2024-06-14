@@ -196,7 +196,6 @@ pub fn payment_str_params_to_casper_client(
             args_simple.args().iter().map(String::as_str).collect()
         });
 
-    // Use the appropriate `with_` method based on available fields as PaymentStrParams is private
     if let Some(payment_hash) = payment_params.payment_hash.get() {
         return _PaymentStrParams::with_hash(
             payment_hash.as_str(),

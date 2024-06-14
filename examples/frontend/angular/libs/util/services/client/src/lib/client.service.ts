@@ -15,7 +15,7 @@ export class ClientService {
 
   private chain_name!: string;
   private public_key!: string;
-  private private_key!: string | undefined;
+  private secret_key!: string | undefined;
   private deploy_json!: string;
   private transaction_json!: string;
   private select_dict_identifier!: string;
@@ -37,7 +37,7 @@ export class ClientService {
     this.stateService.getState().subscribe((state: State) => {
       state.chain_name && (this.chain_name = state.chain_name);
       state.public_key && (this.public_key = state.public_key);
-      state.private_key && (this.private_key = state.private_key);
+      state.secret_key && (this.secret_key = state.secret_key);
       state.deploy_json && (this.deploy_json = state.deploy_json);
       state.verbosity && (this.verbosity = state.verbosity);
       state.select_dict_identifier && (this.select_dict_identifier = state.select_dict_identifier);
@@ -356,15 +356,15 @@ export class ClientService {
       this.errorService.setError(err.toString());
       return;
     }
-    else if (deploy_result && !this.private_key) {
-      const err = "private_key is missing";
+    else if (deploy_result && !this.secret_key) {
+      const err = "secret_key is missing";
       this.errorService.setError(err.toString());
       return;
     }
     const deploy_params = new DeployStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
       timestamp,
       ttl
     );
@@ -382,8 +382,8 @@ export class ClientService {
     //   session_params,
     //   payment_params,
     // );
-    // if (this.private_key) {
-    //   test_deploy = test_deploy.sign(this.private_key);
+    // if (this.secret_key) {
+    //   test_deploy = test_deploy.sign(this.secret_key);
     // }
     try {
       let result;
@@ -438,8 +438,8 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    else if (deploy_result && !this.private_key) {
-      const err = "private_key is missing";
+    else if (deploy_result && !this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -448,7 +448,7 @@ export class ClientService {
     let transaction_params = new TransactionStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
       timestamp,
       ttl
     );
@@ -513,8 +513,8 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    if (!this.private_key) {
-      const err = "private_key is missing";
+    if (!this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -526,7 +526,7 @@ export class ClientService {
     const deploy_params = new DeployStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
     );
     const session_params = this.get_session_params(wasm);
     try {
@@ -549,8 +549,8 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    if (!this.private_key) {
-      const err = "private_key is missing";
+    if (!this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -563,7 +563,7 @@ export class ClientService {
     let transaction_params = new TransactionStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
     );
     transaction_params.payment_amount = payment_amount;
     transaction_params = this.addTransactionArgs(transaction_params);
@@ -588,8 +588,8 @@ export class ClientService {
       this.errorService.setError(err.toString());
       return;
     }
-    else if (deploy_result && !this.private_key) {
-      const err = "private_key is missing";
+    else if (deploy_result && !this.secret_key) {
+      const err = "secret_key is missing";
       this.errorService.setError(err.toString());
       return;
     }
@@ -597,7 +597,7 @@ export class ClientService {
     const deploy_params = new DeployStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
       timestamp,
       ttl
     );
@@ -676,8 +676,8 @@ export class ClientService {
       this.errorService.setError(err.toString());
       return;
     }
-    else if (deploy_result && !this.private_key) {
-      const err = "private_key is missing";
+    else if (deploy_result && !this.secret_key) {
+      const err = "secret_key is missing";
       this.errorService.setError(err.toString());
       return;
     }
@@ -685,7 +685,7 @@ export class ClientService {
     const transaction_params = new TransactionStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
       timestamp,
       ttl
     );
@@ -836,8 +836,8 @@ export class ClientService {
   }
 
   async sign_deploy() {
-    if (!this.private_key) {
-      const err = "private_key is missing";
+    if (!this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -867,15 +867,15 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    signed_deploy = signed_deploy.sign(this.private_key);
+    signed_deploy = signed_deploy.sign(this.secret_key);
     this.deploy_json = jsonPrettyPrint(signed_deploy.toJson(), this.verbosity as Verbosity);
     this.getIdentifier('deployJson')?.setValue(this.deploy_json);
     this.updateDeployJson(this.deploy_json);
   }
 
   async sign_transaction() {
-    if (!this.private_key) {
-      const err = "private_key is missing";
+    if (!this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -900,7 +900,7 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    signed_transaction = signed_transaction.sign(this.private_key);
+    signed_transaction = signed_transaction.sign(this.secret_key);
     this.transaction_json = jsonPrettyPrint(signed_transaction.toJson(), this.verbosity as Verbosity);
     this.getIdentifier('transactionJson')?.setValue(this.transaction_json);
     this.updateTransactionJson(this.transaction_json);
@@ -966,15 +966,15 @@ export class ClientService {
   }
 
   async call_entrypoint_deploy() {
-    if (!this.private_key) {
-      const err = "private_key is missing";
+    if (!this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
     const deploy_params = new DeployStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
     );
     const session_params = this.get_session_params();
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();
@@ -996,8 +996,8 @@ export class ClientService {
   }
 
   async call_entrypoint() {
-    if (!this.private_key) {
-      const err = "private_key is missing";
+    if (!this.secret_key) {
+      const err = "secret_key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -1005,7 +1005,7 @@ export class ClientService {
     let transaction_params = new TransactionStrParams(
       this.chain_name,
       this.public_key,
-      this.private_key,
+      this.secret_key,
     );
 
     const payment_amount: string = this.getIdentifier('paymentAmount')?.value?.trim();

@@ -1,6 +1,6 @@
 import * as config from './config';
 const path = require('path');
-import { setupFixtures, variables as test, deleteFile, getResult, clear, clearInput, setPrivateKey, seletAction, setWasm, submit, get_state_root_hash, sign, screenshot, delay } from './helpers';
+import { setupFixtures, variables as test, deleteFile, getResult, clear, clearInput, setSecretKey, seletAction, setWasm, submit, get_state_root_hash, sign, screenshot, delay } from './helpers';
 const puppeteer = require('puppeteer');
 
 describe('Angular App Tests', () => {
@@ -112,7 +112,7 @@ describe('Angular App Tests', () => {
       await test.page.reload();
       await getResult();
       await seletAction('install_deploy');
-      await setPrivateKey();
+      await setSecretKey();
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
       await clearInput('[e2e-id="argsSimpleElt"]');
@@ -738,7 +738,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await getResult();
-      await setPrivateKey();
+      await setSecretKey();
       await seletAction('call_entrypoint_deploy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
@@ -1039,7 +1039,7 @@ describe('Angular App Tests', () => {
         return textarea?.value;
       });
       expect(unsigned_deploy).toContain(`"approvals": []`);
-      await setPrivateKey();
+      await setSecretKey();
       await sign();
       await delay(300);
       const signed_deploy = await test.page.evaluate(() => {
@@ -1054,7 +1054,7 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await getResult();
-      await setPrivateKey();
+      await setSecretKey();
       await seletAction('make_transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
@@ -1086,7 +1086,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await getResult();
-      await setPrivateKey();
+      await setSecretKey();
       await seletAction('deploy');
       await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
       await test.page.waitForSelector('[e2e-id="sessionHashElt"]');
@@ -1226,7 +1226,7 @@ describe('Angular App Tests', () => {
     beforeEach(async () => {
       await test.page.reload();
       await getResult();
-      await setPrivateKey();
+      await setSecretKey();
       await seletAction('transfer');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');

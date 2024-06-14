@@ -106,8 +106,8 @@ pub fn json_pretty_print_js_alias(value: JsValue, verbosity: Option<Verbosity>) 
 ///
 /// A JsValue containing the corresponding public key.
 /// If an error occurs during the conversion, JavaScript error is returned.
-#[wasm_bindgen(js_name = "privateToPublicKey")]
-pub fn secret_to_public_key(secret_key: &str) -> Result<JsValue, JsValue> {
+#[wasm_bindgen(js_name = "publicKeyFromSecretKey")]
+pub fn public_key_from_secret_key_js_alias(secret_key: &str) -> Result<JsValue, JsValue> {
     let public_key = public_key_from_secret_key(secret_key);
     if let Err(err) = public_key {
         let error_text = format!("Error loading secret key: {:?}", err);
@@ -132,7 +132,7 @@ pub fn secret_to_public_key(secret_key: &str) -> Result<JsValue, JsValue> {
 /// # Errors
 ///
 /// Returns an error if the secret key generation or serialization fails.
-#[wasm_bindgen(js_name = "generatePrivateKey")]
+#[wasm_bindgen(js_name = "generateSecretKey")]
 pub fn generate_ed25519_js_alias() -> Result<JsValue, JsValue> {
     let secret_key = secret_key_generate()
         .map_err(|err| {
@@ -163,7 +163,7 @@ pub fn generate_ed25519_js_alias() -> Result<JsValue, JsValue> {
 /// # Errors
 ///
 /// Returns an error if the secret key generation or serialization fails.
-#[wasm_bindgen(js_name = "generatePrivateKey_secp256k1")]
+#[wasm_bindgen(js_name = "generateSecretKey_secp256k1")]
 pub fn generate_secp256k1_js_alias() -> Result<JsValue, JsValue> {
     let secret_key = secret_key_secp256k1_generate()
         .map_err(|err| {

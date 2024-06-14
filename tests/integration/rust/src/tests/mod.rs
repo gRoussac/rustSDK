@@ -110,12 +110,12 @@ pub async fn _run_example_5() {
 
     pub const CHAIN_NAME: &str = "integration-test";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TTL: &str = "1h";
     pub const TARGET_ACCOUNT: &str =
-        "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+        "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
@@ -145,18 +145,18 @@ pub async fn _run_example_6() {
     use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TTL: &str = "1h";
     pub const TARGET_ACCOUNT: &str =
-        "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+        "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
-    transaction_params.set_secret_key(PRIVATE_KEY);
+    transaction_params.set_secret_key(SECRET_KEY);
     transaction_params.set_ttl(Some(TTL.to_string()));
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -193,7 +193,7 @@ pub async fn _run_example_7() {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const ENTITY_HASH: &str =
         "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -224,10 +224,10 @@ pub async fn _run_example_8() {
     use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
-    let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const ENTITY_HASH: &str =
         "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -237,7 +237,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
     transaction_params.set_initiator_addr(initiator_addr);
-    transaction_params.set_secret_key(PRIVATE_KEY);
+    transaction_params.set_secret_key(SECRET_KEY);
     transaction_params.set_ttl(Some(TTL.to_string()));
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -262,10 +262,10 @@ pub async fn _run_example_9() {
     use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
-    let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const ENTITY_HASH: &str =
         "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -275,7 +275,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
     transaction_params.set_initiator_addr(initiator_addr);
-    transaction_params.set_secret_key(PRIVATE_KEY);
+    transaction_params.set_secret_key(SECRET_KEY);
     transaction_params.set_ttl(Some(TTL.to_string()));
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -300,10 +300,10 @@ pub async fn _run_example_10() {
     use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
-    let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TARGET_ACCOUNT: &str =
@@ -313,7 +313,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
     transaction_params.set_initiator_addr(initiator_addr);
-    transaction_params.set_secret_key(PRIVATE_KEY);
+    transaction_params.set_secret_key(SECRET_KEY);
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
     transaction_params.set_ttl(Some(TTL.to_string()));
 
@@ -358,10 +358,10 @@ pub async fn _run_example_11() -> Result<(), String> {
     }
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     -----END PRIVATE KEY-----"#;
-    let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -383,7 +383,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
     transaction_params.set_initiator_addr(initiator_addr);
-    transaction_params.set_secret_key(PRIVATE_KEY);
+    transaction_params.set_secret_key(SECRET_KEY);
     transaction_params.set_session_args_json(ARGS_JSON);
     transaction_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
 
@@ -440,10 +440,10 @@ pub async fn _run_example_12() {
     };
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
-    let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const ENTITY_HASH: &str =
         "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRYPOINT_MINT: &str = "mint";
@@ -454,7 +454,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let mut transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(CHAIN_NAME);
     transaction_params.set_initiator_addr(initiator_addr);
-    transaction_params.set_secret_key(PRIVATE_KEY);
+    transaction_params.set_secret_key(SECRET_KEY);
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
     let args = Vec::from([
         "token_meta_data:String='test_meta_data'".to_string(),
@@ -503,10 +503,10 @@ pub async fn _run_example_13() {
     use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
-    let initiator_addr: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const ENTITY_HASH: &str =
         "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -524,7 +524,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let mut transaction = sdk
         .make_transaction(builder_params, transaction_params)
         .unwrap();
-    let transaction_signed = transaction.sign(PRIVATE_KEY);
+    let transaction_signed = transaction.sign(SECRET_KEY);
     println!("{:?}", transaction_signed.approvals());
 }
 
@@ -597,12 +597,12 @@ pub async fn _run_example_5_legacy() {
 
     pub const CHAIN_NAME: &str = "integration-test";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TTL: &str = "1h";
     pub const TARGET_ACCOUNT: &str =
-        "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+        "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
@@ -640,20 +640,20 @@ pub async fn _run_example_6_legacy() {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TTL: &str = "1h";
     pub const TARGET_ACCOUNT: &str =
-        "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+        "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
         None,                  // optional Gas price tolerance
@@ -698,7 +698,7 @@ pub async fn _run_example_7_legacy() {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const CONTRACT_HASH: &str =
         "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
@@ -741,8 +741,8 @@ pub async fn _run_example_8_legacy() {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "5000000000";
@@ -754,7 +754,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
         None,                  // optional Gas price tolerance
@@ -790,8 +790,8 @@ pub async fn _run_example_9_legacy() {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "5000000000";
@@ -803,7 +803,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
         None,                  // optional Gas price tolerance
@@ -837,20 +837,20 @@ pub async fn _run_example_10_legacy() {
 
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
-        "0118fe35f84e3744bee6d8b4a971998a762eec2b15d9bac0285a174aac810e3483";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+        "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
     pub const TARGET_ACCOUNT: &str =
-        "018f2875776bc73e416daf1cf0df270efbb52becf1fc6af6d364d29d61ae23fe44";
+        "01868e06026ba9c8695f6f3bb10d44782004dbc144ff65017cf484436f9cf7b0f6";
     pub const TTL: &str = "1h";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
         None,                  // optional Gas price tolerance
@@ -900,10 +900,10 @@ pub async fn _run_example_11_legacy() -> Result<(), String> {
     }
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     -----END PRIVATE KEY-----"#;
-    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let public_key: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -925,7 +925,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         public_key,
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,
         None,
         None,
@@ -992,10 +992,10 @@ pub async fn _run_example_12_legacy() {
     };
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
-    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let public_key: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const CONTRACT_HASH: &str =
         "hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0";
     pub const ENTRYPOINT_MINT: &str = "mint";
@@ -1006,7 +1006,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         public_key,
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,
         None,
         None,

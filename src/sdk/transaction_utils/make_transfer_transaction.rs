@@ -137,7 +137,7 @@ mod tests {
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     #[tokio::test]
@@ -145,11 +145,11 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
         let transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&private_key);
+        transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -167,12 +167,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_make_transfer_transaction_with_valid_transfer_params_without_private_key() {
+    async fn test_make_transfer_transaction_with_valid_transfer_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
@@ -198,11 +198,11 @@ mod tests {
         let sdk = SDK::new(None, None);
         let (_, _, _, chain_name) = get_network_constants();
         let error_message = "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
-        let private_key = get_user_private_key(None).unwrap();
-        let initiator_addr = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
         let transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&private_key);
+        transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(""); // This is not valid payment amoun
 

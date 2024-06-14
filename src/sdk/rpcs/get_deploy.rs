@@ -222,7 +222,7 @@ mod tests {
     };
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     #[tokio::test]
@@ -268,11 +268,11 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let make_transfer = sdk
@@ -307,11 +307,11 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let make_transfer = sdk

@@ -271,13 +271,13 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     async fn get_main_purse() -> URef {
         let sdk = SDK::new(None, None);
         let (node_address, _, _, _) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let entity_result = sdk
             .get_entity(None, Some(account), None, None, Some(node_address))

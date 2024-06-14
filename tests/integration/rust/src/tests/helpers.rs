@@ -1,8 +1,8 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS};
 use crate::config::{
-    DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_PRIVATE_KEY_NAME,
-    DEFAULT_PRIVATE_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
+    DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
+    DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use casper_rust_wasm_sdk::{
     rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
@@ -147,7 +147,7 @@ pub(crate) mod intern {
 
     pub async fn install_cep78(
         initiator_addr: &str,
-        private_key: &str,
+        secret_key: &str,
         path: Option<&str>,
         network_constants: (&str, &str, &str),
     ) -> Result<String, Box<dyn std::error::Error>> {
@@ -162,7 +162,7 @@ pub(crate) mod intern {
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(chain_name);
         transaction_params.set_initiator_addr(initiator_addr);
-        transaction_params.set_secret_key(private_key);
+        transaction_params.set_secret_key(secret_key);
         transaction_params.set_session_args_json(ARGS_JSON);
         transaction_params.set_payment_amount(PAYMENT_AMOUNT_CONTRACT_CEP78);
 
@@ -247,44 +247,44 @@ pub fn get_network_constants() -> (String, String, String, String) {
     )
 }
 
-pub fn get_user_private_key(user: Option<&str>) -> Result<String, std::io::Error> {
+pub fn get_user_secret_key(user: Option<&str>) -> Result<String, std::io::Error> {
     let user = user.unwrap_or("user-1");
     let env_key = get_env_key(user);
     if !env_key.is_empty() {
         return Ok(env_key);
     }
-    let (private_key_nctl_path, private_key_name) = get_private_key_constants();
+    let (secret_key_nctl_path, secret_key_name) = get_secret_key_constants();
     let user_key_path = match user {
         user if user.starts_with("user-") => {
-            private_key_nctl_path.replace("user-1", user).to_string()
+            secret_key_nctl_path.replace("user-1", user).to_string()
         }
-        _ => format!("{private_key_nctl_path}{private_key_name}"),
+        _ => format!("{secret_key_nctl_path}{secret_key_name}"),
     };
-    read_pem_file(&user_key_path, &private_key_name)
+    read_pem_file(&user_key_path, &secret_key_name)
 }
 
-fn get_private_key_constants() -> (String, String) {
-    let private_key_name =
-        env::var("PRIVATE_KEY_NAME").unwrap_or_else(|_| DEFAULT_PRIVATE_KEY_NAME.to_string());
-    let private_key_nctl_path = env::var("PRIVATE_KEY_NCTL_PATH")
-        .unwrap_or_else(|_| DEFAULT_PRIVATE_KEY_NCTL_PATH.to_string());
+fn get_secret_key_constants() -> (String, String) {
+    let secret_key_name =
+        env::var("SECRET_KEY_NAME").unwrap_or_else(|_| DEFAULT_SECRET_KEY_NAME.to_string());
+    let secret_key_nctl_path = env::var("SECRET_KEY_NCTL_PATH")
+        .unwrap_or_else(|_| DEFAULT_SECRET_KEY_NCTL_PATH.to_string());
 
-    (private_key_nctl_path, private_key_name)
+    (secret_key_nctl_path, secret_key_name)
 }
 
 fn get_env_key(user: &str) -> String {
-    let private_key = match env::var(format!(
-        "PRIVATE_KEY_{}",
+    let secret_key = match env::var(format!(
+        "SECRET_KEY_{}",
         user.replace('-', "_").to_uppercase()
     )) {
         Ok(key) => key,
         Err(_) => return "".to_string(),
     };
 
-    format!("-----BEGIN PRIVATE KEY----- {private_key} -----END PRIVATE KEY-----")
+    format!("-----BEGIN PRIVATE KEY----- {secret_key} -----END PRIVATE KEY-----")
 }
 
-fn read_pem_file(file_path: &str, private_key_name: &str) -> Result<String, io::Error> {
+fn read_pem_file(file_path: &str, secret_key_name: &str) -> Result<String, io::Error> {
     let path_buf = env::current_dir()?;
 
     let relative_path = path_buf
@@ -292,7 +292,7 @@ fn read_pem_file(file_path: &str, private_key_name: &str) -> Result<String, io::
         .replace("tests/integration/rust", "");
     let mut relative_path_buf = PathBuf::from(relative_path.clone());
     relative_path_buf.push(file_path);
-    relative_path_buf.push(private_key_name);
+    relative_path_buf.push(secret_key_name);
 
     let mut file = match File::open(&relative_path_buf) {
         Ok(file) => file,
@@ -327,13 +327,13 @@ pub fn read_wasm_file(file_path: &str) -> Result<Vec<u8>, io::Error> {
 
 pub async fn install_cep78_if_needed(
     account: &str,
-    private_key: &str,
+    secret_key: &str,
     path: Option<&str>,
     network_constants: (&str, &str, &str),
 ) -> Option<String> {
     let mut install_guard = CEP78_INSTALLED_GUARD.lock().await;
     if !(*install_guard) {
-        let deploy_hash = install_cep78(account, private_key, path, network_constants)
+        let deploy_hash = install_cep78(account, secret_key, path, network_constants)
             .await
             .unwrap();
         *install_guard = true;
@@ -381,7 +381,7 @@ pub async fn mint_nft(
     contract_cep78_hash: &str,
     initiator_addr: &str,
     target_account_hash: &str,
-    private_key: &str,
+    secret_key: &str,
     network_constants: (&str, &str, &str),
 ) {
     let (node_address, event_address, chain_name) = network_constants;
@@ -389,7 +389,7 @@ pub async fn mint_nft(
     let mut transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(chain_name);
     transaction_params.set_initiator_addr(initiator_addr);
-    transaction_params.set_secret_key(private_key);
+    transaction_params.set_secret_key(secret_key);
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
     // Two ways to build args, either simple or json
     // let args_json_vec: Vec<String> = vec![
