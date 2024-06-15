@@ -1,7 +1,9 @@
 pub mod contract;
 pub mod deploy;
 pub mod deploy_utils;
-pub mod watcher;
 pub mod params;
 pub mod rpcs;
+pub mod transaction;
+pub mod transaction_utils;
 pub mod types;
+pub mod watcher;
