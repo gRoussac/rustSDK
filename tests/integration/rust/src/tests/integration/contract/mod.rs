@@ -16,7 +16,8 @@ pub mod test_module {
             query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
         },
         types::{
-            deploy_hash::DeployHash,
+            addressable_entity_hash::AddressableEntityHash,
+            contract_hash::ContractHash,
             deploy_params::{
                 deploy_str_params::DeployStrParams,
                 dictionary_item_str_params::DictionaryItemStrParams,
@@ -24,6 +25,10 @@ pub mod test_module {
             },
             digest::Digest,
             global_state_identifier::GlobalStateIdentifier,
+            transaction_params::{
+                transaction_builder_params::TransactionBuilderParams,
+                transaction_str_params::TransactionStrParams,
+            },
         },
     };
 
@@ -218,10 +223,87 @@ pub mod test_module {
             .to_string()
             .is_empty());
 
-        let deploy_hash = DeployHash::from(install.as_ref().unwrap().result.deploy_hash);
-        let deploy_hash_as_string = deploy_hash.to_string();
-        assert!(!deploy_hash_as_string.is_empty());
-        deploy_hash_as_string
+        let deploy_hash_as_hex_string =
+            install.as_ref().unwrap().result.deploy_hash.to_hex_string();
+        assert!(!deploy_hash_as_hex_string.is_empty());
+        deploy_hash_as_hex_string
+    }
+
+    pub async fn test_install_transaction() -> String {
+        let config: TestConfig = get_config(true).await;
+        let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+        let mut transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(&config.chain_name);
+        transaction_params.set_initiator_addr(&config.account);
+        transaction_params.set_secret_key(&config.secret_key);
+        transaction_params.set_session_args_simple(args_simple);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+        transaction_params.set_ttl(Some(TTL.to_string()));
+
+        let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
+            Ok(transaction_bytes) => transaction_bytes,
+            Err(err) => {
+                eprintln!("Error reading file: {:?}", err);
+                return String::from("");
+            }
+        };
+
+        let install = create_test_sdk(Some(config))
+            .install(transaction_params, transaction_bytes.into(), None)
+            .await;
+        assert!(!install
+            .as_ref()
+            .unwrap()
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+
+        let transaction_hash_as_hex_string = install
+            .as_ref()
+            .unwrap()
+            .result
+            .transaction_hash
+            .to_hex_string();
+        assert!(!transaction_hash_as_hex_string.is_empty());
+        transaction_hash_as_hex_string
+    }
+
+    pub async fn test_call_entrypoint_transaction() {
+        let config: TestConfig = get_config(false).await;
+        let transaction_params = TransactionStrParams::default();
+        transaction_params.set_chain_name(&config.chain_name);
+        transaction_params.set_initiator_addr(&config.account);
+        transaction_params.set_secret_key(&config.secret_key);
+        transaction_params.set_session_args_json(ARGS_JSON);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
+        transaction_params.set_ttl(Some(TTL.to_string()));
+
+        let contract_hash = ContractHash::new(&config.contract_cep78_hash).unwrap();
+        let entity_hash: AddressableEntityHash = contract_hash.into();
+
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            &entity_hash.to_formatted_string(),
+            ENTRYPOINT_MINT,
+        );
+
+        let test_call_entrypoint_transaction = create_test_sdk(Some(config))
+            .call_entrypoint(builder_params, transaction_params, None)
+            .await;
+        assert!(!test_call_entrypoint_transaction
+            .as_ref()
+            .unwrap()
+            .result
+            .api_version
+            .to_string()
+            .is_empty());
+        assert!(!test_call_entrypoint_transaction
+            .as_ref()
+            .unwrap()
+            .result
+            .transaction_hash
+            .to_string()
+            .is_empty());
     }
 }
 
@@ -238,11 +320,20 @@ mod tests {
     pub async fn test_install_deploy_test() {
         test_install_deploy().await;
     }
-
     #[test]
     pub async fn test_call_entrypoint_deploy_test() {
         test_call_entrypoint_deploy().await;
     }
+
+    #[test]
+    pub async fn test_install_transaction_test() {
+        test_install_transaction().await;
+    }
+    #[test]
+    pub async fn test_call_entrypoint_transaction_test() {
+        test_call_entrypoint_transaction().await;
+    }
+
     #[test]
     pub async fn test_query_contract_dict_test() {
         test_query_contract_dict().await;
