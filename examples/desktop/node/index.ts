@@ -1,4 +1,4 @@
-import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, publicKeyFromSecretKey, Bytes, Deploy, EventParseResult, Subscription, Transaction, TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
+import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams, publicKeyFromSecretKey, Bytes, Deploy, EventParseResult, Subscription, Transaction, TransactionStrParams, TransactionBuilderParams, AddressableEntityHash } from 'casper-sdk';
 const fs = require('fs').promises;
 const http = require('http');
 
@@ -147,13 +147,14 @@ const example7 = async () => {
   const public_key =
     '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
   const payment_amount = '5000000000';
-  const entity_hash =
-    'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  const entity_hash_hex_string =
+    '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const entry_point = 'set_variables';
 
   const transaction_params = new TransactionStrParams(chain_name, public_key);
   transaction_params.payment_amount = payment_amount;
 
+  let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
   let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
 
   const transaction = sdk.make_transaction(builder_params, transaction_params);
@@ -171,12 +172,14 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 -----END PRIVATE KEY-----`;
   const public_key = publicKeyFromSecretKey(secret_key);
   const payment_amount = '5000000000';
-  const entity_hash =
-    'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  const entity_hash_hex_string =
+    '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const entry_point = 'set_variables';
 
   const transaction_params = new TransactionStrParams(chain_name, public_key, secret_key);
   transaction_params.payment_amount = payment_amount;
+
+  let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
   let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
 
   const transaction_result = await sdk.transaction(builder_params, transaction_params);
@@ -194,13 +197,14 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 -----END PRIVATE KEY-----`;
   const public_key = publicKeyFromSecretKey(secret_key);
   const payment_amount = '5000000000';
-  const entity_hash =
+  const entity_hash_formatted_string =
     'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const entry_point = 'set_variables';
 
   const transaction_params = new TransactionStrParams(chain_name, public_key, secret_key);
   transaction_params.payment_amount = payment_amount;
 
+  let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
   let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
 
   const transaction = Transaction.newSession(
@@ -308,7 +312,7 @@ const example12 = async () => {
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 -----END PRIVATE KEY-----`;
   const initiator_addr = publicKeyFromSecretKey(secret_key);
-  const entity_hash =
+  const entity_hash_formatted_string =
     'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const entry_point = 'mint';
   const token_owner =
@@ -319,6 +323,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
   transaction_params.payment_amount = payment_amount;
 
+  let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
   let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
 
   const call_entrypoint_result = await sdk.call_entrypoint(
@@ -365,7 +370,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 const example13 = async () => {
   const chain_name = 'integration-test';
   const payment_amount = '5000000000';
-  const entity_hash =
+  const entity_hash_formatted_string =
     'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -374,6 +379,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
   const transaction_params = new TransactionStrParams(chain_name, initiator_addr);
   transaction_params.payment_amount = payment_amount;
 
+  let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
   let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
 
   const transaction = sdk.make_transaction(builder_params, transaction_params);
@@ -385,12 +391,13 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 const example14 = async () => {
   const chain_name = 'integration-test';
   const payment_amount = '5000000000';
-  const entity_hash =
-    'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  const entity_hash_hex_string =
+    '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
   let public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
   const transaction_params = new TransactionStrParams(chain_name, public_key_kms);
   transaction_params.payment_amount = payment_amount;
 
+  let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
   let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
 
   const transaction = sdk.make_transaction(builder_params, transaction_params);

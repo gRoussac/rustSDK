@@ -19,7 +19,6 @@ pub struct Digest(_Digest);
 #[wasm_bindgen]
 impl Digest {
     #[wasm_bindgen(constructor)]
-    #[wasm_bindgen(js_name = "new")]
     pub fn new_js_alias(digest_hex_str: &str) -> Result<Digest, JsValue> {
         Self::from_string(digest_hex_str)
     }

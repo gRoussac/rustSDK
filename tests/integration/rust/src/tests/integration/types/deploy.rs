@@ -603,11 +603,11 @@ pub mod test_module_deploy {
         let approvals = deploy_signed.approvals();
         let first_approval = &approvals[0];
         assert_eq!(
-            first_approval.signer().to_string(),
+            first_approval.signer().to_hex_string(),
             config.account.to_string()
         );
         assert_eq!(
-            first_approval.signature().to_string(),
+            first_approval.signature().to_hex_string(),
             signature.to_string()
         );
     }

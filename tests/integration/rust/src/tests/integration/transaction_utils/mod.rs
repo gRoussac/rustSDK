@@ -7,7 +7,6 @@ pub mod test_module {
     use crate::tests::helpers::intern::create_test_sdk;
     use casper_rust_wasm_sdk::types::{
         addressable_entity_hash::AddressableEntityHash,
-        contract_hash::ContractHash,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -22,13 +21,11 @@ pub mod test_module {
         transaction_params.set_ttl(Some(TTL.to_string()));
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let contract_hash = ContractHash::new(&config.contract_cep78_hash).unwrap();
-        let entity_hash: AddressableEntityHash = contract_hash.into();
+        let entity_hash: AddressableEntityHash =
+            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
 
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_DECIMALS,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_DECIMALS);
 
         let make_transaction = create_test_sdk(Some(config))
             .make_transaction(builder_params, transaction_params)
@@ -83,13 +80,11 @@ pub mod test_module {
         transaction_params.set_ttl(Some(TTL.to_string()));
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let contract_hash = ContractHash::new(&config.contract_cep78_hash).unwrap();
-        let entity_hash: AddressableEntityHash = contract_hash.into();
+        let entity_hash: AddressableEntityHash =
+            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
 
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_DECIMALS,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_DECIMALS);
 
         let make_transaction = create_test_sdk(Some(config.clone()))
             .make_transaction(builder_params, transaction_params)

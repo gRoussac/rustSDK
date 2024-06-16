@@ -126,15 +126,10 @@ impl TransactionBuilderParams {
     }
 
     #[wasm_bindgen(js_name = "newInvocableEntity")]
-    pub fn new_invocable_entity(entity_hash: &str, entry_point: &str) -> TransactionBuilderParams {
-        let addressable_entity_hash = match AddressableEntityHash::from_formatted_str(entity_hash) {
-            Ok(hash) => Some(hash),
-            Err(_err) => {
-                // TODO Fix Jsvalue ret
-                //  error(&format!("Error parsing entity hash: {}", err.as_string()));
-                None
-            }
-        };
+    pub fn new_invocable_entity(
+        entity_hash: AddressableEntityHash,
+        entry_point: &str,
+    ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
             transaction_bytes: None,
@@ -143,7 +138,7 @@ impl TransactionBuilderParams {
             target: None,
             amount: None,
             maybe_id: None,
-            entity_hash: addressable_entity_hash,
+            entity_hash: Some(entity_hash),
             entity_alias: None,
             package_hash: None,
             package_alias: None,
@@ -188,19 +183,10 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(js_name = "newPackage")]
     pub fn new_package(
-        package_hash: &str,
+        package_hash: PackageHash,
         entry_point: &str,
         maybe_entity_version: Option<String>,
     ) -> TransactionBuilderParams {
-        let maybe_package_hash = match PackageHash::from_formatted_str(package_hash) {
-            Ok(hash) => Some(hash),
-            Err(_err) => {
-                // TODO Fix Jsvalue ret
-                //  error(&format!("Error parsing entity hash: {}", err.as_string()));
-                None
-            }
-        };
-
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
 
         TransactionBuilderParams {
@@ -213,7 +199,7 @@ impl TransactionBuilderParams {
             maybe_id: None,
             entity_hash: None,
             entity_alias: None,
-            package_hash: maybe_package_hash,
+            package_hash: Some(package_hash),
             package_alias: None,
             maybe_entity_version: maybe_entity_version_as_u32,
             public_key: None,

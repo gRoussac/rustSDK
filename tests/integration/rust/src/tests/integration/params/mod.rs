@@ -7,7 +7,6 @@ pub mod test_module {
     };
     use casper_rust_wasm_sdk::types::{
         addressable_entity_hash::AddressableEntityHash,
-        contract_hash::ContractHash,
         deploy_params::{
             deploy_str_params::DeployStrParams,
             dictionary_item_str_params::DictionaryItemStrParams,
@@ -112,8 +111,8 @@ pub mod test_module {
             Some(TTL.to_string()),
             None,
             None,
-            Some(PAYMENT_AMOUNT.to_string()),
             None,
+            Some(PAYMENT_AMOUNT.to_string()),
             None,
             None,
             None,
@@ -122,7 +121,7 @@ pub mod test_module {
         assert_eq!(transaction_params.ttl().unwrap(), TTL);
         assert_eq!(transaction_params.initiator_addr().unwrap(), config.account);
         assert_eq!(transaction_params.secret_key(), None);
-        assert!(transaction_params.timestamp().is_some());
+        assert!(transaction_params.timestamp().is_none());
         assert_eq!(transaction_params.payment_amount().unwrap(), PAYMENT_AMOUNT);
     }
 
@@ -154,15 +153,45 @@ pub mod test_module {
         assert_eq!(transaction_str_params.ttl().unwrap(), DEFAULT_TTL);
     }
 
+    pub async fn test_transaction_str_params_new_with_defaults() {
+        let config: TestConfig = get_config(true).await;
+        let transaction_str_params = TransactionStrParams::new_with_defaults(
+            &config.chain_name,
+            Some(config.account.clone()),
+            None,
+            None,
+        );
+        transaction_str_params.set_payment_amount(PAYMENT_AMOUNT);
+
+        assert_eq!(
+            transaction_str_params.chain_name().unwrap(),
+            config.chain_name
+        );
+        assert_eq!(
+            transaction_str_params.initiator_addr().unwrap(),
+            config.account
+        );
+        assert!(transaction_str_params.timestamp().is_none());
+        assert!(transaction_str_params.ttl().is_none());
+        assert!(transaction_str_params.secret_key().is_none());
+        assert_eq!(
+            transaction_str_params.payment_amount().unwrap(),
+            PAYMENT_AMOUNT
+        );
+
+        transaction_str_params.set_default_ttl();
+        transaction_str_params.set_default_timestamp();
+        assert!(transaction_str_params.timestamp().is_some());
+        assert_eq!(transaction_str_params.ttl().unwrap(), DEFAULT_TTL);
+    }
+
     pub async fn test_transaction_builder_params() {
         let config: TestConfig = get_config(true).await;
-        let contract_hash = ContractHash::new(&config.contract_cep78_hash).unwrap();
-        let entity_hash: AddressableEntityHash = contract_hash.into();
+        let entity_hash: AddressableEntityHash =
+            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
 
-        let transaction_builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let transaction_builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
         assert_eq!(
             transaction_builder_params.entity_hash().unwrap(),
             entity_hash
@@ -213,7 +242,10 @@ mod tests_async {
     pub async fn transaction_str_params_defaults_test() {
         test_transaction_str_params_defaults().await;
     }
-
+    #[test]
+    pub async fn transaction_str_params_new_with_defaults_test() {
+        test_transaction_str_params_new_with_defaults().await;
+    }
     #[test]
     pub async fn transaction_builder_params_test() {
         test_transaction_builder_params().await;

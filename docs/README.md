@@ -633,14 +633,20 @@ console.log(transaction_hash);
 #### Rust
 
 ```rust
-use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+use casper_rust_wasm_sdk::types::{
+    addressable_entity_hash::AddressableEntityHash,
+    transaction_params::{
+        transaction_builder_params::TransactionBuilderParams,
+        transaction_str_params::TransactionStrParams,
+    },
+};
 
 pub const CHAIN_NAME: &str = "integration-test";
 pub const PUBLIC_KEY: &str =
     "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const ENTITY_HASH: &str =
-    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
@@ -650,7 +656,8 @@ transaction_params.set_initiator_addr(PUBLIC_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
+let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
+let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
 
 let transaction = sdk
     .make_transaction(builder_params, transaction_params)
@@ -661,19 +668,24 @@ println!("{:?}", transaction.timestamp());
 #### Typescript
 
 ```ts
-import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
+import {
+  TransactionStrParams,
+  TransactionBuilderParams,
+  AddressableEntityHash,
+} from 'casper-sdk';
 
 const chain_name = 'integration-test';
 const public_key =
   '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
 const payment_amount = '5000000000';
-const entity_hash =
-  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entity_hash_hex_string =
+  '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'set_variables';
 
 const transaction_params = new TransactionStrParams(chain_name, public_key);
 transaction_params.payment_amount = payment_amount;
 
+let entity_hash = new AddressableEntityHash(entity_hash_formatted_string);
 let builder_params = TransactionBuilderParams.newInvocableEntity(
   entity_hash,
   entry_point
@@ -700,7 +712,13 @@ let sdk = SDK::new(
     Some(Verbosity::High),
 );
 
-use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+use casper_rust_wasm_sdk::types::{
+    addressable_entity_hash::AddressableEntityHash,
+    transaction_params::{
+        transaction_builder_params::TransactionBuilderParams,
+        transaction_str_params::TransactionStrParams,
+    },
+};
 
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const PUBLIC_KEY: &str =
@@ -709,7 +727,7 @@ pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----"#;
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const ENTITY_HASH: &str =
-    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
@@ -720,7 +738,8 @@ transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_ttl(Some(TTL.to_string()));
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
+let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
+let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
 
 let transaction = sdk.transaction(builder_params, transaction_params, None, None).await;
 println!(
@@ -732,7 +751,11 @@ println!(
 #### Typescript
 
 ```ts
-import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
+import {
+  TransactionStrParams,
+  TransactionBuilderParams,
+  AddressableEntityHash,
+} from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const public_key =
@@ -740,8 +763,8 @@ const public_key =
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
-const entity_hash =
-  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+const entity_hash_hex_string =
+  '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'set_variables';
 
 const transaction_params = new TransactionStrParams(
@@ -750,6 +773,8 @@ const transaction_params = new TransactionStrParams(
   secret_key
 );
 transaction_params.payment_amount = payment_amount;
+
+let entity_hash = new AddressableEntityHash(entity_hash_hex_string);
 let builder_params = TransactionBuilderParams.newInvocableEntity(
   entity_hash,
   entry_point
@@ -773,7 +798,13 @@ console.log(transaction_result_as_json);
 Puts a [`Transaction`] to the network for execution.
 
 ```rust
-use casper_rust_wasm_sdk::types::transaction_params::transaction_str_params::TransactionStrParams;
+use casper_rust_wasm_sdk::types::{
+    addressable_entity_hash::AddressableEntityHash,
+    transaction_params::{
+        transaction_builder_params::TransactionBuilderParams,
+        transaction_str_params::TransactionStrParams,
+    },
+};
 
 pub const CHAIN_NAME: &str = "casper-net-1";
 pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
@@ -781,7 +812,7 @@ pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
 let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
 pub const PAYMENT_AMOUNT: &str = "5000000000";
 pub const ENTITY_HASH: &str =
-    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRY_POINT: &str = "set_variables";
 pub const TTL: &str = "1h";
 
@@ -792,7 +823,8 @@ transaction_params.set_secret_key(SECRET_KEY);
 transaction_params.set_ttl(Some(TTL.to_string())); // optional TTL
 transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-let builder_params = TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRY_POINT);
+let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
+let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
 
 let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
@@ -846,7 +878,11 @@ println!(
 Puts a [`Transaction`] to the network for execution.
 
 ```ts
-import { TransactionStrParams, TransactionBuilderParams } from 'casper-sdk';
+import {
+  TransactionStrParams,
+  TransactionBuilderParams,
+  AddressableEntityHash,
+} from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const public_key =
@@ -854,7 +890,7 @@ const public_key =
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const payment_amount = '5000000000';
-const entity_hash =
+const entity_hash_formatted_string =
   'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'set_variables';
 
@@ -865,6 +901,9 @@ const transaction_params = new TransactionStrParams(
 );
 transaction_params.payment_amount = payment_amount;
 
+let entity_hash = AddressableEntityHash.fromFormattedStr(
+  entity_hash_formatted_string
+);
 let builder_params = TransactionBuilderParams.newInvocableEntity(
   entity_hash,
   entry_point
@@ -1140,11 +1179,10 @@ let install = sdk
     .install(transaction_params, transaction_bytes.into(), None)
     .await;
 
-let transaction_hash_result = install.as_ref().unwrap().result.transaction_hash;
-println!("{:?}", transaction_hash_result);
+let transaction_hash = install.as_ref().unwrap().result.transaction_hash;
+println!("{:?}", transaction_hash);
 
-let transaction_hash = TransactionHash::from(transaction_hash_result);
-let transaction_hash_as_string = transaction_hash.to_string();
+let transaction_hash_as_string = transaction_hash.to_hex_string();
 println!("wait transaction_hash {}", transaction_hash_as_string);
 let event_parse_result: EventParseResult = sdk
     .wait_transaction(DEFAULT_EVENT_ADDRESS, &transaction_hash_as_string, None)
@@ -1155,7 +1193,12 @@ println!("{:?}", event_parse_result);
 let finalized_approvals = true;
 
 let get_transaction = sdk
-    .get_transaction(transaction_hash, Some(finalized_approvals), None, None)
+    .get_transaction(
+        transaction_hash.into(),
+        Some(finalized_approvals),
+        None,
+        None,
+    )
     .await
     .unwrap();
 let result = json_pretty_print(
@@ -1164,8 +1207,7 @@ let result = json_pretty_print(
 );
 println!("approvals {result}");
 
-let transaction_hash = get_transaction.result.transaction.hash();
-let result = TransactionHash::from(transaction_hash).to_string();
+let result = transaction_hash.to_hex_string();
 println!("processed transaction hash {result}");
 ```
 
@@ -1249,8 +1291,11 @@ async function loadFile() {
 
 ```rust
 use casper_rust_wasm_sdk::types::{
-    transaction_hash::TransactionHash,
-    transaction_params::transaction_str_params::TransactionStrParams,
+    addressable_entity_hash::AddressableEntityHash,
+    transaction_params::{
+        transaction_builder_params::TransactionBuilderParams,
+        transaction_str_params::TransactionStrParams,
+    },
 };
 
 pub const CHAIN_NAME: &str = "casper-net-1";
@@ -1259,7 +1304,7 @@ pub const PUBLIC_KEY: &str =
 pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
 pub const ENTITY_HASH: &str =
-    "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 pub const ENTRYPOINT_MINT: &str = "mint";
 pub const TOKEN_OWNER: &str =
     "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
@@ -1276,8 +1321,9 @@ let args = Vec::from([
 ]);
 transaction_params.set_session_args_simple(args);
 
+let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
 let builder_params =
-    TransactionBuilderParams::new_invocable_entity(ENTITY_HASH, ENTRYPOINT_MINT);
+    TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
 let call_entrypoint = sdk
     .call_entrypoint(builder_params, transaction_params, None)
@@ -1287,8 +1333,8 @@ let transaction_hash_result = call_entrypoint
     .unwrap()
     .result
     .transaction_hash;
-let transaction_hash_string = TransactionHash::from(transaction_hash_result).to_string();
-println!("watch transaction_hash {transaction_hash_string}");
+let transaction_hash = transaction_hash_result.to_hex_string();
+println!("watch transaction_hash {transaction_hash}");
 ```
 
 - <strong>Typescript</strong>
@@ -1299,12 +1345,13 @@ import {
   TransactionStrParams,
   publicKeyFromSecretKey,
   Bytes,
+  AddressableEntityHash,
 } from 'casper-sdk';
 
 const chain_name = 'casper-net-1';
 const secret_key = '';
 const initiator_addr = publicKeyFromSecretKey(secret_key);
-const entity_hash =
+const entity_hash_formatted_string =
   'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
 const entry_point = 'mint';
 const payment_amount = '5000000000';
@@ -1314,6 +1361,7 @@ const transaction_params = new TransactionStrParams(chain_name, initiator_addr, 
 transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", `token_owner:Key='${token_owner}'`];
 transaction_params.payment_amount = payment_amount;
 
+let entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
 let builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
 
 const call_entrypoint_result = await sdk.call_entrypoint(
@@ -2071,20 +2119,20 @@ let install = sdk
     .install_deploy(deploy_params, session_params, PAYMENT_AMOUNT_CONTRACT_CEP78, None)
     .await;
 
-let deploy_hash_result = install.as_ref().unwrap().result.deploy_hash;
-println!("{:?}", deploy_hash_result);
+let deploy_hash = install.as_ref().unwrap().result.deploy_hash;
+let deploy_hash_string = deploy_hash.to_hex_string();
+println!("{:?}", deploy_hash_string);
 
 let event_parse_result = sdk
-    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_result)
+    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_string)
     .await
     .unwrap();
 let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
 println!("{:?}", deploy_processed);
 
 let finalized_approvals = true;
-let deploy_hash = DeployHash::from(deploy_hash_result);
 let get_deploy = sdk
-    .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
+    .get_deploy(deploy_hash.into(), Some(finalized_approvals), None, None)
     .await;
 let get_deploy = get_deploy.unwrap();
 let result = &get_deploy.result.execution_results.get(0).unwrap().result;

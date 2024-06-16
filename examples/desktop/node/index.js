@@ -178,15 +178,16 @@ var example6 = function () { return __awaiter(void 0, void 0, void 0, function (
 }); };
 // make_transaction
 var example7 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var chain_name, public_key, payment_amount, entity_hash, entry_point, transaction_params, builder_params, transaction, transaction_as_json;
+    var chain_name, public_key, payment_amount, entity_hash_hex_string, entry_point, transaction_params, entity_hash, builder_params, transaction, transaction_as_json;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
         public_key = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         payment_amount = '5000000000';
-        entity_hash = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        entity_hash_hex_string = '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         entry_point = 'set_variables';
         transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key);
         transaction_params.payment_amount = payment_amount;
+        entity_hash = new casper_sdk_1.AddressableEntityHash(entity_hash_hex_string);
         builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
         transaction = sdk.make_transaction(builder_params, transaction_params);
         transaction_as_json = transaction.toJson();
@@ -196,7 +197,7 @@ var example7 = function () { return __awaiter(void 0, void 0, void 0, function (
 }); };
 // transaction
 var example8 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, sdk, chain_name, secret_key, public_key, payment_amount, entity_hash, entry_point, transaction_params, builder_params, transaction_result, transaction_result_as_json;
+    var node_address, sdk, chain_name, secret_key, public_key, payment_amount, entity_hash_hex_string, entry_point, transaction_params, entity_hash, builder_params, transaction_result, transaction_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -206,10 +207,11 @@ var example8 = function () { return __awaiter(void 0, void 0, void 0, function (
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '5000000000';
-                entity_hash = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+                entity_hash_hex_string = '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'set_variables';
                 transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
                 transaction_params.payment_amount = payment_amount;
+                entity_hash = new casper_sdk_1.AddressableEntityHash(entity_hash_hex_string);
                 builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
                 return [4 /*yield*/, sdk.transaction(builder_params, transaction_params)];
             case 1:
@@ -222,7 +224,7 @@ var example8 = function () { return __awaiter(void 0, void 0, void 0, function (
 }); };
 // put_transaction
 var example9 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, sdk, chain_name, secret_key, public_key, payment_amount, entity_hash, entry_point, transaction_params, builder_params, transaction, put_transaction_result, put_transaction_result_as_json;
+    var node_address, sdk, chain_name, secret_key, public_key, payment_amount, entity_hash_formatted_string, entry_point, transaction_params, entity_hash, builder_params, transaction, put_transaction_result, put_transaction_result_as_json;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -232,10 +234,11 @@ var example9 = function () { return __awaiter(void 0, void 0, void 0, function (
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
                 public_key = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
                 payment_amount = '5000000000';
-                entity_hash = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+                entity_hash_formatted_string = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'set_variables';
                 transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key, secret_key);
                 transaction_params.payment_amount = payment_amount;
+                entity_hash = casper_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
                 builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
                 transaction = casper_sdk_1.Transaction.newSession(builder_params, transaction_params);
                 return [4 /*yield*/, sdk.put_transaction(transaction)];
@@ -347,7 +350,7 @@ var example11 = function () { return __awaiter(void 0, void 0, void 0, function 
 }); };
 // call_entrypoint
 var example12 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var node_address, events_address, sdk, chain_name, secret_key, initiator_addr, entity_hash, entry_point, token_owner, payment_amount, transaction_params, builder_params, call_entrypoint_result, call_entrypoint_result_as_json, transaction_hash_results, watcher, Subscriptions, getEventHandlerFn, results;
+    var node_address, events_address, sdk, chain_name, secret_key, initiator_addr, entity_hash_formatted_string, entry_point, token_owner, payment_amount, transaction_params, entity_hash, builder_params, call_entrypoint_result, call_entrypoint_result_as_json, transaction_hash_results, watcher, Subscriptions, getEventHandlerFn, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -357,13 +360,14 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
                 chain_name = 'casper-net-1';
                 secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
                 initiator_addr = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
-                entity_hash = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+                entity_hash_formatted_string = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
                 entry_point = 'mint';
                 token_owner = 'account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611';
                 payment_amount = '5000000000';
                 transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr, secret_key);
                 transaction_params.session_args_simple = ["token_meta_data:String='test_meta_data'", "token_owner:Key='".concat(token_owner, "'")];
                 transaction_params.payment_amount = payment_amount;
+                entity_hash = casper_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
                 builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
                 return [4 /*yield*/, sdk.call_entrypoint(builder_params, transaction_params)];
             case 1:
@@ -413,15 +417,16 @@ var example12 = function () { return __awaiter(void 0, void 0, void 0, function 
 }); };
 // sign transaction
 var example13 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var chain_name, payment_amount, entity_hash, secret_key, initiator_addr, transaction_params, builder_params, transaction, signed_transaction;
+    var chain_name, payment_amount, entity_hash_formatted_string, secret_key, initiator_addr, transaction_params, entity_hash, builder_params, transaction, signed_transaction;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
         payment_amount = '5000000000';
-        entity_hash = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        entity_hash_formatted_string = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         secret_key = "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----";
         initiator_addr = (0, casper_sdk_1.publicKeyFromSecretKey)(secret_key);
         transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, initiator_addr);
         transaction_params.payment_amount = payment_amount;
+        entity_hash = casper_sdk_1.AddressableEntityHash.fromFormattedStr(entity_hash_formatted_string);
         builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
         transaction = sdk.make_transaction(builder_params, transaction_params);
         signed_transaction = transaction.sign(secret_key);
@@ -431,14 +436,15 @@ var example13 = function () { return __awaiter(void 0, void 0, void 0, function 
 }); };
 // add signature to transaction
 var example14 = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var chain_name, payment_amount, entity_hash, public_key_kms, transaction_params, builder_params, transaction, signature_kms, signed_transaction, public_key_kms_2, signature_kms_2;
+    var chain_name, payment_amount, entity_hash_hex_string, public_key_kms, transaction_params, entity_hash, builder_params, transaction, signature_kms, signed_transaction, public_key_kms_2, signature_kms_2;
     return __generator(this, function (_a) {
         chain_name = 'integration-test';
         payment_amount = '5000000000';
-        entity_hash = 'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+        entity_hash_hex_string = '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
         public_key_kms = '01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6';
         transaction_params = new casper_sdk_1.TransactionStrParams(chain_name, public_key_kms);
         transaction_params.payment_amount = payment_amount;
+        entity_hash = new casper_sdk_1.AddressableEntityHash(entity_hash_hex_string);
         builder_params = casper_sdk_1.TransactionBuilderParams.newInvocableEntity(entity_hash, 'set_variables');
         transaction = sdk.make_transaction(builder_params, transaction_params);
         signature_kms = '012dbd52d47f982e870476ab6c123f3f29848199b08f5997f757f63986ef656480e27f8e12698c39f14281d2a62c1e8896cc9f272ae3312a68228c5863f849980b';

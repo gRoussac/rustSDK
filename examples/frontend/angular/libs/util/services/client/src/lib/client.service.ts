@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -1254,30 +1254,62 @@ export class ClientService {
   private get_builder_params(wasm?: Uint8Array): TransactionBuilderParams {
     let builder_params: TransactionBuilderParams = new TransactionBuilderParams();
 
-    const entity_hash: string = this.getIdentifier('entityHash')?.value?.trim();
+    const entity_hash_input: string = this.getIdentifier('entityHash')?.value?.trim();
     const entity_name: string = this.getIdentifier('entityAlias')?.value?.trim();
     const entry_point: string = this.getIdentifier('entryPoint')?.value?.trim();
     const call_package: boolean = this.getIdentifier('callPackage')?.value;
 
     if (!call_package) {
-      if (entity_hash) {
-        builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
-      } else if (entity_name) {
+      if (entity_name) {
         builder_params = TransactionBuilderParams.newInvocableEntityAlias(entity_name, entry_point);
+      } else if (entity_hash_input) {
+        let entity_hash: AddressableEntityHash | null = null;
+        try {
+          entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_input);
+        } catch (error) {
+          try {
+            entity_hash = new AddressableEntityHash(entity_hash_input);
+          } catch (innerError) {
+            const err = "entity_hash could not be parsed";
+            this.errorService.setError(err.toString());
+            return builder_params;
+          }
+        }
+        if (entity_hash) {
+          builder_params = TransactionBuilderParams.newInvocableEntity(entity_hash, entry_point);
+        }
       }
     } else {
       const version: string = this.getIdentifier('version')?.value?.trim();
-      if (entity_hash) {
-        builder_params = TransactionBuilderParams.newPackage(entity_hash, entry_point, version);
-      } else if (entity_name) {
+
+      if (entity_name) {
         builder_params = TransactionBuilderParams.newPackageAlias(entity_name, entry_point, version);
+      } else {
+        let package_hash: PackageHash | null = null;
+        try {
+          package_hash = PackageHash.fromFormattedStr(entity_hash_input);
+        } catch (error) {
+          try {
+            package_hash = new PackageHash(entity_hash_input);
+          } catch (innerError) {
+            const err = "entity_hash could not be parsed";
+            this.errorService.setError(err.toString());
+            return builder_params;
+          }
+        }
+        if (package_hash) {
+          builder_params = TransactionBuilderParams.newPackage(package_hash, entry_point, version);
+        }
       }
     }
+
     if (wasm) {
       builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm));
     }
+
     return builder_params;
   }
+
 
   private addTransactionArgs(transaction_params: TransactionStrParams): TransactionStrParams {
     const args_simple: [string] = this.getIdentifier('argsSimple')?.value?.trim()

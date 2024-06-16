@@ -13,7 +13,6 @@ pub struct PackageHash(_PackageHash);
 #[wasm_bindgen]
 impl PackageHash {
     #[wasm_bindgen(constructor)]
-    #[wasm_bindgen(js_name = "fromString")]
     pub fn new(input: &str) -> Result<PackageHash, JsValue> {
         let prefixed_input = format!("package-{}", input);
         Self::from_formatted_str(&prefixed_input)

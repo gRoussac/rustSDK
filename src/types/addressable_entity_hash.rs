@@ -16,7 +16,6 @@ pub struct AddressableEntityHash(_AddressableEntityHash);
 #[wasm_bindgen]
 impl AddressableEntityHash {
     #[wasm_bindgen(constructor)]
-    #[wasm_bindgen(js_name = "fromString")]
     pub fn new(input: &str) -> Result<AddressableEntityHash, JsValue> {
         let prefixed_input = format!("{}{}", ADDRESSABLE_ENTITY_STRING_PREFIX, input);
         Self::from_formatted_str(&prefixed_input)

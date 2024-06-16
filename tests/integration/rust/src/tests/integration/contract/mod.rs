@@ -17,7 +17,6 @@ pub mod test_module {
         },
         types::{
             addressable_entity_hash::AddressableEntityHash,
-            contract_hash::ContractHash,
             deploy_params::{
                 deploy_str_params::DeployStrParams,
                 dictionary_item_str_params::DictionaryItemStrParams,
@@ -279,13 +278,10 @@ pub mod test_module {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_ttl(Some(TTL.to_string()));
 
-        let contract_hash = ContractHash::new(&config.contract_cep78_hash).unwrap();
-        let entity_hash: AddressableEntityHash = contract_hash.into();
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let entity_hash: AddressableEntityHash =
+            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         let test_call_entrypoint_transaction = create_test_sdk(Some(config))
             .call_entrypoint(builder_params, transaction_params, None)
