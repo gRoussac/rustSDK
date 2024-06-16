@@ -1,4 +1,5 @@
 use crate::debug::error;
+use crate::types::account_hash::AccountHash;
 use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 use base64::engine::general_purpose;
 use base64::Engine;
@@ -8,10 +9,9 @@ use blake2::{
 };
 use casper_client::cli::JsonArg;
 use casper_types::{
-    account::AccountHash as _AccountHash, addressable_entity::FromStrError, bytesrepr::ToBytes,
-    cl_value_to_json as cl_value_to_json_from_casper_types, CLValue, DeployBuilder, ErrorExt,
-    Key as _Key, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey, TimeDiff,
-    Timestamp,
+    bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, CLValue,
+    DeployBuilder, ErrorExt, Key as _Key, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs,
+    SecretKey, TimeDiff, Timestamp,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -126,7 +126,7 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
     hex::encode(result)
 }
 
-/// Convert a formatted account hash to a base64-encoded string (cep-18 key encoding).
+/// Convert a formatted account hash to a base64-encoded Key as string (cep-18 key encoding).
 ///
 /// # Arguments
 ///
@@ -135,18 +135,12 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
 ///
 /// # Returns
 ///
-/// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
+/// Returns a `Result` with the base64-encoded string on success, or a `SdkError` on failure.
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
-pub fn get_base64_from_account_hash(account_hash: &str) -> Result<String, FromStrError> {
-    let account_hash = _AccountHash::from_formatted_str(account_hash);
-    let key = match account_hash {
-        Ok(account_hash) => _Key::from(account_hash).to_bytes().unwrap(),
-        Err(err) => {
-            error(&format!("Error in account_hash deser: {:?}", err));
-            return Err(err);
-        }
-    };
-    Ok(general_purpose::STANDARD.encode(key)) // base64.encode
+pub fn get_base64_key_from_account_hash(account_hash: &str) -> Result<String, SdkError> {
+    let account_hash = AccountHash::from_formatted_str(account_hash)?;
+    let key: Key = Key::from_account(account_hash);
+    Ok(general_purpose::STANDARD.encode(key.to_formatted_string())) // base64.encode
 }
 
 /// Gets the time to live (TTL) value or returns the default value if not provided.
@@ -698,14 +692,14 @@ mod tests {
     }
 
     #[test]
-    fn test_get_base64_from_account_hash() {
+    fn test_get_base64_key_from_account_hash() {
         // Test with a known input and expected output
         let input_hash =
             "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f";
         let expected_output = "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf";
 
         // Call the function under test
-        let result = get_base64_from_account_hash(input_hash).unwrap();
+        let result = get_base64_key_from_account_hash(input_hash).unwrap();
 
         // Check the result against the expected output
         assert_eq!(result, expected_output.to_string());

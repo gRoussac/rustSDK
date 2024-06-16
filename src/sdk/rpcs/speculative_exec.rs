@@ -138,7 +138,6 @@ impl SDK {
             transaction
         } else {
             let err = "Error: Missing transaction as json or transaction".to_string();
-            error(&err);
             return Err(JsError::new(&err));
         };
 
@@ -157,7 +156,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

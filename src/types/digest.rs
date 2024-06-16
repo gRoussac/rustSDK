@@ -16,25 +16,33 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct Digest(_Digest);
 
+impl Digest {
+    pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
+        Ok(Digest::from(digest_hex_str))
+    }
+
+    pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, SdkError> {
+        let hex_string = hex::encode(bytes);
+        Ok(Digest::from(&hex_string[..]))
+    }
+}
+
 #[wasm_bindgen]
 impl Digest {
     #[wasm_bindgen(constructor)]
-    pub fn new_js_alias(digest_hex_str: &str) -> Result<Digest, JsValue> {
+    pub fn new_js_alias(digest_hex_str: &str) -> Result<Digest, JsError> {
         Self::from_string(digest_hex_str)
     }
 
     #[wasm_bindgen(js_name = "fromString")]
-    pub fn from_string(digest_hex_str: &str) -> Result<Digest, JsValue> {
+    pub fn from_string(digest_hex_str: &str) -> Result<Digest, JsError> {
         Ok(Digest::from(digest_hex_str))
     }
 
     #[cfg(target_arch = "wasm32")]
-    #[wasm_bindgen(js_name = "fromDigest")]
-    pub fn from_digest_js_alias(bytes: Vec<u8>) -> Result<Digest, JsValue> {
-        Self::from_digest(bytes).map_err(|err| {
-            error(&format!("Failed to parse digest from digest {}", err));
-            JsValue::from_str(&format!("{:?}", err))
-        })
+    #[wasm_bindgen(js_name = "fromRaw")]
+    pub fn from_raw_js_alias(bytes: Vec<u8>) -> Result<Digest, JsError> {
+        Self::from_raw(bytes).map_err(|err| JsError::new(&format!("{:?}", err)))
     }
 
     #[cfg(target_arch = "wasm32")]
@@ -47,17 +55,6 @@ impl Digest {
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()
-    }
-}
-
-impl Digest {
-    pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
-        Ok(Digest::from(digest_hex_str))
-    }
-
-    pub fn from_digest(bytes: Vec<u8>) -> Result<Digest, SdkError> {
-        let hex_string = hex::encode(bytes);
-        Ok(Digest::from(&hex_string[..]))
     }
 }
 

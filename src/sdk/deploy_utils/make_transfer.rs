@@ -1,5 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-use crate::debug::error;
 use crate::types::deploy::Deploy;
 use crate::{
     types::{
@@ -56,7 +54,6 @@ impl SDK {
             Ok(data) => Ok(data),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

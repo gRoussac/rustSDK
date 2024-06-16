@@ -105,7 +105,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-    #[wasm_bindgen(js_name = "get_dictionary_item_options")]
     pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
         let options_result = options.into_serde::<GetDictionaryItemOptions>();
         match options_result {
@@ -150,7 +149,6 @@ impl SDK {
             DictionaryItemInput::Params(params)
         } else {
             let err = "Error: Missing dictionary item identifier or params";
-            error(err);
             return Err(JsError::new(err));
         };
 
@@ -169,7 +167,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

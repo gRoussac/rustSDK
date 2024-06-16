@@ -17,7 +17,6 @@ use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetBlockResult
@@ -39,7 +38,6 @@ impl From<_GetBlockResult> for GetBlockResult {
         GetBlockResult(result)
     }
 }
-
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl GetBlockResult {
@@ -78,7 +76,6 @@ pub struct GetBlockOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     /// Parses block options from a JsValue.
@@ -90,7 +87,7 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
-    #[wasm_bindgen(js_name = "get_block_options")]
+    #[cfg(target_arch = "wasm32")]
     pub fn get_block_options(&self, options: JsValue) -> GetBlockOptions {
         let options_result = options.into_serde::<GetBlockOptions>();
         match options_result {
@@ -115,6 +112,7 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "get_block")]
     pub async fn get_block_js_alias(
         &self,
@@ -142,7 +140,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -161,6 +158,7 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
+    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "This function is an alias. Please use `get_block` instead.")]
     #[allow(deprecated)]
     pub async fn chain_get_block(

@@ -31,15 +31,15 @@ impl AccountIdentifier {
 impl AccountIdentifier {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
+    pub fn new(formatted_str: &str) -> Result<AccountIdentifier, JsError> {
         Self::from_formatted_str_js_alias(formatted_str)
     }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountIdentifier, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse AccountIdentifier from formatted string: {:?}",
                 err
             ))

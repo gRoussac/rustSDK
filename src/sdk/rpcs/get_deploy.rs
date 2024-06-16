@@ -1,8 +1,8 @@
 #[cfg(target_arch = "wasm32")]
+use crate::debug::error;
+#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 use crate::types::deploy_hash::DeployHash;
-#[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
@@ -13,7 +13,6 @@ use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetDeployResult
@@ -75,7 +74,6 @@ pub struct GetDeployOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     /// Parses deploy options from a JsValue.
@@ -87,9 +85,9 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
+    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "prefer 'get_transaction_options'")]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = "get_deploy_options")]
     pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
         let options_result = options.into_serde::<GetDeployOptions>();
         match options_result {
@@ -116,6 +114,7 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `GetDeployResult` or an error.
+    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "prefer 'get_transaction'")]
     #[allow(deprecated)]
     #[wasm_bindgen(js_name = "get_deploy")]
@@ -133,21 +132,9 @@ impl SDK {
 
         let err_msg = "Error: Missing deploy hash as string or deploy hash".to_string();
         let deploy_hash = if let Some(deploy_hash_as_string) = deploy_hash_as_string {
-            let hash = Digest::new(&deploy_hash_as_string);
-            if let Err(err) = hash {
-                let err_msg = format!("Failed to parse AccountHash from formatted string: {}", err);
-                error(&err_msg);
-                return Err(JsError::new(&err_msg));
-            }
-            let deploy_hash = DeployHash::from_digest(hash.unwrap());
-            if deploy_hash.is_err() {
-                error(&err_msg);
-                return Err(JsError::new(&err_msg));
-            }
-            deploy_hash.unwrap()
+            DeployHash::new(&deploy_hash_as_string)?
         } else {
             if deploy_hash.is_none() {
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
@@ -160,13 +147,13 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
     }
 
     /// Retrieves deploy information using the provided options, alias for `get_deploy`.
+    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "This function is an alias. Please use `get_transaction` instead.")]
     #[allow(deprecated)]
     pub async fn info_get_deploy(

@@ -1,8 +1,5 @@
-use crate::debug::error;
-
 use super::key::Key;
 use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
-use casper_types::Key as _Key;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
@@ -20,24 +17,19 @@ impl DictionaryItemIdentifier {
         account_hash: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsValue> {
-        let key = Key::from_formatted_str(account_hash)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse key from formatted string: {:?}",
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap();
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        let key = Key::from_formatted_str(account_hash).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse key from formatted string: {:?}",
+                err
+            ))
+        })?;
 
-        Ok(DictionaryItemIdentifier(
-            _DictionaryItemIdentifier::AccountNamedKey {
-                key: key.to_formatted_string(),
-                dictionary_name: dictionary_name.to_string(),
-                dictionary_item_key: dictionary_item_key.to_string(),
-            },
-        ))
+        Ok(Self(_DictionaryItemIdentifier::AccountNamedKey {
+            key: key.to_formatted_string(),
+            dictionary_name: dictionary_name.to_string(),
+            dictionary_item_key: dictionary_item_key.to_string(),
+        }))
     }
 
     // static context
@@ -46,24 +38,19 @@ impl DictionaryItemIdentifier {
         contract_addr: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsValue> {
-        let key = Key::from_formatted_str(contract_addr)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse key from formatted string: {:?}",
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap();
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        let key = Key::from_formatted_str(contract_addr).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse key from formatted string: {:?}",
+                err
+            ))
+        })?;
 
-        Ok(DictionaryItemIdentifier(
-            _DictionaryItemIdentifier::ContractNamedKey {
-                key: key.to_formatted_string(),
-                dictionary_name: dictionary_name.to_string(),
-                dictionary_item_key: dictionary_item_key.to_string(),
-            },
-        ))
+        Ok(Self(_DictionaryItemIdentifier::ContractNamedKey {
+            key: key.to_formatted_string(),
+            dictionary_name: dictionary_name.to_string(),
+            dictionary_item_key: dictionary_item_key.to_string(),
+        }))
     }
 
     // static context
@@ -71,23 +58,20 @@ impl DictionaryItemIdentifier {
     pub fn new_from_seed_uref(
         seed_uref: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsValue> {
-        let key: _Key = Key::from_formatted_str(seed_uref)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse key from formatted string: {:?}",
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap()
-            .into();
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        let key = Key::from_formatted_str(seed_uref).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse key from formatted string: {:?}",
+                err
+            ))
+        })?;
 
-        Ok(DictionaryItemIdentifier(_DictionaryItemIdentifier::URef {
-            seed_uref: *key.as_uref().ok_or_else(|| {
-                error("Key is not a URef");
-                JsValue::null()
-            })?,
+        let uref = key
+            .into_uref()
+            .ok_or_else(|| JsError::new("Key is not a URef"))?;
+
+        Ok(Self(_DictionaryItemIdentifier::URef {
+            seed_uref: *uref,
             dictionary_item_key: dictionary_item_key.to_string(),
         }))
     }
@@ -96,19 +80,16 @@ impl DictionaryItemIdentifier {
     #[wasm_bindgen(js_name = "newFromDictionaryKey")]
     pub fn new_from_dictionary_key(
         dictionary_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsValue> {
-        let _ = Key::from_formatted_str(dictionary_key)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse key from formatted string: {:?}",
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap();
-        Ok(DictionaryItemIdentifier(
-            _DictionaryItemIdentifier::Dictionary(dictionary_key.to_string()),
-        ))
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        let key = Key::from_formatted_str(dictionary_key).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse key from formatted string: {:?}",
+                err
+            ))
+        })?;
+        Ok(Self(_DictionaryItemIdentifier::Dictionary(
+            key.to_formatted_string(),
+        )))
     }
 
     #[cfg(target_arch = "wasm32")]

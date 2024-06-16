@@ -70,6 +70,9 @@ pub enum SdkError {
     #[error("Failed to parse {context} as an account hash")]
     FailedToParseAccountHashLength { context: &'static str },
 
+    #[error("Failed to parse {context} as an entity addr")]
+    FailedToParseEntityAddrLength { context: &'static str },
+
     #[error("Failed to parse '{context}' as a uref: {error}")]
     FailedToParseURef {
         context: &'static str,

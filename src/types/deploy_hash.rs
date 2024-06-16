@@ -1,5 +1,4 @@
 use super::digest::Digest;
-use crate::debug::error;
 use casper_types::DeployHash as _DeployHash;
 use casper_types::Digest as _Digest;
 #[cfg(target_arch = "wasm32")]
@@ -16,17 +15,16 @@ pub struct DeployHash(_DeployHash);
 #[wasm_bindgen]
 impl DeployHash {
     #[wasm_bindgen(constructor)]
-    pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, JsValue> {
-        let bytes = decode(deploy_hash_hex_str)
-            .map_err(|err| error(&format!("{:?}", err)))
-            .unwrap();
+    pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, JsError> {
+        let bytes =
+            decode(deploy_hash_hex_str).map_err(|err| JsError::new(&format!("{:?}", err)))?;
         let mut hash = [0u8; _Digest::LENGTH];
         hash.copy_from_slice(&bytes);
         Self::from_digest(Digest::from(hash))
     }
 
     #[wasm_bindgen(js_name = "fromDigest")]
-    pub fn from_digest(digest: Digest) -> Result<DeployHash, JsValue> {
+    pub fn from_digest(digest: Digest) -> Result<DeployHash, JsError> {
         Ok(_DeployHash::new(digest.into()).into())
     }
 
