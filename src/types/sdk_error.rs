@@ -4,8 +4,8 @@ use casper_client::{
     Error,
 };
 use casper_types::{
-    addressable_entity::FromStrError, bytesrepr, CLValueError, DigestError, KeyFromStrError,
-    UIntParseError, URefFromStrError,
+    addressable_entity::FromStrError, bytesrepr, contracts::FromStrError as FromContractStrError,
+    CLValueError, DigestError, KeyFromStrError, UIntParseError, URefFromStrError,
 };
 use humantime::{DurationError, TimestampError};
 use std::{num::ParseIntError, str::ParseBoolError};
@@ -33,6 +33,24 @@ pub enum SdkError {
 
     #[error("Failed to parse {context} as an account hash: {error}")]
     FailedToParseAccountHash {
+        context: &'static str,
+        error: FromStrError,
+    },
+
+    #[error("Failed to parse {context} as an contract hash: {error}")]
+    FailedToParseContractHash {
+        context: &'static str,
+        error: FromContractStrError,
+    },
+
+    #[error("Failed to parse {context} as an contract package hash: {error}")]
+    FailedToParseContractPackageHash {
+        context: &'static str,
+        error: FromContractStrError,
+    },
+
+    #[error("Failed to parse {context} as an package hash: {error}")]
+    FailedToParsePackageHash {
         context: &'static str,
         error: FromStrError,
     },

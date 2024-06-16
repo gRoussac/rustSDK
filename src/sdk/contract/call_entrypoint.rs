@@ -142,10 +142,8 @@ mod tests {
         let contract_hash = ContractHash::from_formatted_str(&get_contract_hash().await).unwrap();
         let entity_hash: AddressableEntityHash = contract_hash.into();
 
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -178,10 +176,8 @@ mod tests {
         )
         .unwrap();
 
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -216,10 +212,8 @@ mod tests {
         )
         .unwrap();
 
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -252,10 +246,8 @@ mod tests {
         )
         .unwrap();
 
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk

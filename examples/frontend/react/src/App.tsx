@@ -120,7 +120,7 @@ function App() {
       console.log('js chain_get_block', chain_get_block);
 
       // get_account_info
-      const account_identifier = new AccountIdentifier(public_key);
+      const account_identifier = AccountIdentifier.fromFormattedStr(public_key);
       console.log(account_identifier.toJson());
       const state_get_account_info_options = sdk.get_account_options({
         blockIdentifier: BlockIdentifier.fromHeight(block_identifier_height),
