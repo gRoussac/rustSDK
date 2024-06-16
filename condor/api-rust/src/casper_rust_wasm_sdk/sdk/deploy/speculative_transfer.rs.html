@@ -297,6 +297,9 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::speculative_exec_deploy::SpeculativeExecResult;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -342,8 +345,9 @@
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-    </span><span class="attr">#[allow(clippy::too_many_arguments)]
-    #[wasm_bindgen(js_name = <span class="string">"speculative_transfer"</span>)]
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"speculative_transfer"</span>)]
+    #[allow(clippy::too_many_arguments, deprecated)]
+    #[deprecated(note = <span class="string">"prefer speculative_transfer_transaction"</span>)]
     </span><span class="kw">pub async fn </span>speculative_transfer_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: <span class="kw-2">&amp;</span>str,
@@ -403,7 +407,8 @@
     /// # Returns
     ///
     /// A `Result` containing the result a `SuccessResponse&lt;_SpeculativeExecResult&gt;` or a `SdkError` in case of an error.
-    </span><span class="attr">#[allow(clippy::too_many_arguments)]
+    </span><span class="attr">#[allow(clippy::too_many_arguments, deprecated)]
+    #[deprecated(note = <span class="string">"prefer speculative_transfer_transaction"</span>)]
     </span><span class="kw">pub async fn </span>speculative_transfer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: <span class="kw-2">&amp;</span>str,
@@ -449,6 +454,7 @@
 }
 
 <span class="attr">#[cfg(test)]
+#[allow(deprecated)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use crate</span>::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};

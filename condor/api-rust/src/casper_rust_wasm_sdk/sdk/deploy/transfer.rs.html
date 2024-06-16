@@ -238,6 +238,9 @@
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
 <a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::deploy::PutDeployResult;
 <span class="kw">use crate</span>::{
@@ -278,7 +281,8 @@
     ///
     /// A `Result` containing the result of the transfer or a `JsError` in case of an error.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"transfer"</span>)]
-    #[allow(clippy::too_many_arguments)]
+    #[deprecated(note = <span class="string">"prefer transfer_transaction"</span>)]
+    #[allow(clippy::too_many_arguments, deprecated)]
     </span><span class="kw">pub async fn </span>transfer_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: <span class="kw-2">&amp;</span>str,
@@ -327,7 +331,8 @@
     /// # Returns
     ///
     /// A `Result` containing the result a `SuccessResponse&lt;_PutDeployResult&gt;` of the transfer or a `SdkError` in case of an error.
-    </span><span class="attr">#[allow(clippy::too_many_arguments)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer transfer_transaction"</span>)]
+    #[allow(clippy::too_many_arguments, deprecated)]
     </span><span class="kw">pub async fn </span>transfer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: <span class="kw-2">&amp;</span>str,
@@ -367,6 +372,7 @@
 }
 
 <span class="attr">#[cfg(test)]
+#[allow(deprecated)]
 </span><span class="kw">mod </span>tests {
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;

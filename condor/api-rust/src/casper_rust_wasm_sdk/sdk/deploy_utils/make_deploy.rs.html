@@ -178,6 +178,13 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
@@ -212,6 +219,8 @@
     ///
     /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"make_deploy"</span>)]
+    #[deprecated(note = <span class="string">"prefer 'make_transaction'"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub fn </span>make_deploy_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy_params: DeployStrParams,
@@ -242,6 +251,8 @@
     /// # Returns
     ///
     /// A `Result` containing the created `Deploy` or a `SdkError` in case of an error.
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer 'make_transaction'"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub fn </span>make_deploy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy_params: DeployStrParams,
@@ -253,6 +264,8 @@
 }
 
 <span class="doccomment">/// Internal function to create a deploy.
+</span><span class="attr">#[deprecated(note = <span class="string">"prefer 'make_transaction'"</span>)]
+#[allow(deprecated)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>make_deploy(
     deploy_params: DeployStrParams,
     session_params: SessionStrParams,
@@ -271,6 +284,7 @@
 }
 
 <span class="attr">#[cfg(test)]
+#[allow(deprecated)]
 </span><span class="kw">mod </span>tests {
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;

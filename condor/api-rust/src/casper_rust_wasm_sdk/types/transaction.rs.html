@@ -813,7 +813,6 @@
 <a href="#813" id="813">813</a>
 <a href="#814" id="814">814</a>
 <a href="#815" id="815">815</a>
-<a href="#816" id="816">816</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     account_hash::AccountHash,
     addressable_entity_hash::AddressableEntityHash,
@@ -850,7 +849,6 @@
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_json::{json, Value};
-<span class="kw">use </span>std::collections::BTreeSet;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug, Deserialize, Clone, Serialize)]
@@ -1004,8 +1002,8 @@
         })
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withHash"</span>)]
-    </span><span class="kw">pub fn </span>with_hash(
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withEntityHash"</span>)]
+    </span><span class="kw">pub fn </span>with_entity_hash(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         hash: AddressableEntityHash,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -1042,10 +1040,10 @@
         })
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withModuleBytes"</span>)]
-    </span><span class="kw">pub fn </span>with_module_bytes(
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withTransactionBytes"</span>)]
+    </span><span class="kw">pub fn </span>with_transaction_bytes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        module_bytes: Bytes,
+        transaction_bytes: Bytes,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
         <span class="self">self</span>.build(BuildParams {
@@ -1053,7 +1051,7 @@
             body: <span class="prelude-val">Some</span>(modify_body(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
                 NewBodyParams {
-                    new_module_bytes: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>module_bytes),
+                    new_transaction_bytes: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>transaction_bytes),
                     ..Default::default()
                 },
             )),
@@ -1401,8 +1399,8 @@
         <span class="self">self</span>.<span class="number">0</span>.clone().compute_approvals_hash()
     }
 
-    <span class="kw">pub fn </span>approvals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;Approval&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.clone().approvals()
+    <span class="kw">pub fn </span>approvals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Approval&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.clone().approvals().iter().cloned().collect()
     }
 
     <span class="kw">pub fn </span>header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionHeader {
@@ -1413,7 +1411,7 @@
         <span class="self">self</span>.<span class="number">0</span>.clone().expires()
     }
 
-    <span class="kw">pub fn </span>signers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;AccountHash&gt; {
+    <span class="kw">pub fn </span>signers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;AccountHash&gt; {
         <span class="self">self</span>.<span class="number">0
             </span>.clone()
             .signers()
@@ -1422,7 +1420,7 @@
             .collect()
     }
 
-    <span class="kw">pub fn </span>authorization_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;AccountHash&gt; {
+    <span class="kw">pub fn </span>authorization_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;AccountHash&gt; {
         <span class="self">self</span>.<span class="number">0
             </span>.clone()
             .authorization_keys()
@@ -1521,7 +1519,7 @@
     new_entry_point: <span class="prelude-ty">Option</span>&lt;String&gt;,
     new_alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     new_version: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    new_module_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Bytes&gt;,
+    new_transaction_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Bytes&gt;,
 }
 
 <span class="kw">fn </span>modify_body(
@@ -1533,7 +1531,7 @@
         new_entry_point,
         new_alias,
         new_version,
-        new_module_bytes,
+        new_transaction_bytes,
     }: NewBodyParams,
 ) -&gt; TransactionV1Body {
     <span class="kw">let </span>runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
@@ -1583,14 +1581,14 @@
             }
         },
         casper_types::TransactionTarget::Session {
-            kind,
-            module_bytes,
+            kind: transaction_session_kind,
+            module_bytes: transaction_bytes,
             runtime: <span class="kw">_</span>,
         } =&gt; {
-            <span class="kw">let </span>default: _Bytes = module_bytes.clone();
-            <span class="kw">let </span>new_bytes = new_module_bytes.unwrap();
+            <span class="kw">let </span>default: _Bytes = transaction_bytes.clone();
+            <span class="kw">let </span>new_bytes = new_transaction_bytes.unwrap();
             <span class="kw">let </span>new: <span class="kw-2">&amp;</span>Bytes = new_bytes;
-            <span class="kw">let </span>new_module_bytes: _Bytes = {
+            <span class="kw">let </span>new_transaction_bytes: _Bytes = {
                 <span class="kw">let </span>new_bytes: _Bytes = _Bytes::from((<span class="kw-2">*</span>new).to_vec());
                 <span class="kw">if </span>new_bytes.len() &gt; <span class="number">0 </span>{
                     new_bytes
@@ -1599,7 +1597,7 @@
                 }
             };
 
-            (<span class="kw-2">*</span>TransactionV1Builder::new_session(<span class="kw-2">*</span>kind, new_module_bytes)
+            (<span class="kw-2">*</span>TransactionV1Builder::new_session(<span class="kw-2">*</span>transaction_session_kind, new_transaction_bytes)
                 .with_runtime_args(runtime_args)
                 .body())
             .clone()

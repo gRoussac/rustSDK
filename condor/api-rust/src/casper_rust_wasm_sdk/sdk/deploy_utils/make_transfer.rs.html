@@ -211,6 +211,13 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
@@ -247,6 +254,8 @@
     ///
     /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"make_transfer"</span>)]
+    #[deprecated(note = <span class="string">"prefer 'make_transfer_transaction'"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub fn </span>make_transfer_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: <span class="kw-2">&amp;</span>str,
@@ -288,6 +297,8 @@
     /// # Returns
     ///
     /// A `Result` containing the created `Deploy` or a `SdkError` in case of an error.
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer 'make_transfer_transaction'"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub fn </span>make_transfer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         amount: <span class="kw-2">&amp;</span>str,
@@ -309,6 +320,8 @@
 }
 
 <span class="doccomment">/// Internal function to create a transfer deploy.
+</span><span class="attr">#[deprecated(note = <span class="string">"prefer 'make_transfer_transaction'"</span>)]
+#[allow(deprecated)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>make_transfer(
     amount: <span class="kw-2">&amp;</span>str,
     target_account: <span class="kw-2">&amp;</span>str,
@@ -335,6 +348,7 @@
 }
 
 <span class="attr">#[cfg(test)]
+#[allow(deprecated)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;

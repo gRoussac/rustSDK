@@ -408,6 +408,33 @@
 <a href="#408" id="408">408</a>
 <a href="#409" id="409">409</a>
 <a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::helpers::get_current_timestamp;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_str_or_default;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_ttl_or_default;
@@ -457,14 +484,18 @@
         standard_payment: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
-            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
-        };
-        transaction_params.set_timestamp(timestamp);
-        transaction_params.set_ttl(ttl);
         transaction_params.set_chain_name(chain_name);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(initiator_addr) = initiator_addr {
             transaction_params.set_initiator_addr(<span class="kw-2">&amp;</span>initiator_addr);
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(secret_key) = secret_key {
+            transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
+        };
+        <span class="kw">if </span>timestamp.is_some() {
+            transaction_params.set_timestamp(timestamp);
+        }
+        <span class="kw">if </span>ttl.is_some() {
+            transaction_params.set_ttl(ttl);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(session_args_simple) = session_args_simple {
             transaction_params.set_session_args_simple(session_args_simple);
@@ -488,6 +519,29 @@
             transaction_params.set_standard_payment(standard_payment);
         }
         transaction_params
+    }
+
+    <span class="attr">#[wasm_bindgen]
+    </span><span class="kw">pub fn </span>new_with_defaults(
+        chain_name: <span class="kw-2">&amp;</span>str,
+        initiator_addr: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        ttl: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(
+            chain_name,
+            initiator_addr,
+            secret_key,
+            <span class="prelude-val">None</span>, <span class="comment">// timestamp
+            </span>ttl,
+            <span class="prelude-val">None</span>, <span class="comment">// session_args_simple
+            </span><span class="prelude-val">None</span>, <span class="comment">// session_args_json
+            </span><span class="prelude-val">None</span>, <span class="comment">// pricing_mode
+            </span><span class="prelude-val">None</span>, <span class="comment">// payment_amount
+            </span><span class="prelude-val">None</span>, <span class="comment">// gas_price_tolerance
+            </span><span class="prelude-val">None</span>, <span class="comment">// receipt
+            </span><span class="prelude-val">None</span>, <span class="comment">// standard_payment
+        </span>)
     }
 
     <span class="comment">// Getter and setter for secret_key field

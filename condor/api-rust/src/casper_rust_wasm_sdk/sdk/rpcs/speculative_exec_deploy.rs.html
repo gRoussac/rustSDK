@@ -328,6 +328,13 @@
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -428,6 +435,8 @@
 </span><span class="kw">impl </span>SDK {
     <span class="doccomment">/// Get options for speculative execution from a JavaScript value.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"speculative_exec_deploy_options"</span>)]
+    #[deprecated(note = <span class="string">"prefer speculative_exec_transaction_options"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub fn </span>get_speculative_exec_deploy_options(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         options: JsValue,
@@ -451,7 +460,9 @@
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"speculative_exec_deploy"</span>)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer speculative_exec_transaction"</span>)]
+    #[allow(deprecated)]
+    #[wasm_bindgen(js_name = <span class="string">"speculative_exec_deploy"</span>)]
     </span><span class="kw">pub async fn </span>speculative_exec_deploy_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         options: <span class="prelude-ty">Option</span>&lt;GetSpeculativeExecDeployOptions&gt;,
@@ -510,6 +521,8 @@
     /// # Returns
     ///
     /// A `Result` containing the result of _SpeculativeExecResult or a `SdkError` in case of an error.
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer speculative_exec_transaction"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>speculative_exec_deploy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy: Deploy,
@@ -540,6 +553,7 @@
 }
 
 <span class="attr">#[cfg(test)]
+#[allow(deprecated)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use crate</span>::{

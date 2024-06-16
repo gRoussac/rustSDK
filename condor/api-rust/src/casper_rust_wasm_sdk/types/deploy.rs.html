@@ -792,9 +792,6 @@
 <a href="#792" id="792">792</a>
 <a href="#793" id="793">793</a>
 <a href="#794" id="794">794</a>
-<a href="#795" id="795">795</a>
-<a href="#796" id="796">796</a>
-<a href="#797" id="797">797</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
@@ -814,14 +811,15 @@
         get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
         secret_key_from_pem,
     },
-    make_deploy, make_transfer,
 };
+<span class="attr">#[allow(deprecated)]
+</span><span class="kw">use crate</span>::{make_deploy, make_transfer};
 <span class="kw">use </span>casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 <span class="kw">use </span>casper_types::{
     bytesrepr::{<span class="self">self</span>, Bytes <span class="kw">as </span>_Bytes},
     transaction::Deploy <span class="kw">as </span>_Deploy,
-    ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp, U512,
+    Approval, ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase,
+    RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 <span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -847,6 +845,8 @@
 }
 
 <span class="attr">#[wasm_bindgen]
+#[deprecated(note = <span class="string">"prefer Transaction type"</span>)]
+#[allow(deprecated)]
 </span><span class="kw">impl </span>Deploy {
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(constructor)]
@@ -1182,20 +1182,7 @@
         deploy.into()
     }
 
-    <span class="comment">// TODO TOFIX
-    // #[cfg(target_arch = "wasm32")]
-    // #[wasm_bindgen(js_name = "footprint")]
-    // pub fn footprint_js_alias(&amp;self) -&gt; JsValue {
-    //     match JsValue::from_serde(&amp;self.footprint()) {
-    //         Ok(json) =&gt; json,
-    //         Err(err) =&gt; {
-    //             error(&amp;format!("Error serializing footprint to JSON: {:?}", err));
-    //             JsValue::null()
-    //         }
-    //     }
-    // }
-
-    </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"approvalsHash"</span>)]
     </span><span class="kw">pub fn </span>compute_approvals_hash_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.compute_approvals_hash()) {
@@ -1205,6 +1192,18 @@
                     <span class="string">"Error serializing compute_approvals_hash to JSON: {:?}"</span>,
                     err
                 ));
+                JsValue::null()
+            }
+        }
+    }
+
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"approvals"</span>)]
+    </span><span class="kw">pub fn </span>approvals_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
+        <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.approvals()) {
+            <span class="prelude-val">Ok</span>(json) =&gt; json,
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing approvals to JSON: {:?}"</span>, err));
                 JsValue::null()
             }
         }
@@ -1367,7 +1366,9 @@
     }
 }
 
-<span class="kw">impl </span>Deploy {
+<span class="attr">#[deprecated(note = <span class="string">"prefer Transaction type"</span>)]
+#[allow(deprecated)]
+</span><span class="kw">impl </span>Deploy {
     <span class="kw">pub fn </span>args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RuntimeArgs {
         <span class="self">self</span>.<span class="number">0</span>.clone().session().args().clone()
     }
@@ -1393,19 +1394,7 @@
         })
     }
 
-    <span class="comment">// TODO TOFIX
-    // pub fn footprint(&amp;self) -&gt; DeployFootprint {
-    //     let deploy: _Deploy = self.0.clone();
-    //     match deploy.footprint() {
-    //         Ok(footprint) =&gt; footprint,
-    //         Err(err) =&gt; {
-    //             error(&amp;format!("Error getting footprint: {:?}", err));
-    //             deploy.footprint().unwrap()
-    //         }
-    //     }
-    // }
-
-    </span><span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
+    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
         <span class="kw">let </span>result = serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(json) =&gt; <span class="prelude-val">Ok</span>(json),
@@ -1420,6 +1409,11 @@
     <span class="kw">pub fn </span>compute_approvals_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ApprovalsHash, bytesrepr::Error&gt; {
         <span class="kw">let </span>deploy: _Deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
         deploy.compute_approvals_hash()
+    }
+
+    <span class="kw">pub fn </span>approvals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Approval&gt; {
+        <span class="kw">let </span>deploy: _Deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
+        deploy.approvals().iter().cloned().collect()
     }
 
     <span class="kw">fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, deploy_params: BuildParams) -&gt; Deploy {
