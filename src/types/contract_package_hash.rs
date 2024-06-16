@@ -14,7 +14,6 @@ pub struct ContractPackageHash(_ContractPackageHash);
 #[wasm_bindgen]
 impl ContractPackageHash {
     #[wasm_bindgen(constructor)]
-    #[wasm_bindgen(js_name = "fromString")]
     pub fn new(input: &str) -> Result<ContractPackageHash, JsValue> {
         let prefixed_input = format!("contract-package-{}", input);
         ContractPackageHash::from_formatted_str(&prefixed_input)
