@@ -33,9 +33,9 @@ impl ContractHash {
 impl ContractHash {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new_js_alias(contract_hash_hex_str: &str) -> Result<ContractHash, JsValue> {
+    pub fn new_js_alias(contract_hash_hex_str: &str) -> Result<ContractHash, JsError> {
         Self::new(contract_hash_hex_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse ContractHash from hex string: {:?}",
                 err
             ))
@@ -44,9 +44,9 @@ impl ContractHash {
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<ContractHash, JsValue> {
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<ContractHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse ContractHash from formatted string: {:?}",
                 err
             ))

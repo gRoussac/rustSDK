@@ -2,7 +2,6 @@ use super::addr::transfer_addr::TransferAddr;
 use super::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
 use super::era_id::EraId;
 use super::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
-use crate::debug::error;
 use crate::types::sdk_error::SdkError;
 use casper_types::bytesrepr::ToBytes;
 use casper_types::Key as _Key;
@@ -18,7 +17,7 @@ pub struct Key(_Key);
 #[wasm_bindgen]
 impl Key {
     #[wasm_bindgen(constructor)]
-    pub fn new(key: Key) -> Result<Key, JsValue> {
+    pub fn new(key: Key) -> Result<Key, JsError> {
         let key: _Key = key.into();
         Ok(Key(key))
     }
@@ -121,11 +120,10 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "fromFormattedString")]
-    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<Key, JsValue> {
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<Key, JsError> {
         Self::from_formatted_str(formatted_str)
             .map_err(|err| {
-                error(&format!("Error parsing Key from formatted string, {}", err));
-                JsValue::null()
+                JsError::new(&format!("Error parsing Key from formatted string, {}", err))
             })
             .map(Into::into)
     }

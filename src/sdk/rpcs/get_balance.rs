@@ -94,7 +94,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
-    #[wasm_bindgen(js_name = "get_balance_options")]
     pub fn get_balance_options(&self, options: JsValue) -> GetBalanceOptions {
         let options_result = options.into_serde::<GetBalanceOptions>();
         match options_result {
@@ -139,7 +138,6 @@ impl SDK {
             GetBalanceInput::PurseUrefAsString(purse_uref_as_string)
         } else {
             let err = "Error: Missing purse uref as string or purse uref";
-            error(err);
             return Err(JsError::new(err));
         };
 
@@ -166,7 +164,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

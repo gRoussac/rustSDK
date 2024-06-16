@@ -85,7 +85,6 @@ pub struct GetEntityOptions {
 #[wasm_bindgen]
 impl SDK {
     // Deserialize options for `get_entity` from a JavaScript object
-    #[wasm_bindgen(js_name = "get_entity_options")]
     pub fn get_entity_options(&self, options: JsValue) -> GetEntityOptions {
         let options_result = options.into_serde::<GetEntityOptions>();
         match options_result {

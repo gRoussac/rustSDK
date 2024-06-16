@@ -84,7 +84,6 @@ pub struct GetAccountOptions {
 #[wasm_bindgen]
 impl SDK {
     // Deserialize options for `get_account` from a JavaScript object
-    #[wasm_bindgen(js_name = "get_account_options")]
     #[deprecated(note = "prefer 'get_entity_options'")]
     #[allow(deprecated)]
     pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {

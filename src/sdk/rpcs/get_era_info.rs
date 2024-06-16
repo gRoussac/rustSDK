@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -71,7 +69,6 @@ pub struct GetEraInfoOptions {
 impl SDK {
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
     #[allow(deprecated)]
-    #[wasm_bindgen(js_name = "get_era_info_options")]
     pub fn get_era_info_options(&self, options: JsValue) -> GetEraInfoOptions {
         options.into_serde().unwrap_or_default()
     }
@@ -104,7 +101,7 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
+
                 Err(JsError::new(err))
             }
         }

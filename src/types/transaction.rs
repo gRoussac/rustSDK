@@ -284,15 +284,7 @@ impl Transaction {
 
     #[wasm_bindgen(getter)]
     pub fn hash(&self) -> TransactionHash {
-        // TODO check why fmt is giving a short version in types
-        let transaction_hash: TransactionHash = self.0.clone().hash().into();
-        match TransactionHash::new(&transaction_hash.clone().to_string()) {
-            Ok(transaction_hash) => transaction_hash,
-            Err(err) => {
-                error(&format!("Transaction has not a valid hash: {:?}", err));
-                TransactionHash::new("").unwrap()
-            }
-        }
+        self.0.clone().hash().into()
     }
 
     #[wasm_bindgen(getter)]

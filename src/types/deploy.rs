@@ -333,17 +333,7 @@ impl Deploy {
     #[wasm_bindgen(getter)]
     pub fn hash(&self) -> DeployHash {
         let deploy: _Deploy = self.0.clone();
-        // TODO check why fmt is giving a short version in types
-        // dbg!(format!("{:?}", (*deploy.hash().inner()).clone()));
-        let deploy_hash: DeployHash = (*deploy.hash()).into();
-
-        match DeployHash::new(&deploy_hash.to_string()) {
-            Ok(deploy_hash) => deploy_hash,
-            Err(err) => {
-                error(&format!("Deploy has not a valid hash: {:?}", err));
-                DeployHash::new("").unwrap()
-            }
-        }
+        (*deploy.hash()).into()
     }
 
     #[wasm_bindgen(js_name = "hasValidHash")]

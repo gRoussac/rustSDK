@@ -1,6 +1,4 @@
-use crate::debug::error;
-use casper_types::TransferAddr as _TransferAddr;
-use casper_types::TRANSFER_ADDR_LENGTH;
+use casper_types::{TransferAddr as _TransferAddr, TRANSFER_ADDR_LENGTH};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -8,15 +6,15 @@ pub struct TransferAddr(_TransferAddr);
 
 #[wasm_bindgen]
 impl TransferAddr {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new(bytes: Vec<u8>) -> Result<TransferAddr, JsValue> {
+    pub fn new(bytes: Vec<u8>) -> Result<TransferAddr, JsError> {
         if bytes.len() != TRANSFER_ADDR_LENGTH {
-            error("Invalid TransferAddr length");
-            return Err(JsValue::null());
+            return Err(JsError::new("Invalid TransferAddr length"));
         }
         let mut array = [0u8; TRANSFER_ADDR_LENGTH];
         array.copy_from_slice(&bytes);
-        Ok(TransferAddr(_TransferAddr::new(array)))
+        Ok(_TransferAddr::new(array).into())
     }
 }
 
@@ -34,7 +32,8 @@ impl From<TransferAddr> for _TransferAddr {
     }
 }
 
-#[wasm_bindgen(js_name = "fromTransfer")]
-pub fn from_transfer(key: Vec<u8>) -> TransferAddr {
-    TransferAddr::from(key)
+impl From<_TransferAddr> for TransferAddr {
+    fn from(trasnfer_hash_addr: _TransferAddr) -> Self {
+        TransferAddr(trasnfer_hash_addr)
+    }
 }

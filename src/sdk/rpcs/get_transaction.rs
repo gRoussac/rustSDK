@@ -1,8 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::transaction::Transaction;
 use crate::types::transaction_hash::TransactionHash;
-#[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_transaction, rpcs::results::GetTransactionResult as _GetTransactionResult, Error,
@@ -13,7 +11,6 @@ use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetTransactionResult
@@ -75,7 +72,6 @@ pub struct GetTransactionOptions {
     pub verbosity: Option<Verbosity>,
 }
 
-#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     /// Parses transaction options from a JsValue.
@@ -87,21 +83,24 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed transaction options as a `GetTransactionOptions` struct.
-    #[wasm_bindgen(js_name = "get_transaction_options")]
-    pub fn get_transaction_options(&self, options: JsValue) -> GetTransactionOptions {
-        let options_result = options.into_serde::<GetTransactionOptions>();
+    #[cfg(target_arch = "wasm32")]
+    pub fn get_transaction_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetTransactionOptions, JsError> {
+        let options_result: Result<GetTransactionOptions, _> = options.into_serde();
         match options_result {
             Ok(mut options) => {
                 if let Some(finalized_approvals) = options.finalized_approvals {
                     options.finalized_approvals =
                         Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
                 }
-                options
+                Ok(options)
             }
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetTransactionOptions::default()
-            }
+            Err(err) => Err(JsError::new(&format!(
+                "Error deserializing options: {:?}",
+                err
+            ))),
         }
     }
 
@@ -114,6 +113,7 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `GetTransactionResult` or an error.
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "get_transaction")]
     pub async fn get_transaction_js_alias(
         &self,
@@ -127,24 +127,13 @@ impl SDK {
             node_address,
         } = options.unwrap_or_default();
 
-        let err_msg = "Error: Missing transaction hash as string or transaction hash".to_string();
         let transaction_hash = if let Some(transaction_hash_as_string) = transaction_hash_as_string
         {
-            let hash = Digest::new(&transaction_hash_as_string);
-            if let Err(err) = hash {
-                let err_msg = format!("Failed to parse AccountHash from formatted string: {}", err);
-                error(&err_msg);
-                return Err(JsError::new(&err_msg));
-            }
-            let transaction_hash = TransactionHash::from_digest(hash.unwrap());
-            if transaction_hash.is_err() {
-                error(&err_msg);
-                return Err(JsError::new(&err_msg));
-            }
-            transaction_hash.unwrap()
+            TransactionHash::new(&transaction_hash_as_string)?
         } else {
             if transaction_hash.is_none() {
-                error(&err_msg);
+                let err_msg =
+                    "Error: Missing transaction hash as string or transaction hash".to_string();
                 return Err(JsError::new(&err_msg));
             }
             transaction_hash.unwrap()
@@ -162,13 +151,13 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
     }
 
     /// Retrieves transaction information using the provided options, alias for `get_transaction`.
+    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "This function is an alias. Please use `get_transaction` instead.")]
     #[allow(deprecated)]
     pub async fn info_get_transaction(
@@ -227,7 +216,7 @@ mod tests {
     async fn test_get_transaction_with_none_values() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let transaction_hash = TransactionHash::from_digest([1u8; 32].into()).unwrap();
+        let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let error_message = "builder error";
 
         // Act
@@ -245,7 +234,7 @@ mod tests {
     async fn test_get_transaction_with_invalid_transaction_hash() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let transaction_hash = TransactionHash::from_digest([1u8; 32].into()).unwrap();
+        let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, _) = get_network_constants();
 
@@ -347,7 +336,7 @@ mod tests {
     async fn test_get_transaction_with_error() {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let transaction_hash = TransactionHash::from_digest([1u8; 32].into()).unwrap();
+        let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act

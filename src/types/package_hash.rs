@@ -17,13 +17,13 @@ impl PackageHash {
     }
 
     pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
-        let _package_hash = _PackageHash::from_formatted_str(formatted_str).map_err(|error| {
+        let package_hash = _PackageHash::from_formatted_str(formatted_str).map_err(|error| {
             SdkError::FailedToParsePackageHash {
                 context: "PackageHash::from_formatted_str",
                 error,
             }
         })?;
-        Ok(Self(_package_hash))
+        Ok(Self(package_hash))
     }
 }
 
@@ -31,9 +31,9 @@ impl PackageHash {
 impl PackageHash {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new_js_alias(package_hash_hex_str: &str) -> Result<PackageHash, JsValue> {
+    pub fn new_js_alias(package_hash_hex_str: &str) -> Result<PackageHash, JsError> {
         Self::new(package_hash_hex_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse PackageHash from hex string: {:?}",
                 err
             ))
@@ -42,9 +42,9 @@ impl PackageHash {
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<PackageHash, JsValue> {
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<PackageHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse PackageHash from formatted string: {:?}",
                 err
             ))
@@ -58,28 +58,28 @@ impl PackageHash {
 
     #[wasm_bindgen(js_name = "fromUint8Array")]
     pub fn from_bytes(bytes: Vec<u8>) -> PackageHash {
-        let _package_hash =
+        let package_hash =
             _PackageHash::try_from(&bytes).expect("Failed to convert bytes to PackageHash");
-        Self(_package_hash)
+        Self(package_hash)
     }
 }
 
 impl From<PackageHash> for _PackageHash {
-    fn from(_package_hash: PackageHash) -> Self {
-        _package_hash.0
+    fn from(package_hash: PackageHash) -> Self {
+        package_hash.0
     }
 }
 
 impl From<_PackageHash> for PackageHash {
-    fn from(_package_hash: _PackageHash) -> Self {
-        Self(_package_hash)
+    fn from(package_hash: _PackageHash) -> Self {
+        Self(package_hash)
     }
 }
 
 impl FromBytes for PackageHash {
     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
-        let (_package_hash, remainder) = _PackageHash::from_bytes(bytes)?;
-        Ok((Self(_package_hash), remainder))
+        let (package_hash, remainder) = _PackageHash::from_bytes(bytes)?;
+        Ok((Self(package_hash), remainder))
     }
 }
 

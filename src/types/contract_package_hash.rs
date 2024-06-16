@@ -33,9 +33,9 @@ impl ContractPackageHash {
     #[wasm_bindgen(constructor)]
     pub fn new_js_alias(
         contract_package_hash_hex_str: &str,
-    ) -> Result<ContractPackageHash, JsValue> {
+    ) -> Result<ContractPackageHash, JsError> {
         Self::new(contract_package_hash_hex_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse ContractPackageHash from hex string: {:?}",
                 err
             ))
@@ -46,9 +46,9 @@ impl ContractPackageHash {
     #[wasm_bindgen(js_name = "fromFormattedStr")]
     pub fn from_formatted_str_js_alias(
         formatted_str: &str,
-    ) -> Result<ContractPackageHash, JsValue> {
+    ) -> Result<ContractPackageHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse ContractPackageHash from formatted string: {:?}",
                 err
             ))

@@ -92,7 +92,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block transfers options as a `GetBlockTransfersOptions` struct.
-    #[wasm_bindgen(js_name = "get_block_transfers_options")]
     pub fn get_block_transfers_options(&self, options: JsValue) -> GetBlockTransfersOptions {
         let options_result = options.into_serde::<GetBlockTransfersOptions>();
         match options_result {
@@ -144,7 +143,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

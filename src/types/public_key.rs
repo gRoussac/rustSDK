@@ -47,9 +47,9 @@ impl PublicKey {
 impl PublicKey {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new_js_alias(public_key_hex_str: &str) -> Result<PublicKey, JsValue> {
+    pub fn new_js_alias(public_key_hex_str: &str) -> Result<PublicKey, JsError> {
         Self::new(public_key_hex_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse PublicKey from hex string: {:?}",
                 err
             ))
@@ -58,14 +58,10 @@ impl PublicKey {
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromUint8Array")]
-    pub fn from_bytes_js_alias(bytes: Vec<u8>) -> Result<PublicKey, JsValue> {
-        match Self::from_bytes(&bytes) {
-            Ok((public_key, _)) => Ok(public_key),
-            Err(err) => Err(JsValue::from_str(&format!(
-                "Failed to parse PublicKey: {:?}",
-                err
-            ))),
-        }
+    pub fn from_bytes_js_alias(bytes: Vec<u8>) -> Result<PublicKey, JsError> {
+        Self::from_bytes(&bytes)
+            .map(|(public_key, _)| public_key)
+            .map_err(|err| JsError::new(&format!("Failed to parse PublicKey: {:?}", err)))
     }
 
     #[wasm_bindgen(js_name = "toAccountHash")]

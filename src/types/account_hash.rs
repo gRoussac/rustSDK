@@ -49,9 +49,9 @@ impl AccountHash {
 impl AccountHash {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new_js_alias(account_hash_hex_str: &str) -> Result<AccountHash, JsValue> {
+    pub fn new_js_alias(account_hash_hex_str: &str) -> Result<AccountHash, JsError> {
         Self::new(account_hash_hex_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse AccountHash from hex string: {:?}",
                 err
             ))
@@ -60,9 +60,9 @@ impl AccountHash {
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountHash, JsValue> {
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountHash, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse AccountHash from formatted string: {:?}",
                 err
             ))
@@ -96,6 +96,14 @@ impl AccountHash {
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
+    }
+}
+
+impl From<Vec<u8>> for AccountHash {
+    fn from(bytes: Vec<u8>) -> Self {
+        let mut array = [0u8; ACCOUNT_HASH_LENGTH];
+        array.copy_from_slice(&bytes);
+        AccountHash(_AccountHash::new(array))
     }
 }
 

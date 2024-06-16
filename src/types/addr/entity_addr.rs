@@ -26,25 +26,11 @@ impl EntityAddr {
 
 #[wasm_bindgen]
 impl EntityAddr {
-    // #[cfg(target_arch = "wasm32")]
-    // #[wasm_bindgen(constructor)]
-    // pub fn new(entity_addr_hex_str: &str) -> Result<EntityAddr, JsValue> {
-    //     let bytes = hex::decode(entity_addr_hex_str)
-    //         .map_err(|err| JsValue::from_str(&format!("Failed to decode hex string: {:?}", err)))?;
-    //     if bytes.len() != _EntityAddr::LENGTH {
-    //         return Err(JsValue::from_str("Invalid entity addr length"));
-    //     }
-    //     let mut array = [0u8; _EntityAddr::LENGTH];
-    //     array.copy_from_slice(&bytes);
-    //     let entity_addr = _EntityAddr(array);
-    //     Ok(entity_addr.into())
-    // }
-
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<EntityAddr, JsValue> {
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<EntityAddr, JsError> {
         Self::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(&format!(
+            JsError::new(&format!(
                 "Failed to parse Entity from formatted string: {:?}",
                 err
             ))

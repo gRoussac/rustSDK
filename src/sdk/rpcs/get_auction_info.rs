@@ -83,7 +83,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed auction info options as a `GetAuctionInfoOptions` struct.
-    #[wasm_bindgen(js_name = "get_auction_info_options")]
     pub fn get_auction_info_options(&self, options: JsValue) -> GetAuctionInfoOptions {
         let options_result = options.into_serde::<GetAuctionInfoOptions>();
         match options_result {
@@ -135,7 +134,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
