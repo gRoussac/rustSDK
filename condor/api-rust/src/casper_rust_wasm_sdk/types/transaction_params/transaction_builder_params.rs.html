@@ -713,20 +713,6 @@
 <a href="#713" id="713">713</a>
 <a href="#714" id="714">714</a>
 <a href="#715" id="715">715</a>
-<a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     debug::error,
     types::{
@@ -855,15 +841,10 @@
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"newInvocableEntity"</span>)]
-    </span><span class="kw">pub fn </span>new_invocable_entity(entity_hash: <span class="kw-2">&amp;</span>str, entry_point: <span class="kw-2">&amp;</span>str) -&gt; TransactionBuilderParams {
-        <span class="kw">let </span>addressable_entity_hash = <span class="kw">match </span>AddressableEntityHash::from_formatted_str(entity_hash) {
-            <span class="prelude-val">Ok</span>(hash) =&gt; <span class="prelude-val">Some</span>(hash),
-            <span class="prelude-val">Err</span>(_err) =&gt; {
-                <span class="comment">// TODO Fix Jsvalue ret
-                //  error(&amp;format!("Error parsing entity hash: {}", err.as_string()));
-                </span><span class="prelude-val">None
-            </span>}
-        };
+    </span><span class="kw">pub fn </span>new_invocable_entity(
+        entity_hash: AddressableEntityHash,
+        entry_point: <span class="kw-2">&amp;</span>str,
+    ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
             transaction_bytes: <span class="prelude-val">None</span>,
@@ -872,7 +853,7 @@
             target: <span class="prelude-val">None</span>,
             amount: <span class="prelude-val">None</span>,
             maybe_id: <span class="prelude-val">None</span>,
-            entity_hash: addressable_entity_hash,
+            entity_hash: <span class="prelude-val">Some</span>(entity_hash),
             entity_alias: <span class="prelude-val">None</span>,
             package_hash: <span class="prelude-val">None</span>,
             package_alias: <span class="prelude-val">None</span>,
@@ -917,19 +898,10 @@
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"newPackage"</span>)]
     </span><span class="kw">pub fn </span>new_package(
-        package_hash: <span class="kw-2">&amp;</span>str,
+        package_hash: PackageHash,
         entry_point: <span class="kw-2">&amp;</span>str,
         maybe_entity_version: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; TransactionBuilderParams {
-        <span class="kw">let </span>maybe_package_hash = <span class="kw">match </span>PackageHash::from_formatted_str(package_hash) {
-            <span class="prelude-val">Ok</span>(hash) =&gt; <span class="prelude-val">Some</span>(hash),
-            <span class="prelude-val">Err</span>(_err) =&gt; {
-                <span class="comment">// TODO Fix Jsvalue ret
-                //  error(&amp;format!("Error parsing entity hash: {}", err.as_string()));
-                </span><span class="prelude-val">None
-            </span>}
-        };
-
         <span class="kw">let </span>maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
 
         TransactionBuilderParams {
@@ -942,7 +914,7 @@
             maybe_id: <span class="prelude-val">None</span>,
             entity_hash: <span class="prelude-val">None</span>,
             entity_alias: <span class="prelude-val">None</span>,
-            package_hash: maybe_package_hash,
+            package_hash: <span class="prelude-val">Some</span>(package_hash),
             package_alias: <span class="prelude-val">None</span>,
             maybe_entity_version: maybe_entity_version_as_u32,
             public_key: <span class="prelude-val">None</span>,

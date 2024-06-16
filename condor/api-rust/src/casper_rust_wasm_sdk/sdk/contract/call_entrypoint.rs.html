@@ -260,14 +260,6 @@
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -412,10 +404,8 @@
         <span class="kw">let </span>contract_hash = ContractHash::from_formatted_str(<span class="kw-2">&amp;</span>get_contract_hash().<span class="kw">await</span>).unwrap();
         <span class="kw">let </span>entity_hash: AddressableEntityHash = contract_hash.into();
 
-        <span class="kw">let </span>builder_params = TransactionBuilderParams::new_invocable_entity(
-            <span class="kw-2">&amp;</span>entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        <span class="kw">let </span>builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -448,10 +438,8 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>builder_params = TransactionBuilderParams::new_invocable_entity(
-            <span class="kw-2">&amp;</span>entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        <span class="kw">let </span>builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -486,10 +474,8 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>builder_params = TransactionBuilderParams::new_invocable_entity(
-            <span class="kw-2">&amp;</span>entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        <span class="kw">let </span>builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -522,10 +508,8 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>builder_params = TransactionBuilderParams::new_invocable_entity(
-            <span class="kw-2">&amp;</span>entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        <span class="kw">let </span>builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk

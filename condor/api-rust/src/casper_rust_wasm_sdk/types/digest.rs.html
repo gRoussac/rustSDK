@@ -170,7 +170,6 @@
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
 <a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{Display, Formatter};
 
 <span class="kw">use </span><span class="kw">super</span>::sdk_error::SdkError;
@@ -192,7 +191,6 @@
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>Digest {
     <span class="attr">#[wasm_bindgen(constructor)]
-    #[wasm_bindgen(js_name = <span class="string">"new"</span>)]
     </span><span class="kw">pub fn </span>new_js_alias(digest_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Digest, JsValue&gt; {
         <span class="self">Self</span>::from_string(digest_hex_str)
     }
