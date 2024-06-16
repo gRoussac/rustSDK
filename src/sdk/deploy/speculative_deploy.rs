@@ -42,7 +42,8 @@ impl SDK {
     ///
     /// A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "speculative_deploy")]
-    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_arguments, deprecated)]
+    #[deprecated(note = "prefer speculative_transaction")]
     pub async fn speculative_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,
@@ -96,6 +97,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `SuccessResponse<_SpeculativeExecResult>` or a `SdkError` in case of an error.
+    #[allow(clippy::too_many_arguments, deprecated)]
+    #[deprecated(note = "prefer speculative_transaction")]
     pub async fn speculative_deploy(
         &self,
         deploy_params: DeployStrParams,
@@ -132,6 +135,7 @@ impl SDK {
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};

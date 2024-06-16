@@ -32,6 +32,8 @@ impl SDK {
     ///
     /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "make_deploy")]
+    #[deprecated(note = "prefer 'make_transaction'")]
+    #[allow(deprecated)]
     pub fn make_deploy_js_alias(
         &self,
         deploy_params: DeployStrParams,
@@ -62,6 +64,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the created `Deploy` or a `SdkError` in case of an error.
+    #[deprecated(note = "prefer 'make_transaction'")]
+    #[allow(deprecated)]
     pub fn make_deploy(
         &self,
         deploy_params: DeployStrParams,
@@ -73,6 +77,8 @@ impl SDK {
 }
 
 /// Internal function to create a deploy.
+#[deprecated(note = "prefer 'make_transaction'")]
+#[allow(deprecated)]
 pub(crate) fn make_deploy(
     deploy_params: DeployStrParams,
     session_params: SessionStrParams,
@@ -91,6 +97,7 @@ pub(crate) fn make_deploy(
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
 
     use super::*;

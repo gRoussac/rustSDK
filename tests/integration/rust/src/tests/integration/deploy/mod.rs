@@ -44,6 +44,7 @@ pub mod test_module {
             .is_empty());
     }
 
+    #[allow(deprecated)]
     pub async fn test_transfer() {
         let config: TestConfig = get_config(true).await;
 
@@ -84,6 +85,7 @@ pub mod test_module {
             .is_empty());
     }
 
+    #[allow(deprecated)]
     pub async fn test_speculative_deploy() {
         let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
@@ -126,6 +128,7 @@ pub mod test_module {
             .is_empty());
     }
 
+    #[allow(deprecated)]
     pub async fn test_speculative_transfer() {
         let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(

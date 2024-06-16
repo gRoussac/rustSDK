@@ -47,14 +47,18 @@ impl TransactionStrParams {
         standard_payment: Option<bool>,
     ) -> Self {
         let mut transaction_params = TransactionStrParams::default();
-        if let Some(secret_key) = secret_key {
-            transaction_params.set_secret_key(&secret_key);
-        };
-        transaction_params.set_timestamp(timestamp);
-        transaction_params.set_ttl(ttl);
         transaction_params.set_chain_name(chain_name);
         if let Some(initiator_addr) = initiator_addr {
             transaction_params.set_initiator_addr(&initiator_addr);
+        }
+        if let Some(secret_key) = secret_key {
+            transaction_params.set_secret_key(&secret_key);
+        };
+        if timestamp.is_some() {
+            transaction_params.set_timestamp(timestamp);
+        }
+        if ttl.is_some() {
+            transaction_params.set_ttl(ttl);
         }
         if let Some(session_args_simple) = session_args_simple {
             transaction_params.set_session_args_simple(session_args_simple);
@@ -78,6 +82,29 @@ impl TransactionStrParams {
             transaction_params.set_standard_payment(standard_payment);
         }
         transaction_params
+    }
+
+    #[wasm_bindgen]
+    pub fn new_with_defaults(
+        chain_name: &str,
+        initiator_addr: Option<String>,
+        secret_key: Option<String>,
+        ttl: Option<String>,
+    ) -> Self {
+        Self::new(
+            chain_name,
+            initiator_addr,
+            secret_key,
+            None, // timestamp
+            ttl,
+            None, // session_args_simple
+            None, // session_args_json
+            None, // pricing_mode
+            None, // payment_amount
+            None, // gas_price_tolerance
+            None, // receipt
+            None, // standard_payment
+        )
     }
 
     // Getter and setter for secret_key field

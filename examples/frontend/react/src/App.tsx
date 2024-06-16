@@ -273,7 +273,6 @@ function App() {
       console.assert(deploy_signed.approvals.length === 1); // Deploy should have one approval
 
       deploy_to_sign = new Deploy(make_deploy);
-      //  console.log('make_deploy footprint', deploy_to_sign.footprint());
       console.assert(deploy_to_sign.toJson().approvals.length === 0); // Deploy has no approval
       // console.log('make_deploy ApprovalsHash before', deploy_to_sign.approvalsHash());
       deploy_signed = deploy_to_sign.addArg("test:bool='true'", secret_key); // Deploy was modified has one approval

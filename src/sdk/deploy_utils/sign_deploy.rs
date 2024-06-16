@@ -17,6 +17,8 @@ impl SDK {
     /// # Returns
     ///
     /// The signed `Deploy`.
+    #[deprecated(note = "prefer sign_transaction")]
+    #[allow(deprecated)]
     #[wasm_bindgen(js_name = "sign_deploy")]
     pub fn sign_deploy_js_alias(&self, deploy: Deploy, secret_key: &str) -> Deploy {
         sign_deploy(deploy, secret_key)
@@ -34,18 +36,23 @@ impl SDK {
     /// # Returns
     ///
     /// The signed `Deploy`.
+    #[deprecated(note = "prefer sign_transaction")]
+    #[allow(deprecated)]
     pub fn sign_deploy(&self, deploy: Deploy, secret_key: &str) -> Deploy {
         sign_deploy(deploy, secret_key)
     }
 }
 
 /// Internal function to sign a deploy.
+#[deprecated(note = "prefer sign_transaction")]
+#[allow(deprecated)]
 pub(crate) fn sign_deploy(mut deploy: Deploy, secret_key: &str) -> Deploy {
     // log("sign_deploy!");
     deploy.sign(secret_key)
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use crate::{

@@ -17,14 +17,15 @@ use crate::{
         get_current_timestamp, get_ttl_or_default, insert_arg, parse_timestamp, parse_ttl,
         secret_key_from_pem,
     },
-    make_deploy, make_transfer,
 };
+#[allow(deprecated)]
+use crate::{make_deploy, make_transfer};
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
     transaction::Deploy as _Deploy,
-    ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp, U512,
+    Approval, ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase,
+    RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -50,6 +51,8 @@ struct BuildParams {
 }
 
 #[wasm_bindgen]
+#[deprecated(note = "prefer Transaction type")]
+#[allow(deprecated)]
 impl Deploy {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
@@ -385,19 +388,6 @@ impl Deploy {
         deploy.into()
     }
 
-    // TODO TOFIX
-    // #[cfg(target_arch = "wasm32")]
-    // #[wasm_bindgen(js_name = "footprint")]
-    // pub fn footprint_js_alias(&self) -> JsValue {
-    //     match JsValue::from_serde(&self.footprint()) {
-    //         Ok(json) => json,
-    //         Err(err) => {
-    //             error(&format!("Error serializing footprint to JSON: {:?}", err));
-    //             JsValue::null()
-    //         }
-    //     }
-    // }
-
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "approvalsHash")]
     pub fn compute_approvals_hash_js_alias(&self) -> JsValue {
@@ -408,6 +398,18 @@ impl Deploy {
                     "Error serializing compute_approvals_hash to JSON: {:?}",
                     err
                 ));
+                JsValue::null()
+            }
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "approvals")]
+    pub fn approvals_alias(&self) -> JsValue {
+        match JsValue::from_serde(&self.approvals()) {
+            Ok(json) => json,
+            Err(err) => {
+                error(&format!("Error serializing approvals to JSON: {:?}", err));
                 JsValue::null()
             }
         }
@@ -570,6 +572,8 @@ impl Deploy {
     }
 }
 
+#[deprecated(note = "prefer Transaction type")]
+#[allow(deprecated)]
 impl Deploy {
     pub fn args(&self) -> RuntimeArgs {
         self.0.clone().session().args().clone()
@@ -596,18 +600,6 @@ impl Deploy {
         })
     }
 
-    // TODO TOFIX
-    // pub fn footprint(&self) -> DeployFootprint {
-    //     let deploy: _Deploy = self.0.clone();
-    //     match deploy.footprint() {
-    //         Ok(footprint) => footprint,
-    //         Err(err) => {
-    //             error(&format!("Error getting footprint: {:?}", err));
-    //             deploy.footprint().unwrap()
-    //         }
-    //     }
-    // }
-
     pub fn to_json_string(&self) -> Result<String, String> {
         let result = serde_json::to_string(&self.0);
         match result {
@@ -623,6 +615,11 @@ impl Deploy {
     pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {
         let deploy: _Deploy = self.0.clone();
         deploy.compute_approvals_hash()
+    }
+
+    pub fn approvals(&self) -> Vec<Approval> {
+        let deploy: _Deploy = self.0.clone();
+        deploy.approvals().iter().cloned().collect()
     }
 
     fn build(&self, deploy_params: BuildParams) -> Deploy {

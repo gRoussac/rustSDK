@@ -43,8 +43,9 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-    #[allow(clippy::too_many_arguments)]
     #[wasm_bindgen(js_name = "speculative_transfer")]
+    #[allow(clippy::too_many_arguments, deprecated)]
+    #[deprecated(note = "prefer speculative_transfer_transaction")]
     pub async fn speculative_transfer_js_alias(
         &self,
         amount: &str,
@@ -104,7 +105,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result a `SuccessResponse<_SpeculativeExecResult>` or a `SdkError` in case of an error.
-    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_arguments, deprecated)]
+    #[deprecated(note = "prefer speculative_transfer_transaction")]
     pub async fn speculative_transfer(
         &self,
         amount: &str,
@@ -150,6 +152,7 @@ impl SDK {
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
