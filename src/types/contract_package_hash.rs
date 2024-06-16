@@ -1,35 +1,58 @@
+use super::sdk_error::SdkError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
     contracts::ContractPackageHash as _ContractPackageHash,
     PackageHash,
 };
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-use crate::debug::error;
-
 #[wasm_bindgen]
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize, Copy)]
 pub struct ContractPackageHash(_ContractPackageHash);
+
+impl ContractPackageHash {
+    pub fn new(contract_package_hash_hex_str: &str) -> Result<Self, SdkError> {
+        let prefixed_input = format!("contract-package-{}", contract_package_hash_hex_str);
+        Self::from_formatted_str(&prefixed_input)
+    }
+
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+        let contract_package_hash = _ContractPackageHash::from_formatted_str(formatted_str)
+            .map_err(|error| SdkError::FailedToParseContractPackageHash {
+                context: "ContractPackageHash::from_formatted_str",
+                error,
+            })?;
+        Ok(Self(contract_package_hash))
+    }
+}
 
 #[wasm_bindgen]
 impl ContractPackageHash {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new(input: &str) -> Result<ContractPackageHash, JsValue> {
-        let prefixed_input = format!("contract-package-{}", input);
-        ContractPackageHash::from_formatted_str(&prefixed_input)
+    pub fn new_js_alias(
+        contract_package_hash_hex_str: &str,
+    ) -> Result<ContractPackageHash, JsValue> {
+        Self::new(contract_package_hash_hex_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse ContractPackageHash from hex string: {:?}",
+                err
+            ))
+        })
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(input: &str) -> Result<ContractPackageHash, JsValue> {
-        let contract_package_hash = _ContractPackageHash::from_formatted_str(input)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse ContractPackageHash from formatted string: {:?}",
-                    err
-                ))
-            })
-            .unwrap();
-        Ok(ContractPackageHash(contract_package_hash))
+    pub fn from_formatted_str_js_alias(
+        formatted_str: &str,
+    ) -> Result<ContractPackageHash, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse ContractPackageHash from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]

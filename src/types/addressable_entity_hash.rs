@@ -1,4 +1,3 @@
-use crate::debug::error;
 use casper_types::{
     addressable_entity::{
         AddressableEntityHash as _AddressableEntityHash, ADDRESSABLE_ENTITY_STRING_PREFIX,
@@ -9,29 +8,55 @@ use casper_types::{
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+use super::sdk_error::SdkError;
+
 #[wasm_bindgen]
 #[derive(Debug, Deserialize, Clone, Serialize, Copy, PartialEq, Eq)]
 pub struct AddressableEntityHash(_AddressableEntityHash);
 
-#[wasm_bindgen]
 impl AddressableEntityHash {
-    #[wasm_bindgen(constructor)]
-    pub fn new(input: &str) -> Result<AddressableEntityHash, JsValue> {
-        let prefixed_input = format!("{}{}", ADDRESSABLE_ENTITY_STRING_PREFIX, input);
+    pub fn new(addressable_entity_hex_str: &str) -> Result<Self, SdkError> {
+        let prefixed_input =
+            format!("{ADDRESSABLE_ENTITY_STRING_PREFIX}{addressable_entity_hex_str}");
         Self::from_formatted_str(&prefixed_input)
     }
 
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(input: &str) -> Result<AddressableEntityHash, JsValue> {
-        let addressable_entity_hash = _AddressableEntityHash::from_formatted_str(input)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse AddressableEntityHash from formatted string: {:?}",
-                    err
-                ))
-            })
-            .unwrap();
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+        let addressable_entity_hash = _AddressableEntityHash::from_formatted_str(formatted_str)
+            .map_err(|error| SdkError::FailedToParseAddressableEntityHash {
+                context: "AddressableEntityHash::from_formatted_str",
+                error,
+            })?;
         Ok(Self(addressable_entity_hash))
+    }
+}
+
+#[wasm_bindgen]
+impl AddressableEntityHash {
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(
+        addressable_entity_hex_str: &str,
+    ) -> Result<AddressableEntityHash, JsValue> {
+        Self::new(addressable_entity_hex_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse AddressableEntityHash from hex string: {:?}",
+                err
+            ))
+        })
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    pub fn from_formatted_str_js_alias(
+        formatted_str: &str,
+    ) -> Result<AddressableEntityHash, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse AddressableEntityHash from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]

@@ -1,4 +1,4 @@
-use crate::debug::error;
+use super::sdk_error::SdkError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
     PackageAddr, PackageHash as _PackageHash,
@@ -10,25 +10,45 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Deserialize, Clone, Serialize, Copy)]
 pub struct PackageHash(_PackageHash);
 
-#[wasm_bindgen]
 impl PackageHash {
-    #[wasm_bindgen(constructor)]
-    pub fn new(input: &str) -> Result<PackageHash, JsValue> {
-        let prefixed_input = format!("package-{}", input);
+    pub fn new(package_hash_hex_str: &str) -> Result<Self, SdkError> {
+        let prefixed_input = format!("package-{}", package_hash_hex_str);
         Self::from_formatted_str(&prefixed_input)
     }
 
-    #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(input: &str) -> Result<PackageHash, JsValue> {
-        let _package_hash = _PackageHash::from_formatted_str(input)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse PackageHash from formatted string: {:?}",
-                    err
-                ))
-            })
-            .unwrap();
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+        let _package_hash = _PackageHash::from_formatted_str(formatted_str).map_err(|error| {
+            SdkError::FailedToParsePackageHash {
+                context: "PackageHash::from_formatted_str",
+                error,
+            }
+        })?;
         Ok(Self(_package_hash))
+    }
+}
+
+#[wasm_bindgen]
+impl PackageHash {
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(package_hash_hex_str: &str) -> Result<PackageHash, JsValue> {
+        Self::new(package_hash_hex_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse PackageHash from hex string: {:?}",
+                err
+            ))
+        })
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<PackageHash, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse PackageHash from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]

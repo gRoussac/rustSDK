@@ -1,5 +1,6 @@
-use super::{account_hash::AccountHash, public_key::PublicKey};
+use super::{account_hash::AccountHash, public_key::PublicKey, sdk_error::SdkError};
 use casper_client::rpcs::AccountIdentifier as _AccountIdentifier;
+use casper_types::account::ACCOUNT_HASH_FORMATTED_STRING_PREFIX;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
@@ -10,48 +11,49 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct AccountIdentifier(_AccountIdentifier);
 
+#[deprecated(note = "prefer 'EntityIdentifier'")]
+#[allow(deprecated)]
+impl AccountIdentifier {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+        if formatted_str.contains(ACCOUNT_HASH_FORMATTED_STRING_PREFIX) {
+            let account_hash = AccountHash::from_formatted_str(formatted_str)?;
+            Ok(Self::from_account_under_account_hash(account_hash))
+        } else {
+            let public_key = PublicKey::new(formatted_str)?;
+            Ok(Self::from_account_under_public_key(public_key))
+        }
+    }
+}
+
 #[wasm_bindgen]
+#[deprecated(note = "prefer 'EntityIdentifier'")]
+#[allow(deprecated)]
 impl AccountIdentifier {
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
     pub fn new(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
-        Self::from_formatted_str(formatted_str)
+        Self::from_formatted_str_js_alias(formatted_str)
     }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
-        if formatted_str.contains("account-hash") {
-            let account_hash = AccountHash::from_formatted_str(formatted_str)
-                .map_err(|err| {
-                    JsValue::from_str(&format!(
-                        "Failed to parse AccountHash from formatted string: {:?}",
-                        err
-                    ));
-                })
-                .unwrap();
-            Ok(Self::from_account_under_account_hash(account_hash))
-        } else {
-            let public_key = PublicKey::new(formatted_str)
-                .map_err(|err| {
-                    JsValue::from_str(&format!(
-                        "Failed to parse PublicKey from formatted string: {:?}",
-                        err
-                    ));
-                })
-                .unwrap();
-            Ok(Self::from_account_under_public_key(public_key))
-        }
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountIdentifier, JsValue> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsValue::from_str(&format!(
+                "Failed to parse AccountIdentifier from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "fromPublicKey")]
     pub fn from_account_under_public_key(key: PublicKey) -> Self {
-        AccountIdentifier(_AccountIdentifier::PublicKey(key.into()))
+        Self(_AccountIdentifier::PublicKey(key.into()))
     }
 
     #[wasm_bindgen(js_name = "fromAccountHash")]
     pub fn from_account_under_account_hash(account_hash: AccountHash) -> Self {
-        AccountIdentifier(_AccountIdentifier::AccountHash(account_hash.into()))
+        Self(_AccountIdentifier::AccountHash(account_hash.into()))
     }
 
     #[cfg(target_arch = "wasm32")]

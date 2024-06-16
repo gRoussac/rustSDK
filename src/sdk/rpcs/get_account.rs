@@ -262,6 +262,7 @@ mod tests {
     };
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
+    #[allow(deprecated)]
     fn get_account_identifier() -> AccountIdentifier {
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();

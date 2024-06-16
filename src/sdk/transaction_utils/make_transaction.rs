@@ -111,10 +111,8 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -140,10 +138,8 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -168,10 +164,8 @@ mod tests {
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            &entity_hash.to_formatted_string(),
-            ENTRYPOINT_MINT,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
