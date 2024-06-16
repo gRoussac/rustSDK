@@ -34,7 +34,6 @@ use chrono::{DateTime, Utc};
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::BTreeSet;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
@@ -188,8 +187,8 @@ impl Transaction {
         })
     }
 
-    #[wasm_bindgen(js_name = "withHash")]
-    pub fn with_hash(
+    #[wasm_bindgen(js_name = "withEntityHash")]
+    pub fn with_entity_hash(
         &self,
         hash: AddressableEntityHash,
         secret_key: Option<String>,
@@ -226,10 +225,10 @@ impl Transaction {
         })
     }
 
-    #[wasm_bindgen(js_name = "withModuleBytes")]
-    pub fn with_module_bytes(
+    #[wasm_bindgen(js_name = "withTransactionBytes")]
+    pub fn with_transaction_bytes(
         &self,
-        module_bytes: Bytes,
+        transaction_bytes: Bytes,
         secret_key: Option<String>,
     ) -> Transaction {
         self.build(BuildParams {
@@ -237,7 +236,7 @@ impl Transaction {
             body: Some(modify_body(
                 &self.body(),
                 NewBodyParams {
-                    new_module_bytes: Some(&module_bytes),
+                    new_transaction_bytes: Some(&transaction_bytes),
                     ..Default::default()
                 },
             )),
@@ -585,8 +584,8 @@ impl Transaction {
         self.0.clone().compute_approvals_hash()
     }
 
-    pub fn approvals(&self) -> BTreeSet<Approval> {
-        self.0.clone().approvals()
+    pub fn approvals(&self) -> Vec<Approval> {
+        self.0.clone().approvals().iter().cloned().collect()
     }
 
     pub fn header(&self) -> TransactionHeader {
@@ -597,7 +596,7 @@ impl Transaction {
         self.0.clone().expires()
     }
 
-    pub fn signers(&self) -> BTreeSet<AccountHash> {
+    pub fn signers(&self) -> Vec<AccountHash> {
         self.0
             .clone()
             .signers()
@@ -606,7 +605,7 @@ impl Transaction {
             .collect()
     }
 
-    pub fn authorization_keys(&self) -> BTreeSet<AccountHash> {
+    pub fn authorization_keys(&self) -> Vec<AccountHash> {
         self.0
             .clone()
             .authorization_keys()
@@ -705,7 +704,7 @@ struct NewBodyParams<'a> {
     new_entry_point: Option<String>,
     new_alias: Option<String>,
     new_version: Option<u32>,
-    new_module_bytes: Option<&'a Bytes>,
+    new_transaction_bytes: Option<&'a Bytes>,
 }
 
 fn modify_body(
@@ -717,7 +716,7 @@ fn modify_body(
         new_entry_point,
         new_alias,
         new_version,
-        new_module_bytes,
+        new_transaction_bytes,
     }: NewBodyParams,
 ) -> TransactionV1Body {
     let runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
@@ -767,14 +766,14 @@ fn modify_body(
             }
         },
         casper_types::TransactionTarget::Session {
-            kind,
-            module_bytes,
+            kind: transaction_session_kind,
+            module_bytes: transaction_bytes,
             runtime: _,
         } => {
-            let default: _Bytes = module_bytes.clone();
-            let new_bytes = new_module_bytes.unwrap();
+            let default: _Bytes = transaction_bytes.clone();
+            let new_bytes = new_transaction_bytes.unwrap();
             let new: &Bytes = new_bytes;
-            let new_module_bytes: _Bytes = {
+            let new_transaction_bytes: _Bytes = {
                 let new_bytes: _Bytes = _Bytes::from((*new).to_vec());
                 if new_bytes.len() > 0 {
                     new_bytes
@@ -783,7 +782,7 @@ fn modify_body(
                 }
             };
 
-            (*TransactionV1Builder::new_session(*kind, new_module_bytes)
+            (*TransactionV1Builder::new_session(*transaction_session_kind, new_transaction_bytes)
                 .with_runtime_args(runtime_args)
                 .body())
             .clone()

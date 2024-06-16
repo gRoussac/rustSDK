@@ -585,6 +585,7 @@ pub async fn _run_example_1_legacy() {
 }
 
 // make_transfer
+#[allow(deprecated)]
 pub async fn _run_example_5_legacy() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
@@ -627,7 +628,9 @@ pub async fn _run_example_5_legacy() {
         .unwrap();
     println!("{:?}", make_transfer.timestamp());
 }
+
 // transfer
+#[allow(deprecated)]
 pub async fn _run_example_6_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -685,6 +688,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 }
 
 // make_deploy
+#[allow(deprecated)]
 pub async fn _run_example_7_legacy() {
     let sdk = SDK::new(
         Some("http://localhost:11101".to_string()),
@@ -728,6 +732,7 @@ pub async fn _run_example_7_legacy() {
 }
 
 // deploy
+#[allow(deprecated)]
 pub async fn _run_example_8_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -774,6 +779,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 }
 
 // put_deploy
+#[allow(deprecated)]
 pub async fn _run_example_9_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -824,6 +830,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 }
 
 // put_deploy transfer
+#[allow(deprecated)]
 pub async fn _run_example_10_legacy() {
     let sdk = SDK::new(
         Some("http://127.0.0.1:11101".to_string()),
@@ -975,6 +982,7 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     println!("processed deploy hash {result}");
     Ok(())
 }
+
 // call_entrypoint_deploy
 #[allow(deprecated)]
 pub async fn _run_example_12_legacy() {

@@ -10,6 +10,7 @@ pub mod test_module {
         session_str_params::SessionStrParams,
     };
 
+    #[allow(deprecated)]
     pub async fn test_make_deploy() {
         let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
@@ -33,6 +34,7 @@ pub mod test_module {
         assert_eq!(make_deploy.entry_point_name(), ENTRYPOINT_DECIMALS);
     }
 
+    #[allow(deprecated)]
     pub async fn test_make_transfer() {
         let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(
@@ -59,6 +61,7 @@ pub mod test_module {
         assert!(make_transfer.is_transfer());
     }
 
+    #[allow(deprecated)]
     pub async fn test_sign_deploy() {
         let config: TestConfig = get_config(true).await;
         let deploy_params = DeployStrParams::new(

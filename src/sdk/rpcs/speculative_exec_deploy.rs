@@ -98,6 +98,8 @@ pub struct GetSpeculativeExecDeployOptions {
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
     #[wasm_bindgen(js_name = "speculative_exec_deploy_options")]
+    #[deprecated(note = "prefer speculative_exec_transaction_options")]
+    #[allow(deprecated)]
     pub fn get_speculative_exec_deploy_options(
         &self,
         options: JsValue,
@@ -121,6 +123,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+    #[deprecated(note = "prefer speculative_exec_transaction")]
+    #[allow(deprecated)]
     #[wasm_bindgen(js_name = "speculative_exec_deploy")]
     pub async fn speculative_exec_deploy_js_alias(
         &self,
@@ -180,6 +184,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result of _SpeculativeExecResult or a `SdkError` in case of an error.
+    #[deprecated(note = "prefer speculative_exec_transaction")]
+    #[allow(deprecated)]
     pub async fn speculative_exec_deploy(
         &self,
         deploy: Deploy,
@@ -210,6 +216,7 @@ impl SDK {
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use crate::{

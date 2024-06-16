@@ -38,7 +38,8 @@ impl SDK {
     ///
     /// A `Result` containing the result of the transfer or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "transfer")]
-    #[allow(clippy::too_many_arguments)]
+    #[deprecated(note = "prefer transfer_transaction")]
+    #[allow(clippy::too_many_arguments, deprecated)]
     pub async fn transfer_js_alias(
         &self,
         amount: &str,
@@ -87,7 +88,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the result a `SuccessResponse<_PutDeployResult>` of the transfer or a `SdkError` in case of an error.
-    #[allow(clippy::too_many_arguments)]
+    #[deprecated(note = "prefer transfer_transaction")]
+    #[allow(clippy::too_many_arguments, deprecated)]
     pub async fn transfer(
         &self,
         amount: &str,
@@ -127,6 +129,7 @@ impl SDK {
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
 
     use super::*;

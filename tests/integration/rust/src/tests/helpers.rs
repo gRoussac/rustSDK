@@ -4,6 +4,8 @@ use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
+use casper_rust_wasm_sdk::types::addressable_entity_hash::AddressableEntityHash;
+use casper_rust_wasm_sdk::types::contract_hash::ContractHash;
 use casper_rust_wasm_sdk::{
     rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
     types::{
@@ -403,8 +405,13 @@ pub async fn mint_nft(
     ]);
     transaction_params.set_session_args_simple(args);
 
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(contract_cep78_hash, ENTRYPOINT_MINT);
+    let contract_hash = ContractHash::new(contract_cep78_hash).unwrap();
+    let entity_hash: AddressableEntityHash = contract_hash.into();
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        &entity_hash.to_formatted_string(),
+        ENTRYPOINT_MINT,
+    );
 
     let sdk = create_test_sdk(None);
     let test_call_entrypoint_deploy = sdk

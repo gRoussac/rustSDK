@@ -34,6 +34,8 @@ impl SDK {
     ///
     /// A `Result` containing the created `Deploy` or a `JsError` in case of an error.
     #[wasm_bindgen(js_name = "make_transfer")]
+    #[deprecated(note = "prefer 'make_transfer_transaction'")]
+    #[allow(deprecated)]
     pub fn make_transfer_js_alias(
         &self,
         amount: &str,
@@ -75,6 +77,8 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing the created `Deploy` or a `SdkError` in case of an error.
+    #[deprecated(note = "prefer 'make_transfer_transaction'")]
+    #[allow(deprecated)]
     pub fn make_transfer(
         &self,
         amount: &str,
@@ -96,6 +100,8 @@ impl SDK {
 }
 
 /// Internal function to create a transfer deploy.
+#[deprecated(note = "prefer 'make_transfer_transaction'")]
+#[allow(deprecated)]
 pub(crate) fn make_transfer(
     amount: &str,
     target_account: &str,
@@ -122,6 +128,7 @@ pub(crate) fn make_transfer(
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
