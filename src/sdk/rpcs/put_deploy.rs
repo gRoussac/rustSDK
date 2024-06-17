@@ -106,15 +106,15 @@ mod tests {
     };
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     fn get_deploy() -> Deploy {
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let (_, _, chain_name) = get_network_constants();
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 

@@ -1,5 +1,5 @@
 use crate::tests::helpers::{
-    get_block, get_network_constants, get_user_private_key,
+    get_block, get_network_constants, get_user_secret_key,
     intern::{get_dictionnary_key, get_dictionnary_uref, get_main_purse},
 };
 use casper_rust_wasm_sdk::types::verbosity::Verbosity;
@@ -11,13 +11,13 @@ use tokio::sync::Mutex;
 pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
 pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
-pub const DEFAULT_PRIVATE_KEY_NAME: &str = "secret_key.pem";
+pub const DEFAULT_SECRET_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
 // https://github.com/seanmonstar/reqwest/issues/1148#issuecomment-910868788
 pub const TIMESTAMP_WAIT_TIME: Duration = time::Duration::from_millis(1000);
 pub const DEPLOY_TIME: Duration = time::Duration::from_millis(45000);
-// read_pem_file will look PRIVATE_KEY_NAME to root directory if relative path is not found (relative to root)
-pub const DEFAULT_PRIVATE_KEY_NCTL_PATH: &str =
+// read_pem_file will look SECRET_KEY_NAME to root directory if relative path is not found (relative to root)
+pub const DEFAULT_SECRET_KEY_NCTL_PATH: &str =
     "../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/";
 pub const WASM_PATH: &str = "./tests/wasm/";
 pub const DEFAULT_TTL: &str = "30m";
@@ -62,7 +62,7 @@ pub struct TestConfig {
     pub verbosity: Option<Verbosity>,
     pub event_address: String,
     pub chain_name: String,
-    pub private_key: String,
+    pub secret_key: String,
     pub account: String,
     pub purse_uref: String,
     pub account_hash: String,
@@ -95,10 +95,10 @@ pub async fn initialize_test_config(
     if *block_hash_initialized_guard {
         return Err("initialize_test_config called after block_hash already initialized".into());
     }
-    let private_key = get_user_private_key(None).unwrap();
-    let private_key_target_account = get_user_private_key(Some("user-2"))?;
-    let account = public_key_from_secret_key(&private_key).unwrap();
-    let target_account = public_key_from_secret_key(&private_key_target_account).unwrap();
+    let secret_key = get_user_secret_key(None).unwrap();
+    let secret_key_target_account = get_user_secret_key(Some("user-2"))?;
+    let account = public_key_from_secret_key(&secret_key).unwrap();
+    let target_account = public_key_from_secret_key(&secret_key_target_account).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
     let purse_uref = get_main_purse(&account, &default_node_address).await;
@@ -113,7 +113,7 @@ pub async fn initialize_test_config(
         println!("install_cep78");
         deploy_hash = install_cep78_if_needed(
             &account,
-            &private_key,
+            &secret_key,
             None,
             (&default_node_address, &event_address, &chain_name),
         )
@@ -132,7 +132,7 @@ pub async fn initialize_test_config(
             &contract_cep78_hash,
             &account,
             &account_hash,
-            &private_key,
+            &secret_key,
             (&default_node_address, &event_address, &chain_name),
         )
         .await;
@@ -162,7 +162,7 @@ pub async fn initialize_test_config(
         verbosity: Some(Verbosity::High),
         event_address,
         account,
-        private_key,
+        secret_key,
         chain_name,
         block_height,
         block_hash,

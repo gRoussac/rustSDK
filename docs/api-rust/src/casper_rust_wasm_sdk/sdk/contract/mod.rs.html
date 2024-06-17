@@ -111,19 +111,19 @@
     <span class="kw">use </span>sdk_tests::{
         config::WASM_PATH,
         tests::helpers::{
-            get_contract_cep78_hash_keys, get_network_constants, get_user_private_key,
+            get_contract_cep78_hash_keys, get_network_constants, get_user_secret_key,
             install_cep78_if_needed,
         },
     };
 
-    <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-    <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+    <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+    <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
     <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
     <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
     <span class="kw">let </span>(node_address, event_address, chain_name) = get_network_constants();
     install_cep78_if_needed(
         <span class="kw-2">&amp;</span>account,
-        <span class="kw-2">&amp;</span>private_key,
+        <span class="kw-2">&amp;</span>secret_key,
         <span class="prelude-val">Some</span>(WASM_PATH),
         (<span class="kw-2">&amp;</span>node_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
     )
@@ -134,7 +134,7 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub async fn </span>get_dictionary_item(as_params: bool) -&gt; DictionaryItemInput {
-    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     <span class="kw">static </span><span class="kw-2">mut </span>CONTRACT_CEP78_HASH: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span>(node_address, event_address, chain_name) = get_network_constants();
@@ -142,15 +142,15 @@
     <span class="kw">unsafe </span>{
         <span class="kw">if </span>CONTRACT_CEP78_HASH.is_none() {
             <span class="kw">let </span>contract_cep78_hash = install_cep78().<span class="kw">await</span>;
-            <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-            <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+            <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+            <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
             <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
             <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
             mint_nft(
                 <span class="kw-2">&amp;</span>contract_cep78_hash,
                 <span class="kw-2">&amp;</span>account,
                 <span class="kw-2">&amp;</span>account_hash,
-                <span class="kw-2">&amp;</span>private_key,
+                <span class="kw-2">&amp;</span>secret_key,
                 (<span class="kw-2">&amp;</span>node_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
             )
             .<span class="kw">await</span>;

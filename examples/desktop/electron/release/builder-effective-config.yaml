@@ -20,4 +20,4 @@ files:
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
-electronVersion: 29.1.1
+electronVersion: 31.0.1

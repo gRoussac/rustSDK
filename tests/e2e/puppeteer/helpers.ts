@@ -6,13 +6,13 @@ import * as config from './config';
 const { Browser, Page } = puppeteer;
 
 const casper_sdk = require('casper-rust-wasm-sdk');
-const { SDK, privateToPublicKey, PublicKey } = casper_sdk;
+const { SDK, publicKeyFromSecretKey, PublicKey } = casper_sdk;
 
 export const variables = {
   browser: undefined as typeof Browser | undefined,
   page: undefined as typeof Page | undefined,
   state_root_hash_default: '',
-  private_key: '',
+  secret_key: '',
   account: '',
   account_hash: '',
   target: '',
@@ -81,9 +81,9 @@ export async function seletAction(action: string) {
   await delay(100);
 }
 
-export async function setPrivateKey() {
-  await variables.page.waitForSelector('[e2e-id="privateKeyElt"]');
-  const elementHandle = await variables.page.$('[e2e-id="privateKeyElt"]');
+export async function setSecretKey() {
+  await variables.page.waitForSelector('[e2e-id="secretKeyElt"]');
+  const elementHandle = await variables.page.$('[e2e-id="secretKeyElt"]');
   const resolvedPath = path.resolve(__dirname, '../', config.key_name);
   if (fs.existsSync(resolvedPath)) {
     await elementHandle.uploadFile(resolvedPath);
@@ -126,25 +126,25 @@ export async function setupFixtures() {
   let copy_key_to_root_folder = true;
 
   // User 1 as target for default account
-  if (config.private_key_user_1) {
-    variables.private_key = `-----BEGIN PRIVATE KEY----- ${config.private_key_user_1} -----END PRIVATE KEY-----`;
-    variables.account = privateToPublicKey(variables.private_key);
+  if (config.secret_key_user_1) {
+    variables.secret_key = `-----BEGIN PRIVATE KEY----- ${config.secret_key_user_1} -----END PRIVATE KEY-----`;
+    variables.account = publicKeyFromSecretKey(variables.secret_key);
     const copyFilePath = path.resolve(__dirname, '../', config.key_name);
-    writeFile(variables.private_key, copyFilePath);
+    writeFile(variables.secret_key, copyFilePath);
     variables.delete_key_at_root_after_test = copy_key_to_root_folder;
   } else {
-    variables.private_key = readPEMFile(`${config.key_path}${config.key_name}`, copy_key_to_root_folder);
-    variables.account = privateToPublicKey(variables.private_key);
+    variables.secret_key = readPEMFile(`${config.key_path}${config.key_name}`, copy_key_to_root_folder);
+    variables.account = publicKeyFromSecretKey(variables.secret_key);
   }
 
   // User 2 as target for transfers etc
-  if (config.private_key_user_2) {
-    const private_key_target = `-----BEGIN PRIVATE KEY----- ${config.private_key_user_2} -----END PRIVATE KEY-----`;
-    variables.target = privateToPublicKey(private_key_target);
+  if (config.secret_key_user_2) {
+    const secret_key_target = `-----BEGIN PRIVATE KEY----- ${config.secret_key_user_2} -----END PRIVATE KEY-----`;
+    variables.target = publicKeyFromSecretKey(secret_key_target);
   } else {
     const key_path_target = config.key_path.replace('user-1', 'user-2');
-    const private_key_target = readPEMFile(`${key_path_target}${config.key_name}`);
-    variables.target = privateToPublicKey(private_key_target);
+    const secret_key_target = readPEMFile(`${key_path_target}${config.key_name}`);
+    variables.target = publicKeyFromSecretKey(secret_key_target);
   }
 
   if (!variables.account || !variables.target) {

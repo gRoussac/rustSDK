@@ -566,7 +566,7 @@
     };
     <span class="kw">use </span>sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     <span class="attr">#[tokio::test]
@@ -609,11 +609,11 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         <span class="kw">let </span>make_transfer = sdk
@@ -647,11 +647,11 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         <span class="kw">let </span>make_transfer = sdk

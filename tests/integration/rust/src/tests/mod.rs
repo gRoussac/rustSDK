@@ -147,7 +147,7 @@ pub async fn _run_example_6() {
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
@@ -158,7 +158,7 @@ pub async fn _run_example_6() {
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
     );
@@ -237,7 +237,7 @@ pub async fn _run_example_8() {
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const CONTRACT_HASH: &str =
@@ -248,7 +248,7 @@ pub async fn _run_example_8() {
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
     );
@@ -284,7 +284,7 @@ pub async fn _run_example_9() {
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const CONTRACT_HASH: &str =
@@ -295,7 +295,7 @@ pub async fn _run_example_9() {
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
     );
@@ -329,7 +329,7 @@ pub async fn _run_example_10() {
     pub const CHAIN_NAME: &str = "casper-net-1";
     pub const PUBLIC_KEY: &str =
         "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
     pub const PAYMENT_AMOUNT: &str = "100000000";
     pub const TRANSFER_AMOUNT: &str = "2500000000";
@@ -340,7 +340,7 @@ pub async fn _run_example_10() {
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         PUBLIC_KEY, // sender account
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,                  // optional timestamp
         Some(TTL.to_string()), // optional TTL
     );
@@ -388,9 +388,9 @@ pub async fn _run_example_11() -> Result<(), String> {
     }
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
     -----END PRIVATE KEY-----"#;
-    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let public_key: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const ARGS_JSON: &str = r#"[
 {"name": "collection_name", "type": "String", "value": "enhanced-nft-1"},
 {"name": "collection_symbol", "type": "String", "value": "ENFT-1"},
@@ -412,7 +412,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         public_key,
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,
         None,
     );
@@ -476,9 +476,9 @@ pub async fn _run_example_12() {
     };
 
     pub const CHAIN_NAME: &str = "casper-net-1";
-    pub const PRIVATE_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
+    pub const SECRET_KEY: &str = r#"-----BEGIN PRIVATE KEY-----
         -----END PRIVATE KEY-----"#;
-    let public_key: &str = &public_key_from_secret_key(PRIVATE_KEY).unwrap();
+    let public_key: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const CONTRACT_HASH: &str =
         "hash-508ec6d085766e8abf5c2ff8a6c60ca9e1712fe6228656d5fae3e281b0218ca0";
     pub const ENTRYPOINT_MINT: &str = "mint";
@@ -489,7 +489,7 @@ pub async fn _run_example_12() {
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
         public_key,
-        Some(PRIVATE_KEY.to_string()),
+        Some(SECRET_KEY.to_string()),
         None,
         None,
     );

@@ -30,7 +30,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -65,7 +65,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.to_string()),
+            Some(config.secret_key.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -95,7 +95,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.to_string()),
+            Some(config.secret_key.to_string()),
             None,
             Some(TTL.to_string()),
         );
@@ -109,7 +109,7 @@ pub mod test_module_deploy {
                 .unwrap();
         // assert!(deploy.is_valid());
         assert_eq!(deploy.ttl(), TTL.to_string());
-        deploy = deploy.with_ttl(DEFAULT_TTL, Some(config.private_key.clone()));
+        deploy = deploy.with_ttl(DEFAULT_TTL, Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         assert_eq!(deploy.ttl(), DEFAULT_TTL.to_string());
     }
@@ -119,7 +119,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -141,7 +141,7 @@ pub mod test_module_deploy {
 
         let current_timestamp = &get_current_timestamp(None)[..19];
         assert_ne!(deploy_timestamp, current_timestamp);
-        deploy = deploy.with_timestamp(current_timestamp, Some(config.private_key.clone()));
+        deploy = deploy.with_timestamp(current_timestamp, Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         assert_eq!(&deploy.timestamp()[..19], current_timestamp);
     }
@@ -151,7 +151,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -167,7 +167,7 @@ pub mod test_module_deploy {
         .unwrap();
         // assert!(deploy.is_valid());
         assert_eq!(deploy.chain_name(), config.chain_name);
-        deploy = deploy.with_chain_name("test", Some(config.private_key.clone()));
+        deploy = deploy.with_chain_name("test", Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         assert_eq!(&deploy.chain_name(), "test");
     }
@@ -177,7 +177,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -203,7 +203,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -226,7 +226,7 @@ pub mod test_module_deploy {
             Value::String(ENTRYPOINT_MINT.to_string())
         );
 
-        deploy = deploy.with_entry_point_name("name", Some(config.private_key.clone()));
+        deploy = deploy.with_entry_point_name("name", Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         //assert_eq!(&deploy.entry_point_name(), "name");
 
@@ -241,7 +241,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -259,7 +259,7 @@ pub mod test_module_deploy {
         let new_session_hash = "7b9f86fd244c604012002cde5961464bfd371539c5e6df4b42ada6108090421c";
         deploy = deploy.with_hash(
             ContractHash::new(new_session_hash).unwrap(),
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
         );
         // assert!(deploy.is_valid());
         // assert!(deploy.is_stored_contract());
@@ -275,7 +275,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -304,7 +304,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -323,7 +323,7 @@ pub mod test_module_deploy {
             "10631a7146f1a164fb4af24b71881704cccd9dc988e02f85cf332c8d9b88238a";
         deploy = deploy.with_package_hash(
             ContractPackageHash::new(new_session_package_hash).unwrap(),
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
         );
         // assert!(deploy.is_valid());
         // assert!(deploy.is_stored_contract_package());
@@ -342,7 +342,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -367,7 +367,7 @@ pub mod test_module_deploy {
                 return;
             }
         };
-        deploy = deploy.with_module_bytes(module_bytes.into(), Some(config.private_key.clone()));
+        deploy = deploy.with_module_bytes(module_bytes.into(), Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         // assert!(deploy.is_module_bytes());
         assert!(!deploy
@@ -397,7 +397,7 @@ pub mod test_module_deploy {
         .unwrap();
         // assert!(!deploy.is_valid());
         assert_eq!(&deploy.account(), &config.account);
-        deploy = deploy.with_secret_key(Some(config.private_key.clone()));
+        deploy = deploy.with_secret_key(Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         // Parse the JSON string in 1.6
         let parsed_json: Value = serde_json::from_str(&deploy.to_json_string().unwrap()).unwrap();
@@ -415,7 +415,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -448,7 +448,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             Some(old_timestamp.to_string()),
             Some(TTL.to_string()),
         );
@@ -470,7 +470,7 @@ pub mod test_module_deploy {
 
         let current_timestamp = &get_current_timestamp(None)[..19];
         assert_ne!(deploy_timestamp, current_timestamp);
-        deploy = deploy.with_timestamp(current_timestamp, Some(config.private_key.clone()));
+        deploy = deploy.with_timestamp(current_timestamp, Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         assert!(!deploy.timestamp().is_empty());
         // assert!(!deploy.expired());
@@ -500,7 +500,7 @@ pub mod test_module_deploy {
         // assert!(deploy.has_valid_hash());
         //  let compute_approvals_hash = deploy.compute_approvals_hash();
         assert_eq!(&deploy.account(), &config.account);
-        deploy = deploy.sign(&config.private_key);
+        deploy = deploy.sign(&config.secret_key);
         // assert!(deploy.is_valid());
         // let new_compute_approvals_hash = deploy.compute_approvals_hash();
         // assert_ne!(compute_approvals_hash, new_compute_approvals_hash);
@@ -521,7 +521,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -548,7 +548,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -569,7 +569,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -596,7 +596,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -619,7 +619,7 @@ pub mod test_module_deploy {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -633,11 +633,11 @@ pub mod test_module_deploy {
                 .unwrap();
         // assert!(deploy.is_valid());
         assert!(deploy.args().is_empty());
-        deploy = deploy.add_arg("foo:bool='false".into(), Some(config.private_key.clone()));
+        deploy = deploy.add_arg("foo:bool='false".into(), Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 1);
         let arg_json = r#"{"name": "bar", "type": "U256", "value": 1}"#; // No brackets only one arg
-        deploy = deploy.add_arg(arg_json.into(), Some(config.private_key.clone()));
+        deploy = deploy.add_arg(arg_json.into(), Some(config.secret_key.clone()));
         // assert!(deploy.is_valid());
         assert_eq!(deploy.args().len(), 2);
     }
