@@ -1,8 +1,4 @@
-use std::fmt::{Display, Formatter};
-
 use super::sdk_error::SdkError;
-use crate::debug::error;
-use base16::DecodeError;
 use casper_types::{
     bytesrepr::{self, FromBytes, ToBytes},
     Digest as _Digest, DigestError,
@@ -10,20 +6,21 @@ use casper_types::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[wasm_bindgen]
 pub struct Digest(_Digest);
 
 impl Digest {
     pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
-        Ok(Digest::from(digest_hex_str))
+        Digest::try_from(digest_hex_str)
     }
 
     pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, SdkError> {
         let hex_string = hex::encode(bytes);
-        Ok(Digest::from(&hex_string[..]))
+        Digest::try_from(&hex_string[..])
     }
 }
 
@@ -36,7 +33,7 @@ impl Digest {
 
     #[wasm_bindgen(js_name = "fromString")]
     pub fn from_string(digest_hex_str: &str) -> Result<Digest, JsError> {
-        Ok(Digest::from(digest_hex_str))
+        Digest::try_from(digest_hex_str).map_err(Into::into)
     }
 
     #[cfg(target_arch = "wasm32")]
@@ -109,39 +106,26 @@ impl From<[u8; _Digest::LENGTH]> for Digest {
     }
 }
 
-impl From<&str> for Digest {
-    fn from(s: &str) -> Self {
-        let bytes = hex::decode(s)
-            .map_err(|err| {
-                let context = format!("Decoding hex string {:?}", err);
-                let base16_err = DecodeError::InvalidByte {
-                    byte: 0,  // TODO Fix error
-                    index: 0, // Set the index to 0 or a relevant value here
-                };
-                let err = DigestError::Base16DecodeError(base16_err);
-                let err = SdkError::FailedToParseDigest {
-                    context,
-                    error: err,
-                };
-                error(&err.to_string());
-                err
-            })
-            .unwrap_or_default();
+impl TryFrom<&str> for Digest {
+    type Error = SdkError;
+    fn try_from(input: &str) -> Result<Self, Self::Error> {
+        let bytes = hex::decode(input).map_err(|err| SdkError::FailedToDecodeHex {
+            context: "Digest::try_from &str",
+            error: format!("Decoding hex string {:?}", err),
+        })?;
 
         if bytes.len() != _Digest::LENGTH {
-            let context = "Invalid Digest length";
-            let err = DigestError::IncorrectDigestLength(bytes.len());
-
-            let sdk_error = SdkError::FailedToParseDigest {
-                context: context.to_string(),
-                error: err,
-            };
-            error(&sdk_error.to_string());
+            let context = "Invalid Digest length".to_string();
+            let digest_error = DigestError::IncorrectDigestLength(bytes.len());
+            return Err(SdkError::FailedToParseDigest {
+                context,
+                error: digest_error,
+            });
         }
 
         let mut digest_bytes = [0u8; _Digest::LENGTH];
         digest_bytes.copy_from_slice(&bytes);
-        Digest(_Digest::from(digest_bytes))
+        Ok(Digest(_Digest::from(digest_bytes)))
     }
 }
 
@@ -161,7 +145,7 @@ impl ToDigest for Digest {
 
 impl ToDigest for &str {
     fn to_digest(&self) -> Digest {
-        Digest::from(*self)
+        Digest::try_from(*self).unwrap_or_default()
     }
     fn is_empty(&self) -> bool {
         self.trim().is_empty()
