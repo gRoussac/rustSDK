@@ -105,7 +105,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-    #[wasm_bindgen(js_name = "get_dictionary_item_options")]
     pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
         let options_result = options.into_serde::<GetDictionaryItemOptions>();
         match options_result {
