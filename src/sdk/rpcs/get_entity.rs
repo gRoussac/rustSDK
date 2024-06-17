@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     types::{
         block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier,
         sdk_error::SdkError, verbosity::Verbosity,
@@ -85,15 +84,10 @@ pub struct GetEntityOptions {
 #[wasm_bindgen]
 impl SDK {
     // Deserialize options for `get_entity` from a JavaScript object
-    pub fn get_entity_options(&self, options: JsValue) -> GetEntityOptions {
-        let options_result = options.into_serde::<GetEntityOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetEntityOptions::default()
-            }
-        }
+    pub fn get_entity_options(&self, options: JsValue) -> Result<GetEntityOptions, JsError> {
+        options
+            .into_serde::<GetEntityOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves entity information using the provided options.
@@ -153,7 +147,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -201,13 +194,11 @@ impl SDK {
             match parse_entity_identifier(&entity_identifier_as_string) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    error(&err.to_string());
                     return Err(SdkError::FailedToParseEntityIdentifier);
                 }
             }
         } else {
             let err = "Error: Missing entity identifier".to_string();
-            error(&err);
             return Err(SdkError::InvalidArgument {
                 context: "get_entity",
                 error: err,

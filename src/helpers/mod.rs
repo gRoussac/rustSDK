@@ -1,4 +1,3 @@
-use crate::debug::error;
 use crate::types::account_hash::AccountHash;
 use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 use base64::engine::general_purpose;
@@ -10,7 +9,7 @@ use blake2::{
 use casper_client::cli::JsonArg;
 use casper_types::{
     bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, CLValue,
-    DeployBuilder, ErrorExt, Key as _Key, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs,
+    DeployBuilder, Key as CasperTypesKey, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs,
     SecretKey, TimeDiff, Timestamp,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
@@ -110,7 +109,7 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
 /// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```
 pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
-    let key: _Key = _Key::from(key);
+    let key: CasperTypesKey = CasperTypesKey::from(key);
     let mut bytes_a = key.to_bytes().unwrap_or_default();
     let mut bytes_b = value.to_bytes().unwrap_or_default();
 
@@ -226,9 +225,12 @@ pub(crate) fn get_str_or_default(opt_str: Option<&String>) -> &str {
 ///
 /// # Errors
 ///
-/// Returns an `ErrorExt` if the secret key generation fails.
-pub fn secret_key_generate() -> Result<SecretKey, ErrorExt> {
-    SecretKey::generate_ed25519()
+/// Returns an `SdkError` if the secret key generation fails.
+pub fn secret_key_generate() -> Result<SecretKey, SdkError> {
+    SecretKey::generate_ed25519().map_err(|err| SdkError::FailedToGenerateSecretKey {
+        context: "secret_key_from_pem".to_string(),
+        error: err,
+    })
 }
 
 /// Generates a secret key using the secp256k1 algorithm.
@@ -239,9 +241,12 @@ pub fn secret_key_generate() -> Result<SecretKey, ErrorExt> {
 ///
 /// # Errors
 ///
-/// Returns an `ErrorExt` if the secret key generation fails.
-pub fn secret_key_secp256k1_generate() -> Result<SecretKey, ErrorExt> {
-    SecretKey::generate_secp256k1()
+/// Returns an `SdkError` if the secret key generation fails.
+pub fn secret_key_secp256k1_generate() -> Result<SecretKey, SdkError> {
+    SecretKey::generate_secp256k1().map_err(|err| SdkError::FailedToGenerateSecretKey {
+        context: "secret_key_from_pem".to_string(),
+        error: err,
+    })
 }
 
 /// Parses a secret key in PEM format into a `SecretKey` object.
@@ -253,8 +258,11 @@ pub fn secret_key_secp256k1_generate() -> Result<SecretKey, ErrorExt> {
 /// # Returns
 ///
 /// A `Result` containing the parsed `SecretKey` or an error if parsing fails.
-pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
-    SecretKey::from_pem(secret_key)
+pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, SdkError> {
+    SecretKey::from_pem(secret_key).map_err(|err| SdkError::FailedToParseSecretKey {
+        context: "secret_key_from_pem".to_string(),
+        error: err,
+    })
 }
 
 /// Converts a secret key in PEM format to its corresponding public key as a string.
@@ -266,16 +274,17 @@ pub fn secret_key_from_pem(secret_key: &str) -> Result<SecretKey, ErrorExt> {
 /// # Returns
 ///
 /// A `Result` containing the public key as a string or an error if the conversion fails.
-pub fn public_key_from_secret_key(secret_key: &str) -> Result<String, ErrorExt> {
-    let secret_key_from_pem = secret_key_from_pem(secret_key);
-    let public_key = match secret_key_from_pem {
-        Ok(secret_key) => CasperTypesPublicKey::from(&secret_key),
-        Err(err) => {
-            error(&format!("Error in public_key_from_secret_key: {:?}", err));
-            return Err(err);
-        }
-    };
+pub fn public_key_from_secret_key(secret_key: &str) -> Result<String, SdkError> {
+    // Handle the secret key parsing and map the error
+    let secret_key_from_pem = secret_key_from_pem(secret_key)?;
+
+    // Convert the secret key to public key and handle potential errors
+    let public_key = CasperTypesPublicKey::from(&secret_key_from_pem);
+
+    // Convert to desired public key format
     let public_key_test: PublicKey = public_key.into();
+
+    // Return the public key as a string
     Ok(public_key_test.to_string())
 }
 
@@ -327,21 +336,21 @@ pub fn hex_to_string(hex_string: &str) -> String {
 /// # Returns
 ///
 /// A string representing the CSPR amount.
-pub fn motes_to_cspr(motes: &str) -> String {
+pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
     match Decimal::from_str(motes) {
         Ok(motes_decimal) => {
             let cspr_decimal = motes_decimal / Decimal::new(1_000_000_000, 0);
             let formatted_cspr = cspr_decimal.to_string();
             if formatted_cspr.ends_with(".00") {
-                formatted_cspr.replace(".00", "")
+                Ok(formatted_cspr.replace(".00", ""))
             } else {
-                formatted_cspr
+                Ok(formatted_cspr)
             }
         }
-        Err(err) => {
-            error(&format!("Failed to parse input as Decimal: {:?}", err));
-            "Invalid input".to_string()
-        }
+        Err(err) => Err(SdkError::CustomError(format!(
+            "Failed to parse input as Decimal: {:?}",
+            err
+        ))),
     }
 }
 
@@ -355,28 +364,19 @@ pub fn motes_to_cspr(motes: &str) -> String {
 /// # Returns
 ///
 /// A JSON string representing the pretty printed value.
-pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> String
+pub fn json_pretty_print<T>(value: T, verbosity: Option<Verbosity>) -> Result<String, SdkError>
 where
     T: Serialize,
 {
-    if let Ok(deserialized) = serde_json::to_value(&value) {
-        let result = match verbosity {
-            Some(Verbosity::Low) | None => Ok(deserialized.to_string()),
-            Some(Verbosity::Medium) => casper_types::json_pretty_print(&deserialized),
-            Some(Verbosity::High) => serde_json::to_string_pretty(&deserialized),
-        }
-        .map_err(|err| error(&format!("Error in json_pretty_print: {}", err)));
+    let deserialized = serde_json::to_value(&value).map_err(SdkError::from)?;
 
-        match result {
-            Ok(result) => result,
-            Err(err) => {
-                error(&format!("Error in json_pretty_print: {:?}", err));
-                String::from("")
-            }
+    match verbosity {
+        Some(Verbosity::Low) | None => Ok(deserialized.to_string()),
+        Some(Verbosity::Medium) => casper_types::json_pretty_print(&deserialized)
+            .map_err(|err| SdkError::CustomError(format!("Error in json_pretty_print: {}", err))),
+        Some(Verbosity::High) => {
+            serde_json::to_string_pretty(&deserialized).map_err(SdkError::from)
         }
-    } else {
-        error("Deserialization error into_serde of json_pretty_print");
-        String::from("")
     }
 }
 
@@ -391,36 +391,32 @@ where
 ///
 /// The modified `RuntimeArgs` map.
 #[cfg(target_arch = "wasm32")]
-pub fn insert_js_value_arg(args: &mut RuntimeArgs, js_value_arg: JsValue) -> &RuntimeArgs {
+pub fn insert_js_value_arg(
+    args: &mut RuntimeArgs,
+    js_value_arg: JsValue,
+) -> Result<&RuntimeArgs, SdkError> {
     if js_sys::Object::instanceof(&js_value_arg) {
-        let json_arg: Result<JsonArg, serde_json::Error> = js_value_arg.into_serde();
-        let json_arg: Option<JsonArg> = match json_arg {
-            Ok(arg) => Some(arg),
-            Err(err) => {
-                error(&format!("Error converting to JsonArg: {:?}", err));
-                None
-            }
-        };
-        if let Some(json_arg) = json_arg {
-            let named_arg = NamedArg::try_from(json_arg);
-            let named_arg: Option<NamedArg> = match named_arg {
-                Ok(arg) => Some(arg),
-                Err(err) => {
-                    error(&format!("Error converting to NamedArg: {:?}", err));
-                    None
-                }
-            };
-            if let Some(named_arg) = named_arg {
-                args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
-            }
-        }
+        let json_arg: JsonArg = js_value_arg.into_serde().map_err(|err| {
+            SdkError::CustomError(format!("Error converting to JsonArg: {:?}", err))
+        })?;
+
+        let named_arg = NamedArg::try_from(json_arg).map_err(|err| {
+            SdkError::CustomError(format!("Error converting to NamedArg: {:?}", err))
+        })?;
+
+        args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
     } else if let Some(string_arg) = js_value_arg.as_string() {
         let simple_arg = string_arg;
-        let _ = casper_client::cli::insert_arg(&simple_arg, args);
+        casper_client::cli::insert_arg(&simple_arg, args).map_err(|err| {
+            SdkError::CustomError(format!("Error inserting simple arg: {:?}", err))
+        })?;
     } else {
-        error("Error converting to JsonArg or Simple Arg");
+        return Err(SdkError::CustomError(String::from(
+            "Error converting to JsonArg or Simple Arg",
+        )));
     }
-    args
+
+    Ok(args)
 }
 
 /// Inserts an argument into a RuntimeArgs map.

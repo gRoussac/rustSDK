@@ -1,5 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::{
     types::{
@@ -105,15 +103,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-    pub fn get_dictionary_item_options(&self, options: JsValue) -> GetDictionaryItemOptions {
-        let options_result = options.into_serde::<GetDictionaryItemOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetDictionaryItemOptions::default()
-            }
-        }
+    pub fn get_dictionary_item_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetDictionaryItemOptions, JsError> {
+        options
+            .into_serde::<GetDictionaryItemOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves dictionary item information using the provided options.

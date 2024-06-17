@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
@@ -103,15 +101,10 @@ impl SDK {
     pub fn get_speculative_exec_deploy_options(
         &self,
         options: JsValue,
-    ) -> GetSpeculativeExecDeployOptions {
-        let options_result = options.into_serde::<GetSpeculativeExecDeployOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetSpeculativeExecDeployOptions::default()
-            }
-        }
+    ) -> Result<GetSpeculativeExecDeployOptions, JsError> {
+        options
+            .into_serde::<GetSpeculativeExecDeployOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// JS function for speculative execution.

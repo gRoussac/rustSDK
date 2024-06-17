@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::transaction_hash::TransactionHash;
 use crate::{
-    debug::error,
     types::{
         sdk_error::SdkError,
         transaction_params::{
@@ -101,7 +100,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -136,8 +134,6 @@ impl SDK {
         ) {
             Ok(transaction) => transaction,
             Err(err) => {
-                let err_msg = format!("Error during transaction: {}", err);
-                error(&err_msg);
                 return Err(SdkError::from(err));
             }
         };

@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
@@ -92,15 +90,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block transfers options as a `GetBlockTransfersOptions` struct.
-    pub fn get_block_transfers_options(&self, options: JsValue) -> GetBlockTransfersOptions {
-        let options_result = options.into_serde::<GetBlockTransfersOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetBlockTransfersOptions::default()
-            }
-        }
+    pub fn get_block_transfers_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetBlockTransfersOptions, JsError> {
+        options
+            .into_serde::<GetBlockTransfersOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves block transfers information using the provided options.

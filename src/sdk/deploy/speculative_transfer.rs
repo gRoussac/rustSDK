@@ -3,7 +3,6 @@ use crate::rpcs::speculative_exec_deploy::SpeculativeExecResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     types::{
         block_identifier::BlockIdentifierInput,
         deploy_params::{
@@ -81,7 +80,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -135,8 +133,6 @@ impl SDK {
         );
 
         if let Err(err) = deploy {
-            let err_msg = format!("Error during speculative_transfer: {}", err);
-            error(&err_msg);
             return Err(SdkError::from(err));
         }
 

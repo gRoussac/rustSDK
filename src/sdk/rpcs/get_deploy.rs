@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
 use crate::types::deploy_hash::DeployHash;
 use crate::{types::verbosity::Verbosity, SDK};
@@ -13,6 +11,7 @@ use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetDeployResult
@@ -74,6 +73,7 @@ pub struct GetDeployOptions {
     pub verbosity: Option<Verbosity>,
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     /// Parses deploy options from a JsValue.
@@ -85,24 +85,18 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "prefer 'get_transaction_options'")]
     #[allow(deprecated)]
-    pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
-        let options_result = options.into_serde::<GetDeployOptions>();
-        match options_result {
-            Ok(mut options) => {
-                if let Some(finalized_approvals) = options.finalized_approvals {
-                    options.finalized_approvals =
-                        Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
-                }
-                options
-            }
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetDeployOptions::default()
-            }
+    pub fn get_deploy_options(&self, options: JsValue) -> Result<GetDeployOptions, JsError> {
+        let mut options: GetDeployOptions = options.into_serde()?;
+
+        // Handle finalized_approvals
+        if let Some(finalized_approvals) = options.finalized_approvals {
+            options.finalized_approvals =
+                Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
         }
+
+        Ok(options)
     }
 
     /// Retrieves deploy information using the provided options.
@@ -114,7 +108,6 @@ impl SDK {
     /// # Returns
     ///
     /// A `Result` containing either a `GetDeployResult` or an error.
-    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "prefer 'get_transaction'")]
     #[allow(deprecated)]
     #[wasm_bindgen(js_name = "get_deploy")]
@@ -153,7 +146,6 @@ impl SDK {
     }
 
     /// Retrieves deploy information using the provided options, alias for `get_deploy`.
-    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "This function is an alias. Please use `get_transaction` instead.")]
     #[allow(deprecated)]
     pub async fn info_get_deploy(
