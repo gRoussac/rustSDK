@@ -83,7 +83,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
-    #[wasm_bindgen(js_name = "get_block_options")]
     pub fn get_block_options(&self, options: JsValue) -> GetBlockOptions {
         let options_result = options.into_serde::<GetBlockOptions>();
         match options_result {

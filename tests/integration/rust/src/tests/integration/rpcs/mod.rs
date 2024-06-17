@@ -35,8 +35,7 @@ pub mod test_module {
     pub async fn test_get_account(maybe_block_identifier: Option<BlockIdentifierInput>) {
         let config: TestConfig = get_config(true).await;
         let public_key = PublicKey::new(&config.account).unwrap();
-        let account_identifier =
-            AccountIdentifier::from_account_account_under_public_key(public_key);
+        let account_identifier = AccountIdentifier::from_account_under_public_key(public_key);
         let get_account = create_test_sdk(Some(config))
             .get_account(
                 Some(account_identifier),

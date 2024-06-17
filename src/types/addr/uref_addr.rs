@@ -1,4 +1,3 @@
-use crate::debug::error;
 use casper_types::{URefAddr as _URefAddr, UREF_ADDR_LENGTH};
 use wasm_bindgen::prelude::*;
 
@@ -7,15 +6,23 @@ pub struct URefAddr(_URefAddr);
 
 #[wasm_bindgen]
 impl URefAddr {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new(bytes: Vec<u8>) -> Result<URefAddr, JsValue> {
+    pub fn new(bytes: Vec<u8>) -> Result<URefAddr, JsError> {
         if bytes.len() != UREF_ADDR_LENGTH {
-            error("Invalid URefAddr length");
-            return Err(JsValue::null());
+            return Err(JsError::new("Invalid URefAddr length"));
         }
         let mut array = [0u8; UREF_ADDR_LENGTH];
         array.copy_from_slice(&bytes);
         Ok(URefAddr(array))
+    }
+}
+
+impl From<Vec<u8>> for URefAddr {
+    fn from(bytes: Vec<u8>) -> Self {
+        let mut array = [0u8; UREF_ADDR_LENGTH];
+        array.copy_from_slice(&bytes);
+        URefAddr(array)
     }
 }
 

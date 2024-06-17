@@ -87,7 +87,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    #[wasm_bindgen(js_name = "get_deploy_options")]
     pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
         let options_result = options.into_serde::<GetDeployOptions>();
         match options_result {

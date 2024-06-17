@@ -84,7 +84,6 @@ pub struct GetAccountOptions {
 #[wasm_bindgen]
 impl SDK {
     // Deserialize options for `get_account` from a JavaScript object
-    #[wasm_bindgen(js_name = "get_account_options")]
     pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {
         let options_result = options.into_serde::<GetAccountOptions>();
         match options_result {
@@ -238,7 +237,7 @@ mod tests {
         let account = public_key_from_secret_key(&secret_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
-        AccountIdentifier::from_account_account_under_public_key(public_key)
+        AccountIdentifier::from_account_under_public_key(public_key)
     }
 
     #[tokio::test]

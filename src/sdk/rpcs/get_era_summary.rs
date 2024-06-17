@@ -83,7 +83,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed era summary options as a `GetEraSummaryOptions` struct.
-    #[wasm_bindgen(js_name = "get_era_summary_options")]
     pub fn get_era_summary_options(&self, options: JsValue) -> GetEraSummaryOptions {
         let options_result = options.into_serde::<GetEraSummaryOptions>();
         match options_result {

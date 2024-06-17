@@ -1,4 +1,3 @@
-use crate::debug::error;
 use casper_types::{HashAddr as _HashAddr, KEY_HASH_LENGTH};
 use wasm_bindgen::prelude::*;
 
@@ -7,15 +6,23 @@ pub struct HashAddr(_HashAddr);
 
 #[wasm_bindgen]
 impl HashAddr {
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(constructor)]
-    pub fn new(bytes: Vec<u8>) -> Result<HashAddr, JsValue> {
+    pub fn new(bytes: Vec<u8>) -> Result<HashAddr, JsError> {
         if bytes.len() != KEY_HASH_LENGTH {
-            error("Invalid HashAddr length");
-            return Err(JsValue::null());
+            return Err(JsError::new("Invalid HashAddr length"));
         }
         let mut array = [0u8; KEY_HASH_LENGTH];
         array.copy_from_slice(&bytes);
         Ok(HashAddr(array))
+    }
+}
+
+impl From<Vec<u8>> for HashAddr {
+    fn from(bytes: Vec<u8>) -> Self {
+        let mut array = [0u8; KEY_HASH_LENGTH];
+        array.copy_from_slice(&bytes);
+        HashAddr(array)
     }
 }
 

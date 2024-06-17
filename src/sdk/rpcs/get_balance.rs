@@ -94,7 +94,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
-    #[wasm_bindgen(js_name = "get_balance_options")]
     pub fn get_balance_options(&self, options: JsValue) -> GetBalanceOptions {
         let options_result = options.into_serde::<GetBalanceOptions>();
         match options_result {
