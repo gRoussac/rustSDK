@@ -219,7 +219,7 @@ impl SDK {
             match parse_purse_identifier(&purse_id) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    return Err(SdkError::FailedToParsePurseIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {

@@ -229,6 +229,7 @@ pub fn dictionary_item_str_params_to_casper_client(
         let value = get_str_or_default(dictionary_variant.value.get());
         return _DictionaryItemStrParams::Dictionary(value);
     } else {
+        // TODO Fix return type
         error("Error converting dictionary_item_params");
         return _DictionaryItemStrParams::Dictionary("");
     }

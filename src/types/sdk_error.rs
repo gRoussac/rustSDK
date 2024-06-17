@@ -148,15 +148,6 @@ pub enum SdkError {
     #[error("Failed to parse state identifier")]
     FailedToParseStateIdentifier,
 
-    #[error("Failed to parse purse identifier")]
-    FailedToParsePurseIdentifier,
-
-    #[error("Failed to parse account identifier")]
-    FailedToParseAccountIdentifier,
-
-    #[error("Failed to parse entity identifier")]
-    FailedToParseEntityIdentifier,
-
     ///Failed to parse a transfer target
     #[error("Failed to parse a transfer target")]
     FailedToParseTransferTarget,

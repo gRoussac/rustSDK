@@ -194,7 +194,7 @@ impl SDK {
             match parse_entity_identifier(&entity_identifier_as_string) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    return Err(SdkError::FailedToParseEntityIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {

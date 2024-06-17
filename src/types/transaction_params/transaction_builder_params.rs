@@ -250,12 +250,7 @@ impl TransactionBuilderParams {
         minimum_delegation_amount: u64,
         maximum_delegation_amount: u64,
     ) -> TransactionBuilderParams {
-        let cloned_amount = amount.to_string();
-        let amount = U512::from_dec_str(&cloned_amount)
-            .map_err(|err| {
-                error(&format!("Error converting amount: {:?}", err));
-            })
-            .ok();
+        let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::AddBid,
             transaction_bytes: None,
@@ -443,11 +438,7 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(setter)]
     pub fn set_amount(&mut self, amount: &str) {
-        let amount = U512::from_dec_str(amount)
-            .map_err(|err| {
-                error(&format!("Error converting amount: {:?}", err));
-            })
-            .ok();
+        let amount = convert_amount(amount);
         self.amount = amount;
     }
 

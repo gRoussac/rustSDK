@@ -201,7 +201,7 @@ impl SDK {
             match parse_account_identifier(&account_identifier_as_string) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    return Err(SdkError::FailedToParseAccountIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {
