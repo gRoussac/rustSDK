@@ -140,7 +140,7 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
 ///
 /// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
-pub fn get_base64_from_account_hash(account_hash: &str) -> Result<String, FromStrError> {
+pub fn get_base64_key_from_account_hash(account_hash: &str) -> Result<String, FromStrError> {
     let account_hash = _AccountHash::from_formatted_str(account_hash);
     let key = match account_hash {
         Ok(account_hash) => _Key::from(account_hash).to_bytes().unwrap(),
@@ -702,14 +702,14 @@ mod tests {
     }
 
     #[test]
-    fn test_get_base64_from_account_hash() {
+    fn test_get_base64_key_from_account_hash() {
         // Test with a known input and expected output
         let input_hash =
             "account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f";
         let expected_output = "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf";
 
         // Call the function under test
-        let result = get_base64_from_account_hash(input_hash).unwrap();
+        let result = get_base64_key_from_account_hash(input_hash).unwrap();
 
         // Check the result against the expected output
         assert_eq!(result, expected_output.to_string());

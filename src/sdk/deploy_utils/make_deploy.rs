@@ -97,7 +97,7 @@ mod tests {
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
         config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     #[tokio::test]
@@ -105,11 +105,11 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let (_, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
@@ -126,12 +126,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_make_deploy_with_valid_params_without_private_key() {
+    async fn test_make_deploy_with_valid_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (_, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let session_params = SessionStrParams::default();
@@ -155,11 +155,11 @@ mod tests {
         let sdk = SDK::new(None, None);
         let (_, _, chain_name) = get_network_constants();
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let session_params = SessionStrParams::default();
         session_params.set_session_hash(
             "hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",

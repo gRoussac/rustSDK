@@ -408,7 +408,7 @@
     <span class="kw">use crate</span>::{helpers::public_key_from_secret_key, install_cep78};
     <span class="kw">use </span>sdk_tests::{
         config::{ARGS_SIMPLE, ENTRYPOINT_MINT, PAYMENT_AMOUNT, TTL},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
     <span class="kw">use </span>tokio;
 
@@ -443,11 +443,11 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
 
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -479,8 +479,8 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>error_message =
             <span class="string">"Missing a required arg - exactly one of the following must be provided"</span>;
@@ -488,7 +488,7 @@
         <span class="kw">let </span>deploy_params = DeployStrParams::new(
             <span class="kw-2">&amp;</span>chain_name,
             <span class="kw-2">&amp;</span>account,
-            <span class="prelude-val">Some</span>(private_key.clone()),
+            <span class="prelude-val">Some</span>(secret_key.clone()),
             <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(TTL.to_string()),
         );
@@ -521,12 +521,12 @@
     }
 
     <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>test_call_entrypoint_without_private_key() {
+    </span><span class="kw">async fn </span>test_call_entrypoint_without_secret_key() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>error_message = <span class="string">"account authorization invalid at state root hash"</span>;
 
@@ -564,11 +564,11 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key.clone()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key.clone()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
 
         <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc)"</span>;
 

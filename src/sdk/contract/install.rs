@@ -106,7 +106,7 @@ impl SDK {
 mod tests {
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, TTL, WASM_PATH},
-        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
+        tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
 
     use crate::helpers::public_key_from_secret_key;
@@ -137,11 +137,11 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let mut session_params = SessionStrParams::default();
 
         let module_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
@@ -177,8 +177,8 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let error_message =
             "Missing a required arg - exactly one of the following must be provided";
@@ -186,7 +186,7 @@ mod tests {
         let deploy_params = DeployStrParams::new(
             &chain_name,
             &account,
-            Some(private_key.clone()),
+            Some(secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -215,12 +215,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_install_without_private_key() {
+    async fn test_install_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let (node_address, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let error_message = "account authorization invalid at state root hash";
 
@@ -260,11 +260,11 @@ mod tests {
         // Arrange
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
         let (_, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key.clone()), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key.clone()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

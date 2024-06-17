@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PrivateKeyComponent } from './private-key.component';
+import { SecretKeyComponent } from './secret-key.component';
 
-describe('PrivateKeyComponent', () => {
-  let component: PrivateKeyComponent;
-  let fixture: ComponentFixture<PrivateKeyComponent>;
+describe('SecretKeyComponent', () => {
+  let component: SecretKeyComponent;
+  let fixture: ComponentFixture<SecretKeyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrivateKeyComponent],
+      imports: [SecretKeyComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PrivateKeyComponent);
+    fixture = TestBed.createComponent(SecretKeyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

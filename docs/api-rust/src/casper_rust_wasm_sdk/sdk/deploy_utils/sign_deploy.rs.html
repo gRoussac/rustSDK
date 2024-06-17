@@ -190,7 +190,7 @@
     };
     <span class="kw">use </span>sdk_tests::{
         config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
     <span class="kw">use </span>serde_json::Value;
 
@@ -200,8 +200,8 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>session_params = SessionStrParams::default();
@@ -217,7 +217,7 @@
             .make_deploy(deploy_params, session_params, payment_params)
             .unwrap();
 
-        <span class="kw">let </span>signed_deploy = sdk.sign_deploy(deploy, <span class="kw-2">&amp;</span>private_key);
+        <span class="kw">let </span>signed_deploy = sdk.sign_deploy(deploy, <span class="kw-2">&amp;</span>secret_key);
 
         <span class="comment">// Assert
         // assert!(signed_deploy.is_valid());
@@ -236,8 +236,8 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>session_params = SessionStrParams::default();
