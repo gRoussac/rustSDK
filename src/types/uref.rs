@@ -1,3 +1,4 @@
+use super::sdk_error::SdkError;
 use crate::types::access_rights::AccessRights;
 use crate::types::addr::uref_addr::URefAddr;
 use casper_types::URef as _URef;
@@ -6,8 +7,6 @@ use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 use wasm_bindgen::prelude::*;
-
-use super::sdk_error::SdkError;
 
 #[wasm_bindgen]
 #[derive(Debug, Deserialize, Clone, Serialize, Ord, PartialOrd, Eq, PartialEq)]
