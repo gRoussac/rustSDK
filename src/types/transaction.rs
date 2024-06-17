@@ -510,9 +510,12 @@ impl Transaction {
         &mut self,
         js_value_arg: JsValue,
         secret_key: Option<String>,
-    ) -> Transaction {
+    ) -> Result<Transaction, JsError> {
         let mut args = self.0.clone().session_args().clone();
-        let new_args = insert_js_value_arg(&mut args, js_value_arg);
+        let new_args = match insert_js_value_arg(&mut args, js_value_arg) {
+            Ok(new_args) => new_args,
+            Err(err) => return Err(JsError::new(&format!("Error adding argument: {}", err))),
+        };
         let new_body = modify_body(
             &self.body(),
             NewBodyParams {
@@ -521,11 +524,11 @@ impl Transaction {
             },
         );
 
-        self.build(BuildParams {
+        Ok(self.build(BuildParams {
             secret_key,
             body: Some(new_body),
             ..Default::default()
-        })
+        }))
     }
 }
 

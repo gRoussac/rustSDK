@@ -1,8 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::{
-    debug::error,
-    types::{digest::Digest, public_key::PublicKey},
-};
+use crate::types::{digest::Digest, public_key::PublicKey};
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_node_status, rpcs::results::GetNodeStatusResult as _GetNodeStatusResult, Error, JsonRpcId,
@@ -160,7 +157,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

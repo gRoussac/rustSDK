@@ -1,7 +1,7 @@
 use casper_client::{
     cli::JsonArgsError,
     cli::{CliError, FromDecStrErr},
-    Error,
+    Error as CasperClientError,
 };
 use casper_types::{
     addressable_entity::FromStrError, bytesrepr, contracts::FromStrError as FromContractStrError,
@@ -13,6 +13,12 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SdkError {
+    #[error("Custom error string")]
+    CustomError(String),
+
+    #[error("Failed to serde_json serialization")]
+    SerializationError(serde_json::Error),
+
     #[error("Failed to parse {context} as a key: {error}")]
     FailedToParseKey {
         context: &'static str,
@@ -29,6 +35,18 @@ pub enum SdkError {
     FailedToParsePublicKey {
         context: String,
         error: casper_types::crypto::Error,
+    },
+
+    #[error("Failed to parse {context} as a secret key: {error}")]
+    FailedToParseSecretKey {
+        context: String,
+        error: casper_types::ErrorExt,
+    },
+
+    #[error("Failed to generate {context} as a secret key: {error}")]
+    FailedToGenerateSecretKey {
+        context: String,
+        error: casper_types::ErrorExt,
     },
 
     #[error("Failed to parse {context} as an account hash: {error}")]
@@ -162,7 +180,7 @@ pub enum SdkError {
     JsonArgs(#[from] JsonArgsError),
 
     #[error(transparent)]
-    Core(#[from] Error),
+    Core(#[from] CasperClientError),
 }
 
 impl From<CLValueError> for SdkError {
@@ -234,3 +252,9 @@ impl From<CliError> for SdkError {
         }
     }
 }
+
+// impl From<JsonPrintError> for SdkError {
+//     fn from(err: serde_json::Error) -> Self {
+//         SdkError::SerializationError(err)
+//     }
+// }

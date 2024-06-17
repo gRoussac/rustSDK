@@ -64,8 +64,14 @@ pub fn uint8_array_to_bytes(uint8_array: js_sys::Uint8Array) -> Bytes {
 ///
 /// A string representing the CSPR amount.
 #[wasm_bindgen(js_name = "motesToCSPR")]
-pub fn motes_to_cspr_js_alias(motes: &str) -> String {
-    motes_to_cspr(motes)
+pub fn motes_to_cspr_js_alias(motes: &str) -> Result<String, JsError> {
+    match motes_to_cspr(motes) {
+        Ok(result) => Ok(result),
+        Err(err) => {
+            let error_message = format!("motes_to_cspr error: {}", err);
+            Err(JsError::new(&error_message))
+        }
+    }
 }
 
 /// Pretty prints a JSON value.
@@ -95,7 +101,7 @@ pub fn json_pretty_print_js_alias(
     };
 
     // Pretty print JSON
-    let pretty_printed = json_pretty_print(deserialized, verbosity);
+    let pretty_printed = json_pretty_print(deserialized, verbosity)?;
 
     // Convert pretty printed JSON to JsValue
     let pretty_printed_value: JsValue = JsValue::from_str(&pretty_printed);

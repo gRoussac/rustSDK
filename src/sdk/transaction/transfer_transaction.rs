@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::transaction::transaction::PutTransactionResult;
 use crate::{
-    debug::error,
     make_transfer_transaction,
     types::{
         sdk_error::SdkError, transaction_params::transaction_str_params::TransactionStrParams,
@@ -60,7 +59,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -101,15 +99,9 @@ impl SDK {
             amount,
             transaction_params,
             maybe_id,
-        );
+        )?;
 
-        if let Err(err) = transaction {
-            let err_msg = format!("Error during transfer: {}", err);
-            error(&err_msg);
-            return Err(err);
-        }
-
-        self.put_transaction(transaction.unwrap(), verbosity, node_address)
+        self.put_transaction(transaction, verbosity, node_address)
             .await
             .map_err(SdkError::from)
     }

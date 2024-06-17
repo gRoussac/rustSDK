@@ -4,7 +4,6 @@ use crate::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
 use crate::{
-    debug::error,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -107,15 +106,13 @@ impl SDK {
     ///
     /// Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
     #[wasm_bindgen(js_name = "query_balance_details_options")]
-    pub fn query_balance_details_options(&self, options: JsValue) -> QueryBalanceDetailsOptions {
-        let options_result = options.into_serde::<QueryBalanceDetailsOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                QueryBalanceDetailsOptions::default()
-            }
-        }
+    pub fn query_balance_details_options(
+        &self,
+        options: JsValue,
+    ) -> Result<QueryBalanceDetailsOptions, JsError> {
+        options
+            .into_serde::<QueryBalanceDetailsOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves balance information using the provided options.
@@ -196,7 +193,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -242,13 +238,11 @@ impl SDK {
             match parse_purse_identifier(&purse_id) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    error(&err.to_string());
                     return Err(SdkError::FailedToParsePurseIdentifier);
                 }
             }
         } else {
             let err = "Error: Missing purse identifier".to_string();
-            error(&err);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state",
                 error: err,

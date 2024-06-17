@@ -1,4 +1,3 @@
-use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
@@ -96,15 +95,13 @@ impl SDK {
     ///
     /// Parsed query global state options as a `QueryGlobalStateOptions` struct.
     #[wasm_bindgen(js_name = "query_global_state_options")]
-    pub fn query_global_state_options(&self, options: JsValue) -> QueryGlobalStateOptions {
-        let options_result = options.into_serde::<QueryGlobalStateOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                QueryGlobalStateOptions::default()
-            }
-        }
+    pub fn query_global_state_options(
+        &self,
+        options: JsValue,
+    ) -> Result<QueryGlobalStateOptions, JsError> {
+        options
+            .into_serde::<QueryGlobalStateOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves global state information using the provided options.
@@ -132,14 +129,12 @@ impl SDK {
                     Ok(data) => Ok(data.result.into()),
                     Err(err) => {
                         let err = &format!("Error occurred with {:?}", err);
-                        error(err);
                         Err(JsError::new(err))
                     }
                 }
             }
             Err(err) => {
                 let err = &format!("Error building parameters: {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -205,7 +200,6 @@ impl SDK {
             Some(KeyIdentifierInput::String(key_as_string))
         } else {
             let err_msg = "Error: Missing Key as string or Key".to_string();
-            error(&err_msg);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state",
                 error: err_msg,
@@ -313,7 +307,6 @@ impl SDK {
 
         if key.is_none() {
             let err = "Error: Missing key from formatted string".to_string();
-            error(&err);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state",
                 error: err,

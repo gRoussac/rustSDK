@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::deploy_hash::DeployHash;
 use crate::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -104,7 +103,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -143,8 +141,6 @@ impl SDK {
         );
 
         if let Err(err) = deploy {
-            let err_msg = format!("Error during deploy: {}", err);
-            error(&err_msg);
             return Err(SdkError::from(err));
         }
 

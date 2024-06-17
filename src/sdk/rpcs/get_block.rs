@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -17,6 +15,7 @@ use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 // Define a struct to wrap the GetBlockResult
@@ -76,6 +75,7 @@ pub struct GetBlockOptions {
     pub verbosity: Option<Verbosity>,
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl SDK {
     /// Parses block options from a JsValue.
@@ -87,16 +87,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
-    #[cfg(target_arch = "wasm32")]
-    pub fn get_block_options(&self, options: JsValue) -> GetBlockOptions {
-        let options_result = options.into_serde::<GetBlockOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetBlockOptions::default()
-            }
-        }
+    pub fn get_block_options(&self, options: JsValue) -> Result<GetBlockOptions, JsError> {
+        options
+            .into_serde::<GetBlockOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves block information using the provided options.
@@ -112,7 +106,6 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "get_block")]
     pub async fn get_block_js_alias(
         &self,
@@ -158,7 +151,6 @@ impl SDK {
     /// # Errors
     ///
     /// Returns a `JsError` if there is an error during the retrieval process.
-    #[cfg(target_arch = "wasm32")]
     #[deprecated(note = "This function is an alias. Please use `get_block` instead.")]
     #[allow(deprecated)]
     pub async fn chain_get_block(

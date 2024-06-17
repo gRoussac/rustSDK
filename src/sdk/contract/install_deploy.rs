@@ -5,7 +5,7 @@ use crate::types::deploy_params::{
     payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
     session_str_params::{session_str_params_to_casper_client, SessionStrParams},
 };
-use crate::{debug::error, types::sdk_error::SdkError, SDK};
+use crate::{types::sdk_error::SdkError, SDK};
 use casper_client::{
     cli::deploy::make_deploy, rpcs::results::PutDeployResult as _PutDeployResult, SuccessResponse,
 };
@@ -49,7 +49,7 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
+
                 Err(JsError::new(err))
             }
         }
@@ -96,8 +96,6 @@ impl SDK {
             false,
         );
         if let Err(err) = deploy {
-            let err_msg = format!("Error during install: {}", err);
-            error(&err_msg);
             return Err(SdkError::from(err));
         }
         self.put_deploy(deploy.unwrap().into(), None, node_address)
