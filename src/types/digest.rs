@@ -24,6 +24,7 @@ impl Digest {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 impl Digest {
     #[wasm_bindgen(constructor)]
@@ -33,22 +34,19 @@ impl Digest {
 
     #[wasm_bindgen(js_name = "fromString")]
     pub fn from_string(digest_hex_str: &str) -> Result<Digest, JsError> {
-        Digest::try_from(digest_hex_str).map_err(Into::into)
+        Self::try_from(digest_hex_str).map_err(Into::into)
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromRaw")]
     pub fn from_raw_js_alias(bytes: Vec<u8>) -> Result<Digest, JsError> {
         Self::from_raw(bytes).map_err(|err| JsError::new(&format!("{:?}", err)))
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()
@@ -102,15 +100,15 @@ impl FromBytes for Digest {
 impl From<[u8; _Digest::LENGTH]> for Digest {
     fn from(bytes: [u8; _Digest::LENGTH]) -> Self {
         let digest = _Digest::from(bytes);
-        Digest(digest)
+        Self(digest)
     }
 }
 
 impl TryFrom<&str> for Digest {
     type Error = SdkError;
-    fn try_from(input: &str) -> Result<Self, Self::Error> {
-        let bytes = hex::decode(input).map_err(|err| SdkError::FailedToDecodeHex {
-            context: "Digest::try_from &str",
+    fn try_from(digest_hex_str: &str) -> Result<Self, Self::Error> {
+        let bytes = hex::decode(digest_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
+            context: "Digest::try_from",
             error: format!("Decoding hex string {:?}", err),
         })?;
 
@@ -125,7 +123,7 @@ impl TryFrom<&str> for Digest {
 
         let mut digest_bytes = [0u8; _Digest::LENGTH];
         digest_bytes.copy_from_slice(&bytes);
-        Ok(Digest(_Digest::from(digest_bytes)))
+        Ok(Self(_Digest::from(digest_bytes)))
     }
 }
 

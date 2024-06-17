@@ -116,20 +116,11 @@ impl SDK {
             amount,
             transaction_params,
             maybe_id,
-        );
+        )?;
 
-        if let Err(err) = transaction {
-            return Err(err);
-        }
-
-        self.speculative_exec(
-            transaction.unwrap(),
-            maybe_block_identifier,
-            verbosity,
-            node_address,
-        )
-        .await
-        .map_err(SdkError::from)
+        self.speculative_exec(transaction, maybe_block_identifier, verbosity, node_address)
+            .await
+            .map_err(SdkError::from)
     }
 }
 

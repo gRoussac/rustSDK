@@ -439,7 +439,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     let result = json_pretty_print(
         get_transaction.result.transaction.approvals(),
         Some(Verbosity::Low),
-    );
+    )
+    .unwrap();
     println!("approvals {result}");
 
     let transaction_hash = get_transaction.result.transaction.hash();
@@ -1009,7 +1010,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         .get_deploy(deploy_hash.into(), Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    let result = json_pretty_print(get_deploy.result.deploy.approvals(), Some(Verbosity::Low));
+    let result =
+        json_pretty_print(get_deploy.result.deploy.approvals(), Some(Verbosity::Low)).unwrap();
     println!("approvals {result}");
 
     let deploy_hash = get_deploy.result.deploy.hash().to_hex_string();
