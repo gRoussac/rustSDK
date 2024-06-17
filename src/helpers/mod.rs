@@ -606,7 +606,7 @@ mod tests {
     #[test]
     fn test_motes_to_cspr() {
         let motes = "1000000000";
-        let result = motes_to_cspr(motes);
+        let result = motes_to_cspr(motes).unwrap();
         assert_eq!(result, "1");
     }
 
@@ -623,16 +623,16 @@ mod tests {
             name: "Joe".to_string(),
         };
 
-        let result = json_pretty_print(data.clone(), None);
+        let result = json_pretty_print(data.clone(), None).unwrap();
         assert_eq!(result, "{\"age\":42,\"name\":\"Joe\"}");
 
-        let result = json_pretty_print(data.clone(), Some(Verbosity::Low));
+        let result = json_pretty_print(data.clone(), Some(Verbosity::Low)).unwrap();
         assert_eq!(result, "{\"age\":42,\"name\":\"Joe\"}");
 
-        let result = json_pretty_print(data.clone(), Some(Verbosity::Medium));
+        let result = json_pretty_print(data.clone(), Some(Verbosity::Medium)).unwrap();
         assert_eq!(result, "{\n  \"age\": 42,\n  \"name\": \"Joe\"\n}");
 
-        let result = json_pretty_print(data, Some(Verbosity::High));
+        let result = json_pretty_print(data, Some(Verbosity::High)).unwrap();
         assert_eq!(result, "{\n  \"age\": 42,\n  \"name\": \"Joe\"\n}");
     }
 

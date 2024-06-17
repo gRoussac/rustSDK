@@ -1204,7 +1204,7 @@ let get_transaction = sdk
 let result = json_pretty_print(
     get_transaction.result.transaction.approvals(),
     Some(Verbosity::Low),
-);
+).unwrap();
 println!("approvals {result}");
 
 let result = transaction_hash.to_hex_string();
@@ -2136,7 +2136,7 @@ let get_deploy = sdk
     .await;
 let get_deploy = get_deploy.unwrap();
 let result = &get_deploy.result.execution_results.get(0).unwrap().result;
-println!("{}", json_pretty_print(result, Some(Verbosity::High)));
+println!("{}", json_pretty_print(result, Some(Verbosity::High)).unwrap());
 ```
 
 with

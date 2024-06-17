@@ -1,4 +1,4 @@
-use super::key::Key;
+use super::{key::Key, sdk_error::SdkError};
 use casper_client::rpcs::DictionaryItemIdentifier as _DictionaryItemIdentifier;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -9,17 +9,15 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct DictionaryItemIdentifier(_DictionaryItemIdentifier);
 
-#[wasm_bindgen]
 impl DictionaryItemIdentifier {
     // static context
-    #[wasm_bindgen(js_name = "newFromAccountInfo")]
     pub fn new_from_account_info(
         account_hash: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsError> {
+    ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(account_hash).map_err(|err| {
-            JsError::new(&format!(
+            SdkError::CustomError(format!(
                 "Failed to parse key from formatted string: {:?}",
                 err
             ))
@@ -33,14 +31,13 @@ impl DictionaryItemIdentifier {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "newFromContractInfo")]
     pub fn new_from_contract_info(
         contract_addr: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsError> {
+    ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(contract_addr).map_err(|err| {
-            JsError::new(&format!(
+            SdkError::CustomError(format!(
                 "Failed to parse key from formatted string: {:?}",
                 err
             ))
@@ -54,13 +51,12 @@ impl DictionaryItemIdentifier {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "newFromSeedUref")]
     pub fn new_from_seed_uref(
         seed_uref: &str,
         dictionary_item_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsError> {
+    ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(seed_uref).map_err(|err| {
-            JsError::new(&format!(
+            SdkError::CustomError(format!(
                 "Failed to parse key from formatted string: {:?}",
                 err
             ))
@@ -68,7 +64,7 @@ impl DictionaryItemIdentifier {
 
         let uref = key
             .into_uref()
-            .ok_or_else(|| JsError::new("Key is not a URef"))?;
+            .ok_or_else(|| SdkError::CustomError("Key is not a URef".to_string()))?;
 
         Ok(Self(_DictionaryItemIdentifier::URef {
             seed_uref: *uref,
@@ -77,12 +73,11 @@ impl DictionaryItemIdentifier {
     }
 
     // static context
-    #[wasm_bindgen(js_name = "newFromDictionaryKey")]
     pub fn new_from_dictionary_key(
         dictionary_key: &str,
-    ) -> Result<DictionaryItemIdentifier, JsError> {
+    ) -> Result<DictionaryItemIdentifier, SdkError> {
         let key = Key::from_formatted_str(dictionary_key).map_err(|err| {
-            JsError::new(&format!(
+            SdkError::CustomError(format!(
                 "Failed to parse key from formatted string: {:?}",
                 err
             ))
@@ -90,6 +85,48 @@ impl DictionaryItemIdentifier {
         Ok(Self(_DictionaryItemIdentifier::Dictionary(
             key.to_formatted_string(),
         )))
+    }
+}
+
+#[wasm_bindgen]
+impl DictionaryItemIdentifier {
+    // static context
+    #[wasm_bindgen(js_name = "newFromAccountInfo")]
+    pub fn new_from_account_info_js_alias(
+        account_hash: &str,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        Self::new_from_account_info(account_hash, dictionary_name, dictionary_item_key)
+            .map_err(Into::into)
+    }
+
+    // static context
+    #[wasm_bindgen(js_name = "newFromContractInfo")]
+    pub fn new_from_contract_info_js_alias(
+        contract_addr: &str,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        Self::new_from_contract_info(contract_addr, dictionary_name, dictionary_item_key)
+            .map_err(Into::into)
+    }
+
+    // static context
+    #[wasm_bindgen(js_name = "newFromSeedUref")]
+    pub fn new_from_seed_uref_js_alias(
+        seed_uref: &str,
+        dictionary_item_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        Self::new_from_seed_uref(seed_uref, dictionary_item_key).map_err(Into::into)
+    }
+
+    // static context
+    #[wasm_bindgen(js_name = "newFromDictionaryKey")]
+    pub fn new_from_dictionary_key_js_alias(
+        dictionary_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        Self::new_from_dictionary_key(dictionary_key).map_err(Into::into)
     }
 
     #[cfg(target_arch = "wasm32")]
