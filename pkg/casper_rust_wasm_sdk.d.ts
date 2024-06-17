@@ -178,6 +178,13 @@ export enum Verbosity {
 }
 /**
 */
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
+}
+/**
+*/
 export enum TransactionKind {
   InvocableEntity = 0,
   InvocableEntityAlias = 1,
@@ -190,13 +197,6 @@ export enum TransactionKind {
   Undelegate = 8,
   Redelegate = 9,
   WithdrawBid = 10,
-}
-/**
-*/
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
 }
 /**
 */
