@@ -38,7 +38,6 @@ impl PublicKey {
             }
         };
 
-        // Create the PublicKey
         Ok(PublicKey(public_key))
     }
 }

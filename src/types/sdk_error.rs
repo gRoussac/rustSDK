@@ -243,9 +243,3 @@ impl From<CliError> for SdkError {
         }
     }
 }
-
-// impl From<JsonPrintError> for SdkError {
-//     fn from(err: serde_json::Error) -> Self {
-//         SdkError::SerializationError(err)
-//     }
-// }
