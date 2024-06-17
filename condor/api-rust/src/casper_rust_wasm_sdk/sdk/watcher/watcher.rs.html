@@ -1179,6 +1179,8 @@
 <a href="#1179" id="1179">1179</a>
 <a href="#1180" id="1180">1180</a>
 <a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::SDK;
 <span class="kw">use </span>chrono::{Duration, Utc};
 <span class="kw">use </span>futures_util::StreamExt;
@@ -1508,14 +1510,16 @@
     /// Result containing the serialized transaction events data or an error message.
     </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"start"</span>)]
-    </span><span class="kw">pub async fn </span>start_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;JsValue, JsValue&gt; {
-        <span class="kw">let </span>result: <span class="prelude-ty">Option</span>&lt;Vec&lt;EventParseResult&gt;&gt; = <span class="self">self</span>.start_internal(<span class="prelude-val">None</span>).<span class="kw">await</span>;
+    </span><span class="kw">pub async fn </span>start_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;JsValue, JsError&gt; {
+        <span class="kw">let </span>result = <span class="kw">match </span><span class="self">self</span>.start_internal(<span class="prelude-val">None</span>).<span class="kw">await </span>{
+            <span class="prelude-val">Some</span>(res) =&gt; res,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(JsValue::NULL),
+        };
 
-        <span class="kw">match </span>result {
-            <span class="prelude-val">Some</span>(vec) =&gt; JsValue::from_serde(<span class="kw-2">&amp;</span>vec)
-                .map_err(|err| JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, err)).clone()),
-            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(JsValue::NULL),
-        }
+        <span class="kw">let </span>serialized = JsValue::from_serde(<span class="kw-2">&amp;</span>result)
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing events: {:?}"</span>, err)))<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(serialized)
     }
 
     <span class="doccomment">/// Stops watching for transaction events.

@@ -131,6 +131,14 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{public_key::PublicKey, sdk_error::SdkError};
 <span class="kw">use </span>casper_types::account::ACCOUNT_HASH_LENGTH;
 <span class="kw">use </span>casper_types::{
@@ -182,9 +190,9 @@
 </span><span class="kw">impl </span>AccountHash {
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new_js_alias(account_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountHash, JsValue&gt; {
+    </span><span class="kw">pub fn </span>new_js_alias(account_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountHash, JsError&gt; {
         <span class="self">Self</span>::new(account_hash_hex_str).map_err(|err| {
-            JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">"Failed to parse AccountHash from hex string: {:?}"</span>,
                 err
             ))
@@ -193,9 +201,9 @@
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
-    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountHash, JsValue&gt; {
+    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountHash, JsError&gt; {
         <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">"Failed to parse AccountHash from formatted string: {:?}"</span>,
                 err
             ))
@@ -229,6 +237,14 @@
     #[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
     </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         JsValue::from_serde(<span class="self">self</span>).unwrap_or(JsValue::null())
+    }
+}
+
+<span class="kw">impl </span>From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>AccountHash {
+    <span class="kw">fn </span>from(bytes: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>array = [<span class="number">0u8</span>; ACCOUNT_HASH_LENGTH];
+        array.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
+        AccountHash(_AccountHash::new(array))
     }
 }
 

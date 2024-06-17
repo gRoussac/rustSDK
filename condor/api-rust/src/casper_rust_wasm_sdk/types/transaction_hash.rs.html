@@ -77,14 +77,30 @@
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::digest::Digest;
-<span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span>casper_types::bytesrepr::ToBytes;
+<span class="kw">use </span><span class="kw">super</span>::sdk_error::SdkError;
 <span class="kw">use </span>casper_types::Digest <span class="kw">as </span>_Digest;
+<span class="kw">use </span>casper_types::DigestError;
 <span class="kw">use </span>casper_types::TransactionHash <span class="kw">as </span>_TransactionHash;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
-<span class="kw">use </span>hex::decode;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
@@ -93,37 +109,55 @@
 #[wasm_bindgen]
 </span><span class="kw">pub struct </span>TransactionHash(_TransactionHash);
 
-<span class="attr">#[wasm_bindgen]
-</span><span class="kw">impl </span>TransactionHash {
-    <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(transaction_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionHash, JsValue&gt; {
-        <span class="kw">let </span>bytes = decode(transaction_hash_hex_str)
-            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, err)))
-            .unwrap();
-        <span class="kw">let </span><span class="kw-2">mut </span>hash = [<span class="number">0u8</span>; _Digest::LENGTH];
-        hash.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
-        <span class="self">Self</span>::from_raw(<span class="kw-2">&amp;</span>hash)
+<span class="kw">impl </span>TransactionHash {
+    <span class="kw">pub fn </span>new(transaction_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SdkError&gt; {
+        <span class="kw">let </span>bytes =
+            hex::decode(transaction_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
+                context: <span class="string">"TransactionHash::new"</span>,
+                error: <span class="macro">format!</span>(<span class="string">"{}"</span>, err),
+            })<span class="question-mark">?</span>;
+
+        <span class="self">Self</span>::from_raw(<span class="kw-2">&amp;</span>bytes)
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromRaw"</span>)]
-    </span><span class="kw">pub fn </span>from_raw(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionHash, JsValue&gt; {
+    <span class="kw">pub fn </span>from_raw(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SdkError&gt; {
         <span class="kw">if </span>bytes.len() != _Digest::LENGTH {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(JsValue::from_str(<span class="string">"Invalid digest length"</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::FailedToParseDigest {
+                context: <span class="string">"TransactionHash::from_raw"</span>.to_string(),
+                error: DigestError::IncorrectDigestLength(bytes.len()),
+            });
         }
+
         <span class="kw">let </span><span class="kw-2">mut </span>hash = [<span class="number">0u8</span>; _Digest::LENGTH];
         hash.copy_from_slice(bytes);
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_TransactionHash::from_raw(hash)))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDigest"</span>)]
-    </span><span class="kw">pub fn </span>from_digest(digest: Digest) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionHash, JsValue&gt; {
-        <span class="self">Self</span>::from_raw(<span class="kw-2">&amp;</span>digest.to_bytes().unwrap())
+    <span class="kw">pub fn </span>digest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Digest, SdkError&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="number">0</span>.digest().into())
+    }
+}
+
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">impl </span>TransactionHash {
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(constructor)]
+    </span><span class="kw">pub fn </span>new_js_alias(transaction_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionHash, JsError&gt; {
+        TransactionHash::new(transaction_hash_hex_str)
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, err)))
+    }
+
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"fromRaw"</span>)]
+    </span><span class="kw">pub fn </span>from_raw_js_alias(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionHash, JsError&gt; {
+        TransactionHash::from_raw(bytes).map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, err)))
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"digest"</span>)]
-    </span><span class="kw">pub fn </span>digest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Digest, JsValue&gt; {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="number">0</span>.digest().into())
+    </span><span class="kw">pub fn </span>digest_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Digest, JsError&gt; {
+        <span class="self">self</span>.digest()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, err)))
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]

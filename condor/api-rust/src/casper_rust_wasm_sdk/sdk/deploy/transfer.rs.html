@@ -237,14 +237,9 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::deploy::PutDeployResult;
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -308,7 +303,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -360,8 +354,6 @@
         );
 
         <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = deploy {
-            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error during transfer: {}"</span>, err);
-            error(<span class="kw-2">&amp;</span>err_msg);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
         }
 

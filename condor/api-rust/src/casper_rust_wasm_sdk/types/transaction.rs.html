@@ -808,11 +808,6 @@
 <a href="#808" id="808">808</a>
 <a href="#809" id="809">809</a>
 <a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
-<a href="#814" id="814">814</a>
-<a href="#815" id="815">815</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     account_hash::AccountHash,
     addressable_entity_hash::AddressableEntityHash,
@@ -1099,15 +1094,7 @@
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionHash {
-        <span class="comment">// TODO check why fmt is giving a short version in types
-        </span><span class="kw">let </span>transaction_hash: TransactionHash = <span class="self">self</span>.<span class="number">0</span>.clone().hash().into();
-        <span class="kw">match </span>TransactionHash::new(<span class="kw-2">&amp;</span>transaction_hash.clone().to_string()) {
-            <span class="prelude-val">Ok</span>(transaction_hash) =&gt; transaction_hash,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Transaction has not a valid hash: {:?}"</span>, err));
-                TransactionHash::new(<span class="string">""</span>).unwrap()
-            }
-        }
+        <span class="self">self</span>.<span class="number">0</span>.clone().hash().into()
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
@@ -1333,9 +1320,12 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         js_value_arg: JsValue,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; Transaction {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Transaction, JsError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="self">self</span>.<span class="number">0</span>.clone().session_args().clone();
-        <span class="kw">let </span>new_args = insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg);
+        <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
+            <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
+        };
         <span class="kw">let </span>new_body = modify_body(
             <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
             NewBodyParams {
@@ -1344,11 +1334,11 @@
             },
         );
 
-        <span class="self">self</span>.build(BuildParams {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.build(BuildParams {
             secret_key,
             body: <span class="prelude-val">Some</span>(new_body),
             ..Default::default()
-        })
+        }))
     }
 }
 

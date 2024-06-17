@@ -150,9 +150,9 @@
     #[wasm_bindgen(constructor)]
     </span><span class="kw">pub fn </span>new_js_alias(
         contract_package_hash_hex_str: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsValue&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsError&gt; {
         <span class="self">Self</span>::new(contract_package_hash_hex_str).map_err(|err| {
-            JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">"Failed to parse ContractPackageHash from hex string: {:?}"</span>,
                 err
             ))
@@ -163,9 +163,9 @@
     #[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
     </span><span class="kw">pub fn </span>from_formatted_str_js_alias(
         formatted_str: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsValue&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsError&gt; {
         <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| {
-            JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">"Failed to parse ContractPackageHash from formatted string: {:?}"</span>,
                 err
             ))

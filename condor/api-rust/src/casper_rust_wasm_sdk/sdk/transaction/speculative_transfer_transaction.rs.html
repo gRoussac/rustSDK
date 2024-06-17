@@ -273,25 +273,11 @@
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::speculative_exec::SpeculativeExecTxnResult;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
-    debug::error,
     make_transfer_transaction,
     types::{
         block_identifier::BlockIdentifierInput, sdk_error::SdkError,
@@ -363,7 +349,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -406,22 +391,11 @@
             amount,
             transaction_params,
             maybe_id,
-        );
+        )<span class="question-mark">?</span>;
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = transaction {
-            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error during speculative_transfer_transaction: {}"</span>, err);
-            error(<span class="kw-2">&amp;</span>err_msg);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(err);
-        }
-
-        <span class="self">self</span>.speculative_exec(
-            transaction.unwrap(),
-            maybe_block_identifier,
-            verbosity,
-            node_address,
-        )
-        .<span class="kw">await
-        </span>.map_err(SdkError::from)
+        <span class="self">self</span>.speculative_exec(transaction, maybe_block_identifier, verbosity, node_address)
+            .<span class="kw">await
+            </span>.map_err(SdkError::from)
     }
 }
 

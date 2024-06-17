@@ -391,20 +391,9 @@
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
 <a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{
         account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
         sdk_error::SdkError, verbosity::Verbosity,
@@ -487,18 +476,12 @@
 #[wasm_bindgen]
 </span><span class="kw">impl </span>SDK {
     <span class="comment">// Deserialize options for `get_account` from a JavaScript object
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_account_options"</span>)]
-    #[deprecated(note = <span class="string">"prefer 'get_entity_options'"</span>)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer 'get_entity_options'"</span>)]
     #[allow(deprecated)]
-    </span><span class="kw">pub fn </span>get_account_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetAccountOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetAccountOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetAccountOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_account_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetAccountOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetAccountOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves account information using the provided options.
@@ -560,7 +543,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -612,13 +594,11 @@
             <span class="kw">match </span>parse_account_identifier(<span class="kw-2">&amp;</span>account_identifier_as_string) {
                 <span class="prelude-val">Ok</span>(parsed) =&gt; parsed.into(),
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                    error(<span class="kw-2">&amp;</span>err.to_string());
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::FailedToParseAccountIdentifier);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(err.into());
                 }
             }
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing account identifier"</span>.to_string();
-            error(<span class="kw-2">&amp;</span>err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::InvalidArgument {
                 context: <span class="string">"get_account"</span>,
                 error: err,

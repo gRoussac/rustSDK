@@ -507,19 +507,12 @@
 <a href="#507" id="507">507</a>
 <a href="#508" id="508">508</a>
 <a href="#509" id="509">509</a>
-<a href="#510" id="510">510</a>
-<a href="#511" id="511">511</a>
-<a href="#512" id="512">512</a>
-<a href="#513" id="513">513</a>
-<a href="#514" id="514">514</a>
-<a href="#515" id="515">515</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use </span><span class="kw">crate</span>::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -622,15 +615,13 @@
     ///
     /// Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_balance_details_options"</span>)]
-    </span><span class="kw">pub fn </span>query_balance_details_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; QueryBalanceDetailsOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;QueryBalanceDetailsOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                QueryBalanceDetailsOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>query_balance_details_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;QueryBalanceDetailsOptions, JsError&gt; {
+        options
+            .into_serde::&lt;QueryBalanceDetailsOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves balance information using the provided options.
@@ -711,7 +702,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -757,13 +747,11 @@
             <span class="kw">match </span>parse_purse_identifier(<span class="kw-2">&amp;</span>purse_id) {
                 <span class="prelude-val">Ok</span>(parsed) =&gt; parsed.into(),
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                    error(<span class="kw-2">&amp;</span>err.to_string());
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::FailedToParsePurseIdentifier);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(err.into());
                 }
             }
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing purse identifier"</span>.to_string();
-            error(<span class="kw-2">&amp;</span>err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::InvalidArgument {
                 context: <span class="string">"query_global_state"</span>,
                 error: err,

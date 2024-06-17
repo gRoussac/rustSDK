@@ -395,19 +395,7 @@
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use crate</span>::{
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     types::{
         digest::{Digest, ToDigest},
         sdk_error::SdkError,
@@ -501,16 +489,10 @@
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_balance_options"</span>)]
-    </span><span class="kw">pub fn </span>get_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetBalanceOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetBalanceOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetBalanceOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetBalanceOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetBalanceOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves balance information using the provided options.
@@ -546,7 +528,6 @@
             GetBalanceInput::PurseUrefAsString(purse_uref_as_string)
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing purse uref as string or purse uref"</span>;
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         };
 
@@ -573,7 +554,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

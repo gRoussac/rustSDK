@@ -350,22 +350,9 @@
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
 <a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::transaction::Transaction;
 <span class="kw">use </span><span class="kw">crate</span>::types::transaction_hash::TransactionHash;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{debug::error, types::digest::Digest};
 <span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
 <span class="kw">use </span>casper_client::{
     get_transaction, rpcs::results::GetTransactionResult <span class="kw">as </span>_GetTransactionResult, Error,
@@ -376,8 +363,7 @@
 <span class="kw">use </span>rand::Rng;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="comment">// Define a struct to wrap the GetTransactionResult
 </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -438,8 +424,7 @@
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-#[wasm_bindgen]
+<span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>SDK {
     <span class="doccomment">/// Parses transaction options from a JsValue.
     ///
@@ -450,21 +435,24 @@
     /// # Returns
     ///
     /// Parsed transaction options as a `GetTransactionOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_transaction_options"</span>)]
-    </span><span class="kw">pub fn </span>get_transaction_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetTransactionOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetTransactionOptions&gt;();
+    </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    </span><span class="kw">pub fn </span>get_transaction_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GetTransactionOptions, JsError&gt; {
+        <span class="kw">let </span>options_result: <span class="prelude-ty">Result</span>&lt;GetTransactionOptions, <span class="kw">_</span>&gt; = options.into_serde();
         <span class="kw">match </span>options_result {
             <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>options) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
                     options.finalized_approvals =
                         <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
                 }
-                options
+                <span class="prelude-val">Ok</span>(options)
             }
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetTransactionOptions::default()
-            }
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="string">"Error deserializing options: {:?}"</span>,
+                err
+            ))),
         }
     }
 
@@ -477,7 +465,8 @@
     /// # Returns
     ///
     /// A `Result` containing either a `GetTransactionResult` or an error.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_transaction"</span>)]
+    </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"get_transaction"</span>)]
     </span><span class="kw">pub async fn </span>get_transaction_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         options: <span class="prelude-ty">Option</span>&lt;GetTransactionOptions&gt;,
@@ -490,24 +479,13 @@
             node_address,
         } = options.unwrap_or_default();
 
-        <span class="kw">let </span>err_msg = <span class="string">"Error: Missing transaction hash as string or transaction hash"</span>.to_string();
         <span class="kw">let </span>transaction_hash = <span class="kw">if let </span><span class="prelude-val">Some</span>(transaction_hash_as_string) = transaction_hash_as_string
         {
-            <span class="kw">let </span>hash = Digest::new(<span class="kw-2">&amp;</span>transaction_hash_as_string);
-            <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = hash {
-                <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Failed to parse AccountHash from formatted string: {}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
-            }
-            <span class="kw">let </span>transaction_hash = TransactionHash::from_digest(hash.unwrap());
-            <span class="kw">if </span>transaction_hash.is_err() {
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
-            }
-            transaction_hash.unwrap()
-        } <span class="kw">else </span>{
+            TransactionHash::new(<span class="kw-2">&amp;</span>transaction_hash_as_string)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
             <span class="kw">if </span>transaction_hash.is_none() {
-                error(<span class="kw-2">&amp;</span>err_msg);
+                <span class="kw">let </span>err_msg =
+                    <span class="string">"Error: Missing transaction hash as string or transaction hash"</span>.to_string();
                 <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
             }
             transaction_hash.unwrap()
@@ -525,14 +503,14 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
     }
 
     <span class="doccomment">/// Retrieves transaction information using the provided options, alias for `get_transaction`.
-    </span><span class="attr">#[deprecated(note = <span class="string">"This function is an alias. Please use `get_transaction` instead."</span>)]
+    </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[deprecated(note = <span class="string">"This function is an alias. Please use `get_transaction` instead."</span>)]
     #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>info_get_transaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -590,7 +568,7 @@
     </span><span class="kw">async fn </span>test_get_transaction_with_none_values() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>transaction_hash = TransactionHash::from_digest([<span class="number">1u8</span>; <span class="number">32</span>].into()).unwrap();
+        <span class="kw">let </span>transaction_hash = TransactionHash::from_raw(<span class="kw-2">&amp;</span>[<span class="number">1u8</span>; <span class="number">32</span>]).unwrap();
         <span class="kw">let </span>error_message = <span class="string">"builder error"</span>;
 
         <span class="comment">// Act
@@ -608,7 +586,7 @@
     </span><span class="kw">async fn </span>test_get_transaction_with_invalid_transaction_hash() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>transaction_hash = TransactionHash::from_digest([<span class="number">1u8</span>; <span class="number">32</span>].into()).unwrap();
+        <span class="kw">let </span>transaction_hash = TransactionHash::from_raw(<span class="kw-2">&amp;</span>[<span class="number">1u8</span>; <span class="number">32</span>]).unwrap();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
@@ -710,7 +688,7 @@
     </span><span class="kw">async fn </span>test_get_transaction_with_error() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>transaction_hash = TransactionHash::from_digest([<span class="number">1u8</span>; <span class="number">32</span>].into()).unwrap();
+        <span class="kw">let </span>transaction_hash = TransactionHash::from_raw(<span class="kw-2">&amp;</span>[<span class="number">1u8</span>; <span class="number">32</span>]).unwrap();
         <span class="kw">let </span>error_message = <span class="string">"error sending request for url (http://localhost/rpc)"</span>;
 
         <span class="comment">// Act

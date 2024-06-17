@@ -786,12 +786,6 @@
 <a href="#786" id="786">786</a>
 <a href="#787" id="787">787</a>
 <a href="#788" id="788">788</a>
-<a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a>
-<a href="#791" id="791">791</a>
-<a href="#792" id="792">792</a>
-<a href="#793" id="793">793</a>
-<a href="#794" id="794">794</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
@@ -1127,17 +1121,7 @@
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DeployHash {
         <span class="kw">let </span>deploy: _Deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
-        <span class="comment">// TODO check why fmt is giving a short version in types
-        // dbg!(format!("{:?}", (*deploy.hash().inner()).clone()));
-        </span><span class="kw">let </span>deploy_hash: DeployHash = (<span class="kw-2">*</span>deploy.hash()).into();
-
-        <span class="kw">match </span>DeployHash::new(<span class="kw-2">&amp;</span>deploy_hash.to_string()) {
-            <span class="prelude-val">Ok</span>(deploy_hash) =&gt; deploy_hash,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Deploy has not a valid hash: {:?}"</span>, err));
-                DeployHash::new(<span class="string">""</span>).unwrap()
-            }
-        }
+        (<span class="kw-2">*</span>deploy.hash()).into()
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"hasValidHash"</span>)]
@@ -1344,12 +1328,16 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         js_value_arg: JsValue,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; Deploy {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Deploy, JsError&gt; {
         <span class="kw">let </span>deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
         <span class="kw">let </span>session = deploy.session();
 
         <span class="kw">let </span><span class="kw-2">mut </span>args = session.args().clone();
-        <span class="kw">let </span>new_args = insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg);
+        <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
+            <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
+        };
+
         <span class="kw">let </span>new_session = modify_session(
             session,
             NewSessionParams {
@@ -1358,11 +1346,11 @@
             },
         );
 
-        <span class="self">self</span>.build(BuildParams {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.build(BuildParams {
             secret_key,
             session: <span class="prelude-val">Some</span>(new_session),
             ..Default::default()
-        })
+        }))
     }
 }
 

@@ -314,8 +314,6 @@
 <a href="#314" id="314">314</a>
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::deploy::deploy::PutDeployResult;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy_params::{
@@ -323,7 +321,7 @@
     payment_str_params::{payment_str_params_to_casper_client, PaymentStrParams},
     session_str_params::{session_str_params_to_casper_client, SessionStrParams},
 };
-<span class="kw">use crate</span>::{debug::error, types::sdk_error::SdkError, SDK};
+<span class="kw">use crate</span>::{types::sdk_error::SdkError, SDK};
 <span class="kw">use </span>casper_client::{
     cli::deploy::make_deploy, rpcs::results::PutDeployResult <span class="kw">as </span>_PutDeployResult, SuccessResponse,
 };
@@ -367,7 +365,7 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
+
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -414,8 +412,6 @@
             <span class="bool-val">false</span>,
         );
         <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = deploy {
-            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error during install: {}"</span>, err);
-            error(<span class="kw-2">&amp;</span>err_msg);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
         }
         <span class="self">self</span>.put_deploy(deploy.unwrap().into(), <span class="prelude-val">None</span>, node_address)
