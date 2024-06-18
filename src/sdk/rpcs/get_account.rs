@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     types::{
         account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
         sdk_error::SdkError, verbosity::Verbosity,
@@ -126,7 +125,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -174,13 +172,11 @@ impl SDK {
             match parse_account_identifier(&account_identifier_as_string) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    error(&err.to_string());
-                    return Err(SdkError::FailedToParseAccountIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {
             let err = "Error: Missing account identifier";
-            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "get_account",
                 error: err.to_string(),

@@ -2,7 +2,7 @@
 use crate::types::deploy::Deploy;
 use crate::types::deploy_hash::DeployHash;
 #[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
+use crate::types::digest::Digest;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
@@ -126,18 +126,15 @@ impl SDK {
             let hash = Digest::new(&deploy_hash_as_string);
             if let Err(err) = hash {
                 let err_msg = format!("Failed to parse AccountHash from formatted string: {}", err);
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             let deploy_hash = DeployHash::from_digest(hash.unwrap());
             if deploy_hash.is_err() {
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
         } else {
             if deploy_hash.is_none() {
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
@@ -150,7 +147,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

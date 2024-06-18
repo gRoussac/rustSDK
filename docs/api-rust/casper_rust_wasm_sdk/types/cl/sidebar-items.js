@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["bytes","cl_type"]};
+window.SIDEBAR_ITEMS = {"mod":["bytes"]};

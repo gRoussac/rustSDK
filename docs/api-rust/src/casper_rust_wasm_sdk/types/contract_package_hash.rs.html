@@ -77,38 +77,82 @@
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>casper_types::{
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::sdk_error::SdkError;
+<span class="kw">use </span>casper_types::{
     bytesrepr::{<span class="self">self</span>, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
-    ContractPackageHash <span class="kw">as </span>_ContractPackageHash,
+    contracts::ContractPackageHash <span class="kw">as </span>_ContractPackageHash,
 };
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
-<span class="kw">use </span><span class="kw">crate</span>::debug::error;
-
 <span class="attr">#[wasm_bindgen]
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone, Serialize, Copy)]
 </span><span class="kw">pub struct </span>ContractPackageHash(_ContractPackageHash);
+
+<span class="kw">impl </span>ContractPackageHash {
+    <span class="kw">pub fn </span>new(contract_package_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SdkError&gt; {
+        <span class="kw">let </span>prefixed_input = <span class="macro">format!</span>(<span class="string">"contract-package-{}"</span>, contract_package_hash_hex_str);
+        <span class="self">Self</span>::from_formatted_str(<span class="kw-2">&amp;</span>prefixed_input)
+    }
+
+    <span class="kw">pub fn </span>from_formatted_str(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SdkError&gt; {
+        <span class="kw">let </span>contract_package_hash = _ContractPackageHash::from_formatted_str(formatted_str)
+            .map_err(|error| SdkError::FailedToParseContractPackageHash {
+                context: <span class="string">"ContractPackageHash::from_formatted_str"</span>,
+                error,
+            })<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(contract_package_hash))
+    }
+}
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>ContractPackageHash {
-    <span class="attr">#[wasm_bindgen(constructor)]
-    #[wasm_bindgen(js_name = <span class="string">"fromString"</span>)]
-    </span><span class="kw">pub fn </span>new(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsValue&gt; {
-        <span class="kw">let </span>prefixed_input = <span class="macro">format!</span>(<span class="string">"contract-package-{}"</span>, input);
-        ContractPackageHash::from_formatted_str(<span class="kw-2">&amp;</span>prefixed_input)
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(constructor)]
+    </span><span class="kw">pub fn </span>new_js_alias(
+        contract_package_hash_hex_str: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsError&gt; {
+        <span class="self">Self</span>::new(contract_package_hash_hex_str).map_err(|err| {
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="string">"Failed to parse ContractPackageHash from hex string: {:?}"</span>,
+                err
+            ))
+        })
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
-    </span><span class="kw">pub fn </span>from_formatted_str(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsValue&gt; {
-        <span class="kw">let </span>contract_package_hash = _ContractPackageHash::from_formatted_str(input)
-            .map_err(|err| {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">"Failed to parse ContractPackageHash from formatted string: {:?}"</span>,
-                    err
-                ))
-            })
-            .unwrap();
-        <span class="prelude-val">Ok</span>(ContractPackageHash(contract_package_hash))
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
+    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(
+        formatted_str: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ContractPackageHash, JsError&gt; {
+        <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| {
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="string">"Failed to parse ContractPackageHash from formatted string: {:?}"</span>,
+                err
+            ))
+        })
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toFormattedString"</span>)]
