@@ -129,11 +129,26 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-
-<span class="kw">use </span><span class="kw">super</span>::key::Key;
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+</pre></div><pre class="rust"><code><span class="kw">use super</span>::{key::Key, sdk_error::SdkError};
 <span class="kw">use </span>casper_client::rpcs::DictionaryItemIdentifier <span class="kw">as </span>_DictionaryItemIdentifier;
-<span class="kw">use </span>casper_types::Key <span class="kw">as </span>_Key;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -143,103 +158,124 @@
 #[wasm_bindgen]
 </span><span class="kw">pub struct </span>DictionaryItemIdentifier(_DictionaryItemIdentifier);
 
-<span class="attr">#[wasm_bindgen]
-</span><span class="kw">impl </span>DictionaryItemIdentifier {
+<span class="kw">impl </span>DictionaryItemIdentifier {
     <span class="comment">// static context
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromAccountInfo"</span>)]
     </span><span class="kw">pub fn </span>new_from_account_info(
         account_hash: <span class="kw-2">&amp;</span>str,
         dictionary_name: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsValue&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(account_hash)
-            .map_err(|err| {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap();
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(account_hash).map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(
+                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
+                err
+            ))
+        })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(DictionaryItemIdentifier(
-            _DictionaryItemIdentifier::AccountNamedKey {
-                key: key.to_formatted_string(),
-                dictionary_name: dictionary_name.to_string(),
-                dictionary_item_key: dictionary_item_key.to_string(),
-            },
-        ))
-    }
-
-    <span class="comment">// static context
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromContractInfo"</span>)]
-    </span><span class="kw">pub fn </span>new_from_contract_info(
-        contract_addr: <span class="kw-2">&amp;</span>str,
-        dictionary_name: <span class="kw-2">&amp;</span>str,
-        dictionary_item_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsValue&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(contract_addr)
-            .map_err(|err| {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap();
-
-        <span class="prelude-val">Ok</span>(DictionaryItemIdentifier(
-            _DictionaryItemIdentifier::ContractNamedKey {
-                key: key.to_formatted_string(),
-                dictionary_name: dictionary_name.to_string(),
-                dictionary_item_key: dictionary_item_key.to_string(),
-            },
-        ))
-    }
-
-    <span class="comment">// static context
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromSeedUref"</span>)]
-    </span><span class="kw">pub fn </span>new_from_seed_uref(
-        seed_uref: <span class="kw-2">&amp;</span>str,
-        dictionary_item_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsValue&gt; {
-        <span class="kw">let </span>key: _Key = Key::from_formatted_str(seed_uref)
-            .map_err(|err| {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap()
-            .into();
-
-        <span class="prelude-val">Ok</span>(DictionaryItemIdentifier(_DictionaryItemIdentifier::URef {
-            seed_uref: <span class="kw-2">*</span>key.as_uref().ok_or_else(|| {
-                error(<span class="string">"Key is not a URef"</span>);
-                JsValue::null()
-            })<span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::AccountNamedKey {
+            key: key.to_formatted_string(),
+            dictionary_name: dictionary_name.to_string(),
             dictionary_item_key: dictionary_item_key.to_string(),
         }))
     }
 
     <span class="comment">// static context
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromDictionaryKey"</span>)]
+    </span><span class="kw">pub fn </span>new_from_contract_info(
+        contract_addr: <span class="kw-2">&amp;</span>str,
+        dictionary_name: <span class="kw-2">&amp;</span>str,
+        dictionary_item_key: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(contract_addr).map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(
+                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
+                err
+            ))
+        })<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::ContractNamedKey {
+            key: key.to_formatted_string(),
+            dictionary_name: dictionary_name.to_string(),
+            dictionary_item_key: dictionary_item_key.to_string(),
+        }))
+    }
+
+    <span class="comment">// static context
+    </span><span class="kw">pub fn </span>new_from_seed_uref(
+        seed_uref: <span class="kw-2">&amp;</span>str,
+        dictionary_item_key: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(seed_uref).map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(
+                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
+                err
+            ))
+        })<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>uref = key
+            .into_uref()
+            .ok_or_else(|| SdkError::CustomError(<span class="string">"Key is not a URef"</span>.to_string()))<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::URef {
+            seed_uref: <span class="kw-2">*</span>uref,
+            dictionary_item_key: dictionary_item_key.to_string(),
+        }))
+    }
+
+    <span class="comment">// static context
     </span><span class="kw">pub fn </span>new_from_dictionary_key(
         dictionary_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsValue&gt; {
-        <span class="kw">let _ </span>= Key::from_formatted_str(dictionary_key)
-            .map_err(|err| {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                    err
-                ));
-                JsValue::null()
-            })
-            .unwrap();
-        <span class="prelude-val">Ok</span>(DictionaryItemIdentifier(
-            _DictionaryItemIdentifier::Dictionary(dictionary_key.to_string()),
-        ))
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(dictionary_key).map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(
+                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
+                err
+            ))
+        })<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::Dictionary(
+            key.to_formatted_string(),
+        )))
+    }
+}
+
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">impl </span>DictionaryItemIdentifier {
+    <span class="comment">// static context
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromAccountInfo"</span>)]
+    </span><span class="kw">pub fn </span>new_from_account_info_js_alias(
+        account_hash: <span class="kw-2">&amp;</span>str,
+        dictionary_name: <span class="kw-2">&amp;</span>str,
+        dictionary_item_key: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsError&gt; {
+        <span class="self">Self</span>::new_from_account_info(account_hash, dictionary_name, dictionary_item_key)
+            .map_err(Into::into)
+    }
+
+    <span class="comment">// static context
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromContractInfo"</span>)]
+    </span><span class="kw">pub fn </span>new_from_contract_info_js_alias(
+        contract_addr: <span class="kw-2">&amp;</span>str,
+        dictionary_name: <span class="kw-2">&amp;</span>str,
+        dictionary_item_key: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsError&gt; {
+        <span class="self">Self</span>::new_from_contract_info(contract_addr, dictionary_name, dictionary_item_key)
+            .map_err(Into::into)
+    }
+
+    <span class="comment">// static context
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromSeedUref"</span>)]
+    </span><span class="kw">pub fn </span>new_from_seed_uref_js_alias(
+        seed_uref: <span class="kw-2">&amp;</span>str,
+        dictionary_item_key: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsError&gt; {
+        <span class="self">Self</span>::new_from_seed_uref(seed_uref, dictionary_item_key).map_err(Into::into)
+    }
+
+    <span class="comment">// static context
+    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"newFromDictionaryKey"</span>)]
+    </span><span class="kw">pub fn </span>new_from_dictionary_key_js_alias(
+        dictionary_key: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, JsError&gt; {
+        <span class="self">Self</span>::new_from_dictionary_key(dictionary_key).map_err(Into::into)
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]

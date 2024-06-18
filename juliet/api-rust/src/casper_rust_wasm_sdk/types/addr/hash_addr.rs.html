@@ -30,8 +30,14 @@
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span>casper_types::{HashAddr <span class="kw">as </span>_HashAddr, KEY_HASH_LENGTH};
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>casper_types::{HashAddr <span class="kw">as </span>_HashAddr, KEY_HASH_LENGTH};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[wasm_bindgen]
@@ -39,15 +45,23 @@
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>HashAddr {
-    <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(bytes: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;HashAddr, JsValue&gt; {
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(constructor)]
+    </span><span class="kw">pub fn </span>new(bytes: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;HashAddr, JsError&gt; {
         <span class="kw">if </span>bytes.len() != KEY_HASH_LENGTH {
-            error(<span class="string">"Invalid HashAddr length"</span>);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(JsValue::null());
+            <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="string">"Invalid HashAddr length"</span>));
         }
         <span class="kw">let </span><span class="kw-2">mut </span>array = [<span class="number">0u8</span>; KEY_HASH_LENGTH];
         array.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
         <span class="prelude-val">Ok</span>(HashAddr(array))
+    }
+}
+
+<span class="kw">impl </span>From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>HashAddr {
+    <span class="kw">fn </span>from(bytes: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>array = [<span class="number">0u8</span>; KEY_HASH_LENGTH];
+        array.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
+        HashAddr(array)
     }
 }
 
