@@ -71,8 +71,10 @@ pub struct GetEraInfoOptions {
 impl SDK {
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]
     #[allow(deprecated)]
-    pub fn get_era_info_options(&self, options: JsValue) -> GetEraInfoOptions {
-        options.into_serde().unwrap_or_default()
+    pub fn get_era_info_options(&self, options: JsValue) -> Result<GetEraInfoOptions, JsError> {
+        options
+            .into_serde::<GetEraInfoOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     #[deprecated(note = "prefer 'get_era_summary' as it doesn't require a switch block")]

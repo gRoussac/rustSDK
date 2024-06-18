@@ -97,16 +97,13 @@ pub struct GetSpeculativeExecOptions {
 #[wasm_bindgen]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
-    #[wasm_bindgen(js_name = "speculative_exec_options")]
-    pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecOptions {
-        let options_result = options.into_serde::<GetSpeculativeExecOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetSpeculativeExecOptions::default()
-            }
-        }
+    pub fn get_speculative_exec_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetSpeculativeExecOptions, JsError> {
+        options
+            .into_serde::<GetSpeculativeExecOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// JS Alias for speculative execution.

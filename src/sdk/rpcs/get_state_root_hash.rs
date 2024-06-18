@@ -103,15 +103,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed state root hash options as a `GetStateRootHashOptions` struct.
-    pub fn get_state_root_hash_options(&self, options: JsValue) -> GetStateRootHashOptions {
-        let options_result = options.into_serde::<GetStateRootHashOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetStateRootHashOptions::default()
-            }
-        }
+    pub fn get_state_root_hash_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetStateRootHashOptions, JsError> {
+        options
+            .into_serde::<GetStateRootHashOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves state root hash information using the provided options.

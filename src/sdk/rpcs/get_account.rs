@@ -84,15 +84,10 @@ pub struct GetAccountOptions {
 #[wasm_bindgen]
 impl SDK {
     // Deserialize options for `get_account` from a JavaScript object
-    pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {
-        let options_result = options.into_serde::<GetAccountOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetAccountOptions::default()
-            }
-        }
+    pub fn get_account_options(&self, options: JsValue) -> Result<GetAccountOptions, JsError> {
+        options
+            .into_serde::<GetAccountOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     // JavaScript alias for `get_account` function

@@ -68,7 +68,7 @@ impl SDK {
             error(err);
             return Err(JsError::new(err));
         }
-        let options = self.get_dictionary_item_options(js_value_options.unwrap());
+        let options = self.get_dictionary_item_options(js_value_options.unwrap())?;
         self.get_dictionary_item_js_alias(Some(options)).await
     }
 }

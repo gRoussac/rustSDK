@@ -453,7 +453,8 @@ pub async fn _run_example_11() -> Result<(), String> {
         .get_deploy(deploy_hash, Some(finalized_approvals), None, None)
         .await;
     let get_deploy = get_deploy.unwrap();
-    let result = json_pretty_print(&get_deploy.result.deploy.approvals, Some(Verbosity::Low));
+    let result =
+        json_pretty_print(&get_deploy.result.deploy.approvals, Some(Verbosity::Low)).unwrap();
     println!("approvals {result}");
     let result = DeployHash::from(get_deploy.result.deploy.hash).to_string();
     println!("processed deploy hash {result}");

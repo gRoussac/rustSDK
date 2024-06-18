@@ -82,16 +82,15 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// Parsed auction info options as a `GetAuctionInfoOptions` struct.
-    pub fn get_auction_info_options(&self, options: JsValue) -> GetAuctionInfoOptions {
-        let options_result = options.into_serde::<GetAuctionInfoOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetAuctionInfoOptions::default()
-            }
-        }
+    /// Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
+    /// or a `JsError` if deserialization fails.
+    pub fn get_auction_info_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetAuctionInfoOptions, JsError> {
+        options
+            .into_serde::<GetAuctionInfoOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves auction information using the provided options.

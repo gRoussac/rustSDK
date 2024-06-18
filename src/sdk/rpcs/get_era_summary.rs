@@ -83,15 +83,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed era summary options as a `GetEraSummaryOptions` struct.
-    pub fn get_era_summary_options(&self, options: JsValue) -> GetEraSummaryOptions {
-        let options_result = options.into_serde::<GetEraSummaryOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetEraSummaryOptions::default()
-            }
-        }
+    pub fn get_era_summary_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetEraSummaryOptions, JsError> {
+        options
+            .into_serde::<GetEraSummaryOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves era summary information using the provided options.

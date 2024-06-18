@@ -47,15 +47,15 @@ pub mod test_module {
     }
 
     pub fn test_motes_to_cspr() {
-        let cspr = motes_to_cspr("1000000000");
+        let cspr = motes_to_cspr("1000000000").unwrap();
         assert_eq!(cspr, "1");
-        let cspr = motes_to_cspr("2500000000");
+        let cspr = motes_to_cspr("2500000000").unwrap();
         assert_eq!(cspr, "2.50");
-        let cspr = motes_to_cspr("1111100000000");
+        let cspr = motes_to_cspr("1111100000000").unwrap();
         assert_eq!(cspr, "1111.10");
-        let cspr = motes_to_cspr("2500000000000000000000000000");
+        let cspr = motes_to_cspr("2500000000000000000000000000").unwrap();
         assert_eq!(cspr, "2500000000000000000");
-        let cspr = motes_to_cspr("1000000000000250000000000000");
+        let cspr = motes_to_cspr("1000000000000250000000000000").unwrap();
         assert_eq!(cspr, "1000000000000250000");
     }
 
@@ -154,7 +154,8 @@ pub mod test_module {
         let print = json_pretty_print(
             get_node_status.clone().result.block_sync,
             Some(Verbosity::Low),
-        );
+        )
+        .unwrap();
         let expected = r#"{"historical":null,"forward":null}"#;
         assert_eq!(print, expected);
 
@@ -162,7 +163,8 @@ pub mod test_module {
         let print = json_pretty_print(
             get_node_status.clone().result.block_sync,
             Some(Verbosity::Medium),
-        );
+        )
+        .unwrap();
         let expected = "{\n  \"historical\": null,\n  \"forward\": null\n}";
         assert_eq!(print, expected);
 
@@ -170,7 +172,8 @@ pub mod test_module {
         let print = json_pretty_print(
             get_node_status.clone().result.block_sync,
             Some(Verbosity::High),
-        );
+        )
+        .unwrap();
         let expected = "{\n  \"historical\": null,\n  \"forward\": null\n}";
         assert_eq!(print, expected);
     }
