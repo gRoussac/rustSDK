@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::{debug::error, transaction::transaction::PutTransactionResult};
+use crate::transaction::transaction::PutTransactionResult;
 use crate::{
     types::{transaction::Transaction, verbosity::Verbosity},
     SDK,
@@ -45,7 +45,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

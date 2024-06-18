@@ -801,22 +801,13 @@
 <a href="#801" id="801">801</a>
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     account_hash::AccountHash,
     addressable_entity_hash::AddressableEntityHash,
     cl::bytes::Bytes,
     package_hash::PackageHash,
     public_key::PublicKey,
+    sdk_error::SdkError,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -847,7 +838,6 @@
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_json::{json, Value};
-<span class="kw">use </span>std::collections::BTreeSet;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug, Deserialize, Clone, Serialize)]
@@ -909,8 +899,8 @@
         maybe_source: <span class="prelude-ty">Option</span>&lt;URef&gt;,
         target_account: <span class="kw-2">&amp;</span>str,
         amount: <span class="kw-2">&amp;</span>str,
-        maybe_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
         transaction_params: TransactionStrParams,
+        maybe_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Transaction, String&gt; {
         make_transfer_transaction(
             maybe_source,
@@ -1001,8 +991,8 @@
         })
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withHash"</span>)]
-    </span><span class="kw">pub fn </span>with_hash(
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withEntityHash"</span>)]
+    </span><span class="kw">pub fn </span>with_entity_hash(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         hash: AddressableEntityHash,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -1039,10 +1029,10 @@
         })
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withModuleBytes"</span>)]
-    </span><span class="kw">pub fn </span>with_module_bytes(
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"withTransactionBytes"</span>)]
+    </span><span class="kw">pub fn </span>with_transaction_bytes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        module_bytes: Bytes,
+        transaction_bytes: Bytes,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; Transaction {
         <span class="self">self</span>.build(BuildParams {
@@ -1050,7 +1040,7 @@
             body: <span class="prelude-val">Some</span>(modify_body(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
                 NewBodyParams {
-                    new_module_bytes: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>module_bytes),
+                    new_transaction_bytes: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>transaction_bytes),
                     ..Default::default()
                 },
             )),
@@ -1098,20 +1088,10 @@
 
     <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionHash {
-        <span class="comment">// TODO check why fmt is giving a short version and not debug
-        // dbg!(format!("{:?}", (*transaction.hash().inner()).clone()));
-        </span><span class="kw">let </span>transaction_hash = <span class="self">self</span>.<span class="number">0</span>.clone().hash();
-
-        <span class="kw">match </span>TransactionHash::new(<span class="kw-2">&amp;</span>transaction_hash.to_string()) {
-            <span class="prelude-val">Ok</span>(transaction_hash) =&gt; transaction_hash,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Transaction has not a valid hash: {:?}"</span>, err));
-                TransactionHash::new(<span class="string">""</span>).unwrap()
-            }
-        }
+        <span class="self">self</span>.<span class="number">0</span>.clone().hash().into()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"expired"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>expired(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>now: DateTime&lt;Utc&gt; = Utc::now();
         <span class="kw">let </span>now_millis = now.timestamp_millis() <span class="kw">as </span>u64;
@@ -1126,7 +1106,7 @@
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"expires"</span>)]
+    #[wasm_bindgen(getter, js_name = <span class="string">"expires"</span>)]
     </span><span class="kw">pub fn </span>expires_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.expires()) {
             <span class="prelude-val">Ok</span>(expires) =&gt; expires,
@@ -1138,7 +1118,7 @@
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"signers"</span>)]
+    #[wasm_bindgen(getter, js_name = <span class="string">"signers"</span>)]
     </span><span class="kw">pub fn </span>signers_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.signers()) {
             <span class="prelude-val">Ok</span>(signers) =&gt; signers,
@@ -1150,7 +1130,7 @@
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"authorization_keys"</span>)]
+    #[wasm_bindgen(getter, js_name = <span class="string">"authorization_keys"</span>)]
     </span><span class="kw">pub fn </span>authorization_keys_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.authorization_keys()) {
             <span class="prelude-val">Ok</span>(authorization_keys) =&gt; authorization_keys,
@@ -1195,7 +1175,7 @@
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"approvals"</span>)]
+    #[wasm_bindgen(getter, js_name = <span class="string">"approvals"</span>)]
     </span><span class="kw">pub fn </span>approvals_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.approvals()) {
             <span class="prelude-val">Ok</span>(json) =&gt; json,
@@ -1207,7 +1187,7 @@
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"header"</span>)]
+    #[wasm_bindgen(getter, js_name = <span class="string">"header"</span>)]
     </span><span class="kw">pub fn </span>header_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         <span class="kw">match </span>JsValue::from_serde(<span class="kw-2">&amp;</span><span class="self">self</span>.header()) {
             <span class="prelude-val">Ok</span>(json) =&gt; json,
@@ -1218,12 +1198,12 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"isNative"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>is_native(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.<span class="number">0</span>.clone().is_native()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"isStandardPayment"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>is_standard_payment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.<span class="number">0</span>.clone().is_standard_payment()
     }
@@ -1275,7 +1255,7 @@
         <span class="comment">// Replace the approvals field in the original transaction JSON string
         </span><span class="kw">let </span><span class="kw-2">mut </span>transaction_json: Value = serde_json::from_str(<span class="kw-2">&amp;</span><span class="self">self</span>.to_json_string().unwrap())
             .expect(<span class="string">"Failed to deserialize transaction JSON"</span>);
-        transaction_json[<span class="string">"approvals"</span>] = serde_json::from_str(<span class="kw-2">&amp;</span>updated_approvals_str)
+        transaction_json[<span class="string">"Version1"</span>][<span class="string">"approvals"</span>] = serde_json::from_str(<span class="kw-2">&amp;</span>updated_approvals_str)
             .expect(<span class="string">"Failed to deserialize updated approvals JSON"</span>);
 
         <span class="comment">// Convert the updated transaction JSON back to a Transaction struct
@@ -1285,27 +1265,27 @@
         updated_transaction
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"entryPoint"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>entry_point(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.<span class="number">0</span>.clone().entry_point().to_string()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"TTL"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>ttl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.<span class="number">0</span>.clone().ttl().to_string()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"timestamp"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.<span class="number">0</span>.clone().timestamp().to_string()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"size_estimate"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>size_estimate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.<span class="number">0</span>.clone().size_estimate()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"chain_name"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>chain_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.header() {
             TransactionHeader::Deploy(header) =&gt; header.chain_name().to_string(),
@@ -1313,7 +1293,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"initiator_addr"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>initiator_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>initiator_addr: InitiatorAddr = <span class="self">self</span>.<span class="number">0</span>.clone().initiator_addr().clone();
         <span class="kw">match </span>initiator_addr {
@@ -1322,7 +1302,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"account_hash"</span>)]
+    <span class="attr">#[wasm_bindgen(getter)]
     </span><span class="kw">pub fn </span>account_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AccountHash {
         <span class="kw">let </span>initiator_addr: InitiatorAddr = <span class="self">self</span>.<span class="number">0</span>.clone().initiator_addr().clone();
         initiator_addr.account_hash().into()
@@ -1334,9 +1314,12 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         js_value_arg: JsValue,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; Transaction {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Transaction, JsError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="self">self</span>.<span class="number">0</span>.clone().session_args().clone();
-        <span class="kw">let </span>new_args = insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg);
+        <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
+            <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
+        };
         <span class="kw">let </span>new_body = modify_body(
             <span class="kw-2">&amp;</span><span class="self">self</span>.body(),
             NewBodyParams {
@@ -1345,11 +1328,11 @@
             },
         );
 
-        <span class="self">self</span>.build(BuildParams {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.build(BuildParams {
             secret_key,
             body: <span class="prelude-val">Some</span>(new_body),
             ..Default::default()
-        })
+        }))
     }
 }
 
@@ -1384,24 +1367,16 @@
         })
     }
 
-    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
-        <span class="kw">let </span>result = serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
-        <span class="kw">match </span>result {
-            <span class="prelude-val">Ok</span>(json) =&gt; <span class="prelude-val">Ok</span>(json),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error serializing data to JSON: {:?}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="prelude-val">Err</span>(err_msg)
-            }
-        }
+    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
+        serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).map_err(SdkError::from)
     }
 
     <span class="kw">pub fn </span>compute_approvals_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ApprovalsHash, bytesrepr::Error&gt; {
         <span class="self">self</span>.<span class="number">0</span>.clone().compute_approvals_hash()
     }
 
-    <span class="kw">pub fn </span>approvals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;Approval&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.clone().approvals()
+    <span class="kw">pub fn </span>approvals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Approval&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.clone().approvals().iter().cloned().collect()
     }
 
     <span class="kw">pub fn </span>header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionHeader {
@@ -1412,7 +1387,7 @@
         <span class="self">self</span>.<span class="number">0</span>.clone().expires()
     }
 
-    <span class="kw">pub fn </span>signers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;AccountHash&gt; {
+    <span class="kw">pub fn </span>signers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;AccountHash&gt; {
         <span class="self">self</span>.<span class="number">0
             </span>.clone()
             .signers()
@@ -1421,7 +1396,7 @@
             .collect()
     }
 
-    <span class="kw">pub fn </span>authorization_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BTreeSet&lt;AccountHash&gt; {
+    <span class="kw">pub fn </span>authorization_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;AccountHash&gt; {
         <span class="self">self</span>.<span class="number">0
             </span>.clone()
             .authorization_keys()
@@ -1520,7 +1495,7 @@
     new_entry_point: <span class="prelude-ty">Option</span>&lt;String&gt;,
     new_alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
     new_version: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    new_module_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Bytes&gt;,
+    new_transaction_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Bytes&gt;,
 }
 
 <span class="kw">fn </span>modify_body(
@@ -1532,7 +1507,7 @@
         new_entry_point,
         new_alias,
         new_version,
-        new_module_bytes,
+        new_transaction_bytes,
     }: NewBodyParams,
 ) -&gt; TransactionV1Body {
     <span class="kw">let </span>runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
@@ -1543,49 +1518,53 @@
         }
         casper_types::TransactionTarget::Stored { id, runtime: <span class="kw">_ </span>} =&gt; <span class="kw">match </span>id {
             casper_types::TransactionInvocationTarget::ByHash(hash) =&gt; {
-                TransactionV1Builder::new_targeting_invocable_entity(
+                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_invocable_entity(
                     new_hash.unwrap_or((<span class="kw-2">*</span>hash).into()).into(),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
             casper_types::TransactionInvocationTarget::ByName(alias) =&gt; {
-                TransactionV1Builder::new_targeting_invocable_entity_via_alias(
+                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_invocable_entity_via_alias(
                     new_alias.unwrap_or_else(|| alias.clone()),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
             casper_types::TransactionInvocationTarget::ByPackageHash { addr, version } =&gt; {
-                TransactionV1Builder::new_targeting_package(
+                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_package(
                     new_package_hash.unwrap_or((<span class="kw-2">*</span>addr).into()).into(),
                     <span class="prelude-val">Some</span>(new_version.unwrap_or(version.unwrap_or(<span class="number">1</span>))),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
             casper_types::TransactionInvocationTarget::ByPackageName { name, version } =&gt; {
-                TransactionV1Builder::new_targeting_package_via_alias(
+                (<span class="kw-2">*</span>TransactionV1Builder::new_targeting_package_via_alias(
                     new_alias.unwrap_or_else(|| name.clone()),
                     <span class="prelude-val">Some</span>(new_version.unwrap_or(version.unwrap_or(<span class="number">1</span>))),
                     new_entry_point.unwrap_or_else(|| entry_point.clone()),
                 )
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+                .clone()
             }
         },
         casper_types::TransactionTarget::Session {
-            kind,
-            module_bytes,
+            kind: transaction_session_kind,
+            module_bytes: transaction_bytes,
             runtime: <span class="kw">_</span>,
         } =&gt; {
-            <span class="kw">let </span>default: _Bytes = module_bytes.clone();
-            <span class="kw">let </span>new_bytes = new_module_bytes.unwrap();
+            <span class="kw">let </span>default: _Bytes = transaction_bytes.clone();
+            <span class="kw">let </span>new_bytes = new_transaction_bytes.unwrap();
             <span class="kw">let </span>new: <span class="kw-2">&amp;</span>Bytes = new_bytes;
-            <span class="kw">let </span>new_module_bytes: _Bytes = {
+            <span class="kw">let </span>new_transaction_bytes: _Bytes = {
                 <span class="kw">let </span>new_bytes: _Bytes = _Bytes::from((<span class="kw-2">*</span>new).to_vec());
                 <span class="kw">if </span>new_bytes.len() &gt; <span class="number">0 </span>{
                     new_bytes
@@ -1594,9 +1573,10 @@
                 }
             };
 
-            TransactionV1Builder::new_session(<span class="kw-2">*</span>kind, new_module_bytes)
+            (<span class="kw-2">*</span>TransactionV1Builder::new_session(<span class="kw-2">*</span>transaction_session_kind, new_transaction_bytes)
                 .with_runtime_args(runtime_args)
-                .body
+                .body())
+            .clone()
         }
     }
 }

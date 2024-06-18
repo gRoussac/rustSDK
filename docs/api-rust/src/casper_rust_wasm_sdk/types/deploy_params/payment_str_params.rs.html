@@ -301,7 +301,6 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::args_simple::ArgsSimple;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_str_or_default;
 <span class="kw">use </span>casper_client::cli::PaymentStrParams <span class="kw">as </span>_PaymentStrParams;
@@ -500,8 +499,7 @@
             args_simple.args().iter().map(String::as_str).collect()
         });
 
-    <span class="comment">// Use the appropriate `with_` method based on available fields as PaymentStrParams is private
-    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(payment_hash) = payment_params.payment_hash.get() {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(payment_hash) = payment_params.payment_hash.get() {
         <span class="kw">return </span>_PaymentStrParams::with_hash(
             payment_hash.as_str(),
             get_str_or_default(payment_params.payment_entry_point.get()),

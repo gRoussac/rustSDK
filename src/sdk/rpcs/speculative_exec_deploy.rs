@@ -95,7 +95,6 @@ pub struct GetSpeculativeExecDeployOptions {
 #[wasm_bindgen]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
-    #[wasm_bindgen(js_name = "speculative_exec_deploy_options")]
     #[deprecated(note = "prefer speculative_exec_transaction_options")]
     #[allow(deprecated)]
     pub fn get_speculative_exec_deploy_options(

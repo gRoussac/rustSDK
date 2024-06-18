@@ -701,17 +701,7 @@
 <a href="#701" id="701">701</a>
 <a href="#702" id="702">702</a>
 <a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
-<a href="#712" id="712">712</a>
-<a href="#713" id="713">713</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::account_hash::AccountHash;
 <span class="kw">use </span><span class="kw">crate</span>::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 <span class="kw">use </span>base64::engine::general_purpose;
 <span class="kw">use </span>base64::Engine;
@@ -721,10 +711,9 @@
 };
 <span class="kw">use </span>casper_client::cli::JsonArg;
 <span class="kw">use </span>casper_types::{
-    account::AccountHash <span class="kw">as </span>_AccountHash, addressable_entity::FromStrError, bytesrepr::ToBytes,
-    cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, CLValue, DeployBuilder, ErrorExt,
-    Key <span class="kw">as </span>_Key, NamedArg, PublicKey <span class="kw">as </span>CasperTypesPublicKey, RuntimeArgs, SecretKey, TimeDiff,
-    Timestamp,
+    bytesrepr::ToBytes, cl_value_to_json <span class="kw">as </span>cl_value_to_json_from_casper_types, CLValue,
+    DeployBuilder, Key <span class="kw">as </span>CasperTypesKey, NamedArg, PublicKey <span class="kw">as </span>CasperTypesPublicKey, RuntimeArgs,
+    SecretKey, TimeDiff, Timestamp,
 };
 <span class="kw">use </span>chrono::{DateTime, SecondsFormat, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -823,7 +812,7 @@
 /// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```
 </span><span class="kw">pub fn </span>make_dictionary_item_key&lt;V: ToBytes&gt;(key: Key, value: <span class="kw-2">&amp;</span>V) -&gt; String {
-    <span class="kw">let </span>key: _Key = _Key::from(key);
+    <span class="kw">let </span>key: CasperTypesKey = CasperTypesKey::from(key);
     <span class="kw">let </span><span class="kw-2">mut </span>bytes_a = key.to_bytes().unwrap_or_default();
     <span class="kw">let </span><span class="kw-2">mut </span>bytes_b = value.to_bytes().unwrap_or_default();
 
@@ -839,7 +828,7 @@
     hex::encode(result)
 }
 
-<span class="doccomment">/// Convert a formatted account hash to a base64-encoded string (cep-18 key encoding).
+<span class="doccomment">/// Convert a formatted account hash to a base64-encoded Key as string (cep-18 key encoding).
 ///
 /// # Arguments
 ///
@@ -848,17 +837,11 @@
 ///
 /// # Returns
 ///
-/// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
+/// Returns a `Result` with the base64-encoded string on success, or a `SdkError` on failure.
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
-</span><span class="kw">pub fn </span>get_base64_from_account_hash(account_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, FromStrError&gt; {
-    <span class="kw">let </span>account_hash = _AccountHash::from_formatted_str(account_hash);
-    <span class="kw">let </span>key = <span class="kw">match </span>account_hash {
-        <span class="prelude-val">Ok</span>(account_hash) =&gt; _Key::from(account_hash).to_bytes().unwrap(),
-        <span class="prelude-val">Err</span>(err) =&gt; {
-            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in account_hash deser: {:?}"</span>, err));
-            <span class="kw">return </span><span class="prelude-val">Err</span>(err);
-        }
-    };
+</span><span class="kw">pub fn </span>get_base64_key_from_account_hash(account_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
+    <span class="kw">let </span>account_hash = AccountHash::from_formatted_str(account_hash)<span class="question-mark">?</span>;
+    <span class="kw">let </span>key = Key::from_account(account_hash).to_bytes().unwrap();
     <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
 </span>}
 
@@ -945,9 +928,12 @@
 ///
 /// # Errors
 ///
-/// Returns an `ErrorExt` if the secret key generation fails.
-</span><span class="kw">pub fn </span>secret_key_generate() -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, ErrorExt&gt; {
-    SecretKey::generate_ed25519()
+/// Returns an `SdkError` if the secret key generation fails.
+</span><span class="kw">pub fn </span>secret_key_generate() -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, SdkError&gt; {
+    SecretKey::generate_ed25519().map_err(|err| SdkError::FailedToGenerateSecretKey {
+        context: <span class="string">"secret_key_from_pem"</span>.to_string(),
+        error: err,
+    })
 }
 
 <span class="doccomment">/// Generates a secret key using the secp256k1 algorithm.
@@ -958,9 +944,12 @@
 ///
 /// # Errors
 ///
-/// Returns an `ErrorExt` if the secret key generation fails.
-</span><span class="kw">pub fn </span>secret_key_secp256k1_generate() -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, ErrorExt&gt; {
-    SecretKey::generate_secp256k1()
+/// Returns an `SdkError` if the secret key generation fails.
+</span><span class="kw">pub fn </span>secret_key_secp256k1_generate() -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, SdkError&gt; {
+    SecretKey::generate_secp256k1().map_err(|err| SdkError::FailedToGenerateSecretKey {
+        context: <span class="string">"secret_key_from_pem"</span>.to_string(),
+        error: err,
+    })
 }
 
 <span class="doccomment">/// Parses a secret key in PEM format into a `SecretKey` object.
@@ -972,8 +961,11 @@
 /// # Returns
 ///
 /// A `Result` containing the parsed `SecretKey` or an error if parsing fails.
-</span><span class="kw">pub fn </span>secret_key_from_pem(secret_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, ErrorExt&gt; {
-    SecretKey::from_pem(secret_key)
+</span><span class="kw">pub fn </span>secret_key_from_pem(secret_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;SecretKey, SdkError&gt; {
+    SecretKey::from_pem(secret_key).map_err(|err| SdkError::FailedToParseSecretKey {
+        context: <span class="string">"secret_key_from_pem"</span>.to_string(),
+        error: err,
+    })
 }
 
 <span class="doccomment">/// Converts a secret key in PEM format to its corresponding public key as a string.
@@ -985,17 +977,18 @@
 /// # Returns
 ///
 /// A `Result` containing the public key as a string or an error if the conversion fails.
-</span><span class="kw">pub fn </span>public_key_from_secret_key(secret_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, ErrorExt&gt; {
-    <span class="kw">let </span>secret_key_from_pem = secret_key_from_pem(secret_key);
-    <span class="kw">let </span>public_key = <span class="kw">match </span>secret_key_from_pem {
-        <span class="prelude-val">Ok</span>(secret_key) =&gt; CasperTypesPublicKey::from(<span class="kw-2">&amp;</span>secret_key),
-        <span class="prelude-val">Err</span>(err) =&gt; {
-            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in public_key_from_secret_key: {:?}"</span>, err));
-            <span class="kw">return </span><span class="prelude-val">Err</span>(err);
-        }
-    };
-    <span class="kw">let </span>public_key_test: PublicKey = public_key.into();
-    <span class="prelude-val">Ok</span>(public_key_test.to_string())
+</span><span class="kw">pub fn </span>public_key_from_secret_key(secret_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
+    <span class="comment">// Handle the secret key parsing and map the error
+    </span><span class="kw">let </span>secret_key_from_pem = secret_key_from_pem(secret_key)<span class="question-mark">?</span>;
+
+    <span class="comment">// Convert the secret key to public key and handle potential errors
+    </span><span class="kw">let </span>public_key = CasperTypesPublicKey::from(<span class="kw-2">&amp;</span>secret_key_from_pem);
+
+    <span class="comment">// Convert to desired public key format
+    </span><span class="kw">let </span>public_key_test: PublicKey = public_key.into();
+
+    <span class="comment">// Return the public key as a string
+    </span><span class="prelude-val">Ok</span>(public_key_test.to_string())
 }
 
 <span class="doccomment">/// Converts a hexadecimal string to a vector of unsigned 8-bit integers (Uint8Array).
@@ -1046,21 +1039,21 @@
 /// # Returns
 ///
 /// A string representing the CSPR amount.
-</span><span class="kw">pub fn </span>motes_to_cspr(motes: <span class="kw-2">&amp;</span>str) -&gt; String {
+</span><span class="kw">pub fn </span>motes_to_cspr(motes: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
     <span class="kw">match </span>Decimal::from_str(motes) {
         <span class="prelude-val">Ok</span>(motes_decimal) =&gt; {
             <span class="kw">let </span>cspr_decimal = motes_decimal / Decimal::new(<span class="number">1_000_000_000</span>, <span class="number">0</span>);
             <span class="kw">let </span>formatted_cspr = cspr_decimal.to_string();
             <span class="kw">if </span>formatted_cspr.ends_with(<span class="string">".00"</span>) {
-                formatted_cspr.replace(<span class="string">".00"</span>, <span class="string">""</span>)
+                <span class="prelude-val">Ok</span>(formatted_cspr.replace(<span class="string">".00"</span>, <span class="string">""</span>))
             } <span class="kw">else </span>{
-                formatted_cspr
+                <span class="prelude-val">Ok</span>(formatted_cspr)
             }
         }
-        <span class="prelude-val">Err</span>(err) =&gt; {
-            error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to parse input as Decimal: {:?}"</span>, err));
-            <span class="string">"Invalid input"</span>.to_string()
-        }
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(SdkError::CustomError(<span class="macro">format!</span>(
+            <span class="string">"Failed to parse input as Decimal: {:?}"</span>,
+            err
+        ))),
     }
 }
 
@@ -1074,28 +1067,19 @@
 /// # Returns
 ///
 /// A JSON string representing the pretty printed value.
-</span><span class="kw">pub fn </span>json_pretty_print&lt;T&gt;(value: T, verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;) -&gt; String
+</span><span class="kw">pub fn </span>json_pretty_print&lt;T&gt;(value: T, verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt;
 <span class="kw">where
     </span>T: Serialize,
 {
-    <span class="kw">if let </span><span class="prelude-val">Ok</span>(deserialized) = serde_json::to_value(<span class="kw-2">&amp;</span>value) {
-        <span class="kw">let </span>result = <span class="kw">match </span>verbosity {
-            <span class="prelude-val">Some</span>(Verbosity::Low) | <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(deserialized.to_string()),
-            <span class="prelude-val">Some</span>(Verbosity::Medium) =&gt; casper_types::json_pretty_print(<span class="kw-2">&amp;</span>deserialized),
-            <span class="prelude-val">Some</span>(Verbosity::High) =&gt; serde_json::to_string_pretty(<span class="kw-2">&amp;</span>deserialized),
-        }
-        .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in json_pretty_print: {}"</span>, err)));
+    <span class="kw">let </span>deserialized = serde_json::to_value(<span class="kw-2">&amp;</span>value).map_err(SdkError::from)<span class="question-mark">?</span>;
 
-        <span class="kw">match </span>result {
-            <span class="prelude-val">Ok</span>(result) =&gt; result,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error in json_pretty_print: {:?}"</span>, err));
-                String::from(<span class="string">""</span>)
-            }
+    <span class="kw">match </span>verbosity {
+        <span class="prelude-val">Some</span>(Verbosity::Low) | <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(deserialized.to_string()),
+        <span class="prelude-val">Some</span>(Verbosity::Medium) =&gt; casper_types::json_pretty_print(<span class="kw-2">&amp;</span>deserialized)
+            .map_err(|err| SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error in json_pretty_print: {}"</span>, err))),
+        <span class="prelude-val">Some</span>(Verbosity::High) =&gt; {
+            serde_json::to_string_pretty(<span class="kw-2">&amp;</span>deserialized).map_err(SdkError::from)
         }
-    } <span class="kw">else </span>{
-        error(<span class="string">"Deserialization error into_serde of json_pretty_print"</span>);
-        String::from(<span class="string">""</span>)
     }
 }
 
@@ -1110,36 +1094,32 @@
 ///
 /// The modified `RuntimeArgs` map.
 </span><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">pub fn </span>insert_js_value_arg(args: <span class="kw-2">&amp;mut </span>RuntimeArgs, js_value_arg: JsValue) -&gt; <span class="kw-2">&amp;</span>RuntimeArgs {
+</span><span class="kw">pub fn </span>insert_js_value_arg(
+    args: <span class="kw-2">&amp;mut </span>RuntimeArgs,
+    js_value_arg: JsValue,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>RuntimeArgs, SdkError&gt; {
     <span class="kw">if </span>js_sys::Object::instanceof(<span class="kw-2">&amp;</span>js_value_arg) {
-        <span class="kw">let </span>json_arg: <span class="prelude-ty">Result</span>&lt;JsonArg, serde_json::Error&gt; = js_value_arg.into_serde();
-        <span class="kw">let </span>json_arg: <span class="prelude-ty">Option</span>&lt;JsonArg&gt; = <span class="kw">match </span>json_arg {
-            <span class="prelude-val">Ok</span>(arg) =&gt; <span class="prelude-val">Some</span>(arg),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error converting to JsonArg: {:?}"</span>, err));
-                <span class="prelude-val">None
-            </span>}
-        };
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(json_arg) = json_arg {
-            <span class="kw">let </span>named_arg = NamedArg::try_from(json_arg);
-            <span class="kw">let </span>named_arg: <span class="prelude-ty">Option</span>&lt;NamedArg&gt; = <span class="kw">match </span>named_arg {
-                <span class="prelude-val">Ok</span>(arg) =&gt; <span class="prelude-val">Some</span>(arg),
-                <span class="prelude-val">Err</span>(err) =&gt; {
-                    error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error converting to NamedArg: {:?}"</span>, err));
-                    <span class="prelude-val">None
-                </span>}
-            };
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(named_arg) = named_arg {
-                args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
-            }
-        }
+        <span class="kw">let </span>json_arg: JsonArg = js_value_arg.into_serde().map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error converting to JsonArg: {:?}"</span>, err))
+        })<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>named_arg = NamedArg::try_from(json_arg).map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error converting to NamedArg: {:?}"</span>, err))
+        })<span class="question-mark">?</span>;
+
+        args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
     } <span class="kw">else if let </span><span class="prelude-val">Some</span>(string_arg) = js_value_arg.as_string() {
         <span class="kw">let </span>simple_arg = string_arg;
-        <span class="kw">let _ </span>= casper_client::cli::insert_arg(<span class="kw-2">&amp;</span>simple_arg, args);
+        casper_client::cli::insert_arg(<span class="kw-2">&amp;</span>simple_arg, args).map_err(|err| {
+            SdkError::CustomError(<span class="macro">format!</span>(<span class="string">"Error inserting simple arg: {:?}"</span>, err))
+        })<span class="question-mark">?</span>;
     } <span class="kw">else </span>{
-        error(<span class="string">"Error converting to JsonArg or Simple Arg"</span>);
+        <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::CustomError(String::from(
+            <span class="string">"Error converting to JsonArg or Simple Arg"</span>,
+        )));
     }
-    args
+
+    <span class="prelude-val">Ok</span>(args)
 }
 
 <span class="doccomment">/// Inserts an argument into a RuntimeArgs map.
@@ -1285,7 +1265,7 @@
         <span class="kw">let </span>result = secret_key_from_pem(pem_key);
         <span class="macro">assert!</span>(result.is_err());
         <span class="kw">let </span>pem_key =
-        <span class="string">"-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKR3ayaSpNtpZmu9Tv3kUXi+Xq+V7bQHn+9tT0ZjH5id\n-----END PRIVATE KEY-----"</span>;
+        <span class="string">"-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI\n-----END PRIVATE KEY-----"</span>;
         <span class="kw">let </span>result = secret_key_from_pem(pem_key);
         <span class="macro">assert!</span>(result.is_ok());
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>result.unwrap().to_string(), <span class="string">"SecretKey::Ed25519"</span>);
@@ -1297,12 +1277,12 @@
         <span class="kw">let </span>result = public_key_from_secret_key(pem_key);
         <span class="macro">assert!</span>(result.is_err());
         <span class="kw">let </span>pem_key =
-        <span class="string">"-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIKR3ayaSpNtpZmu9Tv3kUXi+Xq+V7bQHn+9tT0ZjH5id\n-----END PRIVATE KEY-----"</span>;
+        <span class="string">"-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI-----END PRIVATE KEY-----"</span>;
         <span class="kw">let </span>result = public_key_from_secret_key(pem_key);
         <span class="macro">assert!</span>(result.is_ok());
         <span class="macro">assert_eq!</span>(
             result.unwrap(),
-            <span class="string">"0161e40005434ba3cd9a791a2827f5fa3ee514d1475fe72b2823cbaac9c3c71483"
+            <span class="string">"01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6"
         </span>);
     }
 
@@ -1329,7 +1309,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_motes_to_cspr() {
         <span class="kw">let </span>motes = <span class="string">"1000000000"</span>;
-        <span class="kw">let </span>result = motes_to_cspr(motes);
+        <span class="kw">let </span>result = motes_to_cspr(motes).unwrap();
         <span class="macro">assert_eq!</span>(result, <span class="string">"1"</span>);
     }
 
@@ -1346,16 +1326,16 @@
             name: <span class="string">"Joe"</span>.to_string(),
         };
 
-        <span class="kw">let </span>result = json_pretty_print(data.clone(), <span class="prelude-val">None</span>);
+        <span class="kw">let </span>result = json_pretty_print(data.clone(), <span class="prelude-val">None</span>).unwrap();
         <span class="macro">assert_eq!</span>(result, <span class="string">"{\"age\":42,\"name\":\"Joe\"}"</span>);
 
-        <span class="kw">let </span>result = json_pretty_print(data.clone(), <span class="prelude-val">Some</span>(Verbosity::Low));
+        <span class="kw">let </span>result = json_pretty_print(data.clone(), <span class="prelude-val">Some</span>(Verbosity::Low)).unwrap();
         <span class="macro">assert_eq!</span>(result, <span class="string">"{\"age\":42,\"name\":\"Joe\"}"</span>);
 
-        <span class="kw">let </span>result = json_pretty_print(data.clone(), <span class="prelude-val">Some</span>(Verbosity::Medium));
+        <span class="kw">let </span>result = json_pretty_print(data.clone(), <span class="prelude-val">Some</span>(Verbosity::Medium)).unwrap();
         <span class="macro">assert_eq!</span>(result, <span class="string">"{\n  \"age\": 42,\n  \"name\": \"Joe\"\n}"</span>);
 
-        <span class="kw">let </span>result = json_pretty_print(data, <span class="prelude-val">Some</span>(Verbosity::High));
+        <span class="kw">let </span>result = json_pretty_print(data, <span class="prelude-val">Some</span>(Verbosity::High)).unwrap();
         <span class="macro">assert_eq!</span>(result, <span class="string">"{\n  \"age\": 42,\n  \"name\": \"Joe\"\n}"</span>);
     }
 
@@ -1411,14 +1391,14 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_get_base64_from_account_hash() {
+    </span><span class="kw">fn </span>test_get_base64_key_from_account_hash() {
         <span class="comment">// Test with a known input and expected output
         </span><span class="kw">let </span>input_hash =
             <span class="string">"account-hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"</span>;
         <span class="kw">let </span>expected_output = <span class="string">"ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"</span>;
 
         <span class="comment">// Call the function under test
-        </span><span class="kw">let </span>result = get_base64_from_account_hash(input_hash).unwrap();
+        </span><span class="kw">let </span>result = get_base64_key_from_account_hash(input_hash).unwrap();
 
         <span class="comment">// Check the result against the expected output
         </span><span class="macro">assert_eq!</span>(result, expected_output.to_string());

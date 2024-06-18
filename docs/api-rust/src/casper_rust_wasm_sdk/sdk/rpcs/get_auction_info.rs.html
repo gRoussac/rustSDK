@@ -284,14 +284,7 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -373,17 +366,15 @@
     ///
     /// # Returns
     ///
-    /// Parsed auction info options as a `GetAuctionInfoOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_auction_info_options"</span>)]
-    </span><span class="kw">pub fn </span>get_auction_info_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetAuctionInfoOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetAuctionInfoOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetAuctionInfoOptions::default()
-            }
-        }
+    /// Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
+    /// or a `JsError` if deserialization fails.
+    </span><span class="kw">pub fn </span>get_auction_info_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GetAuctionInfoOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetAuctionInfoOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves auction information using the provided options.
@@ -426,7 +417,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

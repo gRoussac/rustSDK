@@ -66,13 +66,22 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::digest::Digest;
-<span class="kw">use </span><span class="kw">crate</span>::debug::error;
+<span class="kw">use </span><span class="kw">super</span>::sdk_error::SdkError;
 <span class="kw">use </span>casper_types::BlockHash <span class="kw">as </span>_BlockHash;
 <span class="kw">use </span>casper_types::Digest <span class="kw">as </span>_Digest;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
-<span class="kw">use </span>hex::decode;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
@@ -81,31 +90,42 @@
 #[derive(Debug, Deserialize, Clone, Serialize)]
 </span><span class="kw">pub struct </span>BlockHash(_BlockHash);
 
-<span class="attr">#[wasm_bindgen]
-</span><span class="kw">impl </span>BlockHash {
-    <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(block_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;BlockHash, JsValue&gt; {
-        <span class="kw">let </span>bytes = decode(block_hash_hex_str)
-            .map_err(|err| error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, err)))
-            .unwrap();
+<span class="kw">impl </span>BlockHash {
+    <span class="kw">pub fn </span>new(deploy_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;BlockHash, SdkError&gt; {
+        <span class="kw">let </span>bytes =
+            hex::decode(deploy_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
+                context: <span class="string">"BlockHash::new"</span>,
+                error: <span class="macro">format!</span>(<span class="string">"Decoding hex string {:?}"</span>, err),
+            })<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>hash = [<span class="number">0u8</span>; _Digest::LENGTH];
         hash.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
         <span class="self">Self</span>::from_digest(Digest::from(hash))
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDigest"</span>)]
-    </span><span class="kw">pub fn </span>from_digest(digest: Digest) -&gt; <span class="prelude-ty">Result</span>&lt;BlockHash, JsValue&gt; {
+    <span class="kw">pub fn </span>from_digest(digest: Digest) -&gt; <span class="prelude-ty">Result</span>&lt;BlockHash, SdkError&gt; {
         <span class="prelude-val">Ok</span>(_BlockHash::new(digest.into()).into())
     }
+}
 
-    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+#[wasm_bindgen]
+</span><span class="kw">impl </span>BlockHash {
+    <span class="attr">#[wasm_bindgen(constructor)]
+    </span><span class="kw">pub fn </span>new_js_alias(block_hash_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;BlockHash, JsError&gt; {
+        <span class="self">Self</span>::new(block_hash_hex_str).map_err(Into::into)
+    }
+
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDigest"</span>)]
+    </span><span class="kw">pub fn </span>from_digest_js_alias(digest: Digest) -&gt; <span class="prelude-ty">Result</span>&lt;BlockHash, JsError&gt; {
+        <span class="self">Self</span>::from_digest(digest).map_err(Into::into)
+    }
+
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toJson"</span>)]
     </span><span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsValue {
         JsValue::from_serde(<span class="self">self</span>).unwrap_or(JsValue::null())
     }
 
-    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-    #[wasm_bindgen(js_name = <span class="string">"toString"</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toString"</span>)]
     </span><span class="kw">pub fn </span>to_string_js_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.to_string()
     }

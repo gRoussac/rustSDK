@@ -120,11 +120,6 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::{account_hash::AccountHash, purse_identifier::PurseIdentifier, uref::URef};
 <span class="kw">use </span>casper_types::{
     bytesrepr::{<span class="self">self</span>, FromBytes, ToBytes},
@@ -165,8 +160,7 @@
             }
         };
 
-        <span class="comment">// Create the PublicKey
-        </span><span class="prelude-val">Ok</span>(PublicKey(public_key))
+        <span class="prelude-val">Ok</span>(PublicKey(public_key))
     }
 }
 
@@ -174,9 +168,9 @@
 </span><span class="kw">impl </span>PublicKey {
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new_js_alias(public_key_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;PublicKey, JsValue&gt; {
+    </span><span class="kw">pub fn </span>new_js_alias(public_key_hex_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;PublicKey, JsError&gt; {
         <span class="self">Self</span>::new(public_key_hex_str).map_err(|err| {
-            JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">"Failed to parse PublicKey from hex string: {:?}"</span>,
                 err
             ))
@@ -185,14 +179,10 @@
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"fromUint8Array"</span>)]
-    </span><span class="kw">pub fn </span>from_bytes_js_alias(bytes: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PublicKey, JsValue&gt; {
-        <span class="kw">match </span><span class="self">Self</span>::from_bytes(<span class="kw-2">&amp;</span>bytes) {
-            <span class="prelude-val">Ok</span>((public_key, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(public_key),
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(JsValue::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">"Failed to parse PublicKey: {:?}"</span>,
-                err
-            ))),
-        }
+    </span><span class="kw">pub fn </span>from_bytes_js_alias(bytes: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PublicKey, JsError&gt; {
+        <span class="self">Self</span>::from_bytes(<span class="kw-2">&amp;</span>bytes)
+            .map(|(public_key, <span class="kw">_</span>)| public_key)
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Failed to parse PublicKey: {:?}"</span>, err)))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toAccountHash"</span>)]

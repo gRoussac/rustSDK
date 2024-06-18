@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["from_transfer"],"struct":["TransferAddr"]};
+window.SIDEBAR_ITEMS = {"struct":["TransferAddr"]};

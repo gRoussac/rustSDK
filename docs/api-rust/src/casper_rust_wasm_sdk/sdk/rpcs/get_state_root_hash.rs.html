@@ -320,15 +320,7 @@
 <a href="#320" id="320">320</a>
 <a href="#321" id="321">321</a>
 <a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
@@ -431,16 +423,13 @@
     /// # Returns
     ///
     /// Parsed state root hash options as a `GetStateRootHashOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_state_root_hash_options"</span>)]
-    </span><span class="kw">pub fn </span>get_state_root_hash_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetStateRootHashOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetStateRootHashOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetStateRootHashOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_state_root_hash_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GetStateRootHashOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetStateRootHashOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves state root hash information using the provided options.
@@ -483,7 +472,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

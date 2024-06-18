@@ -178,14 +178,14 @@
 </span><span class="kw">impl </span>EntityIdentifier {
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;EntityIdentifier, JsValue&gt; {
-        <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| JsValue::from_str(<span class="kw-2">&amp;</span>err.to_string()))
+    </span><span class="kw">pub fn </span>new_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;EntityIdentifier, JsError&gt; {
+        <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| JsError::new(<span class="kw-2">&amp;</span>err.to_string()))
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
     #[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
-    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;EntityIdentifier, JsValue&gt; {
-        <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| JsValue::from_str(<span class="kw-2">&amp;</span>err.to_string()))
+    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;EntityIdentifier, JsError&gt; {
+        <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| JsError::new(<span class="kw-2">&amp;</span>err.to_string()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromPublicKey"</span>)]
