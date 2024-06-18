@@ -90,16 +90,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceOptions` struct.
-    #[wasm_bindgen(js_name = "query_balance_options")]
-    pub fn query_balance_options(&self, options: JsValue) -> QueryBalanceOptions {
-        let options_result = options.into_serde::<QueryBalanceOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                QueryBalanceOptions::default()
-            }
-        }
+    pub fn query_balance_options(&self, options: JsValue) -> Result<QueryBalanceOptions, JsError> {
+        options
+            .into_serde::<QueryBalanceOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves balance information using the provided options.

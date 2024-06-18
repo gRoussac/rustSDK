@@ -522,7 +522,7 @@ export class ClientService {
     //   console.error('Deploy is expired.');
     //   return;
     // }
-    const speculative_exec_options = this.sdk.speculative_exec_options({
+    const speculative_exec_options = this.sdk.get_speculative_exec_options({
       deploy: signed_deploy.toJson()
     });
     this.getIdentifieBlock(speculative_exec_options);

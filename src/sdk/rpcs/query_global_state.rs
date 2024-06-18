@@ -95,16 +95,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query global state options as a `QueryGlobalStateOptions` struct.
-    #[wasm_bindgen(js_name = "query_global_state_options")]
-    pub fn query_global_state_options(&self, options: JsValue) -> QueryGlobalStateOptions {
-        let options_result = options.into_serde::<QueryGlobalStateOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                QueryGlobalStateOptions::default()
-            }
-        }
+    pub fn query_global_state_options(
+        &self,
+        options: JsValue,
+    ) -> Result<QueryGlobalStateOptions, JsError> {
+        options
+            .into_serde::<QueryGlobalStateOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves global state information using the provided options.

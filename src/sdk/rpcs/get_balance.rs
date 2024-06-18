@@ -94,15 +94,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
-    pub fn get_balance_options(&self, options: JsValue) -> GetBalanceOptions {
-        let options_result = options.into_serde::<GetBalanceOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetBalanceOptions::default()
-            }
-        }
+    pub fn get_balance_options(&self, options: JsValue) -> Result<GetBalanceOptions, JsError> {
+        options
+            .into_serde::<GetBalanceOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves balance information using the provided options.

@@ -87,21 +87,16 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
-        let options_result = options.into_serde::<GetDeployOptions>();
-        match options_result {
-            Ok(mut options) => {
-                if let Some(finalized_approvals) = options.finalized_approvals {
-                    options.finalized_approvals =
-                        Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
-                }
-                options
-            }
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetDeployOptions::default()
-            }
+    pub fn get_deploy_options(&self, options: JsValue) -> Result<GetDeployOptions, JsError> {
+        let mut options: GetDeployOptions = options.into_serde()?;
+
+        // Handle finalized_approvals
+        if let Some(finalized_approvals) = options.finalized_approvals {
+            options.finalized_approvals =
+                Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
         }
+
+        Ok(options)
     }
 
     /// Retrieves deploy information using the provided options.

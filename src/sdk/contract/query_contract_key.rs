@@ -65,7 +65,7 @@ impl SDK {
             error(err);
             return Err(JsError::new(err));
         }
-        let options = self.query_global_state_options(js_value_options.unwrap());
+        let options = self.query_global_state_options(js_value_options.unwrap())?;
         self.query_global_state_js_alias(Some(options)).await
     }
 }

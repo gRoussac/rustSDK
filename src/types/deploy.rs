@@ -530,12 +530,16 @@ impl Deploy {
         &mut self,
         js_value_arg: JsValue,
         secret_key: Option<String>,
-    ) -> Deploy {
+    ) -> Result<Deploy, JsError> {
         let deploy = self.0.clone();
         let session = deploy.session();
 
         let mut args = session.args().clone();
-        let new_args = insert_js_value_arg(&mut args, js_value_arg);
+        let new_args = match insert_js_value_arg(&mut args, js_value_arg) {
+            Ok(new_args) => new_args,
+            Err(err) => return Err(JsError::new(&format!("Error adding argument: {}", err))),
+        };
+
         let new_session = modify_session(
             session,
             NewSessionParams {
@@ -544,11 +548,11 @@ impl Deploy {
             },
         );
 
-        self.build(BuildParams {
+        Ok(self.build(BuildParams {
             secret_key,
             session: Some(new_session),
             ..Default::default()
-        })
+        }))
     }
 }
 

@@ -83,15 +83,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
-    pub fn get_block_options(&self, options: JsValue) -> GetBlockOptions {
-        let options_result = options.into_serde::<GetBlockOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetBlockOptions::default()
-            }
-        }
+    pub fn get_block_options(&self, options: JsValue) -> Result<GetBlockOptions, JsError> {
+        options
+            .into_serde::<GetBlockOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves block information using the provided options.

@@ -33,6 +33,18 @@ pub enum SdkError {
         error: casper_types::crypto::Error,
     },
 
+    #[error("Failed to parse {context} as a secret key: {error}")]
+    FailedToParseSecretKey {
+        context: String,
+        error: casper_types::ErrorExt,
+    },
+
+    #[error("Failed to generate {context} as a secret key: {error}")]
+    FailedToGenerateSecretKey {
+        context: String,
+        error: casper_types::ErrorExt,
+    },
+
     #[error("Failed to parse {context} as an account hash: {error}")]
     FailedToParseAccountHash {
         context: &'static str,
