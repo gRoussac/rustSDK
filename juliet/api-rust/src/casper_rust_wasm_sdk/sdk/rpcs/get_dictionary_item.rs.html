@@ -425,13 +425,7 @@
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use crate</span>::{
     types::{
         deploy_params::dictionary_item_str_params::{
@@ -578,7 +572,6 @@
             DictionaryItemInput::Params(params)
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing dictionary item identifier or params"</span>;
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         };
 
@@ -597,7 +590,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

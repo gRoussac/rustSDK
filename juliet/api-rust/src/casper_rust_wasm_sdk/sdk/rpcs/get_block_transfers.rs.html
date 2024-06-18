@@ -277,12 +277,7 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_hash::BlockHash;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
@@ -423,7 +418,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

@@ -264,21 +264,12 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::query_global_state::QueryGlobalStateResult;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::global_state_identifier::GlobalStateIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{
-    debug::error,
-    types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity},
-};
+</span><span class="kw">use </span><span class="kw">crate</span>::types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity};
 <span class="kw">use crate</span>::{rpcs::query_global_state::QueryGlobalStateParams, types::sdk_error::SdkError, SDK};
 <span class="kw">use </span>casper_client::{
     rpcs::results::QueryGlobalStateResult <span class="kw">as </span>_QueryGlobalStateResult, SuccessResponse,
@@ -313,15 +304,13 @@
 </span><span class="kw">impl </span>SDK {
     <span class="doccomment">/// Deserialize query_contract_key_options from a JavaScript object.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_contract_key_options"</span>)]
-    </span><span class="kw">pub fn </span>query_contract_key_state_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; QueryContractKeyOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;QueryContractKeyOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                QueryContractKeyOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>query_contract_key_state_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;QueryContractKeyOptions, JsError&gt; {
+        options
+            .into_serde::&lt;QueryContractKeyOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// JavaScript alias for query_contract_key with deserialized options.
@@ -334,7 +323,6 @@
             JsValue::from_serde::&lt;QueryContractKeyOptions&gt;(<span class="kw-2">&amp;</span>options.unwrap_or_default());
         <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = js_value_options {
             <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing options:  {:?}"</span>, err);
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         }
         <span class="kw">let </span>options = <span class="self">self</span>.query_global_state_options(js_value_options.unwrap())<span class="question-mark">?</span>;

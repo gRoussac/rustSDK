@@ -318,13 +318,7 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_hash::BlockHash;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
@@ -459,7 +453,6 @@
             deploy
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing deploy as json or deploy"</span>.to_string();
-            error(<span class="kw-2">&amp;</span>err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err));
         };
 
@@ -478,7 +471,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

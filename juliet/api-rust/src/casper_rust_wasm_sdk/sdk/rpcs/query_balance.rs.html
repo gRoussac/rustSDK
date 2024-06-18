@@ -491,17 +491,12 @@
 <a href="#491" id="491">491</a>
 <a href="#492" id="492">492</a>
 <a href="#493" id="493">493</a>
-<a href="#494" id="494">494</a>
-<a href="#495" id="495">495</a>
-<a href="#496" id="496">496</a>
-<a href="#497" id="497">497</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use </span><span class="kw">crate</span>::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -671,7 +666,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -717,13 +711,11 @@
             <span class="kw">match </span>parse_purse_identifier(<span class="kw-2">&amp;</span>purse_id) {
                 <span class="prelude-val">Ok</span>(parsed) =&gt; parsed.into(),
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                    error(<span class="kw-2">&amp;</span>err.to_string());
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::FailedToParsePurseIdentifier);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(err.into());
                 }
             }
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing purse identifier"</span>;
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::InvalidArgument {
                 context: <span class="string">"query_balance"</span>,
                 error: err.to_string(),
