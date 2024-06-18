@@ -18,6 +18,10 @@ impl Digest {
         Digest::try_from(digest_hex_str)
     }
 
+    pub fn value(&self) -> [u8; _Digest::LENGTH] {
+        self.0.value()
+    }
+
     pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, SdkError> {
         let hex_string = hex::encode(bytes);
         Digest::try_from(&hex_string[..])

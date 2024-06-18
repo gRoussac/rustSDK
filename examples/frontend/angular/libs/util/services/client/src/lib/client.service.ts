@@ -809,7 +809,7 @@ export class ClientService {
     //   console.error('Deploy is expired.');
     //   return;
     // }
-    const speculative_exec_deploy_options = this.sdk.speculative_exec_deploy_options({
+    const speculative_exec_deploy_options = this.sdk.get_speculative_exec_deploy_options({
       deploy: signed_deploy.toJson()
     });
     this.getIdentifieBlock(speculative_exec_deploy_options);
@@ -826,7 +826,7 @@ export class ClientService {
       return;
     }
     const signed_transaction = new Transaction(JSON.parse(signed_transaction_as_string));
-    const speculative_exec_options = this.sdk.speculative_exec_options({
+    const speculative_exec_options = this.sdk.get_speculative_exec_options({
       transaction: signed_transaction.toJson()
     });
     this.getIdentifieBlock(speculative_exec_options);

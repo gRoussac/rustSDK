@@ -63,17 +63,17 @@
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>BlockIdentifier {
     <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(block_identifier: BlockIdentifier) -&gt; BlockIdentifier {
+    </span><span class="kw">pub fn </span>new(block_identifier: BlockIdentifier) -&gt; <span class="self">Self </span>{
         block_identifier
     }
 
     <span class="kw">pub fn </span>from_hash(hash: BlockHash) -&gt; <span class="self">Self </span>{
-        BlockIdentifier(_BlockIdentifier::Hash(hash.into()))
+        <span class="self">Self</span>(_BlockIdentifier::Hash(hash.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromHeight"</span>)]
     </span><span class="kw">pub fn </span>from_height(height: u64) -&gt; <span class="self">Self </span>{
-        BlockIdentifier(_BlockIdentifier::Height(height))
+        <span class="self">Self</span>(_BlockIdentifier::Height(height))
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]

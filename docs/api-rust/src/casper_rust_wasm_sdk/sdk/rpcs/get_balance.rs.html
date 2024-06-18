@@ -1,90 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="generator" content="rustdoc" />
-    <meta
-      name="description"
-      content="Source of the Rust file `src/sdk/rpcs/get_balance.rs`."
-    />
-    <title>get_balance.rs - source</title>
-    <script>
-      if (window.location.protocol !== 'file:')
-        document.head.insertAdjacentHTML(
-          'beforeend',
-          'SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2'
-            .split(',')
-            .map(
-              (f) =>
-                `<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`
-            )
-            .join('')
-        );
-    </script>
-    <link
-      rel="stylesheet"
-      href="../../../../static.files/normalize-76eba96aa4d2e634.css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"
-    />
-    <meta
-      name="rustdoc-vars"
-      data-root-path="../../../../"
-      data-static-root-path="../../../../static.files/"
-      data-current-crate="casper_rust_wasm_sdk"
-      data-themes=""
-      data-resource-suffix=""
-      data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)"
-      data-channel="nightly"
-      data-search-js="search-d52510db62a78183.js"
-      data-settings-js="settings-4313503d2e1961c2.js"
-    />
-    <script src="../../../../static.files/storage-118b08c4c78b968e.js"></script>
-    <script
-      defer
-      src="../../../../static.files/src-script-e66d777a5a92e9b2.js"
-    ></script>
-    <script defer src="../../../../src-files.js"></script>
-    <script
-      defer
-      src="../../../../static.files/main-20a3ad099b048cf2.js"
-    ></script>
-    <noscript
-      ><link
-        rel="stylesheet"
-        href="../../../../static.files/noscript-df360f571f6edeae.css"
-    /></noscript>
-    <link
-      rel="alternate icon"
-      type="image/png"
-      href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="../../../../static.files/favicon-2c020d218678b618.svg"
-    />
-  </head>
-  <body class="rustdoc src">
-    <!--[if lte IE 11
-      ]><div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-      </div><!
-    [endif]-->
-    <nav class="sidebar">
-      <div class="src-sidebar-title"><h2>Files</h2></div>
-    </nav>
-    <div class="sidebar-resizer"></div>
-    <main>
-      <rustdoc-search></rustdoc-search>
-      <section id="main-content" class="content">
-        <div class="example-wrap">
-          <div data-nosnippet>
-            <pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_balance.rs`."><title>get_balance.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -481,23 +395,7 @@
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-</pre>
-          </div>
-          <pre
-            class="rust"
-          ><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use crate</span>::{
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     types::{
         digest::{Digest, ToDigest},
         sdk_error::SdkError,
@@ -591,16 +489,10 @@
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_balance_options"</span>)]
-    </span><span class="kw">pub fn </span>get_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetBalanceOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetBalanceOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetBalanceOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetBalanceOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetBalanceOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves balance information using the provided options.
@@ -636,7 +528,6 @@
             GetBalanceInput::PurseUrefAsString(purse_uref_as_string)
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing purse uref as string or purse uref"</span>;
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         };
 
@@ -663,7 +554,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -902,9 +792,4 @@
         <span class="macro">assert!</span>(err_string.contains(error_message));
     }
 }
-</code></pre>
-        </div>
-      </section>
-    </main>
-  </body>
-</html>
+</code></pre></div></section></main></body></html>

@@ -94,7 +94,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query global state options as a `QueryGlobalStateOptions` struct.
-    #[wasm_bindgen(js_name = "query_global_state_options")]
     pub fn query_global_state_options(
         &self,
         options: JsValue,

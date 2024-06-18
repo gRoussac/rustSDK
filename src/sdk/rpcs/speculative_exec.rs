@@ -95,7 +95,6 @@ pub struct GetSpeculativeExecTxnOptions {
 #[wasm_bindgen]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
-    #[wasm_bindgen(js_name = "speculative_exec_options")]
     pub fn get_speculative_exec_options(
         &self,
         options: JsValue,

@@ -253,15 +253,8 @@
 <a href="#253" id="253">253</a>
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{
-    debug::error,
-    types::{digest::Digest, public_key::PublicKey},
-};
+</span><span class="kw">use </span><span class="kw">crate</span>::types::{digest::Digest, public_key::PublicKey};
 <span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
 <span class="kw">use </span>casper_client::{
     get_node_status, rpcs::results::GetNodeStatusResult <span class="kw">as </span>_GetNodeStatusResult, Error, JsonRpcId,
@@ -419,7 +412,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

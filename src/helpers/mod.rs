@@ -138,8 +138,8 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
 pub fn get_base64_key_from_account_hash(account_hash: &str) -> Result<String, SdkError> {
     let account_hash = AccountHash::from_formatted_str(account_hash)?;
-    let key: Key = Key::from_account(account_hash);
-    Ok(general_purpose::STANDARD.encode(key.to_formatted_string())) // base64.encode
+    let key = Key::from_account(account_hash).to_bytes().unwrap();
+    Ok(general_purpose::STANDARD.encode(key)) // base64.encode
 }
 
 /// Gets the time to live (TTL) value or returns the default value if not provided.

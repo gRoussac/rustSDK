@@ -277,21 +277,15 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::get_dictionary_item::GetDictionaryItemResult;
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::{
     deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
     dictionary_item_identifier::DictionaryItemIdentifier,
 };
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{debug::error, types::digest::Digest};
 <span class="kw">use crate</span>::{
     rpcs::get_dictionary_item::DictionaryItemInput,
     types::{digest::ToDigest, verbosity::Verbosity},
@@ -326,18 +320,13 @@
 </span><span class="kw">impl </span>SDK {
     <span class="doccomment">/// Deserialize query_contract_dict_options from a JavaScript object.
     </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_contract_dict_options"</span>)]
-    </span><span class="kw">pub fn </span>query_contract_dict_state_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; QueryContractDictOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;QueryContractDictOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">"Error deserializing query_contract_dict_options: {:?}"</span>,
-                    err
-                ));
-                QueryContractDictOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>query_contract_dict_state_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;QueryContractDictOptions, JsError&gt; {
+        options
+            .into_serde::&lt;QueryContractDictOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// JavaScript function for query_contract_dict with deserialized options.
@@ -350,10 +339,9 @@
             JsValue::from_serde::&lt;QueryContractDictOptions&gt;(<span class="kw-2">&amp;</span>options.unwrap_or_default());
         <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = js_value_options {
             <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error serializing options: {:?}"</span>, err);
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         }
-        <span class="kw">let </span>options = <span class="self">self</span>.get_dictionary_item_options(js_value_options.unwrap());
+        <span class="kw">let </span>options = <span class="self">self</span>.get_dictionary_item_options(js_value_options.unwrap())<span class="question-mark">?</span>;
         <span class="self">self</span>.get_dictionary_item_js_alias(<span class="prelude-val">Some</span>(options)).<span class="kw">await
     </span>}
 }

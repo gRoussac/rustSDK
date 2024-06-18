@@ -388,6 +388,7 @@
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
 <a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{debug::error, helpers::get_str_or_default, types::sdk_error::SdkError};
 <span class="kw">use </span>casper_client::cli::DictionaryItemStrParams <span class="kw">as </span>_DictionaryItemStrParams;
 <span class="kw">use </span>casper_types::URef;
@@ -619,7 +620,8 @@
         <span class="kw">let </span>value = get_str_or_default(dictionary_variant.value.get());
         <span class="kw">return </span>_DictionaryItemStrParams::Dictionary(value);
     } <span class="kw">else </span>{
-        error(<span class="string">"Error converting dictionary_item_params"</span>);
+        <span class="comment">// TODO Fix return type
+        </span>error(<span class="string">"Error converting dictionary_item_params"</span>);
         <span class="kw">return </span>_DictionaryItemStrParams::Dictionary(<span class="string">""</span>);
     }
 }

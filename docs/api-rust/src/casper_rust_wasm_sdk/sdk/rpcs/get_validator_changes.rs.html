@@ -181,12 +181,7 @@
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
 <span class="kw">use </span>casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult <span class="kw">as </span>_GetValidatorChangesResult,
     Error, JsonRpcId, SuccessResponse,
@@ -270,7 +265,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

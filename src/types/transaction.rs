@@ -4,6 +4,7 @@ use super::{
     cl::bytes::Bytes,
     package_hash::PackageHash,
     public_key::PublicKey,
+    sdk_error::SdkError,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -563,16 +564,8 @@ impl Transaction {
         })
     }
 
-    pub fn to_json_string(&self) -> Result<String, String> {
-        let result = serde_json::to_string(&self.0);
-        match result {
-            Ok(json) => Ok(json),
-            Err(err) => {
-                let err_msg = format!("Error serializing data to JSON: {:?}", err);
-                error(&err_msg);
-                Err(err_msg)
-            }
-        }
+    pub fn to_json_string(&self) -> Result<String, SdkError> {
+        serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
     pub fn compute_approvals_hash(&self) -> Result<ApprovalsHash, bytesrepr::Error> {

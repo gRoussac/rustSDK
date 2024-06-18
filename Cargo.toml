@@ -36,11 +36,13 @@ num-traits = "0.2"
 humantime = "2"
 thiserror = "1"
 base16 = "0.2.1"
-base64 = { version = "0.21.2", default-features = false, features = ["alloc"] }
+base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
 hex = { version = "0.4.3", default-features = false }
 rust_decimal = "1.10"
 blake2 = { version = "0.9.0", default-features = false }
-reqwest = { version = "0.11", default-features = false, features = ["stream"] }
+reqwest = { version = "0.12.5", default-features = false, features = [
+  "stream",
+] }
 futures-util = "*"
 
 [lib]

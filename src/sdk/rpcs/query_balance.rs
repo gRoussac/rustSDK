@@ -89,7 +89,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceOptions` struct.
-    #[wasm_bindgen(js_name = "query_balance_options")]
     pub fn query_balance_options(&self, options: JsValue) -> Result<QueryBalanceOptions, JsError> {
         options
             .into_serde::<QueryBalanceOptions>()

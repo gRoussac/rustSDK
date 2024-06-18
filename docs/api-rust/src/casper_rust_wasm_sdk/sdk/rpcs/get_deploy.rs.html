@@ -1,90 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="generator" content="rustdoc" />
-    <meta
-      name="description"
-      content="Source of the Rust file `src/sdk/rpcs/get_deploy.rs`."
-    />
-    <title>get_deploy.rs - source</title>
-    <script>
-      if (window.location.protocol !== 'file:')
-        document.head.insertAdjacentHTML(
-          'beforeend',
-          'SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2'
-            .split(',')
-            .map(
-              (f) =>
-                `<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`
-            )
-            .join('')
-        );
-    </script>
-    <link
-      rel="stylesheet"
-      href="../../../../static.files/normalize-76eba96aa4d2e634.css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"
-    />
-    <meta
-      name="rustdoc-vars"
-      data-root-path="../../../../"
-      data-static-root-path="../../../../static.files/"
-      data-current-crate="casper_rust_wasm_sdk"
-      data-themes=""
-      data-resource-suffix=""
-      data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)"
-      data-channel="nightly"
-      data-search-js="search-d52510db62a78183.js"
-      data-settings-js="settings-4313503d2e1961c2.js"
-    />
-    <script src="../../../../static.files/storage-118b08c4c78b968e.js"></script>
-    <script
-      defer
-      src="../../../../static.files/src-script-e66d777a5a92e9b2.js"
-    ></script>
-    <script defer src="../../../../src-files.js"></script>
-    <script
-      defer
-      src="../../../../static.files/main-20a3ad099b048cf2.js"
-    ></script>
-    <noscript
-      ><link
-        rel="stylesheet"
-        href="../../../../static.files/noscript-df360f571f6edeae.css"
-    /></noscript>
-    <link
-      rel="alternate icon"
-      type="image/png"
-      href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="../../../../static.files/favicon-2c020d218678b618.svg"
-    />
-  </head>
-  <body class="rustdoc src">
-    <!--[if lte IE 11
-      ]><div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-      </div><!
-    [endif]-->
-    <nav class="sidebar">
-      <div class="src-sidebar-title"><h2>Files</h2></div>
-    </nav>
-    <div class="sidebar-resizer"></div>
-    <main>
-      <rustdoc-search></rustdoc-search>
-      <section id="main-content" class="content">
-        <div class="example-wrap">
-          <div data-nosnippet>
-            <pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/sdk/rpcs/get_deploy.rs`."><title>get_deploy.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -426,25 +340,9 @@
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-</pre>
-          </div>
-          <pre
-            class="rust"
-          ><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy_hash::DeployHash;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{debug::error, types::digest::Digest};
 <span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
 <span class="kw">use </span>casper_client::{
     get_deploy, rpcs::results::GetDeployResult <span class="kw">as </span>_GetDeployResult, Error, JsonRpcId,
@@ -529,22 +427,18 @@
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_deploy_options"</span>)]
-    </span><span class="kw">pub fn </span>get_deploy_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetDeployOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetDeployOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>options) =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
-                    options.finalized_approvals =
-                        <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
-                }
-                options
-            }
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetDeployOptions::default()
-            }
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer 'get_transaction_options'"</span>)]
+    #[allow(deprecated)]
+    </span><span class="kw">pub fn </span>get_deploy_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetDeployOptions, JsError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options: GetDeployOptions = options.into_serde()<span class="question-mark">?</span>;
+
+        <span class="comment">// Handle finalized_approvals
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
+            options.finalized_approvals =
+                <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
         }
+
+        <span class="prelude-val">Ok</span>(options)
     }
 
     <span class="doccomment">/// Retrieves deploy information using the provided options.
@@ -556,7 +450,9 @@
     /// # Returns
     ///
     /// A `Result` containing either a `GetDeployResult` or an error.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_deploy"</span>)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer 'get_transaction'"</span>)]
+    #[allow(deprecated)]
+    #[wasm_bindgen(js_name = <span class="string">"get_deploy"</span>)]
     </span><span class="kw">pub async fn </span>get_deploy_js_alias(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         options: <span class="prelude-ty">Option</span>&lt;GetDeployOptions&gt;,
@@ -571,21 +467,9 @@
 
         <span class="kw">let </span>err_msg = <span class="string">"Error: Missing deploy hash as string or deploy hash"</span>.to_string();
         <span class="kw">let </span>deploy_hash = <span class="kw">if let </span><span class="prelude-val">Some</span>(deploy_hash_as_string) = deploy_hash_as_string {
-            <span class="kw">let </span>hash = Digest::new(<span class="kw-2">&amp;</span>deploy_hash_as_string);
-            <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = hash {
-                <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Failed to parse AccountHash from formatted string: {}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
-            }
-            <span class="kw">let </span>deploy_hash = DeployHash::from_digest(hash.unwrap());
-            <span class="kw">if </span>deploy_hash.is_err() {
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
-            }
-            deploy_hash.unwrap()
-        } <span class="kw">else </span>{
+            DeployHash::new(<span class="kw-2">&amp;</span>deploy_hash_as_string)<span class="question-mark">?
+        </span>} <span class="kw">else </span>{
             <span class="kw">if </span>deploy_hash.is_none() {
-                error(<span class="kw-2">&amp;</span>err_msg);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
             }
             deploy_hash.unwrap()
@@ -598,14 +482,13 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
     }
 
     <span class="doccomment">/// Retrieves deploy information using the provided options, alias for `get_deploy`.
-    </span><span class="attr">#[deprecated(note = <span class="string">"This function is an alias. Please use `get_deploy` instead."</span>)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"This function is an alias. Please use `get_transaction` instead."</span>)]
     #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>info_get_deploy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -628,6 +511,8 @@
     /// # Returns
     ///
     /// A `Result` containing either a `_GetDeployResult` or an error.
+    </span><span class="attr">#[deprecated(note = <span class="string">"prefer 'get_transaction'"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>get_deploy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy_hash: DeployHash,
@@ -662,6 +547,7 @@
     };
 
     <span class="attr">#[tokio::test]
+    #[allow(deprecated)]
     </span><span class="kw">async fn </span>test_get_deploy_with_none_values() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -678,6 +564,7 @@
     }
 
     <span class="attr">#[tokio::test]
+    #[allow(deprecated)]
     </span><span class="kw">async fn </span>test_get_deploy_with_invalid_deploy_hash() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -695,6 +582,7 @@
     }
 
     <span class="attr">#[tokio::test]
+    #[allow(deprecated)]
     </span><span class="kw">async fn </span>test_get_deploy_with_valid_deploy_hash() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -733,6 +621,7 @@
     }
 
     <span class="attr">#[tokio::test]
+    #[allow(deprecated)]
     </span><span class="kw">async fn </span>test_get_deploy_with_finalized_approvals() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -777,6 +666,7 @@
     }
 
     <span class="attr">#[tokio::test]
+    #[allow(deprecated)]
     </span><span class="kw">async fn </span>test_get_deploy_with_error() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">Some</span>(<span class="string">"http://localhost"</span>.to_string()), <span class="prelude-val">None</span>);
@@ -792,9 +682,4 @@
         <span class="macro">assert!</span>(err_string.contains(error_message));
     }
 }
-</code></pre>
-        </div>
-      </section>
-    </main>
-  </body>
-</html>
+</code></pre></div></section></main></body></html>

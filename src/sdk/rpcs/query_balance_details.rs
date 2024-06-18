@@ -105,7 +105,6 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
-    #[wasm_bindgen(js_name = "query_balance_details_options")]
     pub fn query_balance_details_options(
         &self,
         options: JsValue,
