@@ -776,6 +776,10 @@
 <a href="#776" id="776">776</a>
 <a href="#777" id="777">777</a>
 <a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
@@ -1308,12 +1312,16 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         js_value_arg: JsValue,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; Deploy {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Deploy, JsError&gt; {
         <span class="kw">let </span>deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
         <span class="kw">let </span>session = deploy.session();
 
         <span class="kw">let </span><span class="kw-2">mut </span>args = session.args().clone();
-        <span class="kw">let </span>new_args = insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg);
+        <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
+            <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
+        };
+
         <span class="kw">let </span>new_session = modify_session(
             session,
             NewSessionParams {
@@ -1322,11 +1330,11 @@
             },
         );
 
-        <span class="self">self</span>.build(BuildParams {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.build(BuildParams {
             secret_key,
             session: <span class="prelude-val">Some</span>(new_session),
             ..Default::default()
-        })
+        }))
     }
 }
 

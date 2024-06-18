@@ -337,7 +337,7 @@
             error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         }
-        <span class="kw">let </span>options = <span class="self">self</span>.query_global_state_options(js_value_options.unwrap());
+        <span class="kw">let </span>options = <span class="self">self</span>.query_global_state_options(js_value_options.unwrap())<span class="question-mark">?</span>;
         <span class="self">self</span>.query_global_state_js_alias(<span class="prelude-val">Some</span>(options)).<span class="kw">await
     </span>}
 }

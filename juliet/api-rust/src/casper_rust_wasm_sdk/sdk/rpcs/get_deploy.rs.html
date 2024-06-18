@@ -343,11 +343,6 @@
 <a href="#343" id="343">343</a>
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy_hash::DeployHash;
@@ -437,21 +432,16 @@
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    </span><span class="kw">pub fn </span>get_deploy_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetDeployOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetDeployOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>options) =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
-                    options.finalized_approvals =
-                        <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
-                }
-                options
-            }
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetDeployOptions::default()
-            }
+    </span><span class="kw">pub fn </span>get_deploy_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetDeployOptions, JsError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options: GetDeployOptions = options.into_serde()<span class="question-mark">?</span>;
+
+        <span class="comment">// Handle finalized_approvals
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
+            options.finalized_approvals =
+                <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
         }
+
+        <span class="prelude-val">Ok</span>(options)
     }
 
     <span class="doccomment">/// Retrieves deploy information using the provided options.

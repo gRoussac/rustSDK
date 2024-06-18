@@ -1166,7 +1166,7 @@ let get_deploy = sdk
     .await;
 let get_deploy = get_deploy.unwrap();
 let result = &get_deploy.result.execution_results.get(0).unwrap().result;
-println!("{}", json_pretty_print(result, Some(Verbosity::High)));
+println!("{}", json_pretty_print(result, Some(Verbosity::High))).unwrap();
 ```
 
 with

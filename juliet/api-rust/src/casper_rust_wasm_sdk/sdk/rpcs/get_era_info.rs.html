@@ -235,6 +235,8 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -308,8 +310,10 @@
 </span><span class="kw">impl </span>SDK {
     <span class="attr">#[deprecated(note = <span class="string">"prefer 'get_era_summary' as it doesn't require a switch block"</span>)]
     #[allow(deprecated)]
-    </span><span class="kw">pub fn </span>get_era_info_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetEraInfoOptions {
-        options.into_serde().unwrap_or_default()
+    </span><span class="kw">pub fn </span>get_era_info_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetEraInfoOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetEraInfoOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="attr">#[deprecated(note = <span class="string">"prefer 'get_era_summary' as it doesn't require a switch block"</span>)]
