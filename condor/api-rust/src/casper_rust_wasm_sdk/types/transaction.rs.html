@@ -801,19 +801,13 @@
 <a href="#801" id="801">801</a>
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     account_hash::AccountHash,
     addressable_entity_hash::AddressableEntityHash,
     cl::bytes::Bytes,
     package_hash::PackageHash,
     public_key::PublicKey,
+    sdk_error::SdkError,
     transaction_params::{
         transaction_builder_params::TransactionBuilderParams,
         transaction_str_params::TransactionStrParams,
@@ -1373,16 +1367,8 @@
         })
     }
 
-    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
-        <span class="kw">let </span>result = serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
-        <span class="kw">match </span>result {
-            <span class="prelude-val">Ok</span>(json) =&gt; <span class="prelude-val">Ok</span>(json),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error serializing data to JSON: {:?}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="prelude-val">Err</span>(err_msg)
-            }
-        }
+    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
+        serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).map_err(SdkError::from)
     }
 
     <span class="kw">pub fn </span>compute_approvals_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ApprovalsHash, bytesrepr::Error&gt; {

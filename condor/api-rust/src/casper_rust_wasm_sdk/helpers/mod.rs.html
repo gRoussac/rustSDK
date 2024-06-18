@@ -841,8 +841,8 @@
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
 </span><span class="kw">pub fn </span>get_base64_key_from_account_hash(account_hash: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
     <span class="kw">let </span>account_hash = AccountHash::from_formatted_str(account_hash)<span class="question-mark">?</span>;
-    <span class="kw">let </span>key: Key = Key::from_account(account_hash);
-    <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key.to_formatted_string())) <span class="comment">// base64.encode
+    <span class="kw">let </span>key = Key::from_account(account_hash).to_bytes().unwrap();
+    <span class="prelude-val">Ok</span>(general_purpose::STANDARD.encode(key)) <span class="comment">// base64.encode
 </span>}
 
 <span class="doccomment">/// Gets the time to live (TTL) value or returns the default value if not provided.

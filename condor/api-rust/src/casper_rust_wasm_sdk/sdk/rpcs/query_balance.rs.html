@@ -489,7 +489,6 @@
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
-<a href="#492" id="492">492</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use </span><span class="kw">crate</span>::types::{
@@ -581,7 +580,6 @@
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_balance_options"</span>)]
     </span><span class="kw">pub fn </span>query_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;QueryBalanceOptions, JsError&gt; {
         options
             .into_serde::&lt;QueryBalanceOptions&gt;()
