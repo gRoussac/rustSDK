@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
@@ -135,7 +133,6 @@ impl SDK {
             deploy
         } else {
             let err = "Error: Missing deploy as json or deploy".to_string();
-            error(&err);
             return Err(JsError::new(&err));
         };
 
@@ -154,7 +151,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

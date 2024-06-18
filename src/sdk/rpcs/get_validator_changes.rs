@@ -1,5 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-use crate::debug::error;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_validator_changes, rpcs::results::GetValidatorChangesResult as _GetValidatorChangesResult,
@@ -84,7 +82,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

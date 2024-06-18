@@ -230,18 +230,9 @@
 <a href="#230" id="230">230</a>
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::deploy::PutDeployResult;
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -304,7 +295,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -352,15 +342,9 @@
             deploy_str_params_to_casper_client(<span class="kw-2">&amp;</span>deploy_params),
             payment_str_params_to_casper_client(<span class="kw-2">&amp;</span>payment_params),
             <span class="bool-val">false</span>,
-        );
+        )<span class="question-mark">?</span>;
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = deploy {
-            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error during transfer: {}"</span>, err);
-            error(<span class="kw-2">&amp;</span>err_msg);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
-        }
-
-        <span class="self">self</span>.put_deploy(deploy.unwrap().into(), verbosity, node_address)
+        <span class="self">self</span>.put_deploy(deploy.into(), verbosity, node_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }

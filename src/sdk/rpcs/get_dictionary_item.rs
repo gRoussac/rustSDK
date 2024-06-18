@@ -1,5 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::{
     types::{
@@ -147,7 +145,6 @@ impl SDK {
             DictionaryItemInput::Params(params)
         } else {
             let err = "Error: Missing dictionary item identifier or params";
-            error(err);
             return Err(JsError::new(err));
         };
 
@@ -166,7 +163,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

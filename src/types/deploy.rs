@@ -8,6 +8,7 @@ use super::{
         session_str_params::SessionStrParams,
     },
     public_key::PublicKey,
+    sdk_error::SdkError,
 };
 use crate::{
     debug::error,
@@ -86,7 +87,6 @@ impl Deploy {
             .map(Into::into)
             .map_err(|err| {
                 let err_msg = format!("Error creating session deploy: {}", err);
-                error(&err_msg);
                 err_msg
             })
     }
@@ -582,16 +582,8 @@ impl Deploy {
         })
     }
 
-    pub fn to_json_string(&self) -> Result<String, String> {
-        let result = serde_json::to_string(&self.0);
-        match result {
-            Ok(json) => Ok(json),
-            Err(err) => {
-                let err_msg = format!("Error serializing data to JSON: {:?}", err);
-                error(&err_msg);
-                Err(err_msg)
-            }
-        }
+    pub fn to_json_string(&self) -> Result<String, SdkError> {
+        serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
     // pub fn footprint(&self) -> DeployFootprint {

@@ -3,10 +3,7 @@ use crate::rpcs::query_global_state::QueryGlobalStateResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 #[cfg(target_arch = "wasm32")]
-use crate::{
-    debug::error,
-    types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity},
-};
+use crate::types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity};
 use crate::{rpcs::query_global_state::QueryGlobalStateParams, types::sdk_error::SdkError, SDK};
 use casper_client::{
     rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, SuccessResponse,
@@ -41,15 +38,13 @@ pub struct QueryContractKeyOptions {
 impl SDK {
     /// Deserialize query_contract_key_options from a JavaScript object.
     #[wasm_bindgen(js_name = "query_contract_key_options")]
-    pub fn query_contract_key_state_options(&self, options: JsValue) -> QueryContractKeyOptions {
-        let options_result = options.into_serde::<QueryContractKeyOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                QueryContractKeyOptions::default()
-            }
-        }
+    pub fn query_contract_key_state_options(
+        &self,
+        options: JsValue,
+    ) -> Result<QueryContractKeyOptions, JsError> {
+        options
+            .into_serde::<QueryContractKeyOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// JavaScript alias for query_contract_key with deserialized options.
@@ -62,7 +57,6 @@ impl SDK {
             JsValue::from_serde::<QueryContractKeyOptions>(&options.unwrap_or_default());
         if let Err(err) = js_value_options {
             let err = &format!("Error serializing options:  {:?}", err);
-            error(err);
             return Err(JsError::new(err));
         }
         let options = self.query_global_state_options(js_value_options.unwrap())?;

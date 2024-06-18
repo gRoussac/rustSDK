@@ -318,16 +318,7 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_hash::BlockHash;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
@@ -424,16 +415,13 @@
 #[wasm_bindgen]
 </span><span class="kw">impl </span>SDK {
     <span class="doccomment">/// Get options for speculative execution from a JavaScript value.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"speculative_exec_options"</span>)]
-    </span><span class="kw">pub fn </span>get_speculative_exec_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetSpeculativeExecOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetSpeculativeExecOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetSpeculativeExecOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_speculative_exec_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GetSpeculativeExecOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetSpeculativeExecOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// JS Alias for speculative execution.
@@ -465,7 +453,6 @@
             deploy
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing deploy as json or deploy"</span>.to_string();
-            error(<span class="kw-2">&amp;</span>err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err));
         };
 
@@ -484,7 +471,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

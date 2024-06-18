@@ -1,4 +1,3 @@
-use crate::debug::error;
 use crate::types::digest::Digest;
 use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
@@ -129,14 +128,12 @@ impl SDK {
                     Ok(data) => Ok(data.result.into()),
                     Err(err) => {
                         let err = &format!("Error occurred with {:?}", err);
-                        error(err);
                         Err(JsError::new(err))
                     }
                 }
             }
             Err(err) => {
                 let err = &format!("Error building parameters: {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -202,7 +199,6 @@ impl SDK {
             Some(KeyIdentifierInput::String(key_as_string))
         } else {
             let err_msg = "Error: Missing Key as string or Key".to_string();
-            error(&err_msg);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state_js_alias_params",
                 error: err_msg,
@@ -310,7 +306,6 @@ impl SDK {
 
         if key.is_none() {
             let err = "Error: Missing key from formatted string";
-            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "query_global_state",
                 error: err.to_string(),

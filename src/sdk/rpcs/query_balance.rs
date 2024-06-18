@@ -4,7 +4,6 @@ use crate::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
 use crate::{
-    debug::error,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -174,7 +173,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -220,13 +218,11 @@ impl SDK {
             match parse_purse_identifier(&purse_id) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    error(&err.to_string());
-                    return Err(SdkError::FailedToParsePurseIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {
             let err = "Error: Missing purse identifier";
-            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "query_balance",
                 error: err.to_string(),

@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use super::deploy::PutDeployResult;
 use crate::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -64,7 +63,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -112,15 +110,9 @@ impl SDK {
             deploy_str_params_to_casper_client(&deploy_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        );
+        )?;
 
-        if let Err(err) = deploy {
-            let err_msg = format!("Error during transfer: {}", err);
-            error(&err_msg);
-            return Err(SdkError::from(err));
-        }
-
-        self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
+        self.put_deploy(deploy.into(), verbosity, node_address)
             .await
             .map_err(SdkError::from)
     }

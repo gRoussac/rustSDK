@@ -3,7 +3,6 @@ use crate::rpcs::speculative_exec::SpeculativeExecResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     types::{
         block_identifier::BlockIdentifierInput,
         deploy_params::{
@@ -74,7 +73,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -112,16 +110,10 @@ impl SDK {
             session_str_params_to_casper_client(&session_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        );
-
-        if let Err(err) = deploy {
-            let err_msg = format!("Error during speculative_deploy: {}", err);
-            error(&err_msg);
-            return Err(SdkError::from(err));
-        }
+        )?;
 
         self.speculative_exec(
-            deploy.unwrap().into(),
+            deploy.into(),
             maybe_block_identifier,
             verbosity,
             node_address,

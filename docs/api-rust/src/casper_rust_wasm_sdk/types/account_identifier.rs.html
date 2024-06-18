@@ -95,8 +95,23 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::{account_hash::AccountHash, public_key::PublicKey};
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+</pre></div><pre class="rust"><code><span class="kw">use super</span>::{account_hash::AccountHash, public_key::PublicKey, sdk_error::SdkError};
 <span class="kw">use </span>casper_client::rpcs::AccountIdentifier <span class="kw">as </span>_AccountIdentifier;
+<span class="kw">use </span>casper_types::account::ACCOUNT_HASH_FORMATTED_STRING_PREFIX;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -107,32 +122,45 @@
 #[wasm_bindgen]
 </span><span class="kw">pub struct </span>AccountIdentifier(_AccountIdentifier);
 
-<span class="attr">#[wasm_bindgen]
-</span><span class="kw">impl </span>AccountIdentifier {
-    <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountIdentifier, JsValue&gt; {
-        <span class="self">Self</span>::from_formatted_str(formatted_str)
-    }
-
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
-    </span><span class="kw">pub fn </span>from_formatted_str(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountIdentifier, JsValue&gt; {
-        <span class="kw">if </span>formatted_str.contains(<span class="string">"account-hash"</span>) {
+<span class="kw">impl </span>AccountIdentifier {
+    <span class="kw">pub fn </span>from_formatted_str(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SdkError&gt; {
+        <span class="kw">if </span>formatted_str.contains(ACCOUNT_HASH_FORMATTED_STRING_PREFIX) {
             <span class="kw">let </span>account_hash = AccountHash::from_formatted_str(formatted_str)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_account_under_account_hash(account_hash))
         } <span class="kw">else </span>{
             <span class="kw">let </span>public_key = PublicKey::new(formatted_str)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_account_account_under_public_key(public_key))
+            <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_account_under_public_key(public_key))
         }
+    }
+}
+
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">impl </span>AccountIdentifier {
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(constructor)]
+    </span><span class="kw">pub fn </span>new(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountIdentifier, JsError&gt; {
+        <span class="self">Self</span>::from_formatted_str_js_alias(formatted_str)
+    }
+
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(js_name = <span class="string">"fromFormattedStr"</span>)]
+    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;AccountIdentifier, JsError&gt; {
+        <span class="self">Self</span>::from_formatted_str(formatted_str).map_err(|err| {
+            JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="string">"Failed to parse AccountIdentifier from formatted string: {:?}"</span>,
+                err
+            ))
+        })
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromPublicKey"</span>)]
-    </span><span class="kw">pub fn </span>from_account_account_under_public_key(key: PublicKey) -&gt; <span class="self">Self </span>{
-        AccountIdentifier(_AccountIdentifier::PublicKey(key.into()))
+    </span><span class="kw">pub fn </span>from_account_under_public_key(key: PublicKey) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_AccountIdentifier::PublicKey(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromAccountHash"</span>)]
     </span><span class="kw">pub fn </span>from_account_under_account_hash(account_hash: AccountHash) -&gt; <span class="self">Self </span>{
-        AccountIdentifier(_AccountIdentifier::AccountHash(account_hash.into()))
+        <span class="self">Self</span>(_AccountIdentifier::AccountHash(account_hash.into()))
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]

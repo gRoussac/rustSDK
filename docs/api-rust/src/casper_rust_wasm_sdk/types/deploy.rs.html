@@ -772,10 +772,6 @@
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
 <a href="#774" id="774">774</a>
-<a href="#775" id="775">775</a>
-<a href="#776" id="776">776</a>
-<a href="#777" id="777">777</a>
-<a href="#778" id="778">778</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
@@ -786,6 +782,7 @@
         session_str_params::SessionStrParams,
     },
     public_key::PublicKey,
+    sdk_error::SdkError,
 };
 <span class="kw">use crate</span>::{
     debug::error,
@@ -864,7 +861,6 @@
             .map(Into::into)
             .map_err(|err| {
                 <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error creating session deploy: {}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
                 err_msg
             })
     }
@@ -1308,12 +1304,16 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         js_value_arg: JsValue,
         secret_key: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; Deploy {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Deploy, JsError&gt; {
         <span class="kw">let </span>deploy = <span class="self">self</span>.<span class="number">0</span>.clone();
         <span class="kw">let </span>session = deploy.session();
 
         <span class="kw">let </span><span class="kw-2">mut </span>args = session.args().clone();
-        <span class="kw">let </span>new_args = insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg);
+        <span class="kw">let </span>new_args = <span class="kw">match </span>insert_js_value_arg(<span class="kw-2">&amp;mut </span>args, js_value_arg) {
+            <span class="prelude-val">Ok</span>(new_args) =&gt; new_args,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error adding argument: {}"</span>, err))),
+        };
+
         <span class="kw">let </span>new_session = modify_session(
             session,
             NewSessionParams {
@@ -1322,11 +1322,11 @@
             },
         );
 
-        <span class="self">self</span>.build(BuildParams {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.build(BuildParams {
             secret_key,
             session: <span class="prelude-val">Some</span>(new_session),
             ..Default::default()
-        })
+        }))
     }
 }
 
@@ -1356,16 +1356,8 @@
         })
     }
 
-    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
-        <span class="kw">let </span>result = serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
-        <span class="kw">match </span>result {
-            <span class="prelude-val">Ok</span>(json) =&gt; <span class="prelude-val">Ok</span>(json),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error serializing data to JSON: {:?}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
-                <span class="prelude-val">Err</span>(err_msg)
-            }
-        }
+    <span class="kw">pub fn </span>to_json_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, SdkError&gt; {
+        serde_json::to_string(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).map_err(SdkError::from)
     }
 
     <span class="comment">// pub fn footprint(&amp;self) -&gt; DeployFootprint {
