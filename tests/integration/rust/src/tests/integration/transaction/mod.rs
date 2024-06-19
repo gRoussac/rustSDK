@@ -23,7 +23,7 @@ pub mod test_module {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -94,13 +94,19 @@ pub mod test_module {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
-        let transaction = create_test_sdk(Some(config))
-            .speculative_transaction(builder_params, transaction_params, None, None, None)
+        let transaction = create_test_sdk(Some(config.clone()))
+            .speculative_transaction(
+                builder_params,
+                transaction_params,
+                None,
+                None,
+                Some(config.speculative_address),
+            )
             .await;
         assert!(!transaction
             .as_ref()
@@ -136,7 +142,7 @@ pub mod test_module {
                 None,
                 None,
                 None,
-                None,
+                Some(config.speculative_address),
             )
             .await;
         assert!(!transfer

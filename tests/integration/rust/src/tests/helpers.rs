@@ -5,7 +5,6 @@ use crate::config::{
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use casper_rust_wasm_sdk::types::addressable_entity_hash::AddressableEntityHash;
-use casper_rust_wasm_sdk::types::contract_hash::ContractHash;
 use casper_rust_wasm_sdk::types::entity_identifier::EntityIdentifier;
 use casper_rust_wasm_sdk::{
     types::{
@@ -118,12 +117,12 @@ pub(crate) mod intern {
     }
 
     pub async fn get_dictionnary_uref(
-        contract_hash: &str,
+        contract_entity: &str,
         dictionary_name: &str,
         node_address: Option<String>,
     ) -> String {
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            key: KeyIdentifierInput::String(contract_hash.to_string()),
+            key: KeyIdentifierInput::String(contract_entity.to_string()),
             path: None,
             maybe_global_state_identifier: None,
             state_root_hash: None,
@@ -140,6 +139,7 @@ pub(crate) mod intern {
             .as_contract()
             .unwrap()
             .named_keys();
+
         let (_, dictionnary_uref) = named_keys
             .iter()
             .find(|(key, _)| key == &dictionary_name)
@@ -347,7 +347,7 @@ pub async fn install_cep78_if_needed(
 pub async fn get_contract_cep78_hash_keys(
     account_hash: &str,
     node_address: &str,
-) -> (String, String) {
+) -> (String, String, String) {
     let entity_identifier = EntityIdentifier::from_formatted_str(account_hash).ok();
     let get_entity = create_test_sdk(None)
         .get_entity(
@@ -377,15 +377,16 @@ pub async fn get_contract_cep78_hash_keys(
         .find(|(key, _)| key == &PACKAGE_CEP78_KEY)
         .unwrap();
     (
+        contract_cep78_hash.to_formatted_string(),
         contract_cep78_hash
             .to_formatted_string()
-            .replace("hash-", "contract-"),
+            .replace("hash-", "addressable-entity-"), // entity
         contract_cep78_package_hash.to_formatted_string(),
     )
 }
 
 pub async fn mint_nft(
-    contract_cep78_hash: &str,
+    contract_cep78_entity: &str,
     initiator_addr: &str,
     target_account_hash: &str,
     secret_key: &str,
@@ -410,9 +411,8 @@ pub async fn mint_nft(
     ]);
     transaction_params.set_session_args_simple(args);
 
-    let entity_hash: AddressableEntityHash = ContractHash::from_formatted_str(contract_cep78_hash)
-        .unwrap()
-        .into();
+    let entity_hash: AddressableEntityHash =
+        AddressableEntityHash::from_formatted_str(contract_cep78_entity).unwrap();
 
     let builder_params =
         TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);

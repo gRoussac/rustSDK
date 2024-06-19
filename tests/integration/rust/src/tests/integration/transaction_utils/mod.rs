@@ -22,7 +22,7 @@ pub mod test_module {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_DECIMALS);
@@ -81,7 +81,7 @@ pub mod test_module {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_DECIMALS);
