@@ -491,23 +491,12 @@
 <a href="#491" id="491">491</a>
 <a href="#492" id="492">492</a>
 <a href="#493" id="493">493</a>
-<a href="#494" id="494">494</a>
-<a href="#495" id="495">495</a>
-<a href="#496" id="496">496</a>
-<a href="#497" id="497">497</a>
-<a href="#498" id="498">498</a>
-<a href="#499" id="499">499</a>
-<a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
-<a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use </span><span class="kw">crate</span>::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -593,16 +582,10 @@
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"query_balance_options"</span>)]
-    </span><span class="kw">pub fn </span>query_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; QueryBalanceOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;QueryBalanceOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                QueryBalanceOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>query_balance_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;QueryBalanceOptions, JsError&gt; {
+        options
+            .into_serde::&lt;QueryBalanceOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves balance information using the provided options.
@@ -683,7 +666,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -729,13 +711,11 @@
             <span class="kw">match </span>parse_purse_identifier(<span class="kw-2">&amp;</span>purse_id) {
                 <span class="prelude-val">Ok</span>(parsed) =&gt; parsed.into(),
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                    error(<span class="kw-2">&amp;</span>err.to_string());
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::FailedToParsePurseIdentifier);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(err.into());
                 }
             }
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing purse identifier"</span>;
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::InvalidArgument {
                 context: <span class="string">"query_balance"</span>,
                 error: err.to_string(),
@@ -795,13 +775,13 @@
         helpers::public_key_from_secret_key,
         types::{digest::Digest, public_key::PublicKey},
     };
-    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="kw">fn </span>get_purse_identifier() -&gt; PurseIdentifier {
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
         <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
 
         PurseIdentifier::from_main_purse_under_public_key(public_key)

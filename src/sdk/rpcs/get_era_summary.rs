@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -83,16 +81,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed era summary options as a `GetEraSummaryOptions` struct.
-    #[wasm_bindgen(js_name = "get_era_summary_options")]
-    pub fn get_era_summary_options(&self, options: JsValue) -> GetEraSummaryOptions {
-        let options_result = options.into_serde::<GetEraSummaryOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetEraSummaryOptions::default()
-            }
-        }
+    pub fn get_era_summary_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetEraSummaryOptions, JsError> {
+        options
+            .into_serde::<GetEraSummaryOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves era summary information using the provided options.
@@ -135,7 +130,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

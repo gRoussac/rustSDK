@@ -3,7 +3,6 @@ use crate::rpcs::speculative_exec::SpeculativeExecResult;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     types::{
         block_identifier::BlockIdentifierInput,
         deploy_params::{
@@ -80,7 +79,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -130,16 +128,10 @@ impl SDK {
             deploy_str_params_to_casper_client(&deploy_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        );
-
-        if let Err(err) = deploy {
-            let err_msg = format!("Error during speculative_transfer: {}", err);
-            error(&err_msg);
-            return Err(SdkError::from(err));
-        }
+        )?;
 
         self.speculative_exec(
-            deploy.unwrap().into(),
+            deploy.into(),
             maybe_block_identifier,
             verbosity,
             node_address,
@@ -156,7 +148,7 @@ mod tests {
     use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     // TODO speculative_exec not available in 1.6
@@ -167,11 +159,11 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -203,11 +195,11 @@ mod tests {
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
@@ -230,14 +222,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_speculative_transfer_with_valid_params_without_private_key() {
+    async fn test_speculative_transfer_with_valid_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let payment_params = PaymentStrParams::default();
@@ -269,11 +261,11 @@ mod tests {
         let (node_address, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 

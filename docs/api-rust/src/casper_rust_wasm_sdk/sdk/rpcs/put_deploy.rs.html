@@ -173,10 +173,9 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{debug::error, deploy::deploy::PutDeployResult};
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::deploy::deploy::PutDeployResult;
+<span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
 <span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
 <span class="kw">use </span>casper_client::{
     put_deploy, rpcs::results::PutDeployResult <span class="kw">as </span>_PutDeployResult, Error, JsonRpcId,
@@ -217,7 +216,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -282,15 +280,15 @@
     };
     <span class="kw">use </span>sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     <span class="kw">fn </span>get_deploy() -&gt; Deploy {
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 

@@ -1,39 +1,70 @@
-use std::ops::Deref;
-
-use crate::{
-    debug::error,
-    types::{access_rights::AccessRights, addr::uref_addr::URefAddr},
-};
+use super::sdk_error::SdkError;
+use crate::types::access_rights::AccessRights;
+use crate::types::addr::uref_addr::URefAddr;
 use casper_types::URef as _URef;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
+use std::ops::Deref;
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
 #[wasm_bindgen]
-
+#[derive(Debug, Deserialize, Clone, Serialize, Ord, PartialOrd, Eq, PartialEq)]
 pub struct URef(_URef);
 
-#[wasm_bindgen]
 impl URef {
-    #[wasm_bindgen(constructor)]
-    pub fn new(uref_hex_str: &str, access_rights: u8) -> Result<URef, JsValue> {
+    pub fn new(uref_hex_str: &str, access_rights: u8) -> Result<Self, SdkError> {
         // Convert the input hexadecimal string to bytes
         let bytes = match hex::decode(uref_hex_str) {
             Ok(bytes) => bytes,
             Err(err) => {
-                error(&format!("Invalid hex string: {}", err));
-                return Err(JsValue::null());
+                return Err(SdkError::FailedToDecodeHex {
+                    context: "URef::new",
+                    error: format!("Invalid hex string: {:?}", err),
+                });
             }
         };
 
+        let uref_addr = URefAddr::from(bytes);
+
         let uref = _URef::new(
-            URefAddr::new(bytes).unwrap().into(),
+            uref_addr.into(),
             AccessRights::new(access_rights).unwrap_or_default().into(),
         );
 
         Ok(URef(uref))
+    }
+
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+        let uref = _URef::from_formatted_str(formatted_str).map_err(|error| {
+            SdkError::FailedToParseURef {
+                context: "URef::from_formatted_str",
+                error,
+            }
+        })?;
+        Ok(URef(uref))
+    }
+}
+
+#[wasm_bindgen]
+impl URef {
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(uref_hex_str: &str, access_rights: u8) -> Result<URef, JsError> {
+        Self::new(uref_hex_str, access_rights).map_err(|err| {
+            JsError::new(&format!("Failed to parse URef from hex string: {:?}", err))
+        })
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "fromFormattedStr")]
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<URef, JsError> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse URef from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "fromUint8Array")]

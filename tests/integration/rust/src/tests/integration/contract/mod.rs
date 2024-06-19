@@ -33,7 +33,7 @@ pub mod test_module {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );
@@ -201,7 +201,7 @@ pub mod test_module {
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
             &config.account,
-            Some(config.private_key.clone()),
+            Some(config.secret_key.clone()),
             None,
             Some(TTL.to_string()),
         );

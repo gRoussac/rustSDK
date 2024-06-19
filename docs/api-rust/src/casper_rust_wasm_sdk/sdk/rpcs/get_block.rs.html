@@ -286,18 +286,7 @@
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -380,16 +369,10 @@
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_block_options"</span>)]
-    </span><span class="kw">pub fn </span>get_block_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetBlockOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetBlockOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetBlockOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_block_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetBlockOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetBlockOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves block information using the provided options.
@@ -432,7 +415,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

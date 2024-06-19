@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
-    debug::error,
     types::{
         account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
         sdk_error::SdkError, verbosity::Verbosity,
@@ -84,16 +83,10 @@ pub struct GetAccountOptions {
 #[wasm_bindgen]
 impl SDK {
     // Deserialize options for `get_account` from a JavaScript object
-    #[wasm_bindgen(js_name = "get_account_options")]
-    pub fn get_account_options(&self, options: JsValue) -> GetAccountOptions {
-        let options_result = options.into_serde::<GetAccountOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetAccountOptions::default()
-            }
-        }
+    pub fn get_account_options(&self, options: JsValue) -> Result<GetAccountOptions, JsError> {
+        options
+            .into_serde::<GetAccountOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     // JavaScript alias for `get_account` function
@@ -132,7 +125,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -180,13 +172,11 @@ impl SDK {
             match parse_account_identifier(&account_identifier_as_string) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    error(&err.to_string());
-                    return Err(SdkError::FailedToParseAccountIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {
             let err = "Error: Missing account identifier";
-            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "get_account",
                 error: err.to_string(),
@@ -231,14 +221,14 @@ mod tests {
         helpers::public_key_from_secret_key,
         types::{block_identifier::BlockIdentifier, public_key::PublicKey},
     };
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     fn get_account_identifier() -> AccountIdentifier {
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
-        AccountIdentifier::from_account_account_under_public_key(public_key)
+        AccountIdentifier::from_account_under_public_key(public_key)
     }
 
     #[tokio::test]

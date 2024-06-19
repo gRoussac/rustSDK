@@ -276,18 +276,9 @@
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::deploy_hash::DeployHash;
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -390,7 +381,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -426,16 +416,10 @@
             session_str_params_to_casper_client(<span class="kw-2">&amp;</span>session_params),
             payment_str_params_to_casper_client(<span class="kw-2">&amp;</span>payment_params),
             <span class="bool-val">false</span>,
-        );
-
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = deploy {
-            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error during deploy: {}"</span>, err);
-            error(<span class="kw-2">&amp;</span>err_msg);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
-        }
+        )<span class="question-mark">?</span>;
 
         <span class="comment">// Send the deploy to the network and handle any errors.
-        </span><span class="self">self</span>.put_deploy(deploy.unwrap().into(), verbosity, node_address)
+        </span><span class="self">self</span>.put_deploy(deploy.into(), verbosity, node_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }
@@ -448,7 +432,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;
     <span class="kw">use </span>sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
-        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
+        tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
 
     <span class="kw">fn </span>get_session_params() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>SessionStrParams {
@@ -480,11 +464,11 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
 
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -505,7 +489,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>test_deploy_with_valid_deploy_params_without_private_key() {
+    </span><span class="kw">async fn </span>test_deploy_with_valid_deploy_params_without_secret_key() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
@@ -513,8 +497,8 @@
 
         <span class="kw">let </span>error_message = <span class="string">"Invalid Deploy"</span>;
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
@@ -545,11 +529,11 @@
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
 
         <span class="kw">let </span>error_message = <span class="string">"Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]"</span>;
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(<span class="string">""</span>); <span class="comment">// This is not valid payment amount
 

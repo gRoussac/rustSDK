@@ -1,7 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::deploy_hash::DeployHash;
 use crate::{
-    debug::error,
     types::{
         deploy_params::{
             deploy_str_params::{deploy_str_params_to_casper_client, DeployStrParams},
@@ -104,7 +103,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -140,16 +138,10 @@ impl SDK {
             session_str_params_to_casper_client(&session_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        );
-
-        if let Err(err) = deploy {
-            let err_msg = format!("Error during deploy: {}", err);
-            error(&err_msg);
-            return Err(SdkError::from(err));
-        }
+        )?;
 
         // Send the deploy to the network and handle any errors.
-        self.put_deploy(deploy.unwrap().into(), verbosity, node_address)
+        self.put_deploy(deploy.into(), verbosity, node_address)
             .await
             .map_err(SdkError::from)
     }
@@ -162,7 +154,7 @@ mod tests {
     use crate::helpers::public_key_from_secret_key;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
-        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
+        tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
 
     fn get_session_params() -> &'static SessionStrParams {
@@ -194,11 +186,11 @@ mod tests {
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
 
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -219,7 +211,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_deploy_with_valid_deploy_params_without_private_key() {
+    async fn test_deploy_with_valid_deploy_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
@@ -227,8 +219,8 @@ mod tests {
 
         let error_message = "Invalid Deploy";
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params = DeployStrParams::new(&chain_name, &account, None, None, None);
         let payment_params = PaymentStrParams::default();
@@ -259,11 +251,11 @@ mod tests {
         let (node_address, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(""); // This is not valid payment amount
 

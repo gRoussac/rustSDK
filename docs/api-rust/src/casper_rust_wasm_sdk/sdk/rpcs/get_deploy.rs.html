@@ -339,21 +339,11 @@
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy_hash::DeployHash;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use crate</span>::{debug::error, types::digest::Digest};
+</span><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use crate</span>::{types::verbosity::Verbosity, SDK};
 <span class="kw">use </span>casper_client::{
     get_deploy, rpcs::results::GetDeployResult <span class="kw">as </span>_GetDeployResult, Error, JsonRpcId,
@@ -438,22 +428,16 @@
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_deploy_options"</span>)]
-    </span><span class="kw">pub fn </span>get_deploy_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetDeployOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetDeployOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>options) =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
-                    options.finalized_approvals =
-                        <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
-                }
-                options
-            }
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetDeployOptions::default()
-            }
+    </span><span class="kw">pub fn </span>get_deploy_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;GetDeployOptions, JsError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options: GetDeployOptions = options.into_serde()<span class="question-mark">?</span>;
+
+        <span class="comment">// Handle finalized_approvals
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(finalized_approvals) = options.finalized_approvals {
+            options.finalized_approvals =
+                <span class="prelude-val">Some</span>(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
         }
+
+        <span class="prelude-val">Ok</span>(options)
     }
 
     <span class="doccomment">/// Retrieves deploy information using the provided options.
@@ -483,18 +467,15 @@
             <span class="kw">let </span>hash = Digest::new(<span class="kw-2">&amp;</span>deploy_hash_as_string);
             <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = hash {
                 <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Failed to parse AccountHash from formatted string: {}"</span>, err);
-                error(<span class="kw-2">&amp;</span>err_msg);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
             }
             <span class="kw">let </span>deploy_hash = DeployHash::from_digest(hash.unwrap());
             <span class="kw">if </span>deploy_hash.is_err() {
-                error(<span class="kw-2">&amp;</span>err_msg);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
             }
             deploy_hash.unwrap()
         } <span class="kw">else </span>{
             <span class="kw">if </span>deploy_hash.is_none() {
-                error(<span class="kw-2">&amp;</span>err_msg);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="kw-2">&amp;</span>err_msg));
             }
             deploy_hash.unwrap()
@@ -507,7 +488,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -566,7 +546,7 @@
     };
     <span class="kw">use </span>sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     <span class="attr">#[tokio::test]
@@ -609,11 +589,11 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         <span class="kw">let </span>make_transfer = sdk
@@ -647,11 +627,11 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         <span class="kw">let </span>make_transfer = sdk

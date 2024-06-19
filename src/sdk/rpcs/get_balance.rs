@@ -1,5 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-use crate::debug::error;
 use crate::{
     types::{
         digest::{Digest, ToDigest},
@@ -94,16 +92,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed balance options as a `GetBalanceOptions` struct.
-    #[wasm_bindgen(js_name = "get_balance_options")]
-    pub fn get_balance_options(&self, options: JsValue) -> GetBalanceOptions {
-        let options_result = options.into_serde::<GetBalanceOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetBalanceOptions::default()
-            }
-        }
+    pub fn get_balance_options(&self, options: JsValue) -> Result<GetBalanceOptions, JsError> {
+        options
+            .into_serde::<GetBalanceOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves balance information using the provided options.
@@ -139,7 +131,6 @@ impl SDK {
             GetBalanceInput::PurseUrefAsString(purse_uref_as_string)
         } else {
             let err = "Error: Missing purse uref as string or purse uref";
-            error(err);
             return Err(JsError::new(err));
         };
 
@@ -166,7 +157,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -268,7 +258,7 @@ impl SDK {
 #[cfg(test)]
 mod tests {
 
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     use super::*;
     use crate::helpers::public_key_from_secret_key;
@@ -276,8 +266,8 @@ mod tests {
     async fn get_purse_uref() -> URef {
         let sdk = SDK::new(None, None);
         let (node_address, _, _) = get_network_constants();
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let purse_uref = *sdk
             .get_account(None, Some(account), None, None, Some(node_address))
             .await

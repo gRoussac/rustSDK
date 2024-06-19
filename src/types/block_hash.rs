@@ -1,10 +1,9 @@
 use super::digest::Digest;
-use crate::debug::error;
+use super::sdk_error::SdkError;
 use casper_client::types::BlockHash as _BlockHash;
 use casper_hashing::Digest as _Digest;
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
-use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use wasm_bindgen::prelude::*;
@@ -13,30 +12,41 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct BlockHash(_BlockHash);
 
-#[wasm_bindgen]
 impl BlockHash {
-    #[wasm_bindgen(constructor)]
-    pub fn new(block_hash_hex_str: &str) -> Result<BlockHash, JsValue> {
-        let bytes = decode(block_hash_hex_str)
-            .map_err(|err| error(&format!("{:?}", err)))
-            .unwrap();
+    pub fn new(deploy_hash_hex_str: &str) -> Result<BlockHash, SdkError> {
+        let bytes =
+            hex::decode(deploy_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
+                context: "BlockHash::new",
+                error: format!("Decoding hex string {:?}", err),
+            })?;
         let mut hash = [0u8; _Digest::LENGTH];
         hash.copy_from_slice(&bytes);
         Self::from_digest(Digest::from(hash))
     }
 
-    #[wasm_bindgen(js_name = "fromDigest")]
-    pub fn from_digest(digest: Digest) -> Result<BlockHash, JsValue> {
+    pub fn from_digest(digest: Digest) -> Result<BlockHash, SdkError> {
         Ok(_BlockHash::new(digest.into()).into())
     }
+}
 
-    #[cfg(target_arch = "wasm32")]
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+impl BlockHash {
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(block_hash_hex_str: &str) -> Result<BlockHash, JsError> {
+        Self::new(block_hash_hex_str).map_err(Into::into)
+    }
+
+    #[wasm_bindgen(js_name = "fromDigest")]
+    pub fn from_digest_js_alias(digest: Digest) -> Result<BlockHash, JsError> {
+        Self::from_digest(digest).map_err(Into::into)
+    }
+
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
     }
 
-    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toString")]
     pub fn to_string_js_alias(&self) -> String {
         self.to_string()

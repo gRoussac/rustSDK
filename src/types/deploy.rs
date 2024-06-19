@@ -8,6 +8,7 @@ use super::{
         session_str_params::SessionStrParams,
     },
     public_key::PublicKey,
+    sdk_error::SdkError,
 };
 use crate::{
     debug::error,
@@ -86,7 +87,6 @@ impl Deploy {
             .map(Into::into)
             .map_err(|err| {
                 let err_msg = format!("Error creating session deploy: {}", err);
-                error(&err_msg);
                 err_msg
             })
     }
@@ -530,12 +530,16 @@ impl Deploy {
         &mut self,
         js_value_arg: JsValue,
         secret_key: Option<String>,
-    ) -> Deploy {
+    ) -> Result<Deploy, JsError> {
         let deploy = self.0.clone();
         let session = deploy.session();
 
         let mut args = session.args().clone();
-        let new_args = insert_js_value_arg(&mut args, js_value_arg);
+        let new_args = match insert_js_value_arg(&mut args, js_value_arg) {
+            Ok(new_args) => new_args,
+            Err(err) => return Err(JsError::new(&format!("Error adding argument: {}", err))),
+        };
+
         let new_session = modify_session(
             session,
             NewSessionParams {
@@ -544,11 +548,11 @@ impl Deploy {
             },
         );
 
-        self.build(BuildParams {
+        Ok(self.build(BuildParams {
             secret_key,
             session: Some(new_session),
             ..Default::default()
-        })
+        }))
     }
 }
 
@@ -578,16 +582,8 @@ impl Deploy {
         })
     }
 
-    pub fn to_json_string(&self) -> Result<String, String> {
-        let result = serde_json::to_string(&self.0);
-        match result {
-            Ok(json) => Ok(json),
-            Err(err) => {
-                let err_msg = format!("Error serializing data to JSON: {:?}", err);
-                error(&err_msg);
-                Err(err_msg)
-            }
-        }
+    pub fn to_json_string(&self) -> Result<String, SdkError> {
+        serde_json::to_string(&self.0).map_err(SdkError::from)
     }
 
     // pub fn footprint(&self) -> DeployFootprint {
