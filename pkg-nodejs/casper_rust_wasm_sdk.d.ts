@@ -171,10 +171,13 @@ export function encodeLowerBlake2b(meta_data: string): any;
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
 */
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
+export enum TransactionCategory {
+  Mint = 0,
+  Auction = 1,
+  InstallUpgrade = 2,
+  Large = 3,
+  Medium = 4,
+  Small = 5,
 }
 /**
 */
@@ -185,13 +188,10 @@ export enum TransferTargetKind {
 }
 /**
 */
-export enum TransactionCategory {
-  Mint = 0,
-  Auction = 1,
-  InstallUpgrade = 2,
-  Large = 3,
-  Medium = 4,
-  Small = 5,
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
 }
 /**
 */
