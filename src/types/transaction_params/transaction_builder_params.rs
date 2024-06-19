@@ -2,7 +2,8 @@ use crate::{
     debug::error,
     types::{
         account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey, uref::URef,
+        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey,
+        transaction_category::TransactionCategory, uref::URef,
     },
 };
 use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
@@ -30,6 +31,7 @@ pub struct TransferTarget {
 #[derive(Clone, Debug, Default)]
 pub struct TransactionBuilderParams {
     kind: TransactionKind,
+    transaction_category: Option<TransactionCategory>,
     transaction_bytes: Option<Bytes>,
     maybe_source: Option<URef>,
     target: Option<TransferTarget>,
@@ -70,9 +72,13 @@ pub enum TransactionKind {
 #[wasm_bindgen]
 impl TransactionBuilderParams {
     #[wasm_bindgen(js_name = "newSession")]
-    pub fn new_session(transaction_bytes: Option<Bytes>) -> TransactionBuilderParams {
+    pub fn new_session(
+        transaction_bytes: Option<Bytes>,
+        transaction_category: Option<TransactionCategory>,
+    ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Session,
+            transaction_category: Some(transaction_category.unwrap_or_default()),
             transaction_bytes,
             entry_point: None,
             maybe_source: None,
@@ -104,6 +110,7 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Transfer,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source,
@@ -132,6 +139,7 @@ impl TransactionBuilderParams {
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -160,6 +168,7 @@ impl TransactionBuilderParams {
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -191,6 +200,7 @@ impl TransactionBuilderParams {
 
         TransactionBuilderParams {
             kind: TransactionKind::Package,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -221,6 +231,7 @@ impl TransactionBuilderParams {
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -253,6 +264,7 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::AddBid,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -283,6 +295,7 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Delegate,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -313,6 +326,7 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Undelegate,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -344,6 +358,7 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Redelegate,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -370,6 +385,7 @@ impl TransactionBuilderParams {
         let amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::WithdrawBid,
+            transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -581,6 +597,16 @@ impl TransactionBuilderParams {
     pub fn set_maximum_delegation_amount(&mut self, maximum_delegation_amount: u64) {
         self.maximum_delegation_amount = Some(maximum_delegation_amount);
     }
+
+    #[wasm_bindgen(getter)]
+    pub fn transaction_category(&self) -> Option<TransactionCategory> {
+        self.transaction_category
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_transaction_category(&mut self, transaction_category: TransactionCategory) {
+        self.transaction_category = Some(transaction_category);
+    }
 }
 
 // Convert TransactionBuilderParams to casper_client::cli::TransactionBuilderParams
@@ -589,6 +615,10 @@ pub fn transaction_builder_params_to_casper_client(
 ) -> _TransactionBuilderParams<'_> {
     match transaction_params.kind {
         TransactionKind::Session => _TransactionBuilderParams::Session {
+            transaction_category: transaction_params
+                .transaction_category
+                .unwrap_or_default()
+                .into(),
             transaction_bytes: transaction_params
                 .transaction_bytes
                 .clone()

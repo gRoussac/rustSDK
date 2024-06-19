@@ -1,3 +1,5 @@
+import { config } from "@util/config";
+
 export type option = {
   value: string,
   label: string;
@@ -503,22 +505,21 @@ const selectDictIdentifier: InputField = {
   ]
 };
 
-const selectPricingModeIdentifier: InputField = {
-  id: 'selectPricingModeIdentifier',
+const selectPricingMode: InputField = {
+  id: 'selectPricingMode',
   type: 'select',
   wrap_class: 'mt-3 col-xl-3 mb-3',
   class: 'form-select form-control form-control-sm',
   label: 'Pricing mode',
   label_class: 'input-group-text',
   name: 'pricing_mode',
-  controlName: 'selectPricingModeIdentifier',
-  e2e: 'selectPricingModeIdentifierElt',
+  controlName: 'selectPricingMode',
+  e2e: 'selectPricingModeElt',
   options: [
-    { value: 'classic', label: 'Classic' },
-    { value: 'fixed', label: 'Fixed', default: true },
+    { value: 'classic', label: 'Classic', default: config['default_pricing_mode'] === 'classic' },
+    { value: 'fixed', label: 'Fixed', default: config['default_pricing_mode'] === 'fixed' },
   ]
 };
-
 
 const getBlockFields: InputContainer[][] = [
   [{ input: blockIdentifierHeight }, { input: blockIdentifierHash }]
@@ -595,7 +596,7 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 ];
 
 const installFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingModeIdentifier }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
   [{ wasm_button: true }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
@@ -612,7 +613,7 @@ const makeDeployFields: InputContainer[][] = [
 ];
 
 const makeTransactionFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingModeIdentifier }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
   [{ wasm_button: true }],
   [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias, required: true }],
@@ -632,7 +633,7 @@ const speculativeTransactionFields: InputContainer[][] = [
 ];
 
 const callEntrypointFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingModeIdentifier }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
   [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias }],
   [{ input: entryPointInput }],

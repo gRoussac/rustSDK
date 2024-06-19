@@ -27,8 +27,8 @@ use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
     transaction::Transaction as _Transaction,
     Approval, ApprovalsHash, AsymmetricType, Deploy, InitiatorAddr, PricingMode, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp, TransactionHeader, TransactionV1, TransactionV1Body,
-    TransactionV1Builder,
+    SecretKey, TimeDiff, Timestamp, TransactionCategory, TransactionHeader, TransactionV1,
+    TransactionV1Body, TransactionV1Builder,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -709,6 +709,8 @@ fn modify_body(
 ) -> TransactionV1Body {
     let runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
     let entry_point = body.entry_point().to_string();
+    let transaction_category =
+        TransactionCategory::try_from(body.transaction_category()).unwrap_or_default();
     match body.target() {
         casper_types::TransactionTarget::Native => {
             unimplemented!("native transfer not implemented!")
@@ -754,7 +756,6 @@ fn modify_body(
             }
         },
         casper_types::TransactionTarget::Session {
-            kind: transaction_session_kind,
             module_bytes: transaction_bytes,
             runtime: _,
         } => {
@@ -770,7 +771,7 @@ fn modify_body(
                 }
             };
 
-            (*TransactionV1Builder::new_session(*transaction_session_kind, new_transaction_bytes)
+            (*TransactionV1Builder::new_session(transaction_category, new_transaction_bytes)
                 .with_runtime_args(runtime_args)
                 .body())
             .clone()

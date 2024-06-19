@@ -14,7 +14,7 @@ pub mod test_module {
     };
 
     pub async fn test_transaction() {
-        let config: TestConfig = get_config(false).await;
+        let config: TestConfig = get_config(true).await;
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&config.chain_name);
         transaction_params.set_initiator_addr(&config.account);

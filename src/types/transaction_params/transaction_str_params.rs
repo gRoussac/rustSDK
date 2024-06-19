@@ -24,6 +24,7 @@ pub struct TransactionStrParams {
     standard_payment: OnceCell<bool>,
 }
 
+// TODO Fix this value from PricingMode
 const DEFAULT_PRICING_MODE: &str = "fixed";
 const DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
 const DEFAULT_STANDARD_PAYMENT: bool = false;

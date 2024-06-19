@@ -51,6 +51,9 @@ impl DeployStrParams {
         if let Some(gas_price_tolerance) = gas_price_tolerance {
             deploy_params.set_gas_price_tolerance(gas_price_tolerance);
         };
+        if deploy_params.gas_price_tolerance.get().is_none() {
+            deploy_params.set_gas_price_tolerance("1".to_string());
+        }
         deploy_params
     }
 

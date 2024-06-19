@@ -25,7 +25,7 @@ pub mod test_module {
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
-        let deploy = create_test_sdk(Some(config))
+        let deploy = create_test_sdk(Some(config.clone()))
             .deploy(deploy_params, session_params, payment_params, None, None)
             .await;
         assert!(!deploy
