@@ -280,11 +280,15 @@ pub mod test_module_deploy {
             Some(TTL.to_string()),
             None,
         );
+
         let session_params = SessionStrParams::default();
-        session_params.set_session_package_hash(&config.contract_cep78_package_hash);
+
+        session_params
+            .set_session_package_hash(&config.contract_cep78_package_hash.replace("package-", ""));
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
+
         let mut deploy =
             Deploy::with_payment_and_session(deploy_params, session_params, payment_params)
                 .unwrap();
@@ -292,7 +296,7 @@ pub mod test_module_deploy {
         assert!(deploy.is_stored_contract_package());
 
         let new_session_package_hash =
-            "10631a7146f1a164fb4af24b71881704cccd9dc988e02f85cf332c8d9b88238a";
+            "10fed076cff22b4dc61f08d514cc89084a86fd8c4488cd280c1ca86641010937";
         deploy = deploy.with_package_hash(
             ContractPackageHash::new(new_session_package_hash).unwrap(),
             Some(config.secret_key.clone()),

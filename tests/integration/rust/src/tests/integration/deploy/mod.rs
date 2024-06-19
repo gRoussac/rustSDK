@@ -10,7 +10,7 @@ pub mod test_module {
         session_str_params::SessionStrParams,
     };
 
-    pub async fn test_deploy() {
+    pub async fn test_deploy() -> String {
         let config: TestConfig = get_config(false).await;
         let deploy_params = DeployStrParams::new(
             &config.chain_name,
@@ -28,6 +28,7 @@ pub mod test_module {
         let deploy = create_test_sdk(Some(config.clone()))
             .deploy(deploy_params, session_params, payment_params, None, None)
             .await;
+
         assert!(!deploy
             .as_ref()
             .unwrap()
@@ -35,13 +36,9 @@ pub mod test_module {
             .api_version
             .to_string()
             .is_empty());
-        assert!(!deploy
-            .as_ref()
-            .unwrap()
-            .result
-            .deploy_hash
-            .to_string()
-            .is_empty());
+        let deploy_hash = deploy.as_ref().unwrap().result.deploy_hash.to_string();
+        assert!(!deploy_hash.is_empty());
+        deploy_hash
     }
 
     #[allow(deprecated)]

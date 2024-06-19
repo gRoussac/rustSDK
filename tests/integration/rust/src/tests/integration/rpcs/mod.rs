@@ -6,6 +6,7 @@ pub mod test_module {
     };
     use crate::tests::helpers::intern::create_test_sdk;
     use crate::tests::integration::contract::test_module::test_install_deploy;
+    use crate::tests::integration::deploy::test_module::test_deploy;
     use casper_rust_wasm_sdk::helpers::cl_value_to_json;
     use casper_rust_wasm_sdk::types::account_hash::AccountHash;
     use casper_rust_wasm_sdk::types::account_identifier::AccountIdentifier;
@@ -232,10 +233,11 @@ pub mod test_module {
 
     #[allow(deprecated)]
     pub async fn test_get_deploy() {
-        let config: TestConfig = get_config(false).await;
+        let config: TestConfig = get_config(true).await;
+        let deploy_hash = test_deploy().await;
         let get_deploy = create_test_sdk(Some(config.clone()))
             .get_deploy(
-                DeployHash::new(&config.transaction_hash).unwrap(),
+                DeployHash::new(&deploy_hash).unwrap(),
                 Some(true),
                 None,
                 None,

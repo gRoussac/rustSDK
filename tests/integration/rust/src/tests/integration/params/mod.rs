@@ -188,7 +188,7 @@ pub mod test_module {
     pub async fn test_transaction_builder_params() {
         let config: TestConfig = get_config(true).await;
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let transaction_builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);

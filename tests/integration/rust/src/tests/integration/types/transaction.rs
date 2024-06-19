@@ -83,7 +83,7 @@ pub mod test_module_transaction {
         );
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -191,7 +191,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -214,7 +214,7 @@ pub mod test_module_transaction {
         );
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -278,7 +278,8 @@ pub mod test_module_transaction {
             Some(TTL.to_string()),
         );
 
-        let package_hash = PackageHash::new(&config.contract_cep78_hash).unwrap();
+        let package_hash =
+            PackageHash::from_formatted_str(&config.contract_cep78_package_hash).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_package(package_hash, ENTRYPOINT_MINT, None);
@@ -289,7 +290,7 @@ pub mod test_module_transaction {
         //assert!(transaction.is_stored_contract_package());
 
         let new_session_package_hash_string =
-            "10631a7146f1a164fb4af24b71881704cccd9dc988e02f85cf332c8d9b88238a";
+            "10fed076cff22b4dc61f08d514cc89084a86fd8c4488cd280c1ca86641010937";
         let new_session_package_hash = PackageHash::new(new_session_package_hash_string).unwrap();
         transaction = transaction
             .with_package_hash(new_session_package_hash, Some(config.secret_key.clone()));
@@ -302,7 +303,7 @@ pub mod test_module_transaction {
         assert!(transaction
             .to_json_string()
             .unwrap()
-            .contains(new_session_package_hash_string));
+            .contains(&new_session_package_hash_string));
     }
 
     pub async fn test_transaction_type_with_transaction_bytes() {
@@ -382,7 +383,7 @@ pub mod test_module_transaction {
     //     );
 
     //     let entity_hash: AddressableEntityHash =
-    //     AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+    //     AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
     //     let builder_params =
     //     TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -476,7 +477,7 @@ pub mod test_module_transaction {
         );
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -503,7 +504,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -527,7 +528,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -548,7 +549,7 @@ pub mod test_module_transaction {
         );
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -577,7 +578,7 @@ pub mod test_module_transaction {
         );
 
         let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::new(&config.contract_cep78_hash).unwrap();
+            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
