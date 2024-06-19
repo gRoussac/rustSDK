@@ -2318,7 +2318,7 @@ console.log(deploy_hash);
 
 <br>
 
-![Casper Electron App](https://casper-ecosystem.github.io/rustSDK/condor/images/get_status-electron.png)
+![Casper Electron App](https://github.com/casper-ecosystem/rustSDK/tree/dev/docs/images/get_status-electron.png)
 
 The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
 
@@ -2331,9 +2331,9 @@ $ npm build
 
 You can download an alpha version of the app illustrating the SDK here:
 
-- [Microsoft Windows](examples/desktop/electron/release/Casper%20Setup%201.0.0.exe)
-- [GNU/Linux AppImage](examples/desktop/electron/release/Casper-1.0.0.AppImage)
-- [GNU/Linux Snap](examples/desktop/electron/release/casper_1.0.0_amd64.snap)
+- [Microsoft Windows](https://github.com/casper-ecosystem/rustSDK/raw/dev/examples/desktop/electron/release/Casper%20Webclient%202.0.0.exe)
+- [GNU/Linux AppImage](https://github.com/casper-ecosystem/rustSDK/raw/dev/examples/desktop/electron/release/Casper%20Webclient-2.0.0.AppImage)
+- [GNU/Linux Snap](https://github.com/casper-ecosystem/rustSDK/raw/dev/examples/desktop/electron/release/casper-webclient_2.0.0_amd64.snap)
 - [Mac][TODO]
 
 </details>
