@@ -152,6 +152,10 @@ pub enum SdkError {
     #[error("Failed to parse a transfer target")]
     FailedToParseTransferTarget,
 
+    /// Failed to parse transaction category.
+    #[error("Failed to parse a transaction category")]
+    FailedToParseTransactionCategory,
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 
@@ -240,6 +244,9 @@ impl From<CliError> for SdkError {
             }
             CliError::FailedToParsePackageAddr => SdkError::FailedToParsePackageAddr,
             CliError::FailedToParseTransferTarget => SdkError::FailedToParseTransferTarget,
+            CliError::FailedToParseTransactionCategory => {
+                SdkError::FailedToParseTransactionCategory
+            }
         }
     }
 }

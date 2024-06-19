@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -432,7 +432,7 @@ export class ClientService {
     const timestamp = getTimestamp();
     const ttl: string = this.getIdentifier('TTL')?.value?.trim() || '';
     const gas_price_tolerance: string = this.getIdentifier('gasPriceTolerance')?.value?.trim() || '';
-    const pricing_mode: string = this.getIdentifier('selectPricingModeIdentifier')?.value?.trim() || '';
+    const pricing_mode: string = this.getIdentifier('selectPricingMode')?.value?.trim() || '';
     if (!deploy_result && !this.public_key) {
       const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
@@ -1304,7 +1304,9 @@ export class ClientService {
     }
 
     if (wasm) {
-      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm));
+      const transaction_category: string = this.getIdentifier('selectTransactionCategory')?.value?.trim();
+      console.log(TransactionCategory.toString());
+      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm), transaction_category as unknown as TransactionCategory);
     }
 
     return builder_params;

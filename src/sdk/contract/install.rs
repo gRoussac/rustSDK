@@ -4,6 +4,7 @@ use crate::{
     types::{
         cl::bytes::Bytes,
         sdk_error::SdkError,
+        transaction_category::TransactionCategory,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -81,7 +82,10 @@ impl SDK {
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("install!");
-        let builder_params = TransactionBuilderParams::new_session(Some(transaction_bytes));
+        let builder_params = TransactionBuilderParams::new_session(
+            Some(transaction_bytes),
+            Some(TransactionCategory::InstallUpgrade),
+        );
         self.transaction(builder_params, transaction_params, None, node_address)
             .await
     }
@@ -153,7 +157,6 @@ mod tests {
             .await;
 
         // Assert
-        // dbg!(result);
         assert!(result.is_ok());
         let transaction_hash = result.unwrap().result.transaction_hash;
         assert!(!transaction_hash.to_string().is_empty());

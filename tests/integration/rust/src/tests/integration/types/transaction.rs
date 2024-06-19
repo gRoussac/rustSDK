@@ -317,7 +317,7 @@ pub mod test_module_transaction {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let transaction_bytes: Bytes = Vec::from([0]).into();
-        let builder_params = TransactionBuilderParams::new_session(Some(transaction_bytes));
+        let builder_params = TransactionBuilderParams::new_session(Some(transaction_bytes), None);
 
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());

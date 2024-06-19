@@ -126,7 +126,10 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
+    use crate::{
+        helpers::public_key_from_secret_key,
+        types::{block_identifier::BlockIdentifier, transaction_category::TransactionCategory},
+    };
     use once_cell::sync::Lazy;
     use sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
@@ -149,8 +152,10 @@ mod tests {
                         unimplemented!()
                     }
                 };
-                let builder_params =
-                    TransactionBuilderParams::new_session(Some(transaction_bytes.into()));
+                let builder_params = TransactionBuilderParams::new_session(
+                    Some(transaction_bytes.into()),
+                    Some(TransactionCategory::InstallUpgrade),
+                );
                 BUILDER_PARAMS = Some(builder_params);
             }
             BUILDER_PARAMS.as_ref().unwrap()

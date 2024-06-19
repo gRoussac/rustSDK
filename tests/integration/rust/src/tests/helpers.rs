@@ -5,8 +5,9 @@ use crate::config::{
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use casper_rust_wasm_sdk::types::addressable_entity_hash::AddressableEntityHash;
+use casper_rust_wasm_sdk::types::contract_hash::ContractHash;
+use casper_rust_wasm_sdk::types::entity_identifier::EntityIdentifier;
 use casper_rust_wasm_sdk::{
-    rpcs::query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
     types::{
         block_hash::BlockHash,
         transaction_hash::TransactionHash,
@@ -347,23 +348,26 @@ pub async fn get_contract_cep78_hash_keys(
     account_hash: &str,
     node_address: &str,
 ) -> (String, String) {
-    let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-        key: KeyIdentifierInput::String(account_hash.to_string()),
-        path: None,
-        maybe_global_state_identifier: None,
-        state_root_hash: None,
-        maybe_block_id: None,
-        node_address: Some(node_address.to_string()),
-        verbosity: None,
-    };
-    let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
-    let query_global_state_result = query_global_state.unwrap();
-    let account = query_global_state_result
-        .result
-        .stored_value
-        .as_account()
+    let entity_identifier = EntityIdentifier::from_formatted_str(account_hash).ok();
+    let get_entity = create_test_sdk(None)
+        .get_entity(
+            entity_identifier,
+            None,
+            None,
+            None,
+            Some(node_address.to_string()),
+        )
+        .await
         .unwrap();
-    let named_keys = account.named_keys();
+
+    let account = get_entity
+        .result
+        .entity_result
+        .addressable_entity()
+        .unwrap();
+
+    let named_keys = account.named_keys;
+
     let (_, contract_cep78_hash) = named_keys
         .iter()
         .find(|(key, _)| key == &CONTRACT_CEP78_KEY)
@@ -373,7 +377,9 @@ pub async fn get_contract_cep78_hash_keys(
         .find(|(key, _)| key == &PACKAGE_CEP78_KEY)
         .unwrap();
     (
-        contract_cep78_hash.to_formatted_string(),
+        contract_cep78_hash
+            .to_formatted_string()
+            .replace("hash-", "contract-"),
         contract_cep78_package_hash.to_formatted_string(),
     )
 }
@@ -404,21 +410,22 @@ pub async fn mint_nft(
     ]);
     transaction_params.set_session_args_simple(args);
 
-    let entity_hash: AddressableEntityHash =
-        AddressableEntityHash::new(contract_cep78_hash).unwrap();
+    let entity_hash: AddressableEntityHash = ContractHash::from_formatted_str(contract_cep78_hash)
+        .unwrap()
+        .into();
 
     let builder_params =
         TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
     let sdk = create_test_sdk(None);
-    let test_call_entrypoint_deploy = sdk
+    let test_call_entrypoint = sdk
         .call_entrypoint(
             builder_params,
             transaction_params,
             Some(node_address.to_string()),
         )
         .await;
-    let result = &test_call_entrypoint_deploy.as_ref().unwrap().result;
+    let result = &test_call_entrypoint.as_ref().unwrap().result;
     assert!(!result.clone().api_version.to_string().is_empty());
 
     let transaction_hash = TransactionHash::from(result.transaction_hash);
