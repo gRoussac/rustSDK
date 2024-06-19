@@ -1336,7 +1336,7 @@ console.log(call_entrypoint_result_as_json.deploy_hash);
 
 <br>
 
-![Casper Electron App](docs/images/get_status-electron.png)
+![Casper Electron App](../images/get_status-electron.png)
 
 The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
 
@@ -1349,9 +1349,9 @@ $ npm build
 
 You can download an alpha version of the app illustrating the SDK here:
 
-- [Microsoft Windows](examples/desktop/electron/release/Casper%20Setup%201.0.0.exe)
-- [GNU/Linux AppImage](examples/desktop/electron/release/Casper-1.0.0.AppImage)
-- [GNU/Linux Snap](examples/desktop/electron/release/casper_1.0.0_amd64.snap)
+- [Microsoft Windows](https://github.com/casper-ecosystem/rustSDK/raw/dev-1.6/examples/desktop/electron/release/Casper%20Webclient%201.0.0.exe)
+- [GNU/Linux AppImage](https://github.com/casper-ecosystem/rustSDK/blob/dev-1.6/examples/desktop/electron/release/Casper%20Webclient-1.0.0.AppImage)
+- [GNU/Linux Snap](https://github.com/casper-ecosystem/rustSDK/raw/dev-1.6/examples/desktop/electron/release/casper-webclient_1.0.0_amd64.snap)
 - [Mac][TODO]
 
 </details>
