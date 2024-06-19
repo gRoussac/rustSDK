@@ -1336,7 +1336,7 @@ console.log(call_entrypoint_result_as_json.deploy_hash);
 
 <br>
 
-![Casper Electron App](https://casper-ecosystem.github.io/rustSDK/juliet/images/get_status-electron.png)
+![Casper Electron App](docs/images/get_status-electron.png)
 
 The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
 
