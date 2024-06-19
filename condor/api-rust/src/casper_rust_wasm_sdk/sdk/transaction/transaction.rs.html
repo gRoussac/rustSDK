@@ -269,6 +269,10 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::transaction_hash::TransactionHash;
 <span class="kw">use crate</span>::{
@@ -418,7 +422,9 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;
+    <span class="kw">use crate</span>::{
+        helpers::public_key_from_secret_key, types::transaction_category::TransactionCategory,
+    };
     <span class="kw">use </span>once_cell::sync::Lazy;
     <span class="kw">use </span>sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
@@ -441,8 +447,10 @@
                         <span class="macro">unimplemented!</span>()
                     }
                 };
-                <span class="kw">let </span>builder_params =
-                    TransactionBuilderParams::new_session(<span class="prelude-val">Some</span>(transaction_bytes.into()));
+                <span class="kw">let </span>builder_params = TransactionBuilderParams::new_session(
+                    <span class="prelude-val">Some</span>(transaction_bytes.into()),
+                    <span class="prelude-val">Some</span>(TransactionCategory::InstallUpgrade),
+                );
                 BUILDER_PARAMS = <span class="prelude-val">Some</span>(builder_params);
             }
             BUILDER_PARAMS.as_ref().unwrap()

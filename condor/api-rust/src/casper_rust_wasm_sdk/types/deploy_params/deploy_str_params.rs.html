@@ -205,6 +205,9 @@
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::helpers::get_current_timestamp;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_str_or_default;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_ttl_or_default;
@@ -258,6 +261,9 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(gas_price_tolerance) = gas_price_tolerance {
             deploy_params.set_gas_price_tolerance(gas_price_tolerance);
         };
+        <span class="kw">if </span>deploy_params.gas_price_tolerance.get().is_none() {
+            deploy_params.set_gas_price_tolerance(<span class="string">"1"</span>.to_string());
+        }
         deploy_params
     }
 

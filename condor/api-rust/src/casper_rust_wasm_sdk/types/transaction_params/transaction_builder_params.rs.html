@@ -704,11 +704,42 @@
 <a href="#704" id="704">704</a>
 <a href="#705" id="705">705</a>
 <a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     debug::error,
     types::{
         account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey, uref::URef,
+        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey,
+        transaction_category::TransactionCategory, uref::URef,
     },
 };
 <span class="kw">use </span>casper_client::cli::TransactionBuilderParams <span class="kw">as </span>_TransactionBuilderParams;
@@ -736,6 +767,7 @@
 #[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>TransactionBuilderParams {
     kind: TransactionKind,
+    transaction_category: <span class="prelude-ty">Option</span>&lt;TransactionCategory&gt;,
     transaction_bytes: <span class="prelude-ty">Option</span>&lt;Bytes&gt;,
     maybe_source: <span class="prelude-ty">Option</span>&lt;URef&gt;,
     target: <span class="prelude-ty">Option</span>&lt;TransferTarget&gt;,
@@ -776,9 +808,13 @@
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>TransactionBuilderParams {
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"newSession"</span>)]
-    </span><span class="kw">pub fn </span>new_session(transaction_bytes: <span class="prelude-ty">Option</span>&lt;Bytes&gt;) -&gt; TransactionBuilderParams {
+    </span><span class="kw">pub fn </span>new_session(
+        transaction_bytes: <span class="prelude-ty">Option</span>&lt;Bytes&gt;,
+        transaction_category: <span class="prelude-ty">Option</span>&lt;TransactionCategory&gt;,
+    ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Session,
+            transaction_category: <span class="prelude-val">Some</span>(transaction_category.unwrap_or_default()),
             transaction_bytes,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -810,6 +846,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Transfer,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source,
@@ -838,6 +875,7 @@
     ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -866,6 +904,7 @@
     ) -&gt; TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -897,6 +936,7 @@
 
         TransactionBuilderParams {
             kind: TransactionKind::Package,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -927,6 +967,7 @@
         <span class="kw">let </span>maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">Some</span>(entry_point.to_string()),
             maybe_source: <span class="prelude-val">None</span>,
@@ -959,6 +1000,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::AddBid,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -989,6 +1031,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Delegate,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1019,6 +1062,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Undelegate,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1050,6 +1094,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::Redelegate,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1076,6 +1121,7 @@
         <span class="kw">let </span>amount = convert_amount(amount);
         TransactionBuilderParams {
             kind: TransactionKind::WithdrawBid,
+            transaction_category: <span class="prelude-val">None</span>,
             transaction_bytes: <span class="prelude-val">None</span>,
             entry_point: <span class="prelude-val">None</span>,
             maybe_source: <span class="prelude-val">None</span>,
@@ -1287,6 +1333,16 @@
     </span><span class="kw">pub fn </span>set_maximum_delegation_amount(<span class="kw-2">&amp;mut </span><span class="self">self</span>, maximum_delegation_amount: u64) {
         <span class="self">self</span>.maximum_delegation_amount = <span class="prelude-val">Some</span>(maximum_delegation_amount);
     }
+
+    <span class="attr">#[wasm_bindgen(getter)]
+    </span><span class="kw">pub fn </span>transaction_category(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TransactionCategory&gt; {
+        <span class="self">self</span>.transaction_category
+    }
+
+    <span class="attr">#[wasm_bindgen(setter)]
+    </span><span class="kw">pub fn </span>set_transaction_category(<span class="kw-2">&amp;mut </span><span class="self">self</span>, transaction_category: TransactionCategory) {
+        <span class="self">self</span>.transaction_category = <span class="prelude-val">Some</span>(transaction_category);
+    }
 }
 
 <span class="comment">// Convert TransactionBuilderParams to casper_client::cli::TransactionBuilderParams
@@ -1295,6 +1351,10 @@
 ) -&gt; _TransactionBuilderParams&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">match </span>transaction_params.kind {
         TransactionKind::Session =&gt; _TransactionBuilderParams::Session {
+            transaction_category: transaction_params
+                .transaction_category
+                .unwrap_or_default()
+                .into(),
             transaction_bytes: transaction_params
                 .transaction_bytes
                 .clone()

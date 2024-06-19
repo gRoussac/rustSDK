@@ -243,6 +243,13 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>casper_client::{
     cli::JsonArgsError,
     cli::{CliError, FromDecStrErr},
@@ -397,6 +404,10 @@
     </span><span class="attr">#[error(<span class="string">"Failed to parse a transfer target"</span>)]
     </span>FailedToParseTransferTarget,
 
+    <span class="doccomment">/// Failed to parse transaction category.
+    </span><span class="attr">#[error(<span class="string">"Failed to parse a transaction category"</span>)]
+    </span>FailedToParseTransactionCategory,
+
     <span class="attr">#[error(<span class="string">"Conflicting arguments passed '{context}' {args:?}"</span>)]
     </span>ConflictingArguments { context: String, args: Vec&lt;String&gt; },
 
@@ -485,6 +496,9 @@
             }
             CliError::FailedToParsePackageAddr =&gt; SdkError::FailedToParsePackageAddr,
             CliError::FailedToParseTransferTarget =&gt; SdkError::FailedToParseTransferTarget,
+            CliError::FailedToParseTransactionCategory =&gt; {
+                SdkError::FailedToParseTransactionCategory
+            }
         }
     }
 }

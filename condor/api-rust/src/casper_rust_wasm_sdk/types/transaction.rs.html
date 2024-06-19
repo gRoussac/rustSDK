@@ -801,6 +801,7 @@
 <a href="#801" id="801">801</a>
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     account_hash::AccountHash,
     addressable_entity_hash::AddressableEntityHash,
@@ -830,8 +831,8 @@
     bytesrepr::{<span class="self">self</span>, Bytes <span class="kw">as </span>_Bytes},
     transaction::Transaction <span class="kw">as </span>_Transaction,
     Approval, ApprovalsHash, AsymmetricType, Deploy, InitiatorAddr, PricingMode, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp, TransactionHeader, TransactionV1, TransactionV1Body,
-    TransactionV1Builder,
+    SecretKey, TimeDiff, Timestamp, TransactionCategory, TransactionHeader, TransactionV1,
+    TransactionV1Body, TransactionV1Builder,
 };
 <span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -1512,6 +1513,8 @@
 ) -&gt; TransactionV1Body {
     <span class="kw">let </span>runtime_args = new_args.cloned().unwrap_or_else(|| body.args().clone());
     <span class="kw">let </span>entry_point = body.entry_point().to_string();
+    <span class="kw">let </span>transaction_category =
+        TransactionCategory::try_from(body.transaction_category()).unwrap_or_default();
     <span class="kw">match </span>body.target() {
         casper_types::TransactionTarget::Native =&gt; {
             <span class="macro">unimplemented!</span>(<span class="string">"native transfer not implemented!"</span>)
@@ -1557,7 +1560,6 @@
             }
         },
         casper_types::TransactionTarget::Session {
-            kind: transaction_session_kind,
             module_bytes: transaction_bytes,
             runtime: <span class="kw">_</span>,
         } =&gt; {
@@ -1573,7 +1575,7 @@
                 }
             };
 
-            (<span class="kw-2">*</span>TransactionV1Builder::new_session(<span class="kw-2">*</span>transaction_session_kind, new_transaction_bytes)
+            (<span class="kw-2">*</span>TransactionV1Builder::new_session(transaction_category, new_transaction_bytes)
                 .with_runtime_args(runtime_args)
                 .body())
             .clone()

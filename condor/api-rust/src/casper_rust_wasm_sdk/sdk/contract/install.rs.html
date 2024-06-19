@@ -270,12 +270,16 @@
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::transaction::transaction::PutTransactionResult;
 <span class="kw">use crate</span>::{
     types::{
         cl::bytes::Bytes,
         sdk_error::SdkError,
+        transaction_category::TransactionCategory,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -353,7 +357,10 @@
         node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutTransactionResult&gt;, SdkError&gt; {
         <span class="comment">//log("install!");
-        </span><span class="kw">let </span>builder_params = TransactionBuilderParams::new_session(<span class="prelude-val">Some</span>(transaction_bytes));
+        </span><span class="kw">let </span>builder_params = TransactionBuilderParams::new_session(
+            <span class="prelude-val">Some</span>(transaction_bytes),
+            <span class="prelude-val">Some</span>(TransactionCategory::InstallUpgrade),
+        );
         <span class="self">self</span>.transaction(builder_params, transaction_params, <span class="prelude-val">None</span>, node_address)
             .<span class="kw">await
     </span>}
@@ -425,7 +432,6 @@
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
-        // dbg!(result);
         </span><span class="macro">assert!</span>(result.is_ok());
         <span class="kw">let </span>transaction_hash = result.unwrap().result.transaction_hash;
         <span class="macro">assert!</span>(!transaction_hash.to_string().is_empty());

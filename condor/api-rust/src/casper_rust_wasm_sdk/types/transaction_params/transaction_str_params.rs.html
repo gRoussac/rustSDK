@@ -435,6 +435,7 @@
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::helpers::get_current_timestamp;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_str_or_default;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_ttl_or_default;
@@ -461,7 +462,8 @@
     standard_payment: OnceCell&lt;bool&gt;,
 }
 
-<span class="kw">const </span>DEFAULT_PRICING_MODE: <span class="kw-2">&amp;</span>str = <span class="string">"fixed"</span>;
+<span class="comment">// TODO Fix this value from PricingMode
+</span><span class="kw">const </span>DEFAULT_PRICING_MODE: <span class="kw-2">&amp;</span>str = <span class="string">"fixed"</span>;
 <span class="kw">const </span>DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
 <span class="kw">const </span>DEFAULT_STANDARD_PAYMENT: bool = <span class="bool-val">false</span>;
 
