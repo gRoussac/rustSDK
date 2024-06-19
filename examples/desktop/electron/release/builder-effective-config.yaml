@@ -2,7 +2,7 @@ directories:
   output: release
   buildResources: build
 appId: com.example.myapp
-productName: Casper
+productName: Casper Webclient
 compression: maximum
 win:
   target: portable
@@ -20,4 +20,4 @@ files:
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
-electronVersion: 29.1.1
+electronVersion: 31.0.1

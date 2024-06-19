@@ -11,13 +11,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^29.1.1",
+    "electron": "^31.0.1",
     "electron-builder": "^24.13.3",
-    "electron-updater": "^6.1.8"
+    "electron-updater": "^6.2.1"
   },
   "build": {
     "appId": "com.example.myapp",
-    "productName": "Casper",
+    "productName": "Casper Webclient",
     "compression": "maximum",
     "directories": {
       "output": "release"
