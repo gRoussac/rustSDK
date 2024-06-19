@@ -37,33 +37,23 @@
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
 <a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
-</pre></div><pre class="rust"><code><span class="comment">//use casper_types::TransferAddr as _TransferAddr;
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span>casper_types::TRANSFER_ADDR_LENGTH;
+</pre></div><pre class="rust"><code><span class="kw">use </span>casper_types::{TransferAddr <span class="kw">as </span>_TransferAddr, TRANSFER_ADDR_LENGTH};
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
-<span class="comment">// TODO Fix with TransferAddr as _TransferAddr, and [u8; 32]
-</span><span class="attr">#[wasm_bindgen]
-</span><span class="kw">pub struct </span>TransferAddr([u8; TRANSFER_ADDR_LENGTH]);
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">pub struct </span>TransferAddr(_TransferAddr);
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>TransferAddr {
-    <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(bytes: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;TransferAddr, JsValue&gt; {
+    <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+    #[wasm_bindgen(constructor)]
+    </span><span class="kw">pub fn </span>new(bytes: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;TransferAddr, JsError&gt; {
         <span class="kw">if </span>bytes.len() != TRANSFER_ADDR_LENGTH {
-            error(<span class="string">"Invalid TransferAddr length"</span>);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(JsValue::null());
+            <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(<span class="string">"Invalid TransferAddr length"</span>));
         }
         <span class="kw">let </span><span class="kw-2">mut </span>array = [<span class="number">0u8</span>; TRANSFER_ADDR_LENGTH];
         array.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
-        <span class="prelude-val">Ok</span>(TransferAddr(array))
-    }
-
-    <span class="kw">pub fn </span>to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.to_vec()
+        <span class="prelude-val">Ok</span>(_TransferAddr::new(array).into())
     }
 }
 
@@ -71,15 +61,19 @@
     <span class="kw">fn </span>from(bytes: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>array = [<span class="number">0u8</span>; TRANSFER_ADDR_LENGTH];
         array.copy_from_slice(<span class="kw-2">&amp;</span>bytes);
-        TransferAddr(array)
+        TransferAddr(_TransferAddr::new(array))
     }
 }
 
-<span class="comment">// TODO cannot initialize a tuple struct which contains private fields
-//Implement Into&lt;_TransferAddr&gt; for TransferAddr
+<span class="kw">impl </span>From&lt;TransferAddr&gt; <span class="kw">for </span>_TransferAddr {
+    <span class="kw">fn </span>from(val: TransferAddr) -&gt; <span class="self">Self </span>{
+        val.<span class="number">0
+    </span>}
+}
 
-</span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromTransfer"</span>)]
-</span><span class="kw">pub fn </span>from_transfer(key: Vec&lt;u8&gt;) -&gt; TransferAddr {
-    TransferAddr::from(key)
+<span class="kw">impl </span>From&lt;_TransferAddr&gt; <span class="kw">for </span>TransferAddr {
+    <span class="kw">fn </span>from(trasnfer_hash_addr: _TransferAddr) -&gt; <span class="self">Self </span>{
+        TransferAddr(trasnfer_hash_addr)
+    }
 }
 </code></pre></div></section></main></body></html>

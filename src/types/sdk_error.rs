@@ -1,6 +1,7 @@
 use casper_client::{cli::CliError, cli::JsonArgsError, Error};
 use casper_types::{
-    account::FromStrError, CLValueError, KeyFromStrError, UIntParseError, URefFromStrError,
+    account::FromStrError, bytesrepr, contracts::FromStrError as FromContractStrError,
+    CLValueError, KeyFromStrError, UIntParseError, URefFromStrError,
 };
 use humantime::{DurationError, TimestampError};
 use std::num::ParseIntError;
@@ -8,10 +9,22 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SdkError {
+    #[error("Custom error string")]
+    CustomError(String),
+
+    #[error("Failed to serde_json serialization")]
+    SerializationError(serde_json::Error),
+
     #[error("Failed to parse {context} as a key: {error}")]
     FailedToParseKey {
         context: &'static str,
         error: KeyFromStrError,
+    },
+
+    #[error("Failed to parse {context} as a public key: {error}")]
+    FailedToParsePublicKeyBytes {
+        context: &'static str,
+        error: bytesrepr::Error,
     },
 
     #[error("Failed to parse {context} as a public key: {error}")]
@@ -20,10 +33,40 @@ pub enum SdkError {
         error: casper_types::crypto::Error,
     },
 
+    #[error("Failed to parse {context} as a secret key: {error}")]
+    FailedToParseSecretKey {
+        context: String,
+        error: casper_types::ErrorExt,
+    },
+
+    #[error("Failed to generate {context} as a secret key: {error}")]
+    FailedToGenerateSecretKey {
+        context: String,
+        error: casper_types::ErrorExt,
+    },
+
     #[error("Failed to parse {context} as an account hash: {error}")]
     FailedToParseAccountHash {
         context: &'static str,
         error: FromStrError,
+    },
+
+    #[error("Failed to parse {context} as an contract hash: {error}")]
+    FailedToParseContractHash {
+        context: &'static str,
+        error: FromContractStrError,
+    },
+
+    #[error("Failed to parse {context} as an contract package hash: {error}")]
+    FailedToParseContractPackageHash {
+        context: &'static str,
+        error: FromContractStrError,
+    },
+
+    #[error("Failed to decode hex string: {context}, error: {error}")]
+    FailedToDecodeHex {
+        context: &'static str,
+        error: String,
     },
 
     #[error("Failed to parse '{context}' as a uref: {error}")]
@@ -62,14 +105,11 @@ pub enum SdkError {
         error: casper_hashing::Error,
     },
 
+    #[error("Failed to parse {context} as an account hash")]
+    FailedToParseAccountHashLength { context: &'static str },
+
     #[error("Failed to parse state identifier")]
     FailedToParseStateIdentifier,
-
-    #[error("Failed to parse purse identifier")]
-    FailedToParsePurseIdentifier,
-
-    #[error("Failed to parse account identifier")]
-    FailedToParseAccountIdentifier,
 
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },

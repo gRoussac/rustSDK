@@ -107,12 +107,7 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span>casper_types::AccessRights <span class="kw">as </span>_AccessRights;
+</pre></div><pre class="rust"><code><span class="kw">use </span>casper_types::AccessRights <span class="kw">as </span>_AccessRights;
 <span class="kw">use </span>wasm_bindgen::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[wasm_bindgen]
@@ -163,13 +158,10 @@
 
     <span class="comment">// Utility method to create AccessRights with u8
     </span><span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(access_rights: u8) -&gt; <span class="prelude-ty">Result</span>&lt;AccessRights, JsValue&gt; {
+    </span><span class="kw">pub fn </span>new(access_rights: u8) -&gt; <span class="prelude-ty">Result</span>&lt;AccessRights, JsError&gt; {
         <span class="kw">match </span>_AccessRights::from_bits(access_rights) {
             <span class="prelude-val">Some</span>(rights) =&gt; <span class="prelude-val">Ok</span>(AccessRights(rights)),
-            <span class="prelude-val">None </span>=&gt; {
-                error(<span class="string">"Invalid URef access rights"</span>);
-                <span class="prelude-val">Err</span>(JsValue::null())
-            }
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(JsError::new(<span class="string">"Invalid URef access rights"</span>)),
         }
     }
 

@@ -2,7 +2,7 @@
 use crate::types::deploy::Deploy;
 use crate::types::deploy_hash::DeployHash;
 #[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
+use crate::types::digest::Digest;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
@@ -87,22 +87,16 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed deploy options as a `GetDeployOptions` struct.
-    #[wasm_bindgen(js_name = "get_deploy_options")]
-    pub fn get_deploy_options(&self, options: JsValue) -> GetDeployOptions {
-        let options_result = options.into_serde::<GetDeployOptions>();
-        match options_result {
-            Ok(mut options) => {
-                if let Some(finalized_approvals) = options.finalized_approvals {
-                    options.finalized_approvals =
-                        Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
-                }
-                options
-            }
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetDeployOptions::default()
-            }
+    pub fn get_deploy_options(&self, options: JsValue) -> Result<GetDeployOptions, JsError> {
+        let mut options: GetDeployOptions = options.into_serde()?;
+
+        // Handle finalized_approvals
+        if let Some(finalized_approvals) = options.finalized_approvals {
+            options.finalized_approvals =
+                Some(JsValue::from_bool(finalized_approvals) == JsValue::TRUE);
         }
+
+        Ok(options)
     }
 
     /// Retrieves deploy information using the provided options.
@@ -132,18 +126,15 @@ impl SDK {
             let hash = Digest::new(&deploy_hash_as_string);
             if let Err(err) = hash {
                 let err_msg = format!("Failed to parse AccountHash from formatted string: {}", err);
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             let deploy_hash = DeployHash::from_digest(hash.unwrap());
             if deploy_hash.is_err() {
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
         } else {
             if deploy_hash.is_none() {
-                error(&err_msg);
                 return Err(JsError::new(&err_msg));
             }
             deploy_hash.unwrap()
@@ -156,7 +147,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -215,7 +205,7 @@ mod tests {
     };
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     #[tokio::test]
@@ -258,11 +248,11 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let make_transfer = sdk
@@ -296,11 +286,11 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (node_address, _, chain_name) = get_network_constants();
 
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
 
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
         let make_transfer = sdk

@@ -280,20 +280,11 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::speculative_exec::SpeculativeExecResult;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="kw">use crate</span>::{
-    debug::error,
     types::{
         block_identifier::BlockIdentifierInput,
         deploy_params::{
@@ -364,7 +355,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -402,16 +392,10 @@
             session_str_params_to_casper_client(<span class="kw-2">&amp;</span>session_params),
             payment_str_params_to_casper_client(<span class="kw-2">&amp;</span>payment_params),
             <span class="bool-val">false</span>,
-        );
-
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = deploy {
-            <span class="kw">let </span>err_msg = <span class="macro">format!</span>(<span class="string">"Error during speculative_deploy: {}"</span>, err);
-            error(<span class="kw-2">&amp;</span>err_msg);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
-        }
+        )<span class="question-mark">?</span>;
 
         <span class="self">self</span>.speculative_exec(
-            deploy.unwrap().into(),
+            deploy.into(),
             maybe_block_identifier,
             verbosity,
             node_address,
@@ -428,7 +412,7 @@
     <span class="kw">use crate</span>::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
     <span class="kw">use </span>sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
-        tests::helpers::{get_network_constants, get_user_private_key, read_wasm_file},
+        tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
 
     <span class="kw">fn </span>get_session_params() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>SessionStrParams {
@@ -462,11 +446,11 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -495,11 +479,11 @@
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(<span class="number">1</span>));
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
@@ -520,7 +504,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>test_speculative_deploy_with_valid_params_without_private_key() {
+    </span><span class="kw">async fn </span>test_speculative_deploy_with_valid_params_without_secret_key() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);

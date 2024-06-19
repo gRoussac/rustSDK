@@ -239,14 +239,16 @@ impl DeployWatcher {
     /// Result containing the serialized deploy events data or an error message.
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "start")]
-    pub async fn start_js_alias(&self) -> Result<JsValue, JsValue> {
-        let result: Option<Vec<EventParseResult>> = self.start_internal(None).await;
+    pub async fn start_js_alias(&self) -> Result<JsValue, JsError> {
+        let result = match self.start_internal(None).await {
+            Some(res) => res,
+            None => return Ok(JsValue::NULL),
+        };
 
-        match result {
-            Some(vec) => JsValue::from_serde(&vec)
-                .map_err(|err| JsValue::from_str(&format!("{:?}", err)).clone()),
-            None => Ok(JsValue::NULL),
-        }
+        let serialized = JsValue::from_serde(&result)
+            .map_err(|err| JsError::new(&format!("Error serializing events: {:?}", err)))?;
+
+        Ok(serialized)
     }
 
     /// Stops watching for deploy events.

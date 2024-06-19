@@ -8,11 +8,11 @@ export const app_address_default = 'http://localhost:4200';
 export const chain_name_default = 'casper-net-1';
 
 // Either use direct env variables for private keys of casper-node-launcher-js  or key path to NTCL
-export const private_key_user_1 = process.env.PRIVATE_KEY_USER_1;
-export const private_key_user_2 = process.env.PRIVATE_KEY_USER_2;
+export const secret_key_user_1 = process.env.SECRET_KEY_USER_1;
+export const secret_key_user_2 = process.env.SECRET_KEY_USER_2;
 
 export const key_name = key_name_default;
-export const key_path = process.env.PRIVATE_KEY_NCTL_PATH || key_path_default;
+export const key_path = process.env.SECRET_KEY_NCTL_PATH || key_path_default;
 export const node_address = process.env.NODE_ADDRESS || node_address_default;
 export const app_address = process.env.APP_ADDRESS || app_address_default;
 export const chain_name = process.env.CHAIN_NAME || chain_name_default;

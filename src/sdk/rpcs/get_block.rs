@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 use crate::{
     types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
@@ -83,16 +81,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed block options as a `GetBlockOptions` struct.
-    #[wasm_bindgen(js_name = "get_block_options")]
-    pub fn get_block_options(&self, options: JsValue) -> GetBlockOptions {
-        let options_result = options.into_serde::<GetBlockOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetBlockOptions::default()
-            }
-        }
+    pub fn get_block_options(&self, options: JsValue) -> Result<GetBlockOptions, JsError> {
+        options
+            .into_serde::<GetBlockOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves block information using the provided options.
@@ -135,7 +127,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

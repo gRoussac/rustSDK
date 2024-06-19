@@ -215,24 +215,10 @@
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::addr::transfer_addr::TransferAddr;
 <span class="kw">use </span><span class="kw">super</span>::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
 <span class="kw">use </span><span class="kw">super</span>::era_id::EraId;
 <span class="kw">use super</span>::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
-<span class="kw">use </span><span class="kw">crate</span>::debug::error;
 <span class="kw">use </span><span class="kw">crate</span>::types::sdk_error::SdkError;
 <span class="kw">use </span>casper_types::bytesrepr::ToBytes;
 <span class="kw">use </span>casper_types::Key <span class="kw">as </span>_Key;
@@ -248,7 +234,7 @@
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>Key {
     <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(key: Key) -&gt; <span class="prelude-ty">Result</span>&lt;Key, JsValue&gt; {
+    </span><span class="kw">pub fn </span>new(key: Key) -&gt; <span class="prelude-ty">Result</span>&lt;Key, JsError&gt; {
         <span class="kw">let </span>key: _Key = key.into();
         <span class="prelude-val">Ok</span>(Key(key))
     }
@@ -260,24 +246,24 @@
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromURef"</span>)]
-    </span><span class="kw">pub fn </span>from_uref(key: URef) -&gt; Key {
-        Key(_Key::URef(key.into()))
+    </span><span class="kw">pub fn </span>from_uref(key: URef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::URef(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDeployInfo"</span>)]
-    </span><span class="kw">pub fn </span>from_deploy_info(key: DeployHash) -&gt; Key {
-        Key(_Key::DeployInfo(key.into()))
+    </span><span class="kw">pub fn </span>from_deploy_info(key: DeployHash) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::DeployInfo(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromAccount"</span>)]
-    </span><span class="kw">pub fn </span>from_account(key: AccountHash) -&gt; Key {
-        Key(_Key::Account(key.into()))
+    </span><span class="kw">pub fn </span>from_account(key: AccountHash) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Account(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen]
     #[wasm_bindgen(js_name = <span class="string">"fromHash"</span>)]
-    </span><span class="kw">pub fn </span>from_hash(key: HashAddr) -&gt; Key {
-        Key(_Key::Hash(key.into()))
+    </span><span class="kw">pub fn </span>from_hash(key: HashAddr) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Hash(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromTransfer"</span>)]
@@ -288,28 +274,28 @@
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromEraInfo"</span>)]
-    </span><span class="kw">pub fn </span>from_era_info(key: EraId) -&gt; Key {
-        Key(_Key::EraInfo(key.into()))
+    </span><span class="kw">pub fn </span>from_era_info(key: EraId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::EraInfo(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromBalance"</span>)]
-    </span><span class="kw">pub fn </span>from_balance(key: URefAddr) -&gt; Key {
-        Key(_Key::Balance(key.into()))
+    </span><span class="kw">pub fn </span>from_balance(key: URefAddr) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Balance(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromBid"</span>)]
-    </span><span class="kw">pub fn </span>from_bid(key: AccountHash) -&gt; Key {
-        Key(_Key::Bid(key.into()))
+    </span><span class="kw">pub fn </span>from_bid(key: AccountHash) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Bid(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromWithdraw"</span>)]
-    </span><span class="kw">pub fn </span>from_withdraw(key: AccountHash) -&gt; Key {
-        Key(_Key::Withdraw(key.into()))
+    </span><span class="kw">pub fn </span>from_withdraw(key: AccountHash) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Withdraw(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDictionaryAddr"</span>)]
-    </span><span class="kw">pub fn </span>from_dictionary_addr(key: DictionaryAddr) -&gt; Key {
-        Key(_Key::Dictionary(key.into()))
+    </span><span class="kw">pub fn </span>from_dictionary_addr(key: DictionaryAddr) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Dictionary(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"asDictionaryAddr"</span>)]
@@ -320,29 +306,24 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromSystemContractRegistry"</span>)]
-    </span><span class="kw">pub fn </span>from_system_contract_registry() -&gt; Key {
-        Key(_Key::SystemContractRegistry)
-    }
-
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromEraSummary"</span>)]
-    </span><span class="kw">pub fn </span>from_era_summary() -&gt; Key {
-        Key(_Key::EraSummary)
+    </span><span class="kw">pub fn </span>from_era_summary() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::EraSummary)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromUnbond"</span>)]
-    </span><span class="kw">pub fn </span>from_unbond(key: AccountHash) -&gt; Key {
-        Key(_Key::Unbond(key.into()))
+    </span><span class="kw">pub fn </span>from_unbond(key: AccountHash) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::Unbond(key.into()))
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromChainspecRegistry"</span>)]
-    </span><span class="kw">pub fn </span>from_chainspec_registry() -&gt; Key {
-        Key(_Key::ChainspecRegistry)
+    </span><span class="kw">pub fn </span>from_chainspec_registry() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::ChainspecRegistry)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromChecksumRegistry"</span>)]
-    </span><span class="kw">pub fn </span>from_checksum_registry() -&gt; Key {
-        Key(_Key::ChecksumRegistry)
+    </span><span class="kw">pub fn </span>from_checksum_registry() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(_Key::ChecksumRegistry)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"toFormattedString"</span>)]
@@ -351,19 +332,12 @@
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromFormattedString"</span>)]
-    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(input: JsValue) -&gt; <span class="prelude-ty">Result</span>&lt;Key, JsValue&gt; {
-        <span class="kw">let </span>input_string = input.as_string();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(input_string) = input_string {
-            Key::from_formatted_str(<span class="kw-2">&amp;</span>input_string)
-                .map_err(|err| {
-                    error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing Key from formatted string, {}"</span>, err));
-                    JsValue::null()
-                })
-                .map(Into::into)
-        } <span class="kw">else </span>{
-            error(<span class="string">"Input is not a string"</span>);
-            <span class="prelude-val">Err</span>(JsValue::null())
-        }
+    </span><span class="kw">pub fn </span>from_formatted_str_js_alias(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Key, JsError&gt; {
+        <span class="self">Self</span>::from_formatted_str(formatted_str)
+            .map_err(|err| {
+                JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error parsing Key from formatted string, {}"</span>, err))
+            })
+            .map(Into::into)
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"fromDictionaryKey"</span>)]
@@ -427,8 +401,8 @@
 }
 
 <span class="kw">impl </span>Key {
-    <span class="kw">pub fn </span>from_formatted_str(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Key, SdkError&gt; {
-        _Key::from_formatted_str(input)
+    <span class="kw">pub fn </span>from_formatted_str(formatted_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Key, SdkError&gt; {
+        _Key::from_formatted_str(formatted_str)
             .map(Into::into)
             .map_err(|error| SdkError::FailedToParseKey {
                 context: <span class="string">"Key from formatted string"</span>,

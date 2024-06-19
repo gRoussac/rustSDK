@@ -425,16 +425,7 @@
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use crate</span>::{
     types::{
         deploy_params::dictionary_item_str_params::{
@@ -539,16 +530,13 @@
     /// # Returns
     ///
     /// Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-    </span><span class="attr">#[wasm_bindgen(js_name = <span class="string">"get_dictionary_item_options"</span>)]
-    </span><span class="kw">pub fn </span>get_dictionary_item_options(<span class="kw-2">&amp;</span><span class="self">self</span>, options: JsValue) -&gt; GetDictionaryItemOptions {
-        <span class="kw">let </span>options_result = options.into_serde::&lt;GetDictionaryItemOptions&gt;();
-        <span class="kw">match </span>options_result {
-            <span class="prelude-val">Ok</span>(options) =&gt; options,
-            <span class="prelude-val">Err</span>(err) =&gt; {
-                error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err));
-                GetDictionaryItemOptions::default()
-            }
-        }
+    </span><span class="kw">pub fn </span>get_dictionary_item_options(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        options: JsValue,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GetDictionaryItemOptions, JsError&gt; {
+        options
+            .into_serde::&lt;GetDictionaryItemOptions&gt;()
+            .map_err(|err| JsError::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error deserializing options: {:?}"</span>, err)))
     }
 
     <span class="doccomment">/// Retrieves dictionary item information using the provided options.
@@ -584,7 +572,6 @@
             DictionaryItemInput::Params(params)
         } <span class="kw">else </span>{
             <span class="kw">let </span>err = <span class="string">"Error: Missing dictionary item identifier or params"</span>;
-            error(err);
             <span class="kw">return </span><span class="prelude-val">Err</span>(JsError::new(err));
         };
 
@@ -603,7 +590,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }

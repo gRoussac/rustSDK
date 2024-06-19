@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_hash::BlockHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
@@ -97,16 +95,13 @@ pub struct GetSpeculativeExecOptions {
 #[wasm_bindgen]
 impl SDK {
     /// Get options for speculative execution from a JavaScript value.
-    #[wasm_bindgen(js_name = "speculative_exec_options")]
-    pub fn get_speculative_exec_options(&self, options: JsValue) -> GetSpeculativeExecOptions {
-        let options_result = options.into_serde::<GetSpeculativeExecOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetSpeculativeExecOptions::default()
-            }
-        }
+    pub fn get_speculative_exec_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetSpeculativeExecOptions, JsError> {
+        options
+            .into_serde::<GetSpeculativeExecOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// JS Alias for speculative execution.
@@ -138,7 +133,6 @@ impl SDK {
             deploy
         } else {
             let err = "Error: Missing deploy as json or deploy".to_string();
-            error(&err);
             return Err(JsError::new(&err));
         };
 
@@ -157,7 +151,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -221,15 +214,15 @@ mod tests {
     };
     use sdk_tests::{
         config::{PAYMENT_TRANSFER_AMOUNT, TRANSFER_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     fn get_deploy() -> Deploy {
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let (_, _, chain_name) = get_network_constants();
         let deploy_params =
-            DeployStrParams::new(&chain_name, &account, Some(private_key), None, None);
+            DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 

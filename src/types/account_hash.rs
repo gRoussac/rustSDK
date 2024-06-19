@@ -1,8 +1,8 @@
-use super::public_key::PublicKey;
-use crate::debug::error;
+use super::{public_key::PublicKey, sdk_error::SdkError};
+use casper_types::account::ACCOUNT_HASH_LENGTH;
 use casper_types::{
-    account::{AccountHash as _AccountHash, ACCOUNT_HASH_LENGTH},
-    bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
+    account::AccountHash as _AccountHash,
+    bytesrepr::{self, FromBytes, ToBytes},
     crypto,
 };
 #[cfg(target_arch = "wasm32")]
@@ -10,42 +10,69 @@ use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Deserialize, Clone, Serialize)]
+#[derive(Debug, Deserialize, Clone, Serialize, Ord, PartialOrd, Eq, PartialEq)]
 #[wasm_bindgen]
 pub struct AccountHash(_AccountHash);
 
-#[wasm_bindgen]
 impl AccountHash {
-    #[wasm_bindgen(constructor)]
-    pub fn new(account_hash_hex_str: &str) -> Result<AccountHash, JsValue> {
-        let bytes = hex::decode(account_hash_hex_str)
-            .map_err(|err| JsValue::from_str(&format!("Failed to decode hex string: {:?}", err)))?;
-        if bytes.len() != ACCOUNT_HASH_LENGTH {
-            return Err(JsValue::from_str("Invalid account hash length"));
-        }
-        let mut array = [0u8; ACCOUNT_HASH_LENGTH];
-        array.copy_from_slice(&bytes);
-        let account_hash = _AccountHash(array);
-        Ok(account_hash.into())
+    pub fn new(account_hash_hex_str: &str) -> Result<Self, SdkError> {
+        hex::decode(account_hash_hex_str)
+            .map(|bytes| {
+                if bytes.len() != ACCOUNT_HASH_LENGTH {
+                    Err(SdkError::FailedToParseAccountHashLength {
+                        context: "AccountHash::new",
+                    })
+                } else {
+                    let mut array = [0u8; ACCOUNT_HASH_LENGTH];
+                    array.copy_from_slice(&bytes);
+                    Ok(_AccountHash(array).into())
+                }
+            })
+            .map_err(|err| SdkError::FailedToDecodeHex {
+                context: "AccountHash::new",
+                error: format!("{:?}", err),
+            })?
     }
 
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+        let account_hash = _AccountHash::from_formatted_str(formatted_str).map_err(|error| {
+            SdkError::FailedToParseAccountHash {
+                context: "AccountHash::from_formatted_str",
+                error,
+            }
+        })?;
+        Ok(Self(account_hash))
+    }
+}
+
+#[wasm_bindgen]
+impl AccountHash {
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(constructor)]
+    pub fn new_js_alias(account_hash_hex_str: &str) -> Result<AccountHash, JsError> {
+        Self::new(account_hash_hex_str).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse AccountHash from hex string: {:?}",
+                err
+            ))
+        })
+    }
+
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedStr")]
-    pub fn from_formatted_str(formatted_str: &str) -> Result<AccountHash, JsValue> {
-        let account_hash = _AccountHash::from_formatted_str(formatted_str)
-            .map_err(|err| {
-                error(&format!(
-                    "Failed to parse AccountHash from formatted string: {:?}",
-                    err
-                ))
-            })
-            .unwrap();
-        Ok(AccountHash(account_hash))
+    pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<AccountHash, JsError> {
+        Self::from_formatted_str(formatted_str).map_err(|err| {
+            JsError::new(&format!(
+                "Failed to parse AccountHash from formatted string: {:?}",
+                err
+            ))
+        })
     }
 
     #[wasm_bindgen(js_name = "fromPublicKey")]
     pub fn from_public_key(public_key: PublicKey) -> AccountHash {
         let account_hash = _AccountHash::from_public_key(&(public_key.into()), crypto::blake2b);
-        AccountHash(account_hash)
+        Self(account_hash)
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]
@@ -62,13 +89,21 @@ impl AccountHash {
     pub fn from_bytes(bytes: Vec<u8>) -> AccountHash {
         let account_hash =
             _AccountHash::try_from(&bytes).expect("Failed to convert bytes to AccountHash");
-        AccountHash(account_hash)
+        Self(account_hash)
     }
 
     #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "toJson")]
     pub fn to_json(&self) -> JsValue {
         JsValue::from_serde(self).unwrap_or(JsValue::null())
+    }
+}
+
+impl From<Vec<u8>> for AccountHash {
+    fn from(bytes: Vec<u8>) -> Self {
+        let mut array = [0u8; ACCOUNT_HASH_LENGTH];
+        array.copy_from_slice(&bytes);
+        AccountHash(_AccountHash::new(array))
     }
 }
 
@@ -97,7 +132,7 @@ impl ToBytes for AccountHash {
     }
 
     fn serialized_length(&self) -> usize {
-        U8_SERIALIZED_LENGTH + self.0.value().len() * U8_SERIALIZED_LENGTH
+        self.0.serialized_length()
     }
 
     fn write_bytes(&self, bytes: &mut Vec<u8>) -> Result<(), bytesrepr::Error> {

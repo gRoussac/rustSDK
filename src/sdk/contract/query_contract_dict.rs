@@ -1,12 +1,12 @@
 #[cfg(target_arch = "wasm32")]
 use crate::rpcs::get_dictionary_item::GetDictionaryItemResult;
 #[cfg(target_arch = "wasm32")]
+use crate::types::digest::Digest;
+#[cfg(target_arch = "wasm32")]
 use crate::types::{
     deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
     dictionary_item_identifier::DictionaryItemIdentifier,
 };
-#[cfg(target_arch = "wasm32")]
-use crate::{debug::error, types::digest::Digest};
 use crate::{
     rpcs::get_dictionary_item::DictionaryItemInput,
     types::{digest::ToDigest, verbosity::Verbosity},
@@ -41,18 +41,13 @@ pub struct QueryContractDictOptions {
 impl SDK {
     /// Deserialize query_contract_dict_options from a JavaScript object.
     #[wasm_bindgen(js_name = "query_contract_dict_options")]
-    pub fn query_contract_dict_state_options(&self, options: JsValue) -> QueryContractDictOptions {
-        let options_result = options.into_serde::<QueryContractDictOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!(
-                    "Error deserializing query_contract_dict_options: {:?}",
-                    err
-                ));
-                QueryContractDictOptions::default()
-            }
-        }
+    pub fn query_contract_dict_state_options(
+        &self,
+        options: JsValue,
+    ) -> Result<QueryContractDictOptions, JsError> {
+        options
+            .into_serde::<QueryContractDictOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// JavaScript alias for query_contract_dict with deserialized options.
@@ -65,10 +60,9 @@ impl SDK {
             JsValue::from_serde::<QueryContractDictOptions>(&options.unwrap_or_default());
         if let Err(err) = js_value_options {
             let err = &format!("Error serializing options: {:?}", err);
-            error(err);
             return Err(JsError::new(err));
         }
-        let options = self.get_dictionary_item_options(js_value_options.unwrap());
+        let options = self.get_dictionary_item_options(js_value_options.unwrap())?;
         self.get_dictionary_item_js_alias(Some(options)).await
     }
 }

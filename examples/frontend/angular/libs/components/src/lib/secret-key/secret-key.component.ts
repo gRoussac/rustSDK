@@ -1,26 +1,26 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { State, StateService } from '@util/state';
-import { privateToPublicKey } from 'casper-sdk';
+import { publicKeyFromSecretKey } from 'casper-sdk';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { Subscription } from 'rxjs';
 import { ErrorService } from '@util/error';
 import { StorageService } from '@util/storage';
 
 @Component({
-  selector: 'comp-private-key',
+  selector: 'comp-secret-key',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './private-key.component.html',
-  styleUrls: ['./private-key.component.scss'],
+  templateUrl: './secret-key.component.html',
+  styleUrls: ['./secret-key.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PrivateKeyComponent implements AfterViewInit, OnDestroy {
+export class SecretKeyComponent implements AfterViewInit, OnDestroy {
 
-  @ViewChild('privateKeyElt') privateKeyElt!: ElementRef;
+  @ViewChild('secretKeyElt') secretKeyElt!: ElementRef;
 
   private stateSubscription!: Subscription;
-  private_key?: string;
+  secret_key?: string;
   action!: string;
 
   constructor(
@@ -47,8 +47,8 @@ export class PrivateKeyComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  onPrivateKeyClick() {
-    (this.privateKeyElt.nativeElement as HTMLInputElement).click();
+  onSecretKeyClick() {
+    (this.secretKeyElt.nativeElement as HTMLInputElement).click();
   }
 
   async onPemSelected(event: Event) {
@@ -62,37 +62,37 @@ export class PrivateKeyComponent implements AfterViewInit, OnDestroy {
       text = text.trim();
       this.errorService.setError("");
       try {
-        public_key = privateToPublicKey(text);
+        public_key = publicKeyFromSecretKey(text);
       } catch (err) {
         this.errorService.setError(err as string);
       }
       if (public_key) {
-        this.private_key = text;
+        this.secret_key = text;
       }
 
     } else {
-      this.private_key = '';
+      this.secret_key = '';
     }
 
     this.stateService.setState({
       public_key,
-      private_key: this.private_key
+      secret_key: this.secret_key
     });
 
     this.storageService.setState({
       public_key,
     });
 
-    this.privateKeyElt.nativeElement.value = '';
+    this.secretKeyElt.nativeElement.value = '';
 
     this.changeDetectorRef.markForCheck();
   }
 
   isInvalid(): boolean {
-    if (this.config['action_needs_private_key'] && !(this.config['action_needs_private_key'] as Array<string>)?.includes(this.action)) {
+    if (this.config['action_needs_secret_key'] && !(this.config['action_needs_secret_key'] as Array<string>)?.includes(this.action)) {
       return false;
     }
-    return !this.private_key;
+    return !this.secret_key;
   }
 
 }

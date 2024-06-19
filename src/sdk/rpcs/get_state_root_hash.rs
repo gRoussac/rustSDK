@@ -1,6 +1,4 @@
 #[cfg(target_arch = "wasm32")]
-use crate::debug::error;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
@@ -103,16 +101,13 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed state root hash options as a `GetStateRootHashOptions` struct.
-    #[wasm_bindgen(js_name = "get_state_root_hash_options")]
-    pub fn get_state_root_hash_options(&self, options: JsValue) -> GetStateRootHashOptions {
-        let options_result = options.into_serde::<GetStateRootHashOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                GetStateRootHashOptions::default()
-            }
-        }
+    pub fn get_state_root_hash_options(
+        &self,
+        options: JsValue,
+    ) -> Result<GetStateRootHashOptions, JsError> {
+        options
+            .into_serde::<GetStateRootHashOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves state root hash information using the provided options.
@@ -155,7 +150,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }

@@ -4,7 +4,6 @@ use crate::types::{
     global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
 };
 use crate::{
-    debug::error,
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
 };
@@ -90,16 +89,10 @@ impl SDK {
     /// # Returns
     ///
     /// Parsed query balance options as a `QueryBalanceOptions` struct.
-    #[wasm_bindgen(js_name = "query_balance_options")]
-    pub fn query_balance_options(&self, options: JsValue) -> QueryBalanceOptions {
-        let options_result = options.into_serde::<QueryBalanceOptions>();
-        match options_result {
-            Ok(options) => options,
-            Err(err) => {
-                error(&format!("Error deserializing options: {:?}", err));
-                QueryBalanceOptions::default()
-            }
-        }
+    pub fn query_balance_options(&self, options: JsValue) -> Result<QueryBalanceOptions, JsError> {
+        options
+            .into_serde::<QueryBalanceOptions>()
+            .map_err(|err| JsError::new(&format!("Error deserializing options: {:?}", err)))
     }
 
     /// Retrieves balance information using the provided options.
@@ -180,7 +173,6 @@ impl SDK {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
                 let err = &format!("Error occurred with {:?}", err);
-                error(err);
                 Err(JsError::new(err))
             }
         }
@@ -226,13 +218,11 @@ impl SDK {
             match parse_purse_identifier(&purse_id) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    error(&err.to_string());
-                    return Err(SdkError::FailedToParsePurseIdentifier);
+                    return Err(err.into());
                 }
             }
         } else {
             let err = "Error: Missing purse identifier";
-            error(err);
             return Err(SdkError::InvalidArgument {
                 context: "query_balance",
                 error: err.to_string(),
@@ -292,13 +282,13 @@ mod tests {
         helpers::public_key_from_secret_key,
         types::{digest::Digest, public_key::PublicKey},
     };
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_private_key};
+    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
     use super::*;
 
     fn get_purse_identifier() -> PurseIdentifier {
-        let private_key = get_user_private_key(None).unwrap();
-        let account = public_key_from_secret_key(&private_key).unwrap();
+        let secret_key = get_user_secret_key(None).unwrap();
+        let account = public_key_from_secret_key(&secret_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
 
         PurseIdentifier::from_main_purse_under_public_key(public_key)

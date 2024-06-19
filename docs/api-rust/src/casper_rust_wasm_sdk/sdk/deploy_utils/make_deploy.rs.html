@@ -175,12 +175,7 @@
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::debug::error;
-<span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::deploy::Deploy;
 <span class="kw">use crate</span>::{
     types::{
         deploy_params::{
@@ -223,7 +218,6 @@
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data),
             <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="kw">let </span>err = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Error occurred with {:?}"</span>, err);
-                error(err);
                 <span class="prelude-val">Err</span>(JsError::new(err))
             }
         }
@@ -277,7 +271,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::helpers::public_key_from_secret_key;
     <span class="kw">use </span>sdk_tests::{
         config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
-        tests::helpers::{get_network_constants, get_user_private_key},
+        tests::helpers::{get_network_constants, get_user_secret_key},
     };
 
     <span class="attr">#[tokio::test]
@@ -285,11 +279,11 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>session_params = SessionStrParams::default();
         session_params.set_session_hash(
             <span class="string">"hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
@@ -306,12 +300,12 @@
     }
 
     <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>test_make_deploy_with_valid_params_without_private_key() {
+    </span><span class="kw">async fn </span>test_make_deploy_with_valid_params_without_secret_key() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>session_params = SessionStrParams::default();
@@ -335,11 +329,11 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>error_message = <span class="string">"Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]"</span>;
-        <span class="kw">let </span>private_key = get_user_private_key(<span class="prelude-val">None</span>).unwrap();
-        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>private_key).unwrap();
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>deploy_params =
-            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(private_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+            DeployStrParams::new(<span class="kw-2">&amp;</span>chain_name, <span class="kw-2">&amp;</span>account, <span class="prelude-val">Some</span>(secret_key), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>session_params = SessionStrParams::default();
         session_params.set_session_hash(
             <span class="string">"hash-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
