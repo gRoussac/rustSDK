@@ -212,7 +212,7 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_32(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h9cebdcd965c2c916(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hcc758dd6ed9389ff(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_35(arg0, arg1, arg2) {
@@ -613,10 +613,10 @@ function __wbg_adapter_798(arg0, arg1, arg2, arg3) {
 
 /**
 */
-export const Verbosity = Object.freeze({ Low:0,"0":"Low",Medium:1,"1":"Medium",High:2,"2":"High", });
+export const CLTypeEnum = Object.freeze({ Bool:0,"0":"Bool",I32:1,"1":"I32",I64:2,"2":"I64",U8:3,"3":"U8",U32:4,"4":"U32",U64:5,"5":"U64",U128:6,"6":"U128",U256:7,"7":"U256",U512:8,"8":"U512",Unit:9,"9":"Unit",String:10,"10":"String",Key:11,"11":"Key",URef:12,"12":"URef",PublicKey:13,"13":"PublicKey",Option:14,"14":"Option",List:15,"15":"List",ByteArray:16,"16":"ByteArray",Result:17,"17":"Result",Map:18,"18":"Map",Tuple1:19,"19":"Tuple1",Tuple2:20,"20":"Tuple2",Tuple3:21,"21":"Tuple3",Any:22,"22":"Any", });
 /**
 */
-export const CLTypeEnum = Object.freeze({ Bool:0,"0":"Bool",I32:1,"1":"I32",I64:2,"2":"I64",U8:3,"3":"U8",U32:4,"4":"U32",U64:5,"5":"U64",U128:6,"6":"U128",U256:7,"7":"U256",U512:8,"8":"U512",Unit:9,"9":"Unit",String:10,"10":"String",Key:11,"11":"Key",URef:12,"12":"URef",PublicKey:13,"13":"PublicKey",Option:14,"14":"Option",List:15,"15":"List",ByteArray:16,"16":"ByteArray",Result:17,"17":"Result",Map:18,"18":"Map",Tuple1:19,"19":"Tuple1",Tuple2:20,"20":"Tuple2",Tuple3:21,"21":"Tuple3",Any:22,"22":"Any", });
+export const Verbosity = Object.freeze({ Low:0,"0":"Low",Medium:1,"1":"Medium",High:2,"2":"High", });
 
 const AccessRightsFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
@@ -6223,7 +6223,7 @@ export class SDK {
         return takeObject(ret);
     }
     /**
-    * Calls a smart contract entry point with the specified parameters and returns the result.
+    * Installs a smart contract with the specified parameters and returns the result.
     *
     * # Arguments
     *
@@ -6238,14 +6238,14 @@ export class SDK {
     *
     * # Errors
     *
-    * Returns a `JsError` if there is an error during the call.
+    * Returns a `JsError` if there is an error during the installation.
     * @param {DeployStrParams} deploy_params
     * @param {SessionStrParams} session_params
     * @param {string} payment_amount
     * @param {string | undefined} [node_address]
     * @returns {Promise<PutDeployResult>}
     */
-    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
+    install(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -6254,7 +6254,7 @@ export class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return takeObject(ret);
     }
     /**
@@ -7040,7 +7040,7 @@ export class SDK {
         return Deploy.__wrap(ret);
     }
     /**
-    * Installs a smart contract with the specified parameters and returns the result.
+    * Calls a smart contract entry point with the specified parameters and returns the result.
     *
     * # Arguments
     *
@@ -7055,14 +7055,14 @@ export class SDK {
     *
     * # Errors
     *
-    * Returns a `JsError` if there is an error during the installation.
+    * Returns a `JsError` if there is an error during the call.
     * @param {DeployStrParams} deploy_params
     * @param {SessionStrParams} session_params
     * @param {string} payment_amount
     * @param {string | undefined} [node_address]
     * @returns {Promise<PutDeployResult>}
     */
-    install(deploy_params, session_params, payment_amount, node_address) {
+    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -7071,7 +7071,7 @@ export class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return takeObject(ret);
     }
     /**
@@ -10149,95 +10149,95 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
-    imports.wbg.__wbg_error_adb09b59c60c9cab = function(arg0, arg1) {
-        console.error(getStringFromWasm0(arg0, arg1));
-    };
-    imports.wbg.__wbindgen_error_new = function(arg0, arg1) {
-        const ret = new Error(getStringFromWasm0(arg0, arg1));
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_getpeersresult_new = function(arg0) {
-        const ret = GetPeersResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_getbalanceresult_new = function(arg0) {
-        const ret = GetBalanceResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_speculativeexecresult_new = function(arg0) {
-        const ret = SpeculativeExecResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbg_getdeployresult_new = function(arg0) {
         const ret = GetDeployResult.__wrap(arg0);
         return addHeapObject(ret);
     };
+    imports.wbg.__wbg_error_adb09b59c60c9cab = function(arg0, arg1) {
+        console.error(getStringFromWasm0(arg0, arg1));
+    };
     imports.wbg.__wbg_putdeployresult_new = function(arg0) {
         const ret = PutDeployResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbindgen_error_new = function(arg0, arg1) {
+        const ret = new Error(getStringFromWasm0(arg0, arg1));
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
-        const ret = getObject(arg0);
+    imports.wbg.__wbg_speculativeexecresult_new = function(arg0) {
+        const ret = SpeculativeExecResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getaccountresult_new = function(arg0) {
         const ret = GetAccountResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_queryglobalstateresult_new = function(arg0) {
-        const ret = QueryGlobalStateResult.__wrap(arg0);
+    imports.wbg.__wbg_getpeersresult_new = function(arg0) {
+        const ret = GetPeersResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_getnodestatusresult_new = function(arg0) {
-        const ret = GetNodeStatusResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_geterasummaryresult_new = function(arg0) {
-        const ret = GetEraSummaryResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_getchainspecresult_new = function(arg0) {
-        const ret = GetChainspecResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_querybalanceresult_new = function(arg0) {
-        const ret = QueryBalanceResult.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_getstateroothashresult_new = function(arg0) {
-        const ret = GetStateRootHashResult.__wrap(arg0);
+    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
+        const ret = getObject(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getdictionaryitemresult_new = function(arg0) {
         const ret = GetDictionaryItemResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_getblockresult_new = function(arg0) {
-        const ret = GetBlockResult.__wrap(arg0);
+    imports.wbg.__wbg_geterainforesult_new = function(arg0) {
+        const ret = GetEraInfoResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_geterasummaryresult_new = function(arg0) {
+        const ret = GetEraSummaryResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getstateroothashresult_new = function(arg0) {
+        const ret = GetStateRootHashResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getnodestatusresult_new = function(arg0) {
+        const ret = GetNodeStatusResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getbalanceresult_new = function(arg0) {
+        const ret = GetBalanceResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getvalidatorchangesresult_new = function(arg0) {
         const ret = GetValidatorChangesResult.__wrap(arg0);
         return addHeapObject(ret);
     };
+    imports.wbg.__wbg_queryglobalstateresult_new = function(arg0) {
+        const ret = QueryGlobalStateResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
     imports.wbg.__wbg_getblocktransfersresult_new = function(arg0) {
         const ret = GetBlockTransfersResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_getauctioninforesult_new = function(arg0) {
-        const ret = GetAuctionInfoResult.__wrap(arg0);
+    imports.wbg.__wbg_querybalanceresult_new = function(arg0) {
+        const ret = QueryBalanceResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getblockresult_new = function(arg0) {
+        const ret = GetBlockResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_listrpcsresult_new = function(arg0) {
         const ret = ListRpcsResult.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_geterainforesult_new = function(arg0) {
-        const ret = GetEraInfoResult.__wrap(arg0);
+    imports.wbg.__wbg_getauctioninforesult_new = function(arg0) {
+        const ret = GetAuctionInfoResult.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_getchainspecresult_new = function(arg0) {
+        const ret = GetChainspecResult.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_deploysubscription_unwrap = function(arg0) {
@@ -10289,7 +10289,7 @@ function __wbg_get_imports() {
         const ret = getObject(arg0).value;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_fetch_eadcbc7351113537 = function(arg0) {
+    imports.wbg.__wbg_fetch_1e4e8ed1f64c7e28 = function(arg0) {
         const ret = fetch(getObject(arg0));
         return addHeapObject(ret);
     };
@@ -10638,11 +10638,11 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3510 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper3508 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 653, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper4333 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper4332 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 943, __wbg_adapter_35);
         return addHeapObject(ret);
     };

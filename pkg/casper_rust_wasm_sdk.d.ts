@@ -176,13 +176,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
 */
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
-}
-/**
-*/
 export enum CLTypeEnum {
   Bool = 0,
   I32 = 1,
@@ -207,6 +200,13 @@ export enum CLTypeEnum {
   Tuple2 = 20,
   Tuple3 = 21,
   Any = 22,
+}
+/**
+*/
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
 }
 /**
 */
@@ -2065,7 +2065,7 @@ export class SDK {
 */
   get_era_info(options?: getEraInfoOptions): Promise<GetEraInfoResult>;
 /**
-* Calls a smart contract entry point with the specified parameters and returns the result.
+* Installs a smart contract with the specified parameters and returns the result.
 *
 * # Arguments
 *
@@ -2080,14 +2080,14 @@ export class SDK {
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the call.
+* Returns a `JsError` if there is an error during the installation.
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {string} payment_amount
 * @param {string | undefined} [node_address]
 * @returns {Promise<PutDeployResult>}
 */
-  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
 * Deserialize query_contract_dict_options from a JavaScript object.
 * @param {any} options
@@ -2614,7 +2614,7 @@ export class SDK {
 */
   sign_deploy(deploy: Deploy, secret_key: string): Deploy;
 /**
-* Installs a smart contract with the specified parameters and returns the result.
+* Calls a smart contract entry point with the specified parameters and returns the result.
 *
 * # Arguments
 *
@@ -2629,14 +2629,14 @@ export class SDK {
 *
 * # Errors
 *
-* Returns a `JsError` if there is an error during the installation.
+* Returns a `JsError` if there is an error during the call.
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {string} payment_amount
 * @param {string | undefined} [node_address]
 * @returns {Promise<PutDeployResult>}
 */
-  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
 /**
 * @param {string | undefined} [node_address]
 * @param {Verbosity | undefined} [verbosity]
@@ -3350,7 +3350,7 @@ export interface InitOutput {
   readonly geterainforesult_toJson: (a: number) => number;
   readonly sdk_get_era_info_options: (a: number, b: number) => number;
   readonly sdk_get_era_info: (a: number, b: number) => number;
-  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly sdk_query_contract_dict_options: (a: number, b: number) => number;
   readonly sdk_query_contract_dict: (a: number, b: number) => number;
   readonly __wbg_querycontractkeyoptions_free: (a: number) => void;
@@ -3811,7 +3811,7 @@ export interface InitOutput {
   readonly sdk_speculative_exec: (a: number, b: number) => number;
   readonly sdk_make_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
   readonly sdk_sign_deploy: (a: number, b: number, c: number, d: number) => number;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly __wbg_sdk_free: (a: number) => void;
   readonly sdk_new: (a: number, b: number, c: number) => number;
   readonly sdk_getNodeAddress: (a: number, b: number, c: number, d: number) => void;
@@ -3841,7 +3841,7 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h9cebdcd965c2c916: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hcc758dd6ed9389ff: (a: number, b: number, c: number) => void;
   readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__ha81c364041382701: (a: number, b: number, c: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
