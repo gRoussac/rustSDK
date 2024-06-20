@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { State, StateService } from '@util/state';
-import formFields from './form';
+import formFields, { option } from './form';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { StorageService } from '@util/storage';
 
@@ -41,8 +41,8 @@ export class FormService {
       fields.forEach((row) => {
         row.forEach((field) => {
           const name = field.input?.controlName || field.textarea?.controlName || field.select?.controlName || '';
-          name && (formControlsConfig[name] = new FormControl());
-          if (field.select?.options) {
+          name && (formControlsConfig[name] = new FormControl(this.getDefaultOptionValue(field.select?.options)));
+          if (field.select?.options && name === 'selectDictIdentifier') {
             const select_dict_identifier = field.select?.options.find(option => option.default)?.value || '';
             this.stateService.setState({
               select_dict_identifier
@@ -52,6 +52,11 @@ export class FormService {
       });
     });
     return this.formBuilder.group(formControlsConfig);
+  }
+
+  private getDefaultOptionValue(options: option[] | undefined): string | null {
+    const defaultOption = options && options.find(option => option.default);
+    return defaultOption ? defaultOption.value : null;
   }
 
   private initializeForm() {

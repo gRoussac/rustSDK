@@ -28,6 +28,24 @@ pub struct TransferTarget {
 }
 
 #[wasm_bindgen]
+impl TransferTarget {
+    #[wasm_bindgen(constructor)]
+    pub fn new(
+        kind: TransferTargetKind,
+        public_key: Option<PublicKey>,
+        account_hash: Option<AccountHash>,
+        uref: Option<URef>,
+    ) -> Self {
+        TransferTarget {
+            kind,
+            public_key,
+            account_hash,
+            uref,
+        }
+    }
+}
+
+#[wasm_bindgen]
 #[derive(Clone, Debug, Default)]
 pub struct TransactionBuilderParams {
     kind: TransactionKind,

@@ -1,4 +1,5 @@
 use casper_types::TransactionCategory as _TransactionCategory;
+use core::fmt;
 use serde::{Deserialize, Deserializer, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -84,7 +85,7 @@ impl From<u8> for TransactionCategory {
 
 impl From<&str> for TransactionCategory {
     fn from(s: &str) -> Self {
-        match s.to_lowercase().as_str() {
+        match s {
             Self::MINT => Self::Mint,
             Self::AUCTION => Self::Auction,
             Self::INSTALL_UPGRADE => Self::InstallUpgrade,
@@ -99,6 +100,21 @@ impl From<&str> for TransactionCategory {
 impl From<String> for TransactionCategory {
     fn from(s: String) -> Self {
         s.as_str().into()
+    }
+}
+
+impl fmt::Display for TransactionCategory {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TransactionCategory::Mint => write!(f, "{}", TransactionCategory::MINT),
+            TransactionCategory::Auction => write!(f, "{}", TransactionCategory::AUCTION),
+            TransactionCategory::InstallUpgrade => {
+                write!(f, "{}", TransactionCategory::INSTALL_UPGRADE)
+            }
+            TransactionCategory::Large => write!(f, "{}", TransactionCategory::LARGE),
+            TransactionCategory::Medium => write!(f, "{}", TransactionCategory::MEDIUM),
+            TransactionCategory::Small => write!(f, "{}", TransactionCategory::SMALL),
+        }
     }
 }
 

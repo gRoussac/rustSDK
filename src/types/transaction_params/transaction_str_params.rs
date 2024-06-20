@@ -2,6 +2,7 @@ use crate::helpers::get_current_timestamp;
 use crate::helpers::get_str_or_default;
 use crate::helpers::get_ttl_or_default;
 use crate::types::deploy_params::args_simple::ArgsSimple;
+use crate::types::pricing_mode::PricingMode;
 use casper_client::cli::TransactionStrParams as _TransactionStrParams;
 use casper_types::DeployBuilder;
 use once_cell::sync::OnceCell;
@@ -17,15 +18,14 @@ pub struct TransactionStrParams {
     initiator_addr: OnceCell<String>,
     session_args_simple: OnceCell<ArgsSimple>,
     session_args_json: OnceCell<String>,
-    pricing_mode: OnceCell<String>,
+    pricing_mode: OnceCell<PricingMode>,
     payment_amount: OnceCell<String>,
     gas_price_tolerance: OnceCell<String>,
     receipt: OnceCell<String>,
     standard_payment: OnceCell<bool>,
 }
 
-// TODO Fix this value from PricingMode
-const DEFAULT_PRICING_MODE: &str = "fixed";
+const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Fixed;
 const DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
 const DEFAULT_STANDARD_PAYMENT: bool = false;
 
@@ -41,7 +41,7 @@ impl TransactionStrParams {
         ttl: Option<String>,
         session_args_simple: Option<Vec<String>>,
         session_args_json: Option<String>,
-        pricing_mode: Option<String>,
+        pricing_mode: Option<PricingMode>,
         payment_amount: Option<String>,
         gas_price_tolerance: Option<String>,
         receipt: Option<String>,
@@ -68,7 +68,7 @@ impl TransactionStrParams {
             transaction_params.set_session_args_json(&session_args_json);
         }
         if let Some(pricing_mode) = pricing_mode {
-            transaction_params.set_pricing_mode(&pricing_mode);
+            transaction_params.set_pricing_mode(pricing_mode);
         }
         if let Some(payment_amount) = payment_amount {
             transaction_params.set_payment_amount(&payment_amount);
@@ -216,13 +216,13 @@ impl TransactionStrParams {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn pricing_mode(&self) -> Option<String> {
+    pub fn pricing_mode(&self) -> Option<PricingMode> {
         self.pricing_mode.get().cloned()
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_pricing_mode(&self, pricing_mode: &str) {
-        self.pricing_mode.set(pricing_mode.to_string()).unwrap();
+    pub fn set_pricing_mode(&self, pricing_mode: PricingMode) {
+        self.pricing_mode.set(pricing_mode).unwrap();
     }
 
     #[wasm_bindgen(getter)]
@@ -273,13 +273,6 @@ impl TransactionStrParams {
 pub fn transaction_str_params_to_casper_client(
     transaction_params: &TransactionStrParams,
 ) -> _TransactionStrParams<'_> {
-    let session_args_simple: Vec<&str> = transaction_params
-        .session_args_simple
-        .get()
-        .map_or_else(Vec::new, |args_simple| {
-            args_simple.args().iter().map(String::as_str).collect()
-        });
-
     if transaction_params.timestamp.get().is_none() {
         transaction_params.set_default_timestamp();
     }
@@ -296,9 +289,22 @@ pub fn transaction_str_params_to_casper_client(
         transaction_params.set_standard_payment(DEFAULT_STANDARD_PAYMENT);
     }
 
+    let session_args_simple: Vec<&str> = transaction_params
+        .session_args_simple
+        .get()
+        .map_or_else(Vec::new, |args_simple| {
+            args_simple.args().iter().map(String::as_str).collect()
+        });
+
     let standard_payment_str = match transaction_params.standard_payment.get() {
         Some(true) => "true",
         _ => "false",
+    };
+
+    let pricing_mode = match transaction_params.pricing_mode.get() {
+        Some(PricingMode::Classic) => PricingMode::CLASSIC,
+        Some(PricingMode::Reserved) => PricingMode::RESERVED,
+        _ => PricingMode::FIXED,
     };
 
     _TransactionStrParams {
@@ -309,7 +315,7 @@ pub fn transaction_str_params_to_casper_client(
         ttl: get_str_or_default(transaction_params.ttl.get()),
         session_args_simple,
         session_args_json: get_str_or_default(transaction_params.session_args_json.get()),
-        pricing_mode: get_str_or_default(transaction_params.pricing_mode.get()),
+        pricing_mode,
         payment_amount: get_str_or_default(transaction_params.payment_amount.get()),
         gas_price_tolerance: get_str_or_default(transaction_params.gas_price_tolerance.get()),
         receipt: get_str_or_default(transaction_params.receipt.get()),
@@ -349,7 +355,7 @@ mod tests {
         session_args_json.set("json".to_string()).unwrap();
 
         let pricing_mode = OnceCell::new();
-        pricing_mode.set("mode".to_string()).unwrap();
+        pricing_mode.set(PricingMode::Classic).unwrap();
 
         let payment_amount = OnceCell::new();
         payment_amount.set("amount".to_string()).unwrap();
@@ -387,7 +393,7 @@ mod tests {
         assert_eq!(result.initiator_addr, "account_id");
         assert_eq!(result.session_args_simple, ["simple"]);
         assert_eq!(result.session_args_json, "json");
-        assert_eq!(result.pricing_mode, "mode");
+        assert_eq!(result.pricing_mode, "classic");
         assert_eq!(result.payment_amount, "amount");
         assert_eq!(result.gas_price_tolerance, "1");
         assert_eq!(result.receipt, "receipt");
@@ -412,7 +418,7 @@ mod tests {
 
         transaction_params.set_session_args_json("json");
         transaction_params.set_gas_price_tolerance("1");
-        transaction_params.set_pricing_mode("mode");
+        transaction_params.set_pricing_mode(PricingMode::Fixed);
 
         transaction_params.set_payment_amount("amount");
 
@@ -429,7 +435,7 @@ mod tests {
         assert_eq!(result.initiator_addr, "account_id");
         assert_eq!(result.session_args_simple, ["simple"]);
         assert_eq!(result.session_args_json, "json");
-        assert_eq!(result.pricing_mode, "mode");
+        assert_eq!(result.pricing_mode, "fixed");
         assert_eq!(result.payment_amount, "amount");
         assert_eq!(result.gas_price_tolerance, "1");
         assert_eq!(result.receipt, "receipt");

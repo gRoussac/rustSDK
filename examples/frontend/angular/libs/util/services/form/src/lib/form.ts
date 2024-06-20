@@ -1,4 +1,5 @@
 import { config } from "@util/config";
+import { PricingMode, TransactionCategory } from "casper-sdk";
 
 export type option = {
   value: string,
@@ -516,8 +517,26 @@ const selectPricingMode: InputField = {
   controlName: 'selectPricingMode',
   e2e: 'selectPricingModeElt',
   options: [
-    { value: 'classic', label: 'Classic', default: config['default_pricing_mode'] === 'classic' },
-    { value: 'fixed', label: 'Fixed', default: config['default_pricing_mode'] === 'fixed' },
+    { value: PricingMode.Classic.toString(), label: 'Classic', default: config['default_pricing_mode'] === PricingMode.Classic },
+    { value: PricingMode.Fixed.toString(), label: 'Fixed', default: config['default_pricing_mode'] === PricingMode.Fixed },
+  ]
+};
+
+const selectTransactionCategory: InputField = {
+  id: 'selectTransactionCategory',
+  type: 'select',
+  wrap_class: 'mt-3 col-xl-3 mb-3',
+  class: 'form-select form-control form-control-sm',
+  label: 'Category',
+  label_class: 'input-group-text',
+  name: 'transaction_category',
+  controlName: 'selectTransactionCategory',
+  e2e: 'selectTransactionCategoryElt',
+  options: [
+    { value: TransactionCategory.InstallUpgrade.toString(), label: "Install & Upgrade", default: config['default_transaction_category'] === TransactionCategory.InstallUpgrade },
+    { value: TransactionCategory.Large.toString(), label: "Large", default: config['default_transaction_category'] === TransactionCategory.Large },
+    { value: TransactionCategory.Medium.toString(), label: "Medium", default: config['default_transaction_category'] === TransactionCategory.Medium },
+    { value: TransactionCategory.Small.toString(), label: "Small", default: config['default_transaction_category'] === TransactionCategory.Small },
   ]
 };
 
@@ -597,14 +616,14 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 
 const installFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
-  [{ wasm_button: true }],
+  [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
 ];
 
 const makeDeployFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }],
-  [{ wasm_button: true }],
+  [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: sessionHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: sessionNameInput, required: true }],
   [{ input: entryPointInput, required: true }],
@@ -614,7 +633,7 @@ const makeDeployFields: InputContainer[][] = [
 
 const makeTransactionFields: InputContainer[][] = [
   [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
-  [{ wasm_button: true }],
+  [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias, required: true }],
   [{ input: entryPointInput, required: true }],
