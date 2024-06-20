@@ -20,6 +20,7 @@ pub mod key;
 pub mod package_hash;
 pub mod path;
 pub mod peer_entry;
+pub mod pricing_mode;
 pub mod public_key;
 pub mod purse_identifier;
 pub mod sdk_error;

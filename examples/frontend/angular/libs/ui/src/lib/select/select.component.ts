@@ -49,9 +49,12 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
   onChange($event: Event) {
     const value = ($event.target as HTMLInputElement)?.value;
-    this.stateService.setState({
-      select_dict_identifier: value
-    });
+    const name = ($event.target as HTMLInputElement)?.name;
+    if (name === 'select_dict_identifier') {
+      this.stateService.setState({
+        select_dict_identifier: value
+      });
+    }
   }
 
 }
