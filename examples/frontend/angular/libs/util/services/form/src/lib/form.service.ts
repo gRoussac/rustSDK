@@ -68,7 +68,7 @@ export class FormService {
     const fields = this.action && formFields.get(this.action);
     if (fields) {
       fields.forEach((row) => {
-        row.forEach(({ input, textarea, select }, required) => {
+        row.forEach(({ input, textarea, select, required }) => {
           if (!input && !textarea && !select) {
             return;
           }

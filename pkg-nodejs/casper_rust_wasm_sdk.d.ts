@@ -171,28 +171,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
 */
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
-}
-/**
-*/
-export enum TransactionKind {
-  InvocableEntity = 0,
-  InvocableEntityAlias = 1,
-  Package = 2,
-  PackageAlias = 3,
-  Session = 4,
-  Transfer = 5,
-  AddBid = 6,
-  Delegate = 7,
-  Undelegate = 8,
-  Redelegate = 9,
-  WithdrawBid = 10,
-}
-/**
-*/
 export enum Verbosity {
   Low = 0,
   Medium = 1,
@@ -214,6 +192,28 @@ export enum TransactionCategory {
   Large = 3,
   Medium = 4,
   Small = 5,
+}
+/**
+*/
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
+}
+/**
+*/
+export enum TransactionKind {
+  InvocableEntity = 0,
+  InvocableEntityAlias = 1,
+  Package = 2,
+  PackageAlias = 3,
+  Session = 4,
+  Transfer = 5,
+  AddBid = 6,
+  Delegate = 7,
+  Undelegate = 8,
+  Redelegate = 9,
+  WithdrawBid = 10,
 }
 /**
 */
