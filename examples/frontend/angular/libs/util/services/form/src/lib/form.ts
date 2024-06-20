@@ -537,7 +537,8 @@ const selectTransactionCategory: InputField = {
     { value: TransactionCategory.Large.toString(), label: "Large", default: config['default_transaction_category'] === TransactionCategory.Large },
     { value: TransactionCategory.Medium.toString(), label: "Medium", default: config['default_transaction_category'] === TransactionCategory.Medium },
     { value: TransactionCategory.Small.toString(), label: "Small", default: config['default_transaction_category'] === TransactionCategory.Small },
-  ]
+  ],
+  enabled_when: ['has_wasm']
 };
 
 const getBlockFields: InputContainer[][] = [

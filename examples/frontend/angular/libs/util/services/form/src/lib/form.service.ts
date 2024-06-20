@@ -39,11 +39,11 @@ export class FormService {
     const formControlsConfig: { [key: string]: FormControl; } = {};
     formFields.forEach((fields) => {
       fields.forEach((row) => {
-        row.forEach((field) => {
-          const name = field.input?.controlName || field.textarea?.controlName || field.select?.controlName || '';
-          name && (formControlsConfig[name] = new FormControl(this.getDefaultOptionValue(field.select?.options)));
-          if (field.select?.options && name === 'selectDictIdentifier') {
-            const select_dict_identifier = field.select?.options.find(option => option.default)?.value || '';
+        row.forEach(({ input, textarea, select }) => {
+          const name = input?.controlName || textarea?.controlName || select?.controlName || '';
+          name && (formControlsConfig[name] = new FormControl(this.getDefaultOptionValue(select?.options)));
+          if (select?.options && name === 'selectDictIdentifier') {
+            const select_dict_identifier = select?.options.find(option => option.default)?.value || '';
             this.stateService.setState({
               select_dict_identifier
             });
@@ -68,30 +68,30 @@ export class FormService {
     const fields = this.action && formFields.get(this.action);
     if (fields) {
       fields.forEach((row) => {
-        row.forEach((field) => {
-          if (!field.input && !field.textarea && !field.select) {
+        row.forEach(({ input, textarea, select }, required) => {
+          if (!input && !textarea && !select) {
             return;
           }
-          const name = field.input?.controlName || field.textarea?.controlName || field.select?.controlName || '';
+          const name = input?.controlName || textarea?.controlName || select?.controlName || '';
           const control = this.form.get(name);
           if (!control) { return; }
-          const state = field.input?.state_name || field.textarea?.state_name || field.select?.state_name || [];
+          const state = input?.state_name || textarea?.state_name || select?.state_name || [];
           const stateName = state && state.find(name => this.state[name as keyof State]);
-          const storageName = field.input?.storage_name || field.textarea?.storage_name || field.select?.storage_name || "";
+          const storageName = input?.storage_name || textarea?.storage_name || select?.storage_name || "";
           let defaultValue = stateName ? this.state[stateName as keyof State] : '';
           defaultValue = storageName ? this.storageService.get(storageName as keyof State) : defaultValue;
 
           if (defaultValue) {
             defaultValue && control.setValue(defaultValue);
-          } else if (field.input?.config_name) {
-            const defaultValue = this.config[field.input?.config_name as string] || '';
+          } else if (input?.config_name) {
+            const defaultValue = this.config[input?.config_name as string] || '';
             defaultValue && control.setValue(defaultValue);
-            defaultValue && (field.input.placeholder_config_value = defaultValue as string);
+            defaultValue && (input.placeholder_config_value = defaultValue as string);
           }
           control.enable();
-          if (field.required) {
-            field.input && (field.input.required = true);
-            field.textarea && (field.textarea.required = true);
+          if (required) {
+            input && (input.required = true);
+            textarea && (textarea.required = true);
             control.setValidators([Validators.required]);
           }
         });
@@ -106,12 +106,12 @@ export class FormService {
     }
     const disabledTargets: string[] = [];
     fields.forEach((row) => {
-      row.forEach(({ input, textarea }) => {
-        const controlName = input?.controlName || textarea?.controlName || '';
-        if (!controlName) {
+      row.forEach(({ input, textarea, select }) => {
+        const name = input?.controlName || textarea?.controlName || select?.controlName || '';
+        if (!name) {
           return;
         }
-        const control = this.form.get(controlName);
+        const control = this.form.get(name);
         if (!control) {
           return;
         }
@@ -135,6 +135,13 @@ export class FormService {
             }
           }
 
+        }
+        else if (select && select.enabled_when) {
+          if (this.has_wasm && select.enabled_when?.includes('has_wasm')) {
+            control.enable();
+          } else {
+            control.disable();
+          }
         }
         else if (input && input.enabled_when) {
           if (this.action === 'get_dictionary_item' &&
