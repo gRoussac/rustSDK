@@ -436,10 +436,17 @@
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
 <a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::helpers::get_current_timestamp;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_str_or_default;
 <span class="kw">use </span><span class="kw">crate</span>::helpers::get_ttl_or_default;
 <span class="kw">use </span><span class="kw">crate</span>::types::deploy_params::args_simple::ArgsSimple;
+<span class="kw">use </span><span class="kw">crate</span>::types::pricing_mode::PricingMode;
 <span class="kw">use </span>casper_client::cli::TransactionStrParams <span class="kw">as </span>_TransactionStrParams;
 <span class="kw">use </span>casper_types::DeployBuilder;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -455,15 +462,14 @@
     initiator_addr: OnceCell&lt;String&gt;,
     session_args_simple: OnceCell&lt;ArgsSimple&gt;,
     session_args_json: OnceCell&lt;String&gt;,
-    pricing_mode: OnceCell&lt;String&gt;,
+    pricing_mode: OnceCell&lt;PricingMode&gt;,
     payment_amount: OnceCell&lt;String&gt;,
     gas_price_tolerance: OnceCell&lt;String&gt;,
     receipt: OnceCell&lt;String&gt;,
     standard_payment: OnceCell&lt;bool&gt;,
 }
 
-<span class="comment">// TODO Fix this value from PricingMode
-</span><span class="kw">const </span>DEFAULT_PRICING_MODE: <span class="kw-2">&amp;</span>str = <span class="string">"fixed"</span>;
+<span class="kw">const </span>DEFAULT_PRICING_MODE: PricingMode = PricingMode::Fixed;
 <span class="kw">const </span>DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
 <span class="kw">const </span>DEFAULT_STANDARD_PAYMENT: bool = <span class="bool-val">false</span>;
 
@@ -479,7 +485,7 @@
         ttl: <span class="prelude-ty">Option</span>&lt;String&gt;,
         session_args_simple: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
         session_args_json: <span class="prelude-ty">Option</span>&lt;String&gt;,
-        pricing_mode: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        pricing_mode: <span class="prelude-ty">Option</span>&lt;PricingMode&gt;,
         payment_amount: <span class="prelude-ty">Option</span>&lt;String&gt;,
         gas_price_tolerance: <span class="prelude-ty">Option</span>&lt;String&gt;,
         receipt: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -506,7 +512,7 @@
             transaction_params.set_session_args_json(<span class="kw-2">&amp;</span>session_args_json);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(pricing_mode) = pricing_mode {
-            transaction_params.set_pricing_mode(<span class="kw-2">&amp;</span>pricing_mode);
+            transaction_params.set_pricing_mode(pricing_mode);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(payment_amount) = payment_amount {
             transaction_params.set_payment_amount(<span class="kw-2">&amp;</span>payment_amount);
@@ -654,13 +660,13 @@
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
-    </span><span class="kw">pub fn </span>pricing_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    </span><span class="kw">pub fn </span>pricing_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PricingMode&gt; {
         <span class="self">self</span>.pricing_mode.get().cloned()
     }
 
     <span class="attr">#[wasm_bindgen(setter)]
-    </span><span class="kw">pub fn </span>set_pricing_mode(<span class="kw-2">&amp;</span><span class="self">self</span>, pricing_mode: <span class="kw-2">&amp;</span>str) {
-        <span class="self">self</span>.pricing_mode.set(pricing_mode.to_string()).unwrap();
+    </span><span class="kw">pub fn </span>set_pricing_mode(<span class="kw-2">&amp;</span><span class="self">self</span>, pricing_mode: PricingMode) {
+        <span class="self">self</span>.pricing_mode.set(pricing_mode).unwrap();
     }
 
     <span class="attr">#[wasm_bindgen(getter)]
@@ -711,13 +717,6 @@
 </span><span class="kw">pub fn </span>transaction_str_params_to_casper_client(
     transaction_params: <span class="kw-2">&amp;</span>TransactionStrParams,
 ) -&gt; _TransactionStrParams&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">let </span>session_args_simple: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = transaction_params
-        .session_args_simple
-        .get()
-        .map_or_else(Vec::new, |args_simple| {
-            args_simple.args().iter().map(String::as_str).collect()
-        });
-
     <span class="kw">if </span>transaction_params.timestamp.get().is_none() {
         transaction_params.set_default_timestamp();
     }
@@ -734,9 +733,22 @@
         transaction_params.set_standard_payment(DEFAULT_STANDARD_PAYMENT);
     }
 
+    <span class="kw">let </span>session_args_simple: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = transaction_params
+        .session_args_simple
+        .get()
+        .map_or_else(Vec::new, |args_simple| {
+            args_simple.args().iter().map(String::as_str).collect()
+        });
+
     <span class="kw">let </span>standard_payment_str = <span class="kw">match </span>transaction_params.standard_payment.get() {
         <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; <span class="string">"true"</span>,
         <span class="kw">_ </span>=&gt; <span class="string">"false"</span>,
+    };
+
+    <span class="kw">let </span>pricing_mode = <span class="kw">match </span>transaction_params.pricing_mode.get() {
+        <span class="prelude-val">Some</span>(PricingMode::Classic) =&gt; PricingMode::CLASSIC,
+        <span class="prelude-val">Some</span>(PricingMode::Reserved) =&gt; PricingMode::RESERVED,
+        <span class="kw">_ </span>=&gt; PricingMode::FIXED,
     };
 
     _TransactionStrParams {
@@ -747,7 +759,7 @@
         ttl: get_str_or_default(transaction_params.ttl.get()),
         session_args_simple,
         session_args_json: get_str_or_default(transaction_params.session_args_json.get()),
-        pricing_mode: get_str_or_default(transaction_params.pricing_mode.get()),
+        pricing_mode,
         payment_amount: get_str_or_default(transaction_params.payment_amount.get()),
         gas_price_tolerance: get_str_or_default(transaction_params.gas_price_tolerance.get()),
         receipt: get_str_or_default(transaction_params.receipt.get()),
@@ -787,7 +799,7 @@
         session_args_json.set(<span class="string">"json"</span>.to_string()).unwrap();
 
         <span class="kw">let </span>pricing_mode = OnceCell::new();
-        pricing_mode.set(<span class="string">"mode"</span>.to_string()).unwrap();
+        pricing_mode.set(PricingMode::Classic).unwrap();
 
         <span class="kw">let </span>payment_amount = OnceCell::new();
         payment_amount.set(<span class="string">"amount"</span>.to_string()).unwrap();
@@ -825,7 +837,7 @@
         <span class="macro">assert_eq!</span>(result.initiator_addr, <span class="string">"account_id"</span>);
         <span class="macro">assert_eq!</span>(result.session_args_simple, [<span class="string">"simple"</span>]);
         <span class="macro">assert_eq!</span>(result.session_args_json, <span class="string">"json"</span>);
-        <span class="macro">assert_eq!</span>(result.pricing_mode, <span class="string">"mode"</span>);
+        <span class="macro">assert_eq!</span>(result.pricing_mode, <span class="string">"classic"</span>);
         <span class="macro">assert_eq!</span>(result.payment_amount, <span class="string">"amount"</span>);
         <span class="macro">assert_eq!</span>(result.gas_price_tolerance, <span class="string">"1"</span>);
         <span class="macro">assert_eq!</span>(result.receipt, <span class="string">"receipt"</span>);
@@ -850,7 +862,7 @@
 
         transaction_params.set_session_args_json(<span class="string">"json"</span>);
         transaction_params.set_gas_price_tolerance(<span class="string">"1"</span>);
-        transaction_params.set_pricing_mode(<span class="string">"mode"</span>);
+        transaction_params.set_pricing_mode(PricingMode::Fixed);
 
         transaction_params.set_payment_amount(<span class="string">"amount"</span>);
 
@@ -867,7 +879,7 @@
         <span class="macro">assert_eq!</span>(result.initiator_addr, <span class="string">"account_id"</span>);
         <span class="macro">assert_eq!</span>(result.session_args_simple, [<span class="string">"simple"</span>]);
         <span class="macro">assert_eq!</span>(result.session_args_json, <span class="string">"json"</span>);
-        <span class="macro">assert_eq!</span>(result.pricing_mode, <span class="string">"mode"</span>);
+        <span class="macro">assert_eq!</span>(result.pricing_mode, <span class="string">"fixed"</span>);
         <span class="macro">assert_eq!</span>(result.payment_amount, <span class="string">"amount"</span>);
         <span class="macro">assert_eq!</span>(result.gas_price_tolerance, <span class="string">"1"</span>);
         <span class="macro">assert_eq!</span>(result.receipt, <span class="string">"receipt"</span>);

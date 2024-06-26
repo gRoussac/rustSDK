@@ -94,6 +94,7 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>call_entrypoint;
 <span class="kw">pub mod </span>call_entrypoint_deploy;
 <span class="kw">pub mod </span>install;
@@ -132,7 +133,8 @@
         (<span class="kw-2">&amp;</span>node_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
     )
     .<span class="kw">await</span>;
-    <span class="kw">let </span>(contract_cep78_hash, <span class="kw">_</span>) = get_contract_cep78_hash_keys(<span class="kw-2">&amp;</span>account_hash, <span class="kw-2">&amp;</span>node_address).<span class="kw">await</span>;
+    <span class="kw">let </span>(contract_cep78_hash, <span class="kw">_</span>, <span class="kw">_</span>) =
+        get_contract_cep78_hash_keys(<span class="kw-2">&amp;</span>account_hash, <span class="kw-2">&amp;</span>node_address).<span class="kw">await</span>;
     contract_cep78_hash
 }
 
