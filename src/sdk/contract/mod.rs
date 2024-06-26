@@ -36,7 +36,8 @@ pub async fn install_cep78() -> String {
         (&node_address, &event_address, &chain_name),
     )
     .await;
-    let (contract_cep78_hash, _) = get_contract_cep78_hash_keys(&account_hash, &node_address).await;
+    let (contract_cep78_hash, _, _) =
+        get_contract_cep78_hash_keys(&account_hash, &node_address).await;
     contract_cep78_hash
 }
 
