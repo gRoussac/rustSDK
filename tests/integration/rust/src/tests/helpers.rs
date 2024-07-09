@@ -376,11 +376,16 @@ pub async fn get_contract_cep78_hash_keys(
         .iter()
         .find(|(key, _)| key == &PACKAGE_CEP78_KEY)
         .unwrap();
+
+    dbg!(&format!("{:?}", contract_cep78_hash.to_formatted_string()));
+
     (
-        contract_cep78_hash.to_formatted_string(),
         contract_cep78_hash
             .to_formatted_string()
-            .replace("hash-", "addressable-entity-"), // entity
+            .replace("entity-contract-", "hash-"), // contract hash
+        contract_cep78_hash
+            .to_formatted_string()
+            .replace("entity-contract-", "addressable-entity-"), // entity
         contract_cep78_package_hash.to_formatted_string(),
     )
 }

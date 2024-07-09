@@ -84,9 +84,8 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_secret_key,
-        install_cep78,
-        types::{addressable_entity_hash::AddressableEntityHash, contract_hash::ContractHash},
+        helpers::public_key_from_secret_key, install_cep78,
+        types::addressable_entity_hash::AddressableEntityHash,
     };
     use once_cell::sync::Lazy;
     use sdk_tests::{
@@ -98,8 +97,9 @@ mod tests {
     static ARGS: Lazy<Vec<String>> =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
-    async fn get_contract_hash() -> String {
-        install_cep78().await
+    async fn get_entity_hash() -> String {
+        let (_, entity_hash) = install_cep78().await;
+        entity_hash
     }
 
     #[tokio::test]
@@ -110,7 +110,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
 
         let error_message =
-            "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
+            "transaction requires account - use `with_account` or `with_secret_key`";
 
         // Act
         let result = sdk
@@ -136,8 +136,8 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        let contract_hash = ContractHash::from_formatted_str(&get_contract_hash().await).unwrap();
-        let entity_hash: AddressableEntityHash = contract_hash.into();
+        let entity_hash: AddressableEntityHash =
+            AddressableEntityHash::from_formatted_str(&get_entity_hash().await).unwrap();
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -160,18 +160,18 @@ mod tests {
         let (node_address, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 
-        let error_message =
-            "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
+        let error_message = "the transaction was invalid: no such contract at hash";
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
-        transaction_params.set_payment_amount(""); // This is not valid payment amount
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
         let entity_hash = AddressableEntityHash::from_formatted_str(
             "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
+
+        dbg!(entity_hash);
 
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -184,7 +184,6 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
-
         assert!(err_string.contains(error_message));
     }
 
@@ -196,7 +195,7 @@ mod tests {
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
-        let error_message = "the transaction was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
+        let error_message = "the transaction was invalid: invalid associated keys";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);

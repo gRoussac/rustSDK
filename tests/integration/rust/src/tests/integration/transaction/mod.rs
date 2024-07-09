@@ -24,13 +24,13 @@ pub mod test_module {
 
         let entity_hash: AddressableEntityHash =
             AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
-
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
         let transaction = create_test_sdk(Some(config))
             .transaction(builder_params, transaction_params, None, None)
             .await;
+
         assert!(!transaction
             .as_ref()
             .unwrap()

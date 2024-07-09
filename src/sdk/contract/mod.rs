@@ -15,7 +15,7 @@ use sdk_tests::config::{DICTIONARY_ITEM_KEY, DICTIONARY_NAME};
 use sdk_tests::tests::helpers::mint_nft;
 
 #[cfg(test)]
-pub async fn install_cep78() -> String {
+pub async fn install_cep78() -> (String, String) {
     use sdk_tests::{
         config::WASM_PATH,
         tests::helpers::{
@@ -36,9 +36,9 @@ pub async fn install_cep78() -> String {
         (&node_address, &event_address, &chain_name),
     )
     .await;
-    let (contract_cep78_hash, _, _) =
+    let (contract_cep78_hash, contract_cep78_entity_hash, _contract_cep78_package_hash) =
         get_contract_cep78_hash_keys(&account_hash, &node_address).await;
-    contract_cep78_hash
+    (contract_cep78_hash, contract_cep78_entity_hash)
 }
 
 #[cfg(test)]
@@ -50,7 +50,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
 
     unsafe {
         if CONTRACT_CEP78_HASH.is_none() {
-            let contract_cep78_hash = install_cep78().await;
+            let (contract_cep78_hash, _) = install_cep78().await;
             let secret_key = get_user_secret_key(None).unwrap();
             let account = public_key_from_secret_key(&secret_key).unwrap();
             let public_key = PublicKey::new(&account).unwrap();
