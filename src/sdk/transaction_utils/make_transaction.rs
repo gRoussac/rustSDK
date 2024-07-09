@@ -143,34 +143,4 @@ mod tests {
         // Assert
         assert!(result.is_ok());
     }
-
-    #[tokio::test]
-    async fn test_make_transaction_with_invalid_params() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
-        let error_message = "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
-        let secret_key = get_user_secret_key(None).unwrap();
-
-        let transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&secret_key);
-        transaction_params.set_chain_name(&chain_name);
-        transaction_params.set_payment_amount(""); // This is not valid payment amount
-
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
-        )
-        .unwrap();
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
-
-        // Act
-        let result = sdk.make_transaction(builder_params, transaction_params);
-
-        // Assert
-        assert!(result.is_err());
-
-        let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(error_message));
-    }
 }

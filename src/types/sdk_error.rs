@@ -156,6 +156,10 @@ pub enum SdkError {
     #[error("Failed to parse a transaction category")]
     FailedToParseTransactionCategory,
 
+    /// Failed to parse a validator public key.
+    #[error("Failed to parse a validator public key")]
+    FailedToParseValidatorPublicKey,
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
 
@@ -247,6 +251,7 @@ impl From<CliError> for SdkError {
             CliError::FailedToParseTransactionCategory => {
                 SdkError::FailedToParseTransactionCategory
             }
+            CliError::FailedToParseValidatorPublicKey => SdkError::FailedToParseValidatorPublicKey,
         }
     }
 }

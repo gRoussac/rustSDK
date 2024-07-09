@@ -232,7 +232,7 @@ mod tests {
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
-        let error_message = "the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
+        let error_message = "the deploy was invalid: invalid associated keys";
 
         let deploy_params = DeployStrParams::new(
             &chain_name,

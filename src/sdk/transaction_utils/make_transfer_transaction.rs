@@ -188,34 +188,4 @@ mod tests {
         // Assert
         assert!(result.is_ok());
     }
-
-    #[tokio::test]
-    async fn test_make_transfer_transaction_with_invalid_transfer_params() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let (_, _, _, chain_name) = get_network_constants();
-        let error_message = "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
-        let secret_key = get_user_secret_key(None).unwrap();
-        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
-
-        let transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&secret_key);
-        transaction_params.set_chain_name(&chain_name);
-        transaction_params.set_payment_amount(""); // This is not valid payment amoun
-
-        // Act
-        let result = sdk.make_transfer_transaction(
-            None,
-            &initiator_addr,
-            TRANSFER_AMOUNT,
-            transaction_params,
-            None,
-        );
-        // Assert
-
-        assert!(result.is_err());
-
-        let err_string = result.err().unwrap().to_string();
-        assert!(err_string.contains(error_message));
-    }
 }

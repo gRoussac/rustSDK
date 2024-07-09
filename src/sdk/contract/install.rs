@@ -113,7 +113,7 @@ mod tests {
         let transaction_bytes = Bytes::default();
 
         let error_message =
-            "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
+            "transaction requires account - use `with_account` or `with_secret_key`";
 
         // Act
         let result = sdk
@@ -166,16 +166,14 @@ mod tests {
     async fn test_install_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (node_address, _, _, _) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
 
-        let error_message =
-            "Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty";
+        let error_message = "The transaction sent to the network had an invalid chain name";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
-        transaction_params.set_chain_name(&chain_name);
-        transaction_params.set_payment_amount(""); // This is not valid payment amount
+        transaction_params.set_chain_name("test");
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
         let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
@@ -209,7 +207,7 @@ mod tests {
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 
-        let error_message = "the transaction was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason";
+        let error_message = "the transaction was invalid: invalid associated keys";
 
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_initiator_addr(&initiator_addr);
