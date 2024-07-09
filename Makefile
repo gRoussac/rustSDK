@@ -88,7 +88,7 @@ docker-stop-prod:
 	$(CICD_DC) stop
 
 docker-deploy-prod:
-	rm webclient.tar
+	rm -f webclient.tar
 	$(CICD_DC) build --build-arg BUILD_CONFIGURATION=production
 	docker save -o webclient.tar casper-webclient:latest
 	scp webclient.tar ubuntu@casper-box:/home/ubuntu/webclient/webclient.tar
