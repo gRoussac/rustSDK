@@ -50,13 +50,13 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
 
     unsafe {
         if CONTRACT_CEP78_HASH.is_none() {
-            let (contract_cep78_hash, _) = install_cep78().await;
+            let (contract_cep78_hash, contract_cep78_entity) = install_cep78().await;
             let secret_key = get_user_secret_key(None).unwrap();
             let account = public_key_from_secret_key(&secret_key).unwrap();
             let public_key = PublicKey::new(&account).unwrap();
             let account_hash = public_key.to_account_hash().to_formatted_string();
             mint_nft(
-                &contract_cep78_hash,
+                &contract_cep78_entity,
                 &account,
                 &account_hash,
                 &secret_key,
@@ -88,10 +88,10 @@ async fn get_dictionary_item_input(contract_addr: &str) -> DictionaryItemInput {
 }
 
 #[cfg(test)]
-async fn get_dictionary_item_params_input(account_hash: &str) -> DictionaryItemInput {
+async fn get_dictionary_item_params_input(key: &str) -> DictionaryItemInput {
     use crate::types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams;
 
     let mut params = DictionaryItemStrParams::new();
-    params.set_contract_named_key(account_hash, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
+    params.set_contract_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
     DictionaryItemInput::Params(params)
 }

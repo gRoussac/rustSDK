@@ -45,6 +45,8 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
       .filter(name => !name.startsWith('state_'))
       .filter(name => !name.startsWith('info_'))
       .filter(name => !name.startsWith('account_'))
+      .filter(name => !name.startsWith('wait'))
+      .filter(name => !name.startsWith('watch'))
       .sort();
 
     this.sdk_deploy_methods = this.sdk_methods.filter(name => ['deploy', 'speculative_deploy', 'speculative_transfer', 'transfer'].includes(name));

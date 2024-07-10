@@ -377,8 +377,6 @@ pub async fn get_contract_cep78_hash_keys(
         .find(|(key, _)| key == &PACKAGE_CEP78_KEY)
         .unwrap();
 
-    dbg!(&format!("{:?}", contract_cep78_hash.to_formatted_string()));
-
     (
         contract_cep78_hash
             .to_formatted_string()
