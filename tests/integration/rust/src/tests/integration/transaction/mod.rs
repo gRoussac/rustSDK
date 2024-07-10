@@ -14,7 +14,7 @@ pub mod test_module {
     };
 
     pub async fn test_transaction() {
-        let config: TestConfig = get_config(true).await;
+        let config: TestConfig = get_config(false).await;
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&config.chain_name);
         transaction_params.set_initiator_addr(&config.account);
@@ -24,6 +24,7 @@ pub mod test_module {
 
         let entity_hash: AddressableEntityHash =
             AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
+
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 
