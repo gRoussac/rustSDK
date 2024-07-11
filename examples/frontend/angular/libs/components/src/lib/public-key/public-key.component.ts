@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { ClientService } from '@util/client';
 import { CONFIG, EnvironmentConfig } from '@util/config';
 import { StorageService } from '@util/storage';
+import { FormService } from '@util/form';
 
 @Component({
   selector: 'comp-public-key',
@@ -30,6 +31,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     private readonly clientService: ClientService,
     private readonly storageService: StorageService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly formService: FormService,
   ) { }
 
   async ngAfterViewInit() {
@@ -101,5 +103,6 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
       account_hash,
       main_purse
     });
+    account_hash && this.formService.updateForm();
   }
 }

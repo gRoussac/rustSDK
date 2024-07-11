@@ -392,6 +392,19 @@ const seedContractHash: InputField = {
   enabled_when: ['newFromContractInfo']
 };
 
+const seedEntityHash: InputField = {
+  id: 'seedEntityHashElt',
+  type: 'search',
+  wrap_class: 'col-xl-8 mb-2',
+  class: 'form-control',
+  label: 'Entity Hash',
+  name: 'seed_entity_hash',
+  controlName: 'seedEntityHash',
+  placeholder: 'entity-contract-0x',
+  e2e: 'seedEntityHashElt',
+  enabled_when: ['newFromEntityInfo']
+};
+
 const seedKey: InputField = {
   id: 'seedKeyElt',
   type: 'search',
@@ -415,7 +428,7 @@ const seedName: InputField = {
   controlName: 'seedName',
   placeholder: 'events',
   e2e: 'seedNameElt',
-  enabled_when: ['newFromContractInfo', 'newFromAccountInfo']
+  enabled_when: ['newFromContractInfo', 'newFromAccountInfo', 'newFromEntityInfo']
 };
 
 const itemKey: InputField = {
@@ -428,7 +441,7 @@ const itemKey: InputField = {
   controlName: 'itemKey',
   placeholder: 'Item key string',
   e2e: 'itemKeyElt',
-  enabled_when: ['newFromContractInfo', 'newFromAccountInfo', 'newFromSeedUref']
+  enabled_when: ['newFromContractInfo', 'newFromAccountInfo', 'newFromSeedUref', 'newFromEntityInfo']
 };
 
 const queryKey: InputField = {
@@ -500,7 +513,8 @@ const selectDictIdentifier: InputField = {
   state_name: ['select_dict_identifier'],
   options: [
     { value: 'newFromSeedUref', label: 'From Dictionary Uref' },
-    { value: 'newFromContractInfo', label: 'From Contract Info', default: true },
+    { value: 'newFromContractInfo', label: 'From Contract Info (depr.)', default: true },
+    { value: 'newFromEntityInfo', label: 'From Entity Info', default: true },
     { value: 'newFromAccountInfo', label: 'From Account Info' },
     { value: 'newFromDictionaryKey', label: 'From Dictionary Key' },
   ]
@@ -575,7 +589,7 @@ const queryGlobalStateFields: InputContainer[][] = [
 
 const queryContractDictFields: InputContainer[][] = [
   [{ input: stateRootHash }],
-  [{ input: seedContractHash, required: true }],
+  [{ input: seedEntityHash, required: true }],
   [{ input: seedName, required: true }],
   [{ input: itemKey, required: true }],
 ];
@@ -590,6 +604,7 @@ const getDictionaryItemFields: InputContainer[][] = [
   [{ input: stateRootHash }],
   [{ select: selectDictIdentifier }],
   [{ input: seedContractHash, required: true }],
+  [{ input: seedEntityHash, required: true }],
   [{ input: seedAccountHash, required: true }],
   [{ input: seedUref, required: true }],
   [{ input: seedName, required: true }],

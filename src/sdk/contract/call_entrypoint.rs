@@ -171,8 +171,6 @@ mod tests {
         )
         .unwrap();
 
-        dbg!(entity_hash);
-
         let builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
 

@@ -237,7 +237,7 @@ pub mod test_module_transaction {
         assert!(!transaction
             .to_json_string()
             .unwrap()
-            .contains(&config.contract_cep78_hash));
+            .contains(&config.contract_cep78_key));
         assert!(transaction
             .to_json_string()
             .unwrap()
@@ -303,7 +303,7 @@ pub mod test_module_transaction {
         assert!(transaction
             .to_json_string()
             .unwrap()
-            .contains(&new_session_package_hash_string));
+            .contains(new_session_package_hash_string));
     }
 
     pub async fn test_transaction_type_with_transaction_bytes() {

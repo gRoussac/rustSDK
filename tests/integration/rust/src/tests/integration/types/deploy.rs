@@ -86,7 +86,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -198,7 +202,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -223,7 +231,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -243,7 +255,7 @@ pub mod test_module_deploy {
         assert!(!deploy
             .to_json_string()
             .unwrap()
-            .contains(&config.contract_cep78_hash));
+            .contains(&config.contract_cep78_key));
         assert!(deploy.to_json_string().unwrap().contains(new_session_hash));
     }
 
@@ -390,7 +402,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -482,7 +498,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -504,7 +524,11 @@ pub mod test_module_deploy {
             None,
         );
         let mut session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args = Vec::from([
             "foo:Bool='true'".to_string(),
@@ -532,7 +556,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         session_params.set_session_args_json(ARGS_JSON);
         let payment_params = PaymentStrParams::default();
@@ -556,7 +584,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -585,7 +617,11 @@ pub mod test_module_deploy {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
