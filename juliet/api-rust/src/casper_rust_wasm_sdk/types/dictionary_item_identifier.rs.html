@@ -140,13 +140,6 @@
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{key::Key, sdk_error::SdkError};
 <span class="kw">use </span>casper_client::rpcs::DictionaryItemIdentifier <span class="kw">as </span>_DictionaryItemIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -165,11 +158,9 @@
         dictionary_name: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(account_hash).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+        <span class="kw">let </span>key = Key::from_formatted_str(account_hash).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::AccountNamedKey {
@@ -185,11 +176,9 @@
         dictionary_name: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(contract_addr).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+        <span class="kw">let </span>key = Key::from_formatted_str(contract_addr).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::ContractNamedKey {
@@ -204,16 +193,15 @@
         seed_uref: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(seed_uref).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+        <span class="kw">let </span>key = Key::from_formatted_str(seed_uref).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>uref = key
-            .into_uref()
-            .ok_or_else(|| SdkError::CustomError(<span class="string">"Key is not a URef"</span>.to_string()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>uref = key.into_uref().ok_or_else(|| SdkError::CustomError {
+            context: <span class="string">"Conversion to URef failed"</span>,
+            error: <span class="string">"Key is not a URef"</span>.to_string(),
+        })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::URef {
             seed_uref: <span class="kw-2">*</span>uref,
@@ -225,11 +213,9 @@
     </span><span class="kw">pub fn </span>new_from_dictionary_key(
         dictionary_key: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(dictionary_key).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+        <span class="kw">let </span>key = Key::from_formatted_str(dictionary_key).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::Dictionary(
             key.to_formatted_string(),
