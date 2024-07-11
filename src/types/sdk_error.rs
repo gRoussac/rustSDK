@@ -9,8 +9,11 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SdkError {
-    #[error("Custom error string")]
-    CustomError(String),
+    #[error("{context}: {error}")]
+    CustomError {
+        context: &'static str,
+        error: String,
+    },
 
     #[error("Failed to serde_json serialization")]
     SerializationError(serde_json::Error),
