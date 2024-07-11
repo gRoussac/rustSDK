@@ -22,7 +22,11 @@ pub mod test_module {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_DECIMALS);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -73,7 +77,11 @@ pub mod test_module {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_DECIMALS);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);

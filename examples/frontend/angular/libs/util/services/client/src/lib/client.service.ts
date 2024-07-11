@@ -1039,7 +1039,7 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    const contract_named_key: string = this.getIdentifier('seedContractHash')?.value?.trim() || '';
+    const entity_named_key: string = this.getIdentifier('seedEntityHash')?.value?.trim() || '';
     const dictionary_name: string = this.getIdentifier('seedName')?.value?.trim();
     if (!dictionary_name) {
       const err = "seedName is missing";
@@ -1047,16 +1047,16 @@ export class ClientService {
       return;
     }
     let dictionary_item_params: DictionaryItemStrParams | undefined;
-    if (contract_named_key) {
+    if (entity_named_key) {
       // We have two ways to identify a dictionary, either by identifier or by item params
       // const dictionary_item_identifier =
-      //   DictionaryItemIdentifier.newFromContractInfo(
-      //     contract_named_key,
+      //   DictionaryItemIdentifier.newFromEnitityInfo(
+      //     entity_named_key,
       //     dictionary_name,
       //     dictionary_item_key
       //   );
       dictionary_item_params = new DictionaryItemStrParams();
-      dictionary_item_params.setContractNamedKey(contract_named_key, dictionary_name, dictionary_item_key);
+      dictionary_item_params.setEntityNamedKey(entity_named_key, dictionary_name, dictionary_item_key);
     }
     if (!dictionary_item_params) {
       const err = "dictionary_item_params is missing";
@@ -1124,10 +1124,11 @@ export class ClientService {
           );
       } else {
         const seed_contract_hash: string = this.getIdentifier('seedContractHash')?.value?.trim();
+        const seed_entity_hash: string = this.getIdentifier('seedEntityHash')?.value?.trim();
         const seed_account_hash: string = this.getIdentifier('seedAccountHash')?.value?.trim();
         const seed_name: string = this.getIdentifier('seedName')?.value?.trim();
         if (!seed_name) {
-          const err = "seed_name  is missing";
+          const err = "seed_name is missing";
           err && (this.errorService.setError(err.toString()));
           return;
         }
@@ -1135,6 +1136,14 @@ export class ClientService {
           dictionary_item_identifier =
             DictionaryItemIdentifier.newFromContractInfo(
               seed_contract_hash,
+              seed_name,
+              item_key
+            );
+        }
+        if (seed_entity_hash && this.select_dict_identifier === 'newFromEntityInfo') {
+          dictionary_item_identifier =
+            DictionaryItemIdentifier.newFromEntityInfo(
+              seed_entity_hash,
               seed_name,
               item_key
             );
@@ -1150,7 +1159,7 @@ export class ClientService {
       }
     }
     if (!dictionary_item_identifier) {
-      const err = "dictionary_item_identifier  is missing";
+      const err = "dictionary_item_identifier is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }

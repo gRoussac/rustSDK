@@ -233,7 +233,7 @@ pub mod test_module {
 
     #[allow(deprecated)]
     pub async fn test_get_deploy() {
-        let config: TestConfig = get_config(true).await;
+        let config: TestConfig = get_config(false).await;
         let deploy_hash = test_deploy().await;
         let get_deploy = create_test_sdk(Some(config.clone()))
             .get_deploy(
@@ -281,8 +281,8 @@ pub mod test_module {
             .into();
 
         let mut params = DictionaryItemStrParams::new();
-        params.set_contract_named_key(
-            &config.contract_cep78_hash,
+        params.set_entity_named_key(
+            &config.contract_cep78_key,
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
         );
@@ -309,8 +309,8 @@ pub mod test_module {
     pub async fn test_get_dictionary_item_without_state_root_hash() {
         let config: TestConfig = get_config(false).await;
         let mut params = DictionaryItemStrParams::new();
-        params.set_contract_named_key(
-            &config.contract_cep78_hash,
+        params.set_entity_named_key(
+            &config.contract_cep78_key,
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
         );

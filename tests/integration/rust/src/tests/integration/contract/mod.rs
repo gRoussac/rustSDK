@@ -43,7 +43,11 @@ pub mod test_module {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         session_params.set_session_args_json(ARGS_JSON);
         let payment_params = PaymentStrParams::default();
@@ -82,7 +86,7 @@ pub mod test_module {
         let state_root_hash = &state_root_hash_digest.to_string();
 
         let dictionnary_key = get_dictionnary_key(
-            &config.contract_cep78_hash,
+            &config.contract_cep78_key,
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
             Some(state_root_hash),
@@ -163,7 +167,7 @@ pub mod test_module {
     pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
         let config: TestConfig = get_config(false).await;
         let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            key: KeyIdentifierInput::String(config.to_owned().contract_cep78_hash),
+            key: KeyIdentifierInput::String(config.to_owned().contract_cep78_key),
             path: Some(PathIdentifierInput::String("installer".to_string())),
             maybe_global_state_identifier,
             state_root_hash: None,

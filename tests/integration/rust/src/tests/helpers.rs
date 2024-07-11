@@ -4,11 +4,11 @@ use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
-use casper_rust_wasm_sdk::types::addressable_entity_hash::AddressableEntityHash;
-use casper_rust_wasm_sdk::types::entity_identifier::EntityIdentifier;
 use casper_rust_wasm_sdk::{
     types::{
+        addressable_entity_hash::AddressableEntityHash,
         block_hash::BlockHash,
+        entity_identifier::EntityIdentifier,
         transaction_hash::TransactionHash,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
@@ -38,13 +38,10 @@ pub(crate) mod intern {
         TestConfig, ARGS_JSON, CEP78_CONTRACT, PAYMENT_AMOUNT_CONTRACT_CEP78, WASM_PATH,
     };
     use casper_rust_wasm_sdk::{
-        rpcs::{
-            get_dictionary_item::DictionaryItemInput,
-            query_global_state::{KeyIdentifierInput, QueryGlobalStateParams},
-        },
+        rpcs::get_dictionary_item::DictionaryItemInput,
         types::{
             deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-            transaction_hash::TransactionHash,
+            entity_identifier::EntityIdentifier, transaction_hash::TransactionHash,
             transaction_params::transaction_str_params::TransactionStrParams,
         },
         SDK,
@@ -79,15 +76,16 @@ pub(crate) mod intern {
     }
 
     pub async fn get_dictionnary_key(
-        contract_hash: &str,
+        contract_entity: &str,
         dictionary_name: &str,
         dictionary_item_key: &str,
         get_state_root_hash: Option<&str>,
         node_address: Option<String>,
     ) -> String {
         let mut params = DictionaryItemStrParams::new();
-        params.set_contract_named_key(contract_hash, dictionary_name, dictionary_item_key);
+        params.set_entity_named_key(contract_entity, dictionary_name, dictionary_item_key);
         let dictionary_item = DictionaryItemInput::Params(params);
+
         let get_dictionary_item = create_test_sdk(None)
             .get_dictionary_item(
                 get_state_root_hash.unwrap_or_default(),
@@ -121,30 +119,25 @@ pub(crate) mod intern {
         dictionary_name: &str,
         node_address: Option<String>,
     ) -> String {
-        let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            key: KeyIdentifierInput::String(contract_entity.to_string()),
-            path: None,
-            maybe_global_state_identifier: None,
-            state_root_hash: None,
-            maybe_block_id: None,
-            node_address,
-            verbosity: None,
-        };
-        let query_global_state = create_test_sdk(None).query_global_state(query_params).await;
-        let query_global_state_result = query_global_state.unwrap();
+        let entity_identifier = EntityIdentifier::from_formatted_str(contract_entity).ok();
+        let get_entity = create_test_sdk(None)
+            .get_entity(entity_identifier, None, None, None, node_address)
+            .await
+            .unwrap();
 
-        let named_keys = query_global_state_result
+        let entity = get_entity
             .result
-            .stored_value
-            .as_contract()
-            .unwrap()
-            .named_keys();
+            .entity_result
+            .addressable_entity()
+            .unwrap();
+
+        let named_keys = entity.named_keys;
 
         let (_, dictionnary_uref) = named_keys
             .iter()
             .find(|(key, _)| key == &dictionary_name)
             .unwrap();
-        dictionnary_uref.to_string()
+        dictionnary_uref.to_formatted_string()
     }
 
     pub async fn install_cep78(
@@ -368,7 +361,7 @@ pub async fn get_contract_cep78_hash_keys(
 
     let named_keys = account.named_keys;
 
-    let (_, contract_cep78_hash) = named_keys
+    let (_, contract_cep78_key) = named_keys
         .iter()
         .find(|(key, _)| key == &CONTRACT_CEP78_KEY)
         .unwrap();
@@ -378,10 +371,8 @@ pub async fn get_contract_cep78_hash_keys(
         .unwrap();
 
     (
-        contract_cep78_hash
-            .to_formatted_string()
-            .replace("entity-contract-", "hash-"), // contract hash
-        contract_cep78_hash
+        contract_cep78_key.to_formatted_string(),
+        contract_cep78_key
             .to_formatted_string()
             .replace("entity-contract-", "addressable-entity-"), // entity
         contract_cep78_package_hash.to_formatted_string(),

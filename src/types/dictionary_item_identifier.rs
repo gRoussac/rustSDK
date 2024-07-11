@@ -16,11 +16,9 @@ impl DictionaryItemIdentifier {
         dictionary_name: &str,
         dictionary_item_key: &str,
     ) -> Result<DictionaryItemIdentifier, SdkError> {
-        let key = Key::from_formatted_str(account_hash).map_err(|err| {
-            SdkError::CustomError(format!(
-                "Failed to parse key from formatted string: {:?}",
-                err
-            ))
+        let key = Key::from_formatted_str(account_hash).map_err(|err| SdkError::CustomError {
+            context: "Failed to parse key from formatted string",
+            error: format!("{:?}", err),
         })?;
 
         Ok(Self(_DictionaryItemIdentifier::AccountNamedKey {
@@ -36,14 +34,30 @@ impl DictionaryItemIdentifier {
         dictionary_name: &str,
         dictionary_item_key: &str,
     ) -> Result<DictionaryItemIdentifier, SdkError> {
-        let key = Key::from_formatted_str(contract_addr).map_err(|err| {
-            SdkError::CustomError(format!(
-                "Failed to parse key from formatted string: {:?}",
-                err
-            ))
+        let key = Key::from_formatted_str(contract_addr).map_err(|err| SdkError::CustomError {
+            context: "Failed to parse key from formatted string",
+            error: format!("{:?}", err),
         })?;
 
         Ok(Self(_DictionaryItemIdentifier::ContractNamedKey {
+            key: key.to_formatted_string(),
+            dictionary_name: dictionary_name.to_string(),
+            dictionary_item_key: dictionary_item_key.to_string(),
+        }))
+    }
+
+    // static context
+    pub fn new_from_entity_info(
+        entity_addr: &str,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
+    ) -> Result<DictionaryItemIdentifier, SdkError> {
+        let key = Key::from_formatted_str(entity_addr).map_err(|err| SdkError::CustomError {
+            context: "Failed to parse key from formatted string",
+            error: format!("{:?}", err),
+        })?;
+
+        Ok(Self(_DictionaryItemIdentifier::EntityNamedKey {
             key: key.to_formatted_string(),
             dictionary_name: dictionary_name.to_string(),
             dictionary_item_key: dictionary_item_key.to_string(),
@@ -55,16 +69,15 @@ impl DictionaryItemIdentifier {
         seed_uref: &str,
         dictionary_item_key: &str,
     ) -> Result<DictionaryItemIdentifier, SdkError> {
-        let key = Key::from_formatted_str(seed_uref).map_err(|err| {
-            SdkError::CustomError(format!(
-                "Failed to parse key from formatted string: {:?}",
-                err
-            ))
+        let key = Key::from_formatted_str(seed_uref).map_err(|err| SdkError::CustomError {
+            context: "Failed to parse key from formatted string",
+            error: format!("{:?}", err),
         })?;
 
-        let uref = key
-            .into_uref()
-            .ok_or_else(|| SdkError::CustomError("Key is not a URef".to_string()))?;
+        let uref = key.into_uref().ok_or_else(|| SdkError::CustomError {
+            context: "Key conversion error",
+            error: "Key is not a URef".to_string(),
+        })?;
 
         Ok(Self(_DictionaryItemIdentifier::URef {
             seed_uref: *uref,
@@ -76,11 +89,9 @@ impl DictionaryItemIdentifier {
     pub fn new_from_dictionary_key(
         dictionary_key: &str,
     ) -> Result<DictionaryItemIdentifier, SdkError> {
-        let key = Key::from_formatted_str(dictionary_key).map_err(|err| {
-            SdkError::CustomError(format!(
-                "Failed to parse key from formatted string: {:?}",
-                err
-            ))
+        let key = Key::from_formatted_str(dictionary_key).map_err(|err| SdkError::CustomError {
+            context: "Failed to parse key from formatted string",
+            error: format!("{:?}", err),
         })?;
         Ok(Self(_DictionaryItemIdentifier::Dictionary(
             key.to_formatted_string(),
@@ -110,6 +121,16 @@ impl DictionaryItemIdentifier {
     ) -> Result<DictionaryItemIdentifier, JsError> {
         Self::new_from_contract_info(contract_addr, dictionary_name, dictionary_item_key)
             .map_err(Into::into)
+    }
+
+    #[wasm_bindgen(js_name = "newFromEntityInfo")]
+    pub fn new_from_entity_info_js_alias(
+        entity_addr: &str,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
+    ) -> Result<DictionaryItemIdentifier, JsError> {
+        Self::new_from_entity_info(entity_addr, dictionary_name, dictionary_item_key)
+            .map_err(|err| JsError::new(&format!("SdkError: {}", err)))
     }
 
     // static context

@@ -34,6 +34,19 @@ pub struct ContractNamedKey {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct EntityNamedKey {
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
+    key: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
+    dictionary_name: OnceCell<String>,
+    #[serde(serialize_with = "serialize_once_cell")]
+    #[serde(deserialize_with = "deserialize_once_cell")]
+    dictionary_item_key: OnceCell<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct URefVariant {
     #[serde(serialize_with = "serialize_once_cell")]
     #[serde(deserialize_with = "deserialize_once_cell")]
@@ -74,6 +87,7 @@ where
 pub struct DictionaryItemStrParams {
     account_named_key: Option<AccountNamedKey>,
     contract_named_key: Option<ContractNamedKey>,
+    entity_named_key: Option<EntityNamedKey>,
     uref: Option<URefVariant>,
     dictionary: Option<DictionaryVariant>,
 }
@@ -85,6 +99,7 @@ impl DictionaryItemStrParams {
         DictionaryItemStrParams {
             account_named_key: None,
             contract_named_key: None,
+            entity_named_key: None,
             uref: None,
             dictionary: None,
         }
@@ -133,6 +148,30 @@ impl DictionaryItemStrParams {
                 .dictionary_name
                 .set(dictionary_name.to_string());
             let _ = contract_named_key
+                .dictionary_item_key
+                .set(dictionary_item_key.to_string());
+        }
+    }
+
+    #[wasm_bindgen(js_name = "setEntityNamedKey")]
+    pub fn set_entity_named_key(
+        &mut self,
+        key: &str,
+        dictionary_name: &str,
+        dictionary_item_key: &str,
+    ) {
+        self.entity_named_key = Some(EntityNamedKey {
+            key: OnceCell::new(),
+            dictionary_name: OnceCell::new(),
+            dictionary_item_key: OnceCell::new(),
+        });
+
+        if let Some(entity_named_key) = &mut self.entity_named_key {
+            let _ = entity_named_key.key.set(key.to_string());
+            let _ = entity_named_key
+                .dictionary_name
+                .set(dictionary_name.to_string());
+            let _ = entity_named_key
                 .dictionary_item_key
                 .set(dictionary_item_key.to_string());
         }
@@ -189,6 +228,9 @@ impl DictionaryItemStrParams {
     pub fn contract_named_key(&self) -> Option<ContractNamedKey> {
         self.contract_named_key.clone()
     }
+    pub fn entity_named_key(&self) -> Option<EntityNamedKey> {
+        self.entity_named_key.clone()
+    }
     pub fn uref(&self) -> Option<URefVariant> {
         self.uref.clone()
     }
@@ -215,6 +257,15 @@ pub fn dictionary_item_str_params_to_casper_client(
         let dictionary_item_key = get_str_or_default(contract_named_key.dictionary_item_key.get());
         return _DictionaryItemStrParams::ContractNamedKey {
             hash_addr,
+            dictionary_name,
+            dictionary_item_key,
+        };
+    } else if let Some(entity_named_key) = &dictionary_item_params.entity_named_key {
+        let entity_addr = get_str_or_default(entity_named_key.key.get());
+        let dictionary_name = get_str_or_default(entity_named_key.dictionary_name.get());
+        let dictionary_item_key = get_str_or_default(entity_named_key.dictionary_item_key.get());
+        return _DictionaryItemStrParams::EntityNamedKey {
+            entity_addr,
             dictionary_name,
             dictionary_item_key,
         };
@@ -263,6 +314,7 @@ mod tests {
         let dictionary_item_params = DictionaryItemStrParams {
             account_named_key: Some(account_named_key),
             contract_named_key: None,
+            entity_named_key: None,
             uref: None,
             dictionary: None,
         };
@@ -304,6 +356,7 @@ mod tests {
             contract_named_key: Some(contract_named_key),
             uref: None,
             dictionary: None,
+            entity_named_key: None,
         };
 
         if let _DictionaryItemStrParams::ContractNamedKey {
@@ -315,6 +368,43 @@ mod tests {
             assert_eq!(hash_addr, "contract_key");
             assert_eq!(dictionary_name, "test_contract_dict");
             assert_eq!(dictionary_item_key, "contract_item_key");
+        } else {
+            panic!("Unexpected enum variant");
+        }
+
+        // Test case with EntityNamedKey variant
+        let entity_named_key = EntityNamedKey {
+            key: OnceCell::new(),
+            dictionary_name: OnceCell::new(),
+            dictionary_item_key: OnceCell::new(),
+        };
+        entity_named_key.key.set("entity_key".to_string()).unwrap();
+        entity_named_key
+            .dictionary_name
+            .set("test_entity_dict".to_string())
+            .unwrap();
+        entity_named_key
+            .dictionary_item_key
+            .set("entity_item_key".to_string())
+            .unwrap();
+
+        let dictionary_item_params = DictionaryItemStrParams {
+            account_named_key: None,
+            entity_named_key: Some(entity_named_key),
+            uref: None,
+            dictionary: None,
+            contract_named_key: None,
+        };
+
+        if let _DictionaryItemStrParams::EntityNamedKey {
+            entity_addr,
+            dictionary_name,
+            dictionary_item_key,
+        } = dictionary_item_str_params_to_casper_client(&dictionary_item_params)
+        {
+            assert_eq!(entity_addr, "entity_key");
+            assert_eq!(dictionary_name, "test_entity_dict");
+            assert_eq!(dictionary_item_key, "entity_item_key");
         } else {
             panic!("Unexpected enum variant");
         }
@@ -335,6 +425,7 @@ mod tests {
             contract_named_key: None,
             uref: Some(uref_variant),
             dictionary: None,
+            entity_named_key: None,
         };
 
         if let _DictionaryItemStrParams::URef {
@@ -362,6 +453,7 @@ mod tests {
             contract_named_key: None,
             uref: None,
             dictionary: Some(dictionary_variant),
+            entity_named_key: None,
         };
 
         if let _DictionaryItemStrParams::Dictionary(value) =
@@ -378,6 +470,7 @@ mod tests {
             contract_named_key: None,
             uref: None,
             dictionary: None,
+            entity_named_key: None,
         };
 
         if let _DictionaryItemStrParams::Dictionary(value) =

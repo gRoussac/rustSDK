@@ -143,27 +143,34 @@ export class FormService {
             control.disable();
           }
         }
-        else if (input && input.enabled_when) {
-          if (this.action === 'get_dictionary_item' &&
-            this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
-            control.disable();
-          } else if (this.select_dict_identifier) {
-            control.enable();
+        else if (input) {
+          const state = input?.state_name || [];
+          const stateName = state && state.find(name => this.state[name as keyof State]);
+          const updateValue = stateName ? this.state[stateName as keyof State] : '';
+          updateValue && control.setValue(updateValue);
+
+          if (input.enabled_when) {
+            if (this.action === 'get_dictionary_item' &&
+              this.select_dict_identifier && !input.enabled_when?.includes(this.select_dict_identifier)) {
+              control.disable();
+            } else if (this.select_dict_identifier) {
+              control.enable();
+            }
           }
-        }
-        else if (input && input.disabled_when) {
-          const fieldName: string = control.value && input.disabled_when?.find(field => field.includes('value'));
-          const targetControlName = fieldName && fieldName.split('.')[0];
-          const targetControl = targetControlName && this.form?.get(targetControlName);
-          if (targetControl) {
-            targetControl.disable();
-            disabledTargets.push(targetControlName);
-          }
-          if (this.has_wasm && input?.disabled_when?.includes('has_wasm')) {
-            control.reset();
-            control.disable();
-          } else if (!disabledTargets.includes(input.controlName)) {
-            control.enable();
+          else if (input.disabled_when) {
+            const fieldName: string = control.value && input.disabled_when?.find(field => field.includes('value'));
+            const targetControlName = fieldName && fieldName.split('.')[0];
+            const targetControl = targetControlName && this.form?.get(targetControlName);
+            if (targetControl) {
+              targetControl.disable();
+              disabledTargets.push(targetControlName);
+            }
+            if (this.has_wasm && input?.disabled_when?.includes('has_wasm')) {
+              control.reset();
+              control.disable();
+            } else if (!disabledTargets.includes(input.controlName)) {
+              control.enable();
+            }
           }
         }
         if (input || textarea) {

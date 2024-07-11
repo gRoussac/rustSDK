@@ -74,7 +74,7 @@ pub struct TestConfig {
     pub transaction_hash: String,
     pub dictionary_key: String,
     pub dictionary_uref: String,
-    pub contract_cep78_hash: String,
+    pub contract_cep78_key: String,
     pub contract_cep78_entity: String,
     pub contract_cep78_package_hash: String,
 }
@@ -109,8 +109,9 @@ pub async fn initialize_test_config(
     let purse_uref = get_main_purse(&account, &default_node_address).await;
 
     let mut transaction_hash = String::from("");
-    let mut contract_cep78_hash =
-        String::from("hash-015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7");
+    let mut contract_cep78_key = String::from(
+        "entity-contract-015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7",
+    );
     let mut contract_cep78_entity = String::from(
         "addressable-entity-015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7",
     );
@@ -132,10 +133,10 @@ pub async fn initialize_test_config(
         .await
         .unwrap();
 
-        let (_contract_cep78_hash, _contract_cep78_entity, _contract_cep78_package_hash) =
+        let (_contract_cep78_key, _contract_cep78_entity, _contract_cep78_package_hash) =
             get_contract_cep78_hash_keys(&account_hash, &default_node_address).await;
 
-        contract_cep78_hash = _contract_cep78_hash;
+        contract_cep78_key = _contract_cep78_key;
         contract_cep78_entity = _contract_cep78_entity;
         contract_cep78_package_hash = _contract_cep78_package_hash;
 
@@ -151,7 +152,7 @@ pub async fn initialize_test_config(
         .await;
 
         dictionary_key = get_dictionnary_key(
-            &contract_cep78_hash,
+            &contract_cep78_key,
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
             None,
@@ -160,7 +161,7 @@ pub async fn initialize_test_config(
         .await;
 
         dictionary_uref = get_dictionnary_uref(
-            &contract_cep78_entity,
+            &contract_cep78_key,
             DICTIONARY_NAME,
             Some(default_node_address.clone()),
         )
@@ -184,7 +185,7 @@ pub async fn initialize_test_config(
         account_hash,
         target_account,
         transaction_hash,
-        contract_cep78_hash,
+        contract_cep78_key,
         contract_cep78_entity,
         contract_cep78_package_hash,
         dictionary_key,

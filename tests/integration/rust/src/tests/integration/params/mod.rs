@@ -55,11 +55,17 @@ pub mod test_module {
     pub async fn test_session_params() {
         let config: TestConfig = get_config(true).await;
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         assert_eq!(
             session_params.session_hash().unwrap(),
-            config.contract_cep78_hash
+            config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-")
         );
         assert_eq!(
             session_params.session_entry_point().unwrap(),
@@ -79,6 +85,7 @@ pub mod test_module {
         //  dictionary_item_params.
         assert!(dictionary_item_params.account_named_key().is_none());
         assert!(dictionary_item_params.contract_named_key().is_none());
+        assert!(dictionary_item_params.entity_named_key().is_none());
         assert!(dictionary_item_params.uref().is_none());
         assert!(dictionary_item_params.dictionary().is_none());
 
@@ -88,12 +95,12 @@ pub mod test_module {
             DICTIONARY_ITEM_KEY,
         );
         assert!(dictionary_item_params.account_named_key().is_some());
-        dictionary_item_params.set_contract_named_key(
-            &config.contract_cep78_hash,
+        dictionary_item_params.set_entity_named_key(
+            &config.contract_cep78_key,
             DICTIONARY_NAME,
             DICTIONARY_ITEM_KEY,
         );
-        assert!(dictionary_item_params.contract_named_key().is_some());
+        assert!(dictionary_item_params.entity_named_key().is_some());
         dictionary_item_params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
 
         assert!(dictionary_item_params.uref().is_some());

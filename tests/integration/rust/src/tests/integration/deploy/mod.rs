@@ -21,14 +21,17 @@ pub mod test_module {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
         let deploy = create_test_sdk(Some(config.clone()))
             .deploy(deploy_params, session_params, payment_params, None, None)
             .await;
-
         assert!(!deploy
             .as_ref()
             .unwrap()
@@ -36,7 +39,7 @@ pub mod test_module {
             .api_version
             .to_string()
             .is_empty());
-        let deploy_hash = deploy.as_ref().unwrap().result.deploy_hash.to_string();
+        let deploy_hash = deploy.as_ref().unwrap().result.deploy_hash.to_hex_string();
         assert!(!deploy_hash.is_empty());
         deploy_hash
     }
@@ -94,7 +97,11 @@ pub mod test_module {
             None,
         );
         let session_params = SessionStrParams::default();
-        session_params.set_session_hash(&config.contract_cep78_hash);
+        session_params.set_session_hash(
+            &config
+                .contract_cep78_key
+                .replace("entity-contract-", "hash-"),
+        );
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
