@@ -84,8 +84,7 @@ impl SDK {
 mod tests {
     use super::*;
     use crate::{
-        helpers::public_key_from_secret_key, install_cep78,
-        types::addressable_entity_hash::AddressableEntityHash,
+        helpers::public_key_from_secret_key, install_cep78, types::addr::entity_addr::EntityAddr,
     };
     use once_cell::sync::Lazy;
     use sdk_tests::{
@@ -97,9 +96,8 @@ mod tests {
     static ARGS: Lazy<Vec<String>> =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
-    async fn get_entity_hash() -> String {
-        let (_, entity_hash) = install_cep78().await;
-        entity_hash
+    async fn get_entity_key() -> String {
+        install_cep78().await
     }
 
     #[tokio::test]
@@ -136,11 +134,10 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::from_formatted_str(&get_entity_hash().await).unwrap();
+        let entity_addr = EntityAddr::from_formatted_str(&get_entity_key().await).unwrap();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -166,13 +163,13 @@ mod tests {
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        let entity_addr = EntityAddr::from_formatted_str(
+            "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -201,13 +198,13 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        let entity_addr = EntityAddr::from_formatted_str(
+            "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -235,13 +232,13 @@ mod tests {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        let entity_addr = EntityAddr::from_formatted_str(
+            "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk

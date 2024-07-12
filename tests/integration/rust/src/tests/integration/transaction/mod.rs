@@ -5,12 +5,10 @@ pub mod test_module {
         TRANSFER_AMOUNT, TTL,
     };
     use crate::tests::helpers::intern::create_test_sdk;
-    use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
-        transaction_params::{
-            transaction_builder_params::TransactionBuilderParams,
-            transaction_str_params::TransactionStrParams,
-        },
+    use casper_rust_wasm_sdk::types::addr::entity_addr::EntityAddr;
+    use casper_rust_wasm_sdk::types::transaction_params::{
+        transaction_builder_params::TransactionBuilderParams,
+        transaction_str_params::TransactionStrParams,
     };
 
     pub async fn test_transaction() {
@@ -22,11 +20,10 @@ pub mod test_module {
         transaction_params.set_ttl(Some(TTL.to_string()));
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
+        let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let transaction = create_test_sdk(Some(config))
             .transaction(builder_params, transaction_params, None, None)
@@ -94,11 +91,10 @@ pub mod test_module {
         transaction_params.set_ttl(Some(TTL.to_string()));
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
+        let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let transaction = create_test_sdk(Some(config.clone()))
             .speculative_transaction(

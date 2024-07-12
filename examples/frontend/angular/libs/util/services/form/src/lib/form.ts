@@ -202,7 +202,7 @@ const entityHash: InputField = {
   label: 'Entity hash or Package hash',
   name: 'entity_hash',
   controlName: 'entityHash',
-  placeholder: 'Entity Hash or Package Hash',
+  placeholder: 'Entity Hash (entity-contract-0x) or Package Hash (package-0x)',
   e2e: 'entityHashElt',
   disabled_when: ['has_wasm', 'entityAlias.value']
 };

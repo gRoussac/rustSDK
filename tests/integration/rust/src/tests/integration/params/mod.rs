@@ -6,6 +6,7 @@ pub mod test_module {
         PAYMENT_AMOUNT, TTL,
     };
     use casper_rust_wasm_sdk::types::{
+        addr::entity_addr::EntityAddr,
         addressable_entity_hash::AddressableEntityHash,
         deploy_params::{
             deploy_str_params::DeployStrParams,
@@ -194,11 +195,13 @@ pub mod test_module {
 
     pub async fn test_transaction_builder_params() {
         let config: TestConfig = get_config(true).await;
-        let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
+
+        let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
+        let entity_hash: AddressableEntityHash = entity_addr.into();
 
         let transaction_builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_hash.clone(), ENTRYPOINT_MINT);
+
         assert_eq!(
             transaction_builder_params.entity_hash().unwrap(),
             entity_hash

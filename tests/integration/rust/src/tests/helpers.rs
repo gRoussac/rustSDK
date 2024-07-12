@@ -4,9 +4,9 @@ use crate::config::{
     DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
+use casper_rust_wasm_sdk::types::addr::entity_addr::EntityAddr;
 use casper_rust_wasm_sdk::{
     types::{
-        addressable_entity_hash::AddressableEntityHash,
         block_hash::BlockHash,
         entity_identifier::EntityIdentifier,
         transaction_hash::TransactionHash,
@@ -340,7 +340,7 @@ pub async fn install_cep78_if_needed(
 pub async fn get_contract_cep78_hash_keys(
     account_hash: &str,
     node_address: &str,
-) -> (String, String, String) {
+) -> (String, String) {
     let entity_identifier = EntityIdentifier::from_formatted_str(account_hash).ok();
     let get_entity = create_test_sdk(None)
         .get_entity(
@@ -372,15 +372,12 @@ pub async fn get_contract_cep78_hash_keys(
 
     (
         contract_cep78_key.to_formatted_string(),
-        contract_cep78_key
-            .to_formatted_string()
-            .replace("entity-contract-", "addressable-entity-"), // entity
         contract_cep78_package_hash.to_formatted_string(),
     )
 }
 
 pub async fn mint_nft(
-    contract_cep78_entity: &str,
+    contract_cep78_key: &str,
     initiator_addr: &str,
     target_account_hash: &str,
     secret_key: &str,
@@ -405,11 +402,10 @@ pub async fn mint_nft(
     ]);
     transaction_params.set_session_args_simple(args);
 
-    let entity_hash: AddressableEntityHash =
-        AddressableEntityHash::from_formatted_str(contract_cep78_entity).unwrap();
+    let entity_addr = EntityAddr::from_formatted_str(contract_cep78_key.into()).unwrap();
 
     let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
     let sdk = create_test_sdk(None);
     let test_call_entrypoint = sdk
