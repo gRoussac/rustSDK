@@ -53,7 +53,7 @@ jobs:
       - name: Clippy
         uses: actions-rs/cargo@v1
         with:
-          command: clippy
+          command: make clippy
 
       - name: Lint
         run: make check-lint
