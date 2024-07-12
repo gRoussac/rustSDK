@@ -25,10 +25,9 @@ use crate::{
 };
 use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
-    transaction::Transaction as _Transaction,
     Approval, ApprovalsHash, AsymmetricType, Deploy, InitiatorAddr, PricingMode, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp, TransactionCategory, TransactionHeader, TransactionV1,
-    TransactionV1Body, TransactionV1Builder,
+    SecretKey, TimeDiff, Timestamp, Transaction as _Transaction, TransactionCategory,
+    TransactionHeader, TransactionV1, TransactionV1Body, TransactionV1Builder,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]

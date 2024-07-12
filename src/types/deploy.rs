@@ -24,9 +24,8 @@ use crate::{make_deploy, make_transfer};
 use casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 use casper_types::{
     bytesrepr::{self, Bytes as _Bytes},
-    transaction::Deploy as _Deploy,
-    Approval, ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase,
-    RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
+    Approval, ApprovalsHash, AsymmetricType, Deploy as _Deploy, DeployBuilder,
+    ExecutableDeployItem, Phase, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
