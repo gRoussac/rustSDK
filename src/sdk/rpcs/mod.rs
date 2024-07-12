@@ -24,7 +24,7 @@ pub mod speculative_exec;
 pub mod speculative_exec_deploy;
 
 #[cfg(test)]
-use dotenv::dotenv;
+use dotenvy::dotenv;
 
 #[cfg(test)]
 mod setup {
