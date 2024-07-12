@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
-use casper_types::{transaction::TransferTarget as _TransferTarget, U512};
+use casper_types::{TransferTarget as _TransferTarget, U512};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
