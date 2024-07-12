@@ -66,4 +66,4 @@ lto = true
 tokio = { version = "1", features = ["full"] }
 sdk_tests = { path = "tests/integration/rust" }
 ctor = "*"
-dotenv = "0.15.0"
+dotenvy = "0.15.7"

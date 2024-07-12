@@ -19,7 +19,7 @@ pub mod query_global_state;
 pub mod speculative_exec;
 
 #[cfg(test)]
-use dotenv::dotenv;
+use dotenvy::dotenv;
 
 #[cfg(test)]
 mod setup {
