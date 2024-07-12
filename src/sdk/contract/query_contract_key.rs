@@ -100,7 +100,7 @@ mod tests {
     use tokio;
 
     async fn get_key_input() -> KeyIdentifierInput {
-        KeyIdentifierInput::String((install_cep78().await).0)
+        KeyIdentifierInput::String(install_cep78().await)
     }
 
     #[tokio::test]

@@ -75,7 +75,6 @@ pub struct TestConfig {
     pub dictionary_key: String,
     pub dictionary_uref: String,
     pub contract_cep78_key: String,
-    pub contract_cep78_entity: String,
     pub contract_cep78_package_hash: String,
 }
 
@@ -112,9 +111,6 @@ pub async fn initialize_test_config(
     let mut contract_cep78_key = String::from(
         "entity-contract-015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7",
     );
-    let mut contract_cep78_entity = String::from(
-        "addressable-entity-015b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7",
-    );
     let mut contract_cep78_package_hash =
         String::from("package-02418948cabaf6a700773f724e690338945167eac4ee67b6f11abd72562b1a44");
     let mut dictionary_key =
@@ -133,17 +129,16 @@ pub async fn initialize_test_config(
         .await
         .unwrap();
 
-        let (_contract_cep78_key, _contract_cep78_entity, _contract_cep78_package_hash) =
+        let (_contract_cep78_key, _contract_cep78_package_hash) =
             get_contract_cep78_hash_keys(&account_hash, &default_node_address).await;
 
         contract_cep78_key = _contract_cep78_key;
-        contract_cep78_entity = _contract_cep78_entity;
         contract_cep78_package_hash = _contract_cep78_package_hash;
 
         println!("mint_nft");
         // install has been running for over 60 seconds
         mint_nft(
-            &contract_cep78_entity,
+            &contract_cep78_key,
             &account,
             &account_hash,
             &secret_key,
@@ -186,7 +181,6 @@ pub async fn initialize_test_config(
         target_account,
         transaction_hash,
         contract_cep78_key,
-        contract_cep78_entity,
         contract_cep78_package_hash,
         dictionary_key,
         dictionary_uref,

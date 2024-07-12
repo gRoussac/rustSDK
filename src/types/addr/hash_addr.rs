@@ -16,6 +16,18 @@ impl HashAddr {
         array.copy_from_slice(&bytes);
         Ok(HashAddr(array))
     }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "toBytes")]
+    pub fn to_bytes_js_alias(&self) -> Vec<u8> {
+        self.to_bytes()
+    }
+}
+
+impl HashAddr {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
 }
 
 impl From<Vec<u8>> for HashAddr {

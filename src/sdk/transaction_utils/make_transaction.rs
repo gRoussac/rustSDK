@@ -84,9 +84,7 @@ pub(crate) fn make_transaction(
 mod tests {
 
     use super::*;
-    use crate::{
-        helpers::public_key_from_secret_key, types::addressable_entity_hash::AddressableEntityHash,
-    };
+    use crate::{helpers::public_key_from_secret_key, types::addr::entity_addr::EntityAddr};
     use sdk_tests::{
         config::{ENTRYPOINT_MINT, PAYMENT_AMOUNT},
         tests::helpers::{get_network_constants, get_user_secret_key},
@@ -104,12 +102,12 @@ mod tests {
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        let entity_addr = EntityAddr::from_formatted_str(
+            "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -131,12 +129,12 @@ mod tests {
         transaction_params.set_initiator_addr(&initiator_addr);
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-        let entity_hash = AddressableEntityHash::from_formatted_str(
-            "addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
+        let entity_addr = EntityAddr::from_formatted_str(
+            "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);

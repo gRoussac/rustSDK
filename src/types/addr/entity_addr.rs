@@ -8,6 +8,8 @@ use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+use super::hash_addr::HashAddr;
+
 #[derive(Debug, Deserialize, Clone, Serialize)]
 #[wasm_bindgen]
 pub struct EntityAddr(_EntityAddr);
@@ -21,6 +23,10 @@ impl EntityAddr {
             }
         })?;
         Ok(EntityAddr(entity_addr))
+    }
+
+    pub fn value(&self) -> HashAddr {
+        self.0.value().into()
     }
 }
 

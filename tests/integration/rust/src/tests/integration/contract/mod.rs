@@ -16,7 +16,7 @@ pub mod test_module {
             query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
         },
         types::{
-            addressable_entity_hash::AddressableEntityHash,
+            addr::entity_addr::EntityAddr,
             deploy_params::{
                 deploy_str_params::DeployStrParams,
                 dictionary_item_str_params::DictionaryItemStrParams,
@@ -282,10 +282,10 @@ pub mod test_module {
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_ttl(Some(TTL.to_string()));
 
-        let entity_hash: AddressableEntityHash =
-            AddressableEntityHash::from_formatted_str(&config.contract_cep78_entity).unwrap();
+        let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
+
         let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let test_call_entrypoint_transaction = create_test_sdk(Some(config))
             .call_entrypoint(builder_params, transaction_params, None)

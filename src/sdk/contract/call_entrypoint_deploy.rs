@@ -113,8 +113,7 @@ mod tests {
     use tokio;
 
     async fn get_contract_hash() -> String {
-        let (contract_hash, _) = install_cep78().await;
-        contract_hash
+        install_cep78().await
     }
 
     #[tokio::test]

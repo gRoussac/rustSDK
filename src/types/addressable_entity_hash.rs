@@ -1,10 +1,12 @@
-use super::sdk_error::SdkError;
+use super::{
+    addr::{entity_addr::EntityAddr, hash_addr::HashAddr},
+    sdk_error::SdkError,
+};
 use casper_types::{
     addressable_entity::{
         AddressableEntityHash as _AddressableEntityHash, ADDRESSABLE_ENTITY_STRING_PREFIX,
     },
     bytesrepr::{self, FromBytes, ToBytes, U8_SERIALIZED_LENGTH},
-    HashAddr,
 };
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -104,11 +106,25 @@ impl ToBytes for AddressableEntityHash {
     }
 }
 
-impl From<HashAddr> for AddressableEntityHash {
-    fn from(bytes: HashAddr) -> Self {
+impl From<[u8; 32]> for AddressableEntityHash {
+    fn from(bytes: [u8; 32]) -> Self {
         _AddressableEntityHash::from_bytes(&bytes)
             .map(|(hash, _)| hash)
             .expect("Failed to convert bytes to AddressableEntityHash")
             .into()
+    }
+}
+
+impl From<HashAddr> for AddressableEntityHash {
+    fn from(hash_addr: HashAddr) -> Self {
+        let bytes = hash_addr.to_bytes();
+        let array: [u8; 32] = bytes.try_into().expect("HashAddr must convert to [u8; 32]");
+        AddressableEntityHash::from(array)
+    }
+}
+
+impl From<EntityAddr> for AddressableEntityHash {
+    fn from(entity_addr: EntityAddr) -> Self {
+        _AddressableEntityHash::new(entity_addr.value().into()).into()
     }
 }

@@ -186,7 +186,7 @@ pub async fn _run_example_7() {
     );
 
     use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
+        addr::entity_addr::EntityAddr,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -197,8 +197,8 @@ pub async fn _run_example_7() {
     pub const PUBLIC_KEY: &str =
         "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "5000000000";
-    pub const ENTITY_HASH: &str =
-        "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    pub const ENTITY_ADDR: &str =
+        "entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRY_POINT: &str = "decimals";
     pub const TTL: &str = "1h";
 
@@ -208,8 +208,9 @@ pub async fn _run_example_7() {
     transaction_params.set_ttl(Some(TTL.to_string()));
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-    let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
-    let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
+    let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
 
     let transaction = sdk
         .make_transaction(builder_params, transaction_params)
@@ -225,7 +226,7 @@ pub async fn _run_example_8() {
     );
 
     use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
+        addr::entity_addr::EntityAddr,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -238,8 +239,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "5000000000";
-    pub const ENTITY_HASH: &str =
-        "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    pub const ENTITY_ADDR: &str =
+        "entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRY_POINT: &str = "set_variables";
     pub const TTL: &str = "1h";
 
@@ -250,8 +251,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_ttl(Some(TTL.to_string()));
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-    let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
-    let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
+    let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
 
     let transaction = sdk
         .transaction(builder_params, transaction_params, None, None)
@@ -270,7 +272,7 @@ pub async fn _run_example_9() {
     );
 
     use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
+        addr::entity_addr::EntityAddr,
         transaction::Transaction,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
@@ -284,8 +286,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "5000000000";
-    pub const ENTITY_HASH: &str =
-        "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    pub const ENTITY_ADDR: &str =
+        "entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRY_POINT: &str = "set_variables";
     pub const TTL: &str = "1h";
 
@@ -296,8 +298,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_ttl(Some(TTL.to_string()));
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-    let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
-    let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
+    let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
 
     let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
@@ -457,7 +460,7 @@ pub async fn _run_example_12() {
     );
 
     use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
+        addr::entity_addr::EntityAddr,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -469,8 +472,8 @@ pub async fn _run_example_12() {
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
-    pub const ENTITY_HASH: &str =
-        "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    pub const ENTITY_ADDR: &str =
+        "entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRYPOINT_MINT: &str = "mint";
     pub const TOKEN_OWNER: &str =
         "account-hash-878985c8c07064e09e67cc349dd21219b8e41942a0adc4bfa378cf0eace32611";
@@ -487,9 +490,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     ]);
     transaction_params.set_session_args_simple(args);
 
-    let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
+    let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
     let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
     let call_entrypoint_deploy = sdk
         .call_entrypoint(builder_params, transaction_params, None)
@@ -527,7 +530,7 @@ pub async fn _run_example_13() {
     );
 
     use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
+        addr::entity_addr::EntityAddr,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -540,8 +543,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
         -----END PRIVATE KEY-----"#;
     let initiator_addr: &str = &public_key_from_secret_key(SECRET_KEY).unwrap();
     pub const PAYMENT_AMOUNT: &str = "5000000000";
-    pub const ENTITY_HASH: &str =
-        "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    pub const ENTITY_ADDR: &str =
+        "entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRY_POINT: &str = "decimals";
     pub const TTL: &str = "1h";
 
@@ -551,8 +554,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
     transaction_params.set_ttl(Some(TTL.to_string()));
 
-    let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
-    let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
+    let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
 
     let mut transaction = sdk
         .make_transaction(builder_params, transaction_params)
@@ -569,7 +573,7 @@ pub async fn _run_example_14() {
     );
 
     use casper_rust_wasm_sdk::types::{
-        addressable_entity_hash::AddressableEntityHash,
+        addr::entity_addr::EntityAddr,
         transaction_params::{
             transaction_builder_params::TransactionBuilderParams,
             transaction_str_params::TransactionStrParams,
@@ -580,8 +584,8 @@ pub async fn _run_example_14() {
     pub const PUBLIC_KEY_KMS: &str =
         "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "5000000000";
-    pub const ENTITY_HASH: &str =
-        "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+    pub const ENTITY_ADDR: &str =
+        "entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRY_POINT: &str = "decimals";
 
     let transaction_params = TransactionStrParams::default();
@@ -589,8 +593,9 @@ pub async fn _run_example_14() {
     transaction_params.set_initiator_addr(PUBLIC_KEY_KMS);
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
-    let entity_hash = AddressableEntityHash::new(ENTITY_HASH).unwrap();
-    let builder_params = TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRY_POINT);
+    let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
 
     let transaction = sdk
         .make_transaction(builder_params, transaction_params)
@@ -745,7 +750,7 @@ pub async fn _run_example_7_legacy() {
         "01aff5c18a954604dd27d139d8e0cfc533ac3d53784d76c7a7ac5ff4039510fdf6";
     pub const PAYMENT_AMOUNT: &str = "5000000000";
     pub const CONTRACT_HASH: &str =
-        "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+        "hash-entity-contract-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
     pub const ENTRY_POINT: &str = "decimals";
     pub const TTL: &str = "1h";
 
