@@ -26,8 +26,9 @@ jobs:
         with:
           toolchain: stable
           profile: minimal
-          components: rustfmt, clippy, audit
+          components: rustfmt, clippy
           target: wasm32-unknown-unknown
+      - run: cargo install cargo-audit
 
       - name: Fmt
         uses: actions-rs/cargo@v1
