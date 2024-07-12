@@ -62,7 +62,7 @@ lto = true
 sdk_tests = { path = "tests/integration/rust" }
 tokio = { version = "1", features = ["full"] }
 ctor = "*"
-dotenv = "0.15.0"
+dotenvy = "0.15.7"
 
 
 [patch.crates-io]
