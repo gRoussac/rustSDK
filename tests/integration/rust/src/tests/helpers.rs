@@ -131,7 +131,7 @@ pub(crate) mod intern {
             .addressable_entity()
             .unwrap();
 
-        let named_keys = entity.named_keys;
+        let named_keys = entity.named_keys.clone();
 
         let (_, dictionnary_uref) = named_keys
             .iter()
@@ -359,7 +359,7 @@ pub async fn get_contract_cep78_hash_keys(
         .addressable_entity()
         .unwrap();
 
-    let named_keys = account.named_keys;
+    let named_keys = account.named_keys.clone();
 
     let (_, contract_cep78_key) = named_keys
         .iter()
