@@ -367,7 +367,7 @@
     <span class="kw">use </span>tokio;
 
     <span class="kw">async fn </span>get_key_input() -&gt; KeyIdentifierInput {
-        KeyIdentifierInput::String(install_cep78().<span class="kw">await</span>)
+        KeyIdentifierInput::String((install_cep78().<span class="kw">await</span>).<span class="number">0</span>)
     }
 
     <span class="attr">#[tokio::test]

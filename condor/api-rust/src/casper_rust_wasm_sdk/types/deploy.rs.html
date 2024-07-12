@@ -777,7 +777,6 @@
 <a href="#777" id="777">777</a>
 <a href="#778" id="778">778</a>
 <a href="#779" id="779">779</a>
-<a href="#780" id="780">780</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     cl::bytes::Bytes,
     contract_hash::ContractHash,
@@ -804,9 +803,8 @@
 <span class="kw">use </span>casper_client::MAX_SERIALIZED_SIZE_OF_DEPLOY;
 <span class="kw">use </span>casper_types::{
     bytesrepr::{<span class="self">self</span>, Bytes <span class="kw">as </span>_Bytes},
-    transaction::Deploy <span class="kw">as </span>_Deploy,
-    Approval, ApprovalsHash, AsymmetricType, DeployBuilder, ExecutableDeployItem, Phase,
-    RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
+    Approval, ApprovalsHash, AsymmetricType, Deploy <span class="kw">as </span>_Deploy, DeployBuilder,
+    ExecutableDeployItem, Phase, RuntimeArgs, SecretKey, TimeDiff, Timestamp, U512,
 };
 <span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]

@@ -423,8 +423,9 @@
     <span class="kw">use </span>tokio;
 
     <span class="kw">async fn </span>get_contract_hash() -&gt; String {
-        install_cep78().<span class="kw">await
-    </span>}
+        <span class="kw">let </span>(contract_hash, <span class="kw">_</span>) = install_cep78().<span class="kw">await</span>;
+        contract_hash
+    }
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_none_values() {
@@ -479,7 +480,6 @@
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
-        // dbg!(result);
         </span><span class="macro">assert!</span>(result.is_ok());
         <span class="kw">let </span>deploy_hash = result.unwrap().result.deploy_hash;
         <span class="macro">assert!</span>(!deploy_hash.to_string().is_empty());
@@ -540,7 +540,7 @@
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
-        <span class="kw">let </span>error_message = <span class="string">"the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the deploy was invalid: invalid associated keys"</span>;
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(
             <span class="kw-2">&amp;</span>chain_name,

@@ -254,9 +254,6 @@
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::transaction::transaction::PutTransactionResult;
 <span class="kw">use </span><span class="kw">crate</span>::types::transaction_params::{
@@ -343,9 +340,8 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use crate</span>::{
-        helpers::public_key_from_secret_key,
-        install_cep78,
-        types::{addressable_entity_hash::AddressableEntityHash, contract_hash::ContractHash},
+        helpers::public_key_from_secret_key, install_cep78,
+        types::addressable_entity_hash::AddressableEntityHash,
     };
     <span class="kw">use </span>once_cell::sync::Lazy;
     <span class="kw">use </span>sdk_tests::{
@@ -357,9 +353,10 @@
     <span class="kw">static </span>ARGS: Lazy&lt;Vec&lt;String&gt;&gt; =
         Lazy::new(|| ARGS_SIMPLE.iter().map(|s| s.to_string()).collect());
 
-    <span class="kw">async fn </span>get_contract_hash() -&gt; String {
-        install_cep78().<span class="kw">await
-    </span>}
+    <span class="kw">async fn </span>get_entity_hash() -&gt; String {
+        <span class="kw">let </span>(<span class="kw">_</span>, entity_hash) = install_cep78().<span class="kw">await</span>;
+        entity_hash
+    }
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>test_call_entrypoint_with_none_values() {
@@ -369,7 +366,7 @@
         <span class="kw">let </span>transaction_params = TransactionStrParams::default();
 
         <span class="kw">let </span>error_message =
-            <span class="string">"Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty"</span>;
+            <span class="string">"transaction requires account - use `with_account` or `with_secret_key`"</span>;
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -395,8 +392,8 @@
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_session_args_simple(ARGS.to_vec());
 
-        <span class="kw">let </span>contract_hash = ContractHash::from_formatted_str(<span class="kw-2">&amp;</span>get_contract_hash().<span class="kw">await</span>).unwrap();
-        <span class="kw">let </span>entity_hash: AddressableEntityHash = contract_hash.into();
+        <span class="kw">let </span>entity_hash: AddressableEntityHash =
+            AddressableEntityHash::from_formatted_str(<span class="kw-2">&amp;</span>get_entity_hash().<span class="kw">await</span>).unwrap();
 
         <span class="kw">let </span>builder_params =
             TransactionBuilderParams::new_invocable_entity(entity_hash, ENTRYPOINT_MINT);
@@ -419,13 +416,11 @@
         <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
-        <span class="kw">let </span>error_message =
-            <span class="string">"Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: no such contract at hash"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
         transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
-        transaction_params.set_payment_amount(<span class="string">""</span>); <span class="comment">// This is not valid payment amount
-        </span>transaction_params.set_session_args_simple(ARGS.to_vec());
+        transaction_params.set_session_args_simple(ARGS.to_vec());
 
         <span class="kw">let </span>entity_hash = AddressableEntityHash::from_formatted_str(
             <span class="string">"addressable-entity-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d"</span>,
@@ -443,7 +438,6 @@
         <span class="comment">// Assert
         </span><span class="macro">assert!</span>(result.is_err());
         <span class="kw">let </span>err_string = result.err().unwrap().to_string();
-
         <span class="macro">assert!</span>(err_string.contains(error_message));
     }
 
@@ -455,7 +449,7 @@
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
-        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the transaction was invalid: invalid associated keys"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);

@@ -272,7 +272,6 @@
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::speculative_exec::SpeculativeExecTxnResult;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -518,16 +517,15 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, default_speculative_address, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>error_message = <span class="string">"Invalid argument 'create_transaction (payment_amount)': payment_amount is required to be non empty"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"Invalid transaction"</span>;
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
         <span class="kw">let </span>transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(<span class="kw-2">&amp;</span>chain_name);
         transaction_params.set_secret_key(<span class="kw-2">&amp;</span>secret_key);
-        transaction_params.set_payment_amount(<span class="string">""</span>); <span class="comment">// This is not valid payment amount
 
-        // Act
+        <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
             .speculative_transfer_transaction(
                 <span class="prelude-val">None</span>,

@@ -548,7 +548,7 @@
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
-        <span class="kw">let </span>error_message = <span class="string">"the deploy was invalid: The transaction or deploy sent to the network was invalid for an unspecified reason"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"the deploy was invalid: invalid associated keys"</span>;
 
         <span class="kw">let </span>deploy_params = DeployStrParams::new(
             <span class="kw-2">&amp;</span>chain_name,
