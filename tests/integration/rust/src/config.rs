@@ -85,7 +85,7 @@ pub async fn initialize_test_config(
     skip_install: bool,
 ) -> Result<TestConfig, Box<dyn std::error::Error>> {
     use crate::tests::helpers::{get_contract_cep78_hash_keys, install_cep78_if_needed, mint_nft};
-    use dotenv::dotenv;
+    use dotenvy::dotenv;
 
     dotenv().ok();
 

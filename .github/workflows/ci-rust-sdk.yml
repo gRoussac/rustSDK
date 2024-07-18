@@ -36,6 +36,7 @@ jobs:
           profile: minimal
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
+      - run: cargo install cargo-audit
 
       - name: Fmt
         uses: actions-rs/cargo@v1
@@ -43,16 +44,11 @@ jobs:
           command: fmt
           args: -- --check
 
-      # - name: Audit
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: audit
-      #     args: --deny warnings || true
-
-      - name: Clippy
+      - name: Audit
         uses: actions-rs/cargo@v1
         with:
-          command: clippy
+          command: audit
+          args: --deny warnings
 
       - name: Lint
         run: make check-lint

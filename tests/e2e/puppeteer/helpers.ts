@@ -78,7 +78,7 @@ export async function seletAction(action: string) {
   });
   expect(action_selected).toBe(action);
   // wait for document to refresh
-  await delay(100);
+  await delay(150);
 }
 
 export async function setSecretKey() {
