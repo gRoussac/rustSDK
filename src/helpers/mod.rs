@@ -351,10 +351,10 @@ pub fn motes_to_cspr(motes: &str) -> Result<String, SdkError> {
                 Ok(formatted_cspr)
             }
         }
-        Err(err) => Err(SdkError::CustomError(format!(
-            "Failed to parse input as Decimal: {:?}",
-            err
-        ))),
+        Err(err) => Err(SdkError::CustomError {
+            context: "Failed to parse input as Decimal",
+            error: format!("{:?}", err),
+        }),
     }
 }
 
@@ -376,8 +376,12 @@ where
 
     match verbosity {
         Some(Verbosity::Low) | None => Ok(deserialized.to_string()),
-        Some(Verbosity::Medium) => casper_types::json_pretty_print(&deserialized)
-            .map_err(|err| SdkError::CustomError(format!("Error in json_pretty_print: {}", err))),
+        Some(Verbosity::Medium) => {
+            casper_types::json_pretty_print(&deserialized).map_err(|err| SdkError::CustomError {
+                context: "Error in json_pretty_print",
+                error: format!("{}", err),
+            })
+        }
         Some(Verbosity::High) => {
             serde_json::to_string_pretty(&deserialized).map_err(SdkError::from)
         }
@@ -400,24 +404,30 @@ pub fn insert_js_value_arg(
     js_value_arg: JsValue,
 ) -> Result<&RuntimeArgs, SdkError> {
     if js_sys::Object::instanceof(&js_value_arg) {
-        let json_arg: JsonArg = js_value_arg.into_serde().map_err(|err| {
-            SdkError::CustomError(format!("Error converting to JsonArg: {:?}", err))
-        })?;
+        let json_arg: JsonArg = js_value_arg
+            .into_serde()
+            .map_err(|err| SdkError::CustomError {
+                context: "Error converting to JsonArg",
+                error: format!("{:?}", err),
+            })?;
 
-        let named_arg = NamedArg::try_from(json_arg).map_err(|err| {
-            SdkError::CustomError(format!("Error converting to NamedArg: {:?}", err))
+        let named_arg = NamedArg::try_from(json_arg).map_err(|err| SdkError::CustomError {
+            context: "Error converting to NamedArg",
+            error: format!("{:?}", err),
         })?;
 
         args.insert_cl_value(named_arg.name(), named_arg.cl_value().clone());
     } else if let Some(string_arg) = js_value_arg.as_string() {
         let simple_arg = string_arg;
-        casper_client::cli::insert_arg(&simple_arg, args).map_err(|err| {
-            SdkError::CustomError(format!("Error inserting simple arg: {:?}", err))
+        casper_client::cli::insert_arg(&simple_arg, args).map_err(|err| SdkError::CustomError {
+            context: "Error inserting simple arg",
+            error: format!("{:?}", err),
         })?;
     } else {
-        return Err(SdkError::CustomError(String::from(
-            "Error converting to JsonArg or Simple Arg",
-        )));
+        return Err(SdkError::CustomError {
+            context: "Error converting to JsonArg or Simple Arg",
+            error: String::from("Unknown argument type"),
+        });
     }
 
     Ok(args)
