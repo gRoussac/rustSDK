@@ -812,7 +812,6 @@ export class ClientService {
     const speculative_exec_deploy_options = this.sdk.get_speculative_exec_deploy_options({
       deploy: signed_deploy.toJson()
     });
-    this.getIdentifieBlock(speculative_exec_deploy_options);
     const speculative_exec_deploy = await this.sdk.speculative_exec_deploy(speculative_exec_deploy_options);
     speculative_exec_deploy && this.resultService.setResult(speculative_exec_deploy.toJson());
     return speculative_exec_deploy;
@@ -829,7 +828,6 @@ export class ClientService {
     const speculative_exec_options = this.sdk.get_speculative_exec_options({
       transaction: signed_transaction.toJson()
     });
-    this.getIdentifieBlock(speculative_exec_options);
     const speculative_exec = await this.sdk.speculative_exec(speculative_exec_options);
     speculative_exec && this.resultService.setResult(speculative_exec.toJson());
     return speculative_exec;
