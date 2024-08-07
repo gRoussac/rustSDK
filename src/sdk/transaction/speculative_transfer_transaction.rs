@@ -150,41 +150,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[ignore]
-    async fn _test_speculative_transfer_transaction_with_block_identifier() {
-        // Arrange
-        let sdk = SDK::new(None, None);
-        let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, chain_name) = get_network_constants();
-        let block_identifier =
-            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
-
-        let secret_key = get_user_secret_key(None).unwrap();
-        let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
-
-        let transaction_params = TransactionStrParams::default();
-        transaction_params.set_secret_key(&secret_key);
-        transaction_params.set_chain_name(&chain_name);
-        transaction_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
-
-        // Act
-        let result = sdk
-            .speculative_transfer_transaction(
-                None,
-                &initiator_addr,
-                TRANSFER_AMOUNT,
-                transaction_params,
-                None,
-                verbosity,
-                Some(default_speculative_address),
-            )
-            .await;
-
-        // Assert
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
     async fn test_speculative_transfer_transaction_with_valid_params_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
