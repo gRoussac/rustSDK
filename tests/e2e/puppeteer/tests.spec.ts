@@ -368,40 +368,6 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Rpc call get_era_summary', () => {
-    beforeAll(async () => {
-      await test.page.reload();
-      await seletAction('get_era_summary');
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
-    });
-    afterEach(async () => {
-      await clear();
-    });
-    it('should get_era_summary', async () => {
-      await submit();
-      await getResult();
-    });
-
-    it('should get_era_summary with block height', async () => {
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
-      await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
-      await submit();
-      await getResult();
-    });
-
-    it('should get_era_summary with block hash', async () => {
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
-      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
-      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
-      await clearInput('[e2e-id="blockIdentifierHashElt"]');
-      await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
-      await submit();
-      await getResult();
-    });
-  });
-
   describe('Rpc call get_node_status', () => {
     beforeAll(async () => {
       await test.page.reload();
@@ -1297,6 +1263,41 @@ describe('Angular App Tests', () => {
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
       await clearInput('[e2e-id="itemKeyElt"]');
       await test.page.type('[e2e-id="itemKeyElt"]', '0');
+      await submit();
+      await getResult();
+    });
+  });
+
+
+  describe('Rpc call get_era_summary', () => {
+    beforeAll(async () => {
+      await test.page.reload();
+      await seletAction('get_era_summary');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
+    });
+    afterEach(async () => {
+      await clear();
+    });
+    it('should get_era_summary', async () => {
+      await submit();
+      await getResult();
+    });
+
+    it('should get_era_summary with block height', async () => {
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
+      await submit();
+      await getResult();
+    });
+
+    it('should get_era_summary with block hash', async () => {
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHashElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
+      await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
       await submit();
       await getResult();
     });
