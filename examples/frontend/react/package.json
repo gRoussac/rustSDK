@@ -3,21 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.14.3",
+    "@types/node": "^22.1.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "bootstrap": "^5.3.3",
     "casper-sdk": "file:../../../pkg",
     "http-proxy-middleware": "^3.0.0",
     "react": "^18.3.1",
-    "react-bootstrap": "^2.10.1",
+    "react-bootstrap": "^2.10.4",
     "react-dom": "^18.3.1",
-    "typescript": "^5.4.5",
-    "web-vitals": "^4.1.1"
+    "typescript": "^5.5.4",
+    "web-vitals": "^4.2.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
