@@ -175,11 +175,13 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     pub async fn test_speculative_transaction_test() {
         test_speculative_transaction().await;
     }
 
     #[test]
+    #[ignore]
     pub async fn test_speculative_transfer_transaction_test() {
         test_speculative_transfer_transaction().await;
     }

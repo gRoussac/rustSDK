@@ -153,7 +153,8 @@ mod tests {
         payment_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let mut session_params = SessionStrParams::default();
-        session_params.set_session_hash(&get_contract_hash().await);
+        session_params
+            .set_session_hash(&(&get_contract_hash().await).replace("entity-contract", "hash"));
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let args_simple: Vec<String> = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
         session_params.set_session_args(args_simple);
