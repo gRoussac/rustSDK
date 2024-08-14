@@ -11,10 +11,7 @@ pub mod test_module {
         },
     };
     use casper_rust_wasm_sdk::{
-        rpcs::{
-            get_dictionary_item::DictionaryItemInput,
-            query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
-        },
+        rpcs::{get_dictionary_item::DictionaryItemInput, query_global_state::PathIdentifierInput},
         types::{
             addr::entity_addr::EntityAddr,
             deploy_params::{
@@ -23,7 +20,6 @@ pub mod test_module {
                 payment_str_params::PaymentStrParams, session_str_params::SessionStrParams,
             },
             digest::Digest,
-            global_state_identifier::GlobalStateIdentifier,
             transaction_params::{
                 transaction_builder_params::TransactionBuilderParams,
                 transaction_str_params::TransactionStrParams,
@@ -164,31 +160,33 @@ pub mod test_module {
             .is_empty());
     }
 
-    pub async fn query_contract_key(maybe_global_state_identifier: Option<GlobalStateIdentifier>) {
+    pub async fn test_query_contract_key() {
         let config: TestConfig = get_config(false).await;
-        let query_params: QueryGlobalStateParams = QueryGlobalStateParams {
-            key: KeyIdentifierInput::String(config.to_owned().contract_cep78_key),
-            path: Some(PathIdentifierInput::String("installer".to_string())),
-            maybe_global_state_identifier,
-            state_root_hash: None,
-            maybe_block_id: None,
-            node_address: config.to_owned().node_address,
-            verbosity: config.to_owned().verbosity,
-        };
-        let query_contract_key = create_test_sdk(Some(config))
-            .query_contract_key(query_params)
-            .await;
 
-        let query_contract_key = query_contract_key.unwrap();
-        assert!(!query_contract_key.result.api_version.to_string().is_empty());
-        assert!(!query_contract_key
-            .result
+        let entity_identifier = None;
+        let entity_identifier_as_string = Some(config.contract_cep78_key.clone());
+        let path = PathIdentifierInput::String("installer".to_string());
+        let maybe_block_identifier = None;
+
+        // Query the contract key using the parameters
+        let query_result = create_test_sdk(Some(config))
+            .query_contract_key(
+                entity_identifier,
+                entity_identifier_as_string,
+                path,
+                maybe_block_identifier,
+                None,
+                None,
+            )
+            .await;
+        let result = query_result.unwrap().result;
+
+        assert!(!result.api_version.to_string().is_empty());
+        assert!(result
             .stored_value
-            .as_account()
+            .as_addressable_entity()
             .unwrap()
-            .account_hash()
-            .to_string()
-            .is_empty());
+            .is_account_kind());
     }
 
     #[allow(deprecated)]
@@ -310,10 +308,6 @@ pub mod test_module {
 #[cfg(test)]
 mod tests {
     use super::test_module::*;
-    use crate::config::{get_config, TestConfig};
-    use casper_rust_wasm_sdk::types::{
-        block_hash::BlockHash, global_state_identifier::GlobalStateIdentifier,
-    };
     use tokio::test;
 
     #[test]
@@ -324,7 +318,6 @@ mod tests {
     pub async fn test_call_entrypoint_deploy_test() {
         test_call_entrypoint_deploy().await;
     }
-
     #[test]
     pub async fn test_install_transaction_test() {
         test_install_transaction().await;
@@ -333,7 +326,6 @@ mod tests {
     pub async fn test_call_entrypoint_transaction_test() {
         test_call_entrypoint_transaction().await;
     }
-
     #[test]
     pub async fn test_query_contract_dict_test() {
         test_query_contract_dict().await;
@@ -342,18 +334,12 @@ mod tests {
     pub async fn test_query_contract_dict_with_dictionary_key_test() {
         test_query_contract_dict_with_dictionary_key().await;
     }
-
     #[test]
     pub async fn test_query_contract_dict_with_dictionary_uref_test() {
         test_query_contract_dict_with_dictionary_uref().await;
     }
     #[test]
     pub async fn test_query_contract_key_test() {
-        let config: TestConfig = get_config(false).await;
-
-        let maybe_global_state_identifier = Some(GlobalStateIdentifier::from_block_hash(
-            BlockHash::new(&config.block_hash).unwrap(),
-        ));
-        query_contract_key(maybe_global_state_identifier).await;
+        test_query_contract_key().await;
     }
 }
