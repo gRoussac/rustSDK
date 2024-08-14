@@ -1,10 +1,15 @@
 #[cfg(target_arch = "wasm32")]
-use crate::rpcs::query_global_state::QueryGlobalStateResult;
+use crate::rpcs::get_entity::GetAddressableEntityResult;
 #[cfg(target_arch = "wasm32")]
-use crate::types::global_state_identifier::GlobalStateIdentifier;
-#[cfg(target_arch = "wasm32")]
-use crate::types::{digest::Digest, key::Key, path::Path, verbosity::Verbosity};
-use crate::{rpcs::query_global_state::QueryGlobalStateParams, types::sdk_error::SdkError, SDK};
+use crate::types::block_identifier::BlockIdentifier;
+use crate::{
+    rpcs::query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
+    types::{
+        block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier,
+        sdk_error::SdkError, verbosity::Verbosity,
+    },
+    SDK,
+};
 use casper_client::{
     rpcs::results::QueryGlobalStateResult as _QueryGlobalStateResult, SuccessResponse,
 };
@@ -19,14 +24,10 @@ use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "queryContractKeyOptions", getter_with_clone)]
 pub struct QueryContractKeyOptions {
-    pub global_state_identifier: Option<GlobalStateIdentifier>,
-    pub state_root_hash_as_string: Option<String>,
-    pub state_root_hash: Option<Digest>,
+    pub entity_identifier: Option<EntityIdentifier>,
+    pub entity_identifier_as_string: Option<String>,
+    pub maybe_block_identifier: Option<BlockIdentifier>,
     pub maybe_block_id_as_string: Option<String>,
-    #[serde(rename = "key_as_string")]
-    pub contract_key_as_string: Option<String>,
-    #[serde(rename = "key")]
-    pub contract_key: Option<Key>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
     pub node_address: Option<String>,
@@ -52,15 +53,40 @@ impl SDK {
     pub async fn query_contract_key_js_alias(
         &self,
         options: Option<QueryContractKeyOptions>,
-    ) -> Result<QueryGlobalStateResult, JsError> {
-        let js_value_options =
-            JsValue::from_serde::<QueryContractKeyOptions>(&options.unwrap_or_default());
-        if let Err(err) = js_value_options {
-            let err = &format!("Error serializing options:  {:?}", err);
-            return Err(JsError::new(err));
+    ) -> Result<GetAddressableEntityResult, JsError> {
+        let options = options.unwrap_or_default();
+
+        // Ensure valid conversion of `path` from `QueryContractKeyOptions`
+        let path_input = match (options.path, options.path_as_string) {
+            (Some(path), None) => PathIdentifierInput::Path(path),
+            (None, Some(path_string)) => PathIdentifierInput::String(path_string),
+            (Some(_), Some(_)) => {
+                let err = "Only one of `path` or `path_as_string` can be provided".to_string();
+                return Err(JsError::new(&err));
+            }
+            (None, None) => {
+                let err = "Either `path` or `path_as_string` must be provided".to_string();
+                return Err(JsError::new(&err));
+            }
+        };
+
+        match self
+            .query_contract_key(
+                options.entity_identifier,
+                options.entity_identifier_as_string,
+                path_input,
+                options.maybe_block_identifier,
+                options.verbosity,
+                options.node_address,
+            )
+            .await
+        {
+            Ok(success_response) => Ok(success_response),
+            Err(error) => {
+                let err = format!("Error querying contract key: {:?}", error);
+                Err(JsError::new(&err))
+            }
         }
-        let options = self.query_global_state_options(js_value_options.unwrap())?;
-        self.query_global_state_js_alias(Some(options)).await
     }
 }
 
@@ -74,15 +100,85 @@ impl SDK {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `SuccessResponse<_QueryGlobalStateResult>` or a `SdkError` in case of an error.
+    /// A `Result` containing either a `SuccessResponse<_GetAddressableEntityResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_key(
         &self,
-        query_params: QueryGlobalStateParams,
+        entity_identifier: Option<EntityIdentifier>,
+        entity_identifier_as_string: Option<String>,
+        path: PathIdentifierInput,
+        maybe_block_identifier: Option<BlockIdentifierInput>,
+        verbosity: Option<Verbosity>,
+        node_address: Option<String>,
     ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
+        let path_string = match path {
+            PathIdentifierInput::Path(ref path_struct) => {
+                if path_struct.is_empty() {
+                    return Err(SdkError::InvalidArgument {
+                        context: "Path",
+                        error: "Path is empty".to_string(),
+                    });
+                }
+                // Assuming `Path` can be converted to a string (for example, by joining segments)
+                path_struct.to_string() // Customize based on how `Path` should be converted
+            }
+            PathIdentifierInput::String(ref path_string) => {
+                if path_string.is_empty() {
+                    return Err(SdkError::InvalidArgument {
+                        context: "Path string",
+                        error: "Path string is empty".to_string(),
+                    });
+                }
+                path_string.clone()
+            }
+        };
+
         //log("query_contract_key!");
-        self.query_global_state(query_params)
+        let entity = self
+            .get_entity(
+                entity_identifier,
+                entity_identifier_as_string,
+                maybe_block_identifier,
+                verbosity,
+                node_address.clone(),
+            )
             .await
-            .map_err(SdkError::from)
+            .map_err(SdkError::from);
+
+        let addressable_entity = entity
+            .as_ref()
+            .map_err(|err| SdkError::InvalidArgument {
+                context: "Addressable entity",
+                error: format!("Failed to get entity: {}", err),
+            })?
+            .result
+            .entity_result
+            .addressable_entity()
+            .ok_or_else(|| SdkError::InvalidArgument {
+                context: "Addressable entity",
+                error: "Addressable entity is missing".to_string(),
+            })?;
+
+        let named_key = *addressable_entity
+            .named_keys
+            .get(&path_string)
+            .ok_or_else(|| SdkError::InvalidArgument {
+                context: "Named key",
+                error: format!("No key found for path string '{}'", path_string),
+            })?;
+
+        let key = KeyIdentifierInput::Key(named_key.into());
+
+        self.query_global_state(QueryGlobalStateParams {
+            key,
+            path: None,
+            maybe_global_state_identifier: None,
+            state_root_hash: None,
+            maybe_block_id: None,
+            verbosity,
+            node_address,
+        })
+        .await
+        .map_err(SdkError::from)
     }
 }
 
@@ -91,16 +187,16 @@ mod tests {
     use super::*;
     use crate::{
         install_cep78,
-        rpcs::query_global_state::KeyIdentifierInput,
         types::{
-            digest::Digest, global_state_identifier::GlobalStateIdentifier, verbosity::Verbosity,
+            block_identifier::BlockIdentifier, entity_identifier::EntityIdentifier,
+            verbosity::Verbosity,
         },
     };
     use sdk_tests::tests::helpers::{get_block, get_network_constants};
     use tokio;
 
-    async fn get_key_input() -> KeyIdentifierInput {
-        KeyIdentifierInput::String(install_cep78().await)
+    async fn get_entity_input() -> EntityIdentifier {
+        EntityIdentifier::from_formatted_str(&install_cep78().await).unwrap()
     }
 
     #[tokio::test]
@@ -109,17 +205,11 @@ mod tests {
         let sdk = SDK::new(None, None);
         let error_message = "builder error";
 
+        let path = PathIdentifierInput::String("installer".to_string());
+
         // Act
         let result = sdk
-            .query_contract_key(QueryGlobalStateParams {
-                key: get_key_input().await,
-                path: None,
-                maybe_global_state_identifier: None,
-                state_root_hash: None,
-                maybe_block_id: None,
-                verbosity: None,
-                node_address: None,
-            })
+            .query_contract_key(Some(get_entity_input().await), None, path, None, None, None)
             .await;
 
         // Assert
@@ -132,20 +222,13 @@ mod tests {
     async fn test_query_contract_key_with_missing_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let error_message =
-            "Invalid argument 'query_global_state': Error: Missing key from formatted string";
+        let error_message = "Invalid argument 'get_entity': Error: Missing entity identifier";
+
+        let path = PathIdentifierInput::String("installer".to_string());
 
         // Act
         let result = sdk
-            .query_contract_key(QueryGlobalStateParams {
-                key: KeyIdentifierInput::String(String::new()),
-                path: None,
-                maybe_global_state_identifier: None,
-                state_root_hash: None,
-                maybe_block_id: None,
-                verbosity: None,
-                node_address: None,
-            })
+            .query_contract_key(None, None, path, None, None, None)
             .await;
 
         // Assert
@@ -155,27 +238,60 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_query_contract_key_with_entity_identifier_as_string() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let (node_address, _, _, _) = get_network_constants();
+
+        let entity = get_entity_input().await;
+
+        let path = PathIdentifierInput::String("installer".to_string());
+
+        let (_, block_height) = get_block(&node_address.clone()).await;
+        let block_identifier =
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
+
+        // Act
+        let result = sdk
+            .query_contract_key(
+                Some(entity),
+                None,
+                path,
+                Some(block_identifier),
+                verbosity,
+                Some(node_address),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
     async fn test_query_contract_key_with_global_state_identifier() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, _) = get_network_constants();
 
-        let key = get_key_input().await;
-        let (_, block_height) = get_block(&node_address.clone()).await;
-        let global_state_identifier = GlobalStateIdentifier::from_block_height(block_height);
+        let entity = get_entity_input().await;
 
+        let path = PathIdentifierInput::String("installer".to_string());
+
+        let (_, block_height) = get_block(&node_address.clone()).await;
+        let block_identifier =
+            BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
         // Act
         let result = sdk
-            .query_contract_key(QueryGlobalStateParams {
-                key,
-                path: None,
-                maybe_global_state_identifier: Some(global_state_identifier.clone()),
-                state_root_hash: None,
-                maybe_block_id: None,
+            .query_contract_key(
+                None,
+                Some(entity.to_string()),
+                path,
+                Some(block_identifier),
                 verbosity,
-                node_address: Some(node_address),
-            })
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -183,58 +299,88 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_contract_key_with_state_root_hash() {
+    async fn test_query_contract_key_with_missing_path() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, _) = get_network_constants();
-        let state_root_hash: Digest = sdk
-            .get_state_root_hash(None, verbosity, Some(node_address.clone()))
-            .await
-            .unwrap()
-            .result
-            .state_root_hash
-            .unwrap()
-            .into();
+
+        let entity = get_entity_input().await;
+        let error_message = "Invalid argument 'Path': Path is empty";
+
+        let vec_of_strings = vec!["".to_string()]; // empty path should error
+        let path = PathIdentifierInput::Path(vec_of_strings.into());
+
         // Act
         let result = sdk
-            .query_contract_key(QueryGlobalStateParams {
-                key: get_key_input().await,
-                path: None,
-                maybe_global_state_identifier: None,
-                state_root_hash: Some(state_root_hash.to_string()),
-                maybe_block_id: None,
+            .query_contract_key(
+                Some(entity),
+                None,
+                path,
+                None,
                 verbosity,
-                node_address: Some(node_address),
-            })
+                Some(node_address),
+            )
             .await;
 
         // Assert
-        assert!(result.is_ok());
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(error_message));
     }
 
     #[tokio::test]
-    async fn test_query_contract_key_with_block_id() {
+    async fn test_query_contract_key_with_missing_path_as_string() {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
         let (node_address, _, _, _) = get_network_constants();
 
-        let key = get_key_input().await;
+        let entity = get_entity_input().await;
+        let error_message = "Invalid argument 'Path string': Path string is empty";
 
-        let (_, block_height) = get_block(&node_address.clone()).await;
+        let path = PathIdentifierInput::String("".to_string()); // empty path should error
 
         // Act
         let result = sdk
-            .query_contract_key(QueryGlobalStateParams {
-                key,
-                path: None,
-                maybe_global_state_identifier: None,
-                state_root_hash: None,
-                maybe_block_id: Some(block_height.to_string()),
+            .query_contract_key(
+                Some(entity),
+                None,
+                path,
+                None,
                 verbosity,
-                node_address: Some(node_address),
-            })
+                Some(node_address),
+            )
+            .await;
+
+        // Assert
+        assert!(result.is_err());
+        let err_string = result.err().unwrap().to_string();
+        assert!(err_string.contains(error_message));
+    }
+
+    #[tokio::test]
+    async fn test_query_contract_key_with_path_as_string() {
+        // Arrange
+        let sdk = SDK::new(None, None);
+        let verbosity = Some(Verbosity::High);
+        let (node_address, _, _, _) = get_network_constants();
+
+        let entity = get_entity_input().await;
+
+        let vec_of_strings = vec!["installer".to_string()];
+        let path = PathIdentifierInput::Path(vec_of_strings.into());
+
+        // Act
+        let result = sdk
+            .query_contract_key(
+                Some(entity),
+                None,
+                path,
+                None,
+                verbosity,
+                Some(node_address),
+            )
             .await;
 
         // Assert
@@ -246,19 +392,14 @@ mod tests {
         let sdk = SDK::new(Some("http://localhost".to_string()), None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
+        let entity = get_entity_input().await;
+
+        let path = PathIdentifierInput::String("installer".to_string());
+
         // Act
         let result = sdk
-            .query_contract_key(QueryGlobalStateParams {
-                key: get_key_input().await,
-                path: None,
-                maybe_global_state_identifier: None,
-                state_root_hash: None,
-                maybe_block_id: None,
-                verbosity: None,
-                node_address: None,
-            })
+            .query_contract_key(Some(entity), None, path, None, None, None)
             .await;
-
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
