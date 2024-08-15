@@ -81,7 +81,7 @@ export class ClientService {
     const finalized_approvals = this.getIdentifier('finalizedApprovals')?.value;
     const deploy_hash_as_string: string = this.getIdentifier('deployHash')?.value?.trim();
     if (!deploy_hash_as_string) {
-      const err = "deploy_hash_as_string is missing";
+      const err = "deploy_hash is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -101,7 +101,7 @@ export class ClientService {
     const finalized_approvals = this.getIdentifier('finalizedApprovals')?.value;
     const transaction_hash_as_string: string = this.getIdentifier('transactionHash')?.value?.trim();
     if (!transaction_hash_as_string) {
-      const err = "transaction_hash_as_string is missing";
+      const err = "transaction_hash is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -201,7 +201,7 @@ export class ClientService {
     const purse_uref_as_string: string = this.getIdentifier('purseUref')?.value?.trim();
     const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
     if (!purse_uref_as_string) {
-      const err = "purse_uref_as_string is missing";
+      const err = "purse_uref is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -292,7 +292,7 @@ export class ClientService {
   async query_balance() {
     const purse_identifier_as_string: string = this.getIdentifier('purseIdentifier')?.value?.trim();
     if (!purse_identifier_as_string) {
-      const err = "deploy_hash_as_string is missing";
+      const err = "deploy_hash is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -311,7 +311,7 @@ export class ClientService {
   async query_balance_details() {
     const purse_identifier_as_string: string = this.getIdentifier('purseIdentifier')?.value?.trim();
     if (!purse_identifier_as_string) {
-      const err = "deploy_hash_as_string is missing";
+      const err = "deploy_hash is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -331,7 +331,7 @@ export class ClientService {
     const path_as_string: string = this.getIdentifier('queryPath')?.value?.trim() || '';
     const key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
     if (!key_as_string) {
-      const err = "key_as_string is missing";
+      const err = "key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -764,7 +764,7 @@ export class ClientService {
   async speculative_exec_deploy() {
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
-      const err = "signed_deploy_as_string is missing";
+      const err = "signed_deploy is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -788,7 +788,7 @@ export class ClientService {
   async speculative_exec() {
     const signed_transaction_as_string: string = this.getIdentifier('transactionJson')?.value?.trim();
     if (!signed_transaction_as_string) {
-      const err = "signed_transaction_as_string is missing";
+      const err = "signed_transaction is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -809,7 +809,7 @@ export class ClientService {
     }
     const signed_deploy_as_string: string = this.getIdentifier('deployJson')?.value?.trim();
     if (!signed_deploy_as_string) {
-      const err = "signed_deploy_as_string is missing";
+      const err = "signed_deploy is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -829,7 +829,7 @@ export class ClientService {
       return;
     }
     if (!signed_deploy) {
-      const err = "signed_deploy_as_string is missing";
+      const err = "signed_deploy is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -847,7 +847,7 @@ export class ClientService {
     }
     const signed_transaction_as_string: string = this.getIdentifier('transactionJson')?.value?.trim();
     if (!signed_transaction_as_string) {
-      const err = "signed_transaction_as_string is missing";
+      const err = "signed_transaction is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -862,7 +862,7 @@ export class ClientService {
       return;
     }
     if (!signed_transaction) {
-      const err = "signed_transaction_as_string is missing";
+      const err = "signed_transaction is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
@@ -1108,19 +1108,23 @@ export class ClientService {
   }
 
   async query_contract_key() {
-    const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
-    const key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
-    if (!key_as_string) {
-      const err = "key_as_string is missing";
+    const entity_identifier_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
+    if (!entity_identifier_as_string) {
+      const err = "key is missing";
       err && (this.errorService.setError(err.toString()));
       return;
     }
-    const path_as_string: string = this.getIdentifier('queryPath')?.value.toString().trim().replace(/^\/+|\/+$/g, '');
+    const path_as_string: string = this.getIdentifier('queryPath')?.value?.toString().trim().replace(/^\/+|\/+$/g, '');
+    if (!path_as_string) {
+      const err = "path is missing";
+      err && (this.errorService.setError(err.toString()));
+      return;
+    }
     const query_contract_key_options = this.sdk.query_contract_key_options({
-      state_root_hash_as_string: state_root_hash || '',
-      key_as_string,
+      entity_identifier_as_string,
       path_as_string,
     });
+    this.getIdentifieBlock(query_contract_key_options);
     try {
       const query_contract_key = await this.sdk.query_contract_key(query_contract_key_options);
       query_contract_key && this.resultService.setResult(query_contract_key.toJson());
