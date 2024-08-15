@@ -1,7 +1,7 @@
 #[cfg(target_arch = "wasm32")]
-use crate::rpcs::get_entity::GetAddressableEntityResult;
-#[cfg(target_arch = "wasm32")]
 use crate::types::block_identifier::BlockIdentifier;
+#[cfg(target_arch = "wasm32")]
+use crate::{rpcs::query_global_state::QueryGlobalStateResult, types::path::Path};
 use crate::{
     rpcs::query_global_state::{KeyIdentifierInput, PathIdentifierInput, QueryGlobalStateParams},
     types::{
@@ -53,7 +53,7 @@ impl SDK {
     pub async fn query_contract_key_js_alias(
         &self,
         options: Option<QueryContractKeyOptions>,
-    ) -> Result<GetAddressableEntityResult, JsError> {
+    ) -> Result<QueryGlobalStateResult, JsError> {
         let options = options.unwrap_or_default();
 
         // Ensure valid conversion of `path` from `QueryContractKeyOptions`
@@ -70,21 +70,32 @@ impl SDK {
             }
         };
 
-        match self
+        let maybe_block_identifier =
+            if let Some(maybe_block_identifier) = options.maybe_block_identifier {
+                Some(BlockIdentifierInput::BlockIdentifier(
+                    maybe_block_identifier,
+                ))
+            } else {
+                options
+                    .maybe_block_id_as_string
+                    .map(BlockIdentifierInput::String)
+            };
+
+        let result = self
             .query_contract_key(
                 options.entity_identifier,
                 options.entity_identifier_as_string,
                 path_input,
-                options.maybe_block_identifier,
+                maybe_block_identifier,
                 options.verbosity,
                 options.node_address,
             )
-            .await
-        {
-            Ok(success_response) => Ok(success_response),
-            Err(error) => {
-                let err = format!("Error querying contract key: {:?}", error);
-                Err(JsError::new(&err))
+            .await;
+        match result {
+            Ok(data) => Ok(data.result.into()),
+            Err(err) => {
+                let err = &format!("Error occurred with {:?}", err);
+                Err(JsError::new(err))
             }
         }
     }

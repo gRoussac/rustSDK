@@ -595,7 +595,7 @@ const queryContractDictFields: InputContainer[][] = [
 ];
 
 const queryContractKeyFields: InputContainer[][] = [
-  [{ input: stateRootHash }],
+  ...getBlockFields,
   [{ input: queryContractKey, required: true }],
   [{ input: queryPath }],
 ];
