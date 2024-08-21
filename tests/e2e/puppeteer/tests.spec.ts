@@ -1,6 +1,6 @@
 import * as config from './config';
 const path = require('path');
-import { setupFixtures, variables as test, deleteFile, getResult, clear, clearInput, setSecretKey, seletAction, setWasm, submit, get_state_root_hash, sign, screenshot, delay } from './helpers';
+import { setupFixtures, variables as test, deleteFile, getResult, clear, clearInput, setSecretKey, seletAction, setWasm, submit, get_state_root_hash, sign, screenshot, delay, get_block } from './helpers';
 const puppeteer = require('puppeteer');
 
 describe('Angular App Tests', () => {
@@ -107,7 +107,39 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Contract install', () => {
+  describe('Contract install transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await seletAction('install');
+      await setSecretKey();
+      await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
+      await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
+    });
+
+    it('should install cep78 contract', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
+      await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
+      await setWasm(config.contract_cep78);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      transaction = JSON.parse(transaction);
+      expect(transaction?.transaction_hash).toBeDefined();
+      test.transaction_hash = transaction.transaction_hash?.Version1?.toString();
+    });
+  });
+
+  describe('Contract install deploy', () => {
     beforeEach(async () => {
       await test.page.reload();
       await seletAction('install_deploy');
@@ -136,27 +168,9 @@ describe('Angular App Tests', () => {
       expect(deploy?.deploy_hash).toBeDefined();
       test.deploy_hash = deploy.deploy_hash;
     });
-
-    it('should install cep78 contract', async () => {
-      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
-      await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
-      await setWasm(config.contract_cep78);
-      await submit();
-      await test.page.waitForSelector('[e2e-id="result"]');
-      let deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(deploy).toBeDefined();
-      deploy = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      deploy = JSON.parse(deploy);
-      expect(deploy?.deploy_hash).toBeDefined();
-      test.deploy_hash = deploy.deploy_hash;
-    });
   });
 
-  describe('Rpc call get_account', () => {
+  describe.skip('Rpc call get_account', () => {
     beforeAll(async () => {
       await test.page.reload();
       await seletAction('get_account');
@@ -500,6 +514,46 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Rpc call get_deploy', () => {
+    beforeAll(async () => {
+      await test.page.reload();
+      await seletAction('get_deploy');
+    });
+
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should get_deploy', async () => {
+      expect(test.deploy_hash).toBeDefined();
+      await test.page.waitForSelector('[e2e-id="deployHashElt"]');
+      await clearInput('[e2e-id="deployHashElt"]');
+      await test.page.type('[e2e-id="deployHashElt"]', test.deploy_hash);
+      await submit();
+      await getResult();
+    });
+  });
+
+  describe('Rpc call get_transaction', () => {
+    beforeAll(async () => {
+      await test.page.reload();
+      await seletAction('get_transaction');
+    });
+
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should get_transaction', async () => {
+      expect(test.deploy_hash).toBeDefined();
+      await test.page.waitForSelector('[e2e-id="transactionHashElt"]');
+      await clearInput('[e2e-id="transactionHashElt"]');
+      await test.page.type('[e2e-id="transactionHashElt"]', test.transaction_hash);
+      await submit();
+      await getResult();
+    });
+  });
+
   describe('Rpc call query_global_state', () => {
     beforeAll(async () => {
       await test.page.reload();
@@ -569,7 +623,7 @@ describe('Angular App Tests', () => {
       await clearInput('[e2e-id="queryPathElt"]');
     });
 
-    it(`should query_global_state with nft key`, async () => {
+    it(`should query_global_state with account key and path and get entity`, async () => {
       expect(test.account).toBeDefined();
       expect(config.contract_cep78_key).toBeDefined();
       await test.page.reload();
@@ -592,15 +646,12 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       let result_json = JSON.parse(result);
-      expect(result_json?.stored_value.Account.named_keys).toBeDefined();
-      let named_keys = result_json?.stored_value.Account.named_keys as Array<{ name: string; key: string; }>;
-      test.contract_cep78_hash = named_keys.find(key => key.name === config.contract_cep78_key)?.key || '';
-      test.contract_cep78_package_hash = named_keys.find(key => key.name === config.package_cep78_key)?.key || '';
-      expect(test.contract_cep78_hash).toBeDefined();
-      expect(test.contract_cep78_hash).toBeTruthy();
-      if (!test.contract_cep78_hash) {
-        throw 'test.contract_cep78_hash missing';
-      }
+
+      // Get account entity
+      expect(result_json?.stored_value.CLValue.parsed).toBeDefined();
+      test.entity_account = result_json?.stored_value.CLValue.parsed.toString();
+
+      // Test a global key
       await clearInput('[e2e-id="queryPathElt"]');
       await test.page.type('[e2e-id="queryPathElt"]', config.contract_cep78_key + '/collection_name');
       await clear();
@@ -611,38 +662,89 @@ describe('Angular App Tests', () => {
       });
       result_json = JSON.parse(result);
       expect(result_json?.stored_value.CLValue.parsed).toEqual(config.collection_name);
-    }, 30000);
+    });
   });
 
-  describe('Rpc call get_deploy', () => {
+  describe('Rpc call get_entity', () => {
     beforeAll(async () => {
+      await get_state_root_hash(); // refresh state root hash
       await test.page.reload();
-      await seletAction('get_deploy');
+      await seletAction('get_entity');
     });
-
     afterEach(async () => {
       await clear();
     });
 
-    it('should get_deploy', async () => {
-      expect(test.deploy_hash).toBeDefined();
-      await test.page.waitForSelector('[e2e-id="deployHashElt"]');
-      await clearInput('[e2e-id="deployHashElt"]');
-      await test.page.type('[e2e-id="deployHashElt"]', test.deploy_hash);
+    it('should get_entity from public key', async () => {
+      await test.page.waitForSelector('[e2e-id="entityIdentifierElt"]');
+      await clearInput('[e2e-id="entityIdentifierElt"]');
+      await test.page.type('[e2e-id="entityIdentifierElt"]', test.account);
+      await submit();
+      const result = await getResult();
+      const pattern = /\"account-hash-[0-9a-f]{64}\"/i;
+      expect(result).toMatch(pattern);
+    });
+
+    it('should get_entity from account hash', async () => {
+      await test.page.waitForSelector('[e2e-id="entityIdentifierElt"]');
+      await clearInput('[e2e-id="entityIdentifierElt"]');
+      await test.page.type('[e2e-id="entityIdentifierElt"]', test.account_hash);
+      await submit();
+      const result = await getResult();
+      const pattern = new RegExp(`"${test.account_hash}"`, 'i');
+      expect(result).toMatch(pattern);
+    });
+
+    it('should get_entity from public key with block', async () => {
+      await test.page.waitForSelector('[e2e-id="entityIdentifierElt"]');
+      await clearInput('[e2e-id="entityIdentifierElt"]');
+      await test.page.type('[e2e-id="entityIdentifierElt"]', test.account);
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
+      await submit();
+      let result = await getResult();
+      const pattern = /\"account-hash-[0-9a-f]{64}\"/i;
+      expect(result).toMatch(pattern);
+      await clear();
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
+      await submit();
+      result = await getResult();
+      expect(result).toMatch(pattern);
+    });
+
+    it(`should get_entity from entity account to set contract hash`, async () => {
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
+      await test.page.waitForSelector('[e2e-id="entityIdentifierElt"]');
+      await clearInput('[e2e-id="entityIdentifierElt"]');
+      await test.page.type('[e2e-id="entityIdentifierElt"]', test.entity_account);
       await submit();
       await getResult();
+      const result = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      const result_json = JSON.parse(result);
+      const named_keys = result_json?.entity_result?.AddressableEntity.named_keys as Array<{ name: string; key: string; }>;
+      test.contract_cep78_entity = named_keys.find(key => key.name === config.contract_cep78_key)?.key || '';
+      test.contract_cep78_package_hash = named_keys.find(key => key.name === config.package_cep78_key)?.key || '';
+      expect(test.contract_cep78_entity).toBeDefined();
+      if (!test.contract_cep78_entity) {
+        throw 'test.contract_cep78_entity missing';
+      }
+      test.contract_cep78_hash = test.contract_cep78_entity.replace('entity-contract', 'hash');
     });
   });
 
   describe('Contract query_contract_key', () => {
     beforeEach(async () => {
-      await get_state_root_hash(); // refresh state root hash before querying contract keys
+      await get_state_root_hash(); // refresh state root hash
       await test.page.reload();
       await seletAction('query_contract_key');
-      await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.waitForSelector('[e2e-id="queryPathElt"]');
-      await clearInput('[e2e-id="stateRootHashElt"]');
       await clearInput('[e2e-id="queryKeyElt"]');
       await clearInput('[e2e-id="queryPathElt"]');
     });
@@ -651,33 +753,20 @@ describe('Angular App Tests', () => {
       await clear();
     });
 
-    it('should query_contract_key with contract hash', async () => {
-      await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
-      await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
+    it('should query_contract_key with contract entity', async () => {
+      await get_block();
+      await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
+      await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_entity);
       await test.page.type('[e2e-id="queryPathElt"]', 'installer');
       await submit();
       await getResult();
     });
 
-    it('should query_contract_key with contract hash without state root hash', async () => {
-      await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
+    it('should query_contract_key with contract entity without state root hash', async () => {
+      await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_entity);
       await test.page.type('[e2e-id="queryPathElt"]', 'installer');
       await submit();
       await getResult();
-    });
-
-    it('should query_contract_key to get dictionary uref', async () => {
-      await test.page.type('[e2e-id="queryKeyElt"]', test.contract_cep78_hash);
-      await submit();
-      await getResult();
-      const result = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(result).toBeDefined();
-      let result_json = JSON.parse(result);
-      expect(result_json?.stored_value.Contract.named_keys).toBeDefined();
-      let named_keys = result_json?.stored_value.Contract.named_keys as Array<{ name: string; key: string; }>;
-      test.dictionary_uref = named_keys.find(key => key.name === 'events')?.key || '';
     });
   });
 
@@ -1203,10 +1292,24 @@ describe('Angular App Tests', () => {
     beforeAll(async () => {
       await test.page.reload();
       await get_state_root_hash(); // refresh state root hash before querying contract dict
+
+      await seletAction('get_entity');
+      await test.page.waitForSelector('[e2e-id="entityIdentifierElt"]');
+      await clearInput('[e2e-id="entityIdentifierElt"]');
+      await test.page.type('[e2e-id="entityIdentifierElt"]', test.contract_cep78_entity);
+      await submit();
+      await getResult();
+      const result = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      const result_json = JSON.parse(result);
+      const named_keys = result_json?.entity_result?.AddressableEntity.named_keys as Array<{ name: string; key: string; }>;
+      test.dictionary_uref = named_keys.find(key => key.name === 'events')?.key || '';
+
       await seletAction('get_dictionary_item');
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
-      await test.page.waitForSelector('[e2e-id="seedContractHashElt"]');
+      await test.page.waitForSelector('[e2e-id="seedEntityHashElt"]');
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
     });
@@ -1216,10 +1319,12 @@ describe('Angular App Tests', () => {
     });
 
     it('should get_dictionary_item with contract hash with state root hash', async () => {
+      await test.page.waitForSelector('[e2e-id="selectDictIdentifierElt"]');
+      await test.page.select('[e2e-id="selectDictIdentifierElt"]', "newFromEntityInfo");
       await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
       await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
-      await test.page.waitForSelector('[e2e-id="seedContractHashElt"]');
-      await test.page.type('[e2e-id="seedContractHashElt"]', test.contract_cep78_hash);
+      await test.page.waitForSelector('[e2e-id="seedEntityHashElt"]');
+      await test.page.type('[e2e-id="seedEntityHashElt"]', test.contract_cep78_entity);
       await test.page.waitForSelector('[e2e-id="seedNameElt"]');
       await test.page.type('[e2e-id="seedNameElt"]', 'events');
       await test.page.waitForSelector('[e2e-id="itemKeyElt"]');

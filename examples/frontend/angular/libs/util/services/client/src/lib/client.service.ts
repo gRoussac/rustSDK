@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory, PricingMode } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory, PricingMode, EntityAddr } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -1115,11 +1115,6 @@ export class ClientService {
       return;
     }
     const path_as_string: string = this.getIdentifier('queryPath')?.value?.toString().trim().replace(/^\/+|\/+$/g, '');
-    if (!path_as_string) {
-      const err = "path is missing";
-      err && (this.errorService.setError(err.toString()));
-      return;
-    }
     const query_contract_key_options = this.sdk.query_contract_key_options({
       entity_identifier_as_string,
       path_as_string,
@@ -1306,9 +1301,11 @@ export class ClientService {
       if (entity_name) {
         builder_params = TransactionBuilderParams.newInvocableEntityAlias(entity_name, entry_point);
       } else if (entity_hash_input) {
+        let entity_addr: EntityAddr | null = null;
         let entity_hash: AddressableEntityHash | null = null;
         try {
-          entity_hash = AddressableEntityHash.fromFormattedStr(entity_hash_input);
+          entity_addr = EntityAddr.fromFormattedStr(entity_hash_input);
+          entity_hash = new AddressableEntityHash(entity_addr.toHexString());
         } catch (error) {
           try {
             entity_hash = new AddressableEntityHash(entity_hash_input);
@@ -1335,7 +1332,7 @@ export class ClientService {
           try {
             package_hash = new PackageHash(entity_hash_input);
           } catch (innerError) {
-            const err = "entity_hash could not be parsed";
+            const err = "package_hash could not be parsed";
             this.errorService.setError(err.toString());
             return builder_params;
           }

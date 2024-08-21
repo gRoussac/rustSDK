@@ -513,7 +513,7 @@ const selectDictIdentifier: InputField = {
   state_name: ['select_dict_identifier'],
   options: [
     { value: 'newFromSeedUref', label: 'From Dictionary Uref' },
-    { value: 'newFromContractInfo', label: 'From Contract Info (depr.)', default: true },
+    { value: 'newFromContractInfo', label: 'From Contract Info (depr.)' },
     { value: 'newFromEntityInfo', label: 'From Entity Info', default: true },
     { value: 'newFromAccountInfo', label: 'From Account Info' },
     { value: 'newFromDictionaryKey', label: 'From Dictionary Key' },
@@ -597,7 +597,7 @@ const queryContractDictFields: InputContainer[][] = [
 const queryContractKeyFields: InputContainer[][] = [
   ...getBlockFields,
   [{ input: queryContractKey, required: true }],
-  [{ input: queryPath }],
+  [{ input: queryPath, required: true }],
 ];
 
 const getDictionaryItemFields: InputContainer[][] = [

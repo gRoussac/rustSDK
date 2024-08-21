@@ -129,8 +129,7 @@ impl SDK {
                         error: "Path is empty".to_string(),
                     });
                 }
-                // Assuming `Path` can be converted to a string (for example, by joining segments)
-                path_struct.to_string() // Customize based on how `Path` should be converted
+                path_struct.to_string()
             }
             PathIdentifierInput::String(ref path_string) => {
                 if path_string.is_empty() {

@@ -50,7 +50,7 @@ impl EntityAddr {
 
     #[wasm_bindgen(js_name = "toHexString")]
     pub fn to_hex_string(&self) -> String {
-        self.0.to_string()
+        self.value().to_hex_string()
     }
 
     #[cfg(target_arch = "wasm32")]

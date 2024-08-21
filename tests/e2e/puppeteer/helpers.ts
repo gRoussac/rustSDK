@@ -15,12 +15,15 @@ export const variables = {
   secret_key: '',
   account: '',
   account_hash: '',
+  entity_account: '',
   target: '',
   block_height: '',
   block_hash: '',
   deploy_hash: '',
+  transaction_hash: '',
   dictionary_key: '',
   dictionary_uref: '',
+  contract_cep78_entity: '',
   contract_cep78_hash: '',
   contract_cep78_package_hash: '',
   delete_key_at_root_after_test: false,
@@ -222,11 +225,11 @@ function writeFile(content: string, dest: string) {
   }
 }
 
-async function get_block() {
+export async function get_block() {
   const chain_get_block_options = variables.sdk.get_block_options({
     node_address: config.node_address
   });
   const block_result = await variables.sdk.get_block(chain_get_block_options);
-  variables.block_hash = block_result?.block?.Version2?.hash;
-  variables.block_height = block_result?.block?.Version2?.header.height.toString();
+  variables.block_hash = block_result?.block?.hash?.toString();
+  variables.block_height = block_result?.block?.header?.height?.toString();
 }
