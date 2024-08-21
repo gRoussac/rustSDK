@@ -296,8 +296,7 @@ pub mod test_module_deploy {
 
         let session_params = SessionStrParams::default();
 
-        session_params
-            .set_session_package_hash(&config.contract_cep78_package_hash.replace("package-", ""));
+        session_params.set_session_package_hash(&config.contract_cep78_package_hash);
         session_params.set_session_entry_point(ENTRYPOINT_MINT);
         let payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(PAYMENT_AMOUNT);

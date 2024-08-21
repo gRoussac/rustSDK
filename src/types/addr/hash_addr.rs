@@ -1,4 +1,5 @@
 use casper_types::{HashAddr as _HashAddr, KEY_HASH_LENGTH};
+use core::fmt::{Display, Formatter};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -22,11 +23,27 @@ impl HashAddr {
     pub fn to_bytes_js_alias(&self) -> Vec<u8> {
         self.to_bytes()
     }
+
+    #[cfg(target_arch = "wasm32")]
+    #[wasm_bindgen(js_name = "toHexString")]
+    pub fn to_hex_string_js_alias(&self) -> String {
+        self.to_string()
+    }
 }
 
 impl HashAddr {
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0.to_vec()
+    }
+
+    pub fn to_hex_string(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl Display for HashAddr {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", base16::encode_lower(&self.0))
     }
 }
 
