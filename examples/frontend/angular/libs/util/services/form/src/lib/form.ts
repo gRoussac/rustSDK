@@ -271,7 +271,7 @@ const entityAlias: InputField = {
   name: 'entity_alias',
   controlName: 'entityAlias',
   placeholder: 'Counter',
-  e2e: 'entityElt',
+  e2e: 'entityAliasElt',
   disabled_when: ['has_wasm', 'entityHash.value']
 };
 
