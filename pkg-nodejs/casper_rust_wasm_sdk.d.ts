@@ -171,13 +171,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
 */
-export enum PricingMode {
-  Fixed = 0,
-  Classic = 1,
-  Reserved = 2,
-}
-/**
-*/
 export enum TransactionKind {
   InvocableEntity = 0,
   InvocableEntityAlias = 1,
@@ -190,6 +183,20 @@ export enum TransactionKind {
   Undelegate = 8,
   Redelegate = 9,
   WithdrawBid = 10,
+}
+/**
+*/
+export enum PricingMode {
+  Fixed = 0,
+  Classic = 1,
+  Reserved = 2,
+}
+/**
+*/
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
 }
 /**
 */
@@ -207,13 +214,6 @@ export enum TransactionCategory {
   Large = 3,
   Medium = 4,
   Small = 5,
-}
-/**
-*/
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
 }
 /**
 */
