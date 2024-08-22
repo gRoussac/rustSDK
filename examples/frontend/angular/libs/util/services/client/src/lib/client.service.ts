@@ -705,9 +705,9 @@ export class ClientService {
       }
       if (result) {
         const result_json = result.toJson();
-        this.deploy_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
-        this.deploy_json && this.resultService.setResult(result_json);
-        !deploy_result && this.updateDeployJson(this.deploy_json);
+        this.transaction_json = jsonPrettyPrint(result_json, this.verbosity as Verbosity);
+        this.transaction_json && this.resultService.setResult(result_json);
+        !deploy_result && this.updateTransactionJson(this.transaction_json);
       }
       return result;
     } catch (err) {

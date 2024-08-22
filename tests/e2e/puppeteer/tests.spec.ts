@@ -107,37 +107,6 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Contract install transaction', () => {
-    beforeEach(async () => {
-      await test.page.reload();
-      await seletAction('install');
-      await setSecretKey();
-      await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
-      await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
-      await clearInput('[e2e-id="argsSimpleElt"]');
-      await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
-      await clearInput('[e2e-id="argsJsonElt"]');
-    });
-
-    it('should install cep78 contract', async () => {
-      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
-      await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
-      await setWasm(config.contract_cep78);
-      await submit();
-      await test.page.waitForSelector('[e2e-id="result"]');
-
-      let transaction = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      expect(transaction).toBeDefined();
-      transaction = await test.page.evaluate(() => {
-        return document.querySelector('[e2e-id="result"]')?.textContent;
-      });
-      transaction = JSON.parse(transaction);
-      expect(transaction?.transaction_hash).toBeDefined();
-      test.transaction_hash = transaction.transaction_hash?.Version1?.toString();
-    });
-  });
 
   describe('Contract install deploy', () => {
     beforeEach(async () => {
@@ -167,6 +136,38 @@ describe('Angular App Tests', () => {
       deploy = JSON.parse(deploy);
       expect(deploy?.deploy_hash).toBeDefined();
       test.deploy_hash = deploy.deploy_hash;
+    });
+  });
+
+  describe('Contract install transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await seletAction('install');
+      await setSecretKey();
+      await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
+      await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
+    });
+
+    it('should install cep78 contract', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount_contract_cep78);
+      await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
+      await setWasm(config.contract_cep78);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      transaction = JSON.parse(transaction);
+      expect(transaction?.transaction_hash).toBeDefined();
+      test.transaction_hash = transaction.transaction_hash?.Version1?.toString();
     });
   });
 
@@ -514,6 +515,66 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Rpc call query_balance details', () => {
+    beforeAll(async () => {
+      await test.page.reload();
+      await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
+      await clearInput('[e2e-id="publicKeyElt"]');
+      await test.page.type('[e2e-id="publicKeyElt"]', test.account);
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: { blur: () => any; }) => e.blur());
+      await test.page.waitForSelector('[e2e-id="main_purse"]');
+      await seletAction('query_balance_details');
+      await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await test.page.waitForSelector('[e2e-id="purseIdentifierElt"]');
+    });
+
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should query_balance details with purse identifier', async () => {
+      await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
+      await submit();
+      await getResult();
+    });
+
+    it('should query_balance details without state root hash', async () => {
+      await clearInput('[e2e-id="stateRootHashElt"]');
+      await submit();
+      await getResult();
+    });
+
+    it('should query_balance details with public key', async () => {
+      await clearInput('[e2e-id="purseIdentifierElt"]');
+      await test.page.type('[e2e-id="purseIdentifierElt"]', test.account);
+      await submit();
+      await getResult();
+    });
+
+    it('should query_balance details with account hash', async () => {
+      await clearInput('[e2e-id="purseIdentifierElt"]');
+      await test.page.type('[e2e-id="purseIdentifierElt"]', test.account_hash);
+      await submit();
+      await getResult();
+    });
+
+    it('should query_balance details with block height', async () => {
+      await test.page.waitForSelector('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await test.page.type('[e2e-id="blockIdentifierHeightElt"]', test.block_height);
+      await submit();
+      await getResult();
+    });
+
+    it('should query_balance details with block hash', async () => {
+      await clearInput('[e2e-id="blockIdentifierHeightElt"]');
+      await clearInput('[e2e-id="blockIdentifierHashElt"]');
+      await test.page.type('[e2e-id="blockIdentifierHashElt"]', test.block_hash);
+      await submit();
+      await getResult();
+    });
+  });
+
   describe('Rpc call get_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
@@ -745,8 +806,6 @@ describe('Angular App Tests', () => {
       await clearInput('[e2e-id="blockIdentifierHashElt"]');
       await test.page.waitForSelector('[e2e-id="queryKeyElt"]');
       await test.page.waitForSelector('[e2e-id="queryPathElt"]');
-      await clearInput('[e2e-id="queryKeyElt"]');
-      await clearInput('[e2e-id="queryPathElt"]');
     });
 
     afterEach(async () => {
@@ -770,7 +829,7 @@ describe('Angular App Tests', () => {
     });
   });
 
-  describe('Contract call entry point', () => {
+  describe('Contract call entry point deploy', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
@@ -879,6 +938,152 @@ describe('Angular App Tests', () => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(call).toBeDefined();
+    });
+  });
+
+  describe('Contract call entry point transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await setSecretKey();
+      await seletAction('call_entrypoint');
+      await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="entityHashElt"]');
+      await test.page.waitForSelector('[e2e-id="entryPointElt"]');
+      await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
+      await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
+    });
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should call entry point with entity hash', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      let call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with entity name', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.waitForSelector('[e2e-id="entityAliasElt"]');
+      await test.page.type('[e2e-id="entityAliasElt"]', config.contract_cep78_key);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      let call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with entity hash and args simple', async () => {
+      let args_simple_mint =
+        `token_meta_data:String='test_meta_data',token_owner:Key='${test.account_hash}'`;
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsSimpleElt"]', args_simple_mint);
+      let call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with contract entity hash and args json', async () => {
+      let args_json_mint = `[{"name": "token_meta_data", "type": "String", "value": "test_meta_data_json"},
+      {"name": "token_owner", "type": "Key", "value": "${test.account_hash}"}]`;
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsJsonElt"]', args_json_mint);
+      let call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+
+    it('should should call entry point with entity package hash and args simple', async () => {
+      let args_simple_mint =
+        `token_meta_data:String='test_meta_data',token_owner:Key='${test.account_hash}'`;
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_package_hash);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsSimpleElt"]', args_simple_mint);
+      await test.page.waitForSelector('[e2e-id="callPackageElt"]');
+      await test.page.click('[e2e-id="callPackageElt"]');
+      await test.page.waitForSelector('[e2e-id="versionElt"]');
+      await test.page.type('[e2e-id="versionElt"]', "1");
+      let call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      call = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(call).toBeDefined();
+    });
+  });
+
+  describe('Contract query_contract_dict', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await get_state_root_hash(); // refresh state root hash
+      await seletAction('query_contract_dict');
+      await test.page.waitForSelector('[e2e-id="stateRootHashElt"]');
+      await test.page.waitForSelector('[e2e-id="seedEntityHashElt"]');
+      await test.page.waitForSelector('[e2e-id="seedNameElt"]');
+      await test.page.waitForSelector('[e2e-id="itemKeyElt"]');
+    });
+
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should query_contract_dict with contract entity', async () => {
+      await get_block();
+      await test.page.type('[e2e-id="stateRootHashElt"]', test.state_root_hash_default);
+      await test.page.type('[e2e-id="seedEntityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="itemKeyElt"]', '0');
+      await submit();
+      await getResult();
+    });
+
+    it('should query_contract_dict with contract entity without state root hash', async () => {
+      await test.page.type('[e2e-id="seedEntityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="seedNameElt"]', 'events');
+      await test.page.type('[e2e-id="itemKeyElt"]', '0');
+      await submit();
+      await getResult();
     });
   });
 
@@ -997,6 +1202,123 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Transaction util make_transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
+      await clearInput('[e2e-id="publicKeyElt"]');
+      await test.page.type('[e2e-id="publicKeyElt"]', test.account);
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: { blur: () => any; }) => e.blur());
+      await test.page.waitForSelector('[e2e-id="main_purse"]');
+      await seletAction('make_transaction');
+      await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="entityHashElt"]');
+      await test.page.waitForSelector('[e2e-id="entryPointElt"]');
+      await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
+      await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
+      await test.page.waitForSelector('[e2e-id="TTLElt"]');
+    });
+
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should make_transaction with contract hash', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+
+    it('should make_transaction with contract name', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.waitForSelector('[e2e-id="entityAliasElt"]');
+      await test.page.type('[e2e-id="entityAliasElt"]', "enhanced-nft-1");
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+
+    it('should make_transaction with contract hash and args simple', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+
+    it('should make_transaction with contract hash and args json', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+
+    it('should make_transaction with package hash and args simple', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_package_hash);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
+      await test.page.waitForSelector('[e2e-id="callPackageElt"]');
+      await test.page.click('[e2e-id="callPackageElt"]');
+      await test.page.waitForSelector('[e2e-id="versionElt"]');
+      await test.page.type('[e2e-id="versionElt"]', "1");
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+
+    it('should make_transaction without TTL', async () => {
+      await clearInput('[e2e-id="TTLElt"]');
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+
+    it('should make_transaction with module bytes', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
+      await setWasm(config.contract_hello);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transaction).toBeDefined();
+    });
+  });
+
   describe('Deploy util make_transfer', () => {
     beforeEach(async () => {
       await test.page.reload();
@@ -1041,6 +1363,50 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Transaction util make_transfer_transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
+      await clearInput('[e2e-id="publicKeyElt"]');
+      await test.page.type('[e2e-id="publicKeyElt"]', test.account);
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: { blur: () => any; }) => e.blur());
+      await test.page.waitForSelector('[e2e-id="main_purse"]');
+      await seletAction('make_transfer_transaction');
+      await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
+    });
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should make_transfer_transaction', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
+      await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
+      await test.page.type('[e2e-id="targetAccountElt"]', test.target);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transfer_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transfer_transaction).toBeDefined();
+    });
+
+    it('should make_transfer_transaction without TTL', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
+      await clearInput('[e2e-id="TTLElt"]');
+      await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
+      await test.page.type('[e2e-id="targetAccountElt"]', test.target);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transfer_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transfer_transaction).toBeDefined();
+    });
+  });
+
   describe('Deploy util sign_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
@@ -1082,6 +1448,47 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Transaction util sign_transaction', () => {
+    beforeAll(async () => {
+      await test.page.reload();
+      await test.page.waitForSelector('[e2e-id="publicKeyElt"]');
+      await clearInput('[e2e-id="publicKeyElt"]');
+      await test.page.type('[e2e-id="publicKeyElt"]', test.account);
+      await test.page.$eval('[e2e-id="publicKeyElt"]', (e: { blur: () => any; }) => e.blur());
+      await test.page.waitForSelector('[e2e-id="main_purse"]');
+      await seletAction('make_transfer_transaction');
+      await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
+    });
+
+    it('should sign_transaction', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
+      await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
+      await test.page.type('[e2e-id="targetAccountElt"]', test.target);
+      await submit();
+      await getResult();
+      let make_transfer_transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transfer_transaction).toBeDefined();
+      await seletAction('sign_transaction');
+      const unsigned_transaction = await test.page.evaluate(() => {
+        const textarea = document.querySelector('[e2e-id="transactionJsonElt"]') as HTMLTextAreaElement;
+        return textarea?.value;
+      });
+      expect(unsigned_transaction).toContain(`"approvals": []`);
+      await setSecretKey();
+      await sign();
+      await delay(300);
+      const signed_transaction = await test.page.evaluate(() => {
+        const textarea = document.querySelector('[e2e-id="transactionJsonElt"]') as HTMLTextAreaElement;
+        return textarea?.value;
+      });
+      expect(signed_transaction).not.toContain(`"approvals": []`);
+    });
+  });
+
   describe('Deploy util put_deploy', () => {
     beforeAll(async () => {
       await test.page.reload();
@@ -1108,6 +1515,37 @@ describe('Angular App Tests', () => {
         return textarea?.value;
       });
       expect(signed_deploy).not.toContain(`"approvals": []`);
+      await submit();
+      await getResult();
+    });
+  });
+
+  describe('Transaction util put_transaction', () => {
+    beforeAll(async () => {
+      await test.page.reload();
+      await setSecretKey();
+      await seletAction('make_transfer_transaction');
+      await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
+    });
+
+    it('should put_transaction a transfer', async () => {
+      await clearInput('[e2e-id="transferAmountElt"]');
+      await clearInput('[e2e-id="targetAccountElt"]');
+      await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
+      await test.page.type('[e2e-id="targetAccountElt"]', test.target);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let make_transfer = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(make_transfer).toBeDefined();
+      await seletAction('put_transaction');
+      const signed_transaction = await test.page.evaluate(() => {
+        const textarea = document.querySelector('[e2e-id="transactionJsonElt"]') as HTMLTextAreaElement;
+        return textarea?.value;
+      });
+      expect(signed_transaction).not.toContain(`"approvals": []`);
       await submit();
       await getResult();
     });
@@ -1252,11 +1690,186 @@ describe('Angular App Tests', () => {
     });
   });
 
+  describe('Deploy transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await setSecretKey();
+      await seletAction('transaction');
+      await test.page.waitForSelector('[e2e-id="paymentAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="entityHashElt"]');
+      await test.page.waitForSelector('[e2e-id="entryPointElt"]');
+      await test.page.waitForSelector('[e2e-id="argsSimpleElt"]');
+      await clearInput('[e2e-id="argsSimpleElt"]');
+      await test.page.waitForSelector('[e2e-id="argsJsonElt"]');
+      await clearInput('[e2e-id="argsJsonElt"]');
+    });
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should deploy a transaction with contract hash', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+
+    it('should deploy a transaction with contract name', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.waitForSelector('[e2e-id="entityAliasElt"]');
+      await test.page.type('[e2e-id="entityAliasElt"]', "enhanced-nft-1");
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+
+    it('should deploy a transaction with contract hash and args simple', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+
+    it('should deploy a transaction with contract hash and args json', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsJsonElt"]', config.args_json);
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+
+    it('should deploy a transaction with package hash and args simple', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_package_hash);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
+      await test.page.waitForSelector('[e2e-id="callPackageElt"]');
+      await test.page.click('[e2e-id="callPackageElt"]');
+      await test.page.waitForSelector('[e2e-id="versionElt"]');
+      await test.page.type('[e2e-id="versionElt"]', "1");
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+
+    it('should deploy a transaction without TTL', async () => {
+      await clearInput('[e2e-id="TTLElt"]');
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="entityHashElt"]', test.contract_cep78_entity);
+      await test.page.type('[e2e-id="entryPointElt"]', config.entrypoint);
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+
+    it('should deploy a transaction with module bytes', async () => {
+      await test.page.type('[e2e-id="paymentAmountElt"]', config.payment_amount);
+      await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
+      await setWasm(config.contract_hello);
+      let transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeUndefined();
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      transaction = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transaction).toBeDefined();
+    });
+  });
+
   describe('Deploy transfer', () => {
     beforeEach(async () => {
       await test.page.reload();
       await setSecretKey();
       await seletAction('transfer');
+      await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
+      await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
+    });
+    afterEach(async () => {
+      await clear();
+    });
+
+    it('should transfer', async () => {
+      await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
+      await test.page.type('[e2e-id="targetAccountElt"]', test.target);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let transfer = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transfer).toBeDefined();
+    });
+
+    it('should transfer without TTL', async () => {
+      await clearInput('[e2e-id="TTLElt"]');
+      await test.page.type('[e2e-id="transferAmountElt"]', config.transfer_amount);
+      await test.page.type('[e2e-id="targetAccountElt"]', test.target);
+      await submit();
+      await test.page.waitForSelector('[e2e-id="result"]');
+      let transfer = await test.page.evaluate(() => {
+        return document.querySelector('[e2e-id="result"]')?.textContent;
+      });
+      expect(transfer).toBeDefined();
+    });
+  });
+
+  describe('Deploy transfer transaction', () => {
+    beforeEach(async () => {
+      await test.page.reload();
+      await setSecretKey();
+      await seletAction('transfer_transaction');
       await test.page.waitForSelector('[e2e-id="transferAmountElt"]');
       await test.page.waitForSelector('[e2e-id="targetAccountElt"]');
     });
