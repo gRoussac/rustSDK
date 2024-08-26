@@ -33,7 +33,7 @@ impl From<TransferAddr> for _TransferAddr {
 }
 
 impl From<_TransferAddr> for TransferAddr {
-    fn from(trasnfer_hash_addr: _TransferAddr) -> Self {
-        TransferAddr(trasnfer_hash_addr)
+    fn from(transfer_hash_addr: _TransferAddr) -> Self {
+        TransferAddr(transfer_hash_addr)
     }
 }
