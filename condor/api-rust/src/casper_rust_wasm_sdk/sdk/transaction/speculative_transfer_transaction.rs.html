@@ -406,7 +406,7 @@
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
         <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw">_</span>, default_speculative_address, chain_name) = get_network_constants();
 
-        <span class="kw">let </span>error_message = <span class="string">"Invalid transaction"</span>;
+        <span class="kw">let </span>error_message = <span class="string">"Node request failure"</span>;
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
