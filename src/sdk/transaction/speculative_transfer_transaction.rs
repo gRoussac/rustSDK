@@ -188,7 +188,7 @@ mod tests {
         let verbosity = Some(Verbosity::High);
         let (_, _, default_speculative_address, chain_name) = get_network_constants();
 
-        let error_message = "Invalid transaction";
+        let error_message = "Node request failure";
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
 

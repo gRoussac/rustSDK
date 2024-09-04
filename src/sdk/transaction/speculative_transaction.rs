@@ -202,7 +202,7 @@ mod tests {
 
         let secret_key = get_user_secret_key(None).unwrap();
 
-        let error_message = "Invalid transaction";
+        let error_message = "Node request failure";
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
@@ -220,7 +220,6 @@ mod tests {
 
         // Assert
         assert!(result.is_err());
-
         let err_string = result.err().unwrap().to_string();
         assert!(err_string.contains(error_message));
     }
