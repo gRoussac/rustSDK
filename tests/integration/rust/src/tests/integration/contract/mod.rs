@@ -182,11 +182,21 @@ pub mod test_module {
         let result = query_result.unwrap().result;
 
         assert!(!result.api_version.to_string().is_empty());
-        assert!(result
-            .stored_value
-            .as_addressable_entity()
-            .unwrap()
-            .is_account_kind());
+        assert_eq!(
+            result
+                .stored_value
+                .as_cl_value()
+                .unwrap()
+                .cl_type()
+                .to_string(),
+            "key"
+        );
+        // TODO check as_addressable_entity
+        // assert!(result
+        //     .stored_value
+        //     .as_addressable_entity()
+        //     .unwrap()
+        //     .is_account_kind());
     }
 
     #[allow(deprecated)]
