@@ -367,11 +367,7 @@ impl SDK {
             .map_err(SdkError::from)
         } else {
             let state_root_hash = self
-                .get_state_root_hash(
-                    None,
-                    None,
-                    Some(self.get_rpc_address(rpc_address.clone())),
-                )
+                .get_state_root_hash(None, None, Some(self.get_rpc_address(rpc_address.clone())))
                 .await;
 
             let state_root_hash_as_string: String = match state_root_hash {

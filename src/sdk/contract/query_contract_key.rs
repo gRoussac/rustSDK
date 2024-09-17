@@ -323,14 +323,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(
-                Some(entity),
-                None,
-                path,
-                None,
-                verbosity,
-                Some(rpc_address),
-            )
+            .query_contract_key(Some(entity), None, path, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -353,14 +346,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(
-                Some(entity),
-                None,
-                path,
-                None,
-                verbosity,
-                Some(rpc_address),
-            )
+            .query_contract_key(Some(entity), None, path, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert
@@ -383,14 +369,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .query_contract_key(
-                Some(entity),
-                None,
-                path,
-                None,
-                verbosity,
-                Some(rpc_address),
-            )
+            .query_contract_key(Some(entity), None, path, None, verbosity, Some(rpc_address))
             .await;
 
         // Assert

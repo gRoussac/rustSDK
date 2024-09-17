@@ -226,11 +226,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_era_info(
-                Some(block_identifier),
-                verbosity,
-                Some(rpc_address.clone()),
-            )
+            .get_era_info(Some(block_identifier), verbosity, Some(rpc_address.clone()))
             .await;
 
         // Assert
