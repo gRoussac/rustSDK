@@ -3,12 +3,12 @@ import init, { SDK, Verbosity } from "casper-sdk";
 
 export const SDK_TOKEN = new InjectionToken<SDK>('SDK');
 export const WASM_ASSET_PATH = new InjectionToken<string>('wasm_asset_path');
-export const NODE_ADDRESS = new InjectionToken<string>('node_address');
+export const RPC_ADDRESS = new InjectionToken<string>('rpc_address');
 export const VERBOSITY = new InjectionToken<Verbosity>('verbosity');
 
 type Params = {
   wasm_asset_path: string,
-  node_address: string;
+  rpc_address: string;
   verbosity: Verbosity;
 };
 
@@ -16,7 +16,7 @@ export const fetchWasmFactory = async (
   params: Params
 ): Promise<SDK> => {
   const wasm = await init(params.wasm_asset_path);
-  return wasm && new SDK(params.node_address, params.verbosity);
+  return wasm && new SDK(params.rpc_address, params.verbosity);
 };
 
 export function provideSafeAsync<T>(
@@ -29,11 +29,11 @@ export function provideSafeAsync<T>(
   return [
     {
       provide: APP_INITIALIZER,
-      useFactory: (wasm_asset_path: string, node_address: string, verbosity: Verbosity) =>
-        async () => container.value = await initializer({ wasm_asset_path, node_address, verbosity })
+      useFactory: (wasm_asset_path: string, rpc_address: string, verbosity: Verbosity) =>
+        async () => container.value = await initializer({ wasm_asset_path, rpc_address, verbosity })
       ,
       multi: true,
-      deps: [WASM_ASSET_PATH, NODE_ADDRESS, VERBOSITY],
+      deps: [WASM_ASSET_PATH, RPC_ADDRESS, VERBOSITY],
     },
     {
       provide: token,

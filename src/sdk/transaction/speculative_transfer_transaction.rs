@@ -27,7 +27,7 @@ impl SDK {
     /// * `maybe_id` - An optional transfer ID (defaults to a random number).
     /// * `transaction_params` - The transactionment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -42,7 +42,7 @@ impl SDK {
         transaction_params: TransactionStrParams,
         maybe_id: Option<String>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SpeculativeExecTxnResult, JsError> {
         let result = self
             .speculative_transfer_transaction(
@@ -52,7 +52,7 @@ impl SDK {
                 transaction_params,
                 maybe_id,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -76,7 +76,7 @@ impl SDK {
     /// * `transaction_params` - The transactionment parameters.
     /// * `maybe_id` - An optional transfer ID (defaults to a random number).
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -90,7 +90,7 @@ impl SDK {
         transaction_params: TransactionStrParams,
         maybe_id: Option<String>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_SpeculativeExecTxnResult>, SdkError> {
         // log("speculative_transfer_transaction!");
         let transaction = make_transfer_transaction(
@@ -101,7 +101,7 @@ impl SDK {
             maybe_id,
         )?;
 
-        self.speculative_exec(transaction, verbosity, node_address)
+        self.speculative_exec(transaction, verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }

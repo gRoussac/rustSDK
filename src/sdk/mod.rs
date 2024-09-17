@@ -23,7 +23,7 @@ use crate::types::verbosity::Verbosity;
 
 #[wasm_bindgen]
 pub struct SDK {
-    node_address: Option<String>,
+    rpc_address: Option<String>,
     verbosity: Option<Verbosity>,
 }
 
@@ -36,25 +36,25 @@ impl Default for SDK {
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(constructor)]
-    pub fn new(node_address: Option<String>, verbosity: Option<Verbosity>) -> Self {
+    pub fn new(rpc_address: Option<String>, verbosity: Option<Verbosity>) -> Self {
         SDK {
-            node_address,
+            rpc_address,
             verbosity,
         }
     }
 
     #[wasm_bindgen(js_name = "getNodeAddress")]
-    pub fn get_node_address(&self, node_address: Option<String>) -> String {
-        node_address
+    pub fn get_rpc_address(&self, rpc_address: Option<String>) -> String {
+        rpc_address
             .as_ref()
             .cloned()
-            .or_else(|| self.node_address.as_ref().map(String::to_owned))
+            .or_else(|| self.rpc_address.as_ref().map(String::to_owned))
             .unwrap_or_default()
     }
 
     #[wasm_bindgen(js_name = "setNodeAddress")]
-    pub fn set_node_address(&mut self, node_address: Option<String>) -> Result<(), String> {
-        self.node_address = node_address;
+    pub fn set_rpc_address(&mut self, rpc_address: Option<String>) -> Result<(), String> {
+        self.rpc_address = rpc_address;
         Ok(())
     }
 

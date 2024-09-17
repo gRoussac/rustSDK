@@ -137,7 +137,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -150,9 +150,9 @@ impl SDK {
     pub async fn get_node_status_js_alias(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetNodeStatusResult, JsError> {
-        let result = self.get_node_status(verbosity, node_address).await;
+        let result = self.get_node_status(verbosity, rpc_address).await;
         match result {
             Ok(data) => Ok(data.result.into()),
             Err(err) => {
@@ -168,9 +168,9 @@ impl SDK {
     pub async fn info_get_status(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<GetNodeStatusResult, JsError> {
-        self.get_node_status_js_alias(verbosity, node_address).await
+        self.get_node_status_js_alias(verbosity, rpc_address).await
     }
 }
 
@@ -180,7 +180,7 @@ impl SDK {
     /// # Arguments
     ///
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -192,12 +192,12 @@ impl SDK {
     pub async fn get_node_status(
         &self,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetNodeStatusResult>, Error> {
         //log("get_node_status!");
         get_node_status(
             JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-            &self.get_node_address(node_address),
+            &self.get_rpc_address(rpc_address),
             self.get_verbosity(verbosity).into(),
         )
         .await
@@ -229,10 +229,10 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         // Act
-        let result = sdk.get_node_status(verbosity, Some(node_address)).await;
+        let result = sdk.get_node_status(verbosity, Some(rpc_address)).await;
 
         // Assert
         assert!(result.is_ok());

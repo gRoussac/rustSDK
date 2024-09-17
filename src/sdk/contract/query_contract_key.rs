@@ -30,7 +30,7 @@ pub struct QueryContractKeyOptions {
     pub maybe_block_id_as_string: Option<String>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -88,7 +88,7 @@ impl SDK {
                 path_input,
                 maybe_block_identifier,
                 options.verbosity,
-                options.node_address,
+                options.rpc_address,
             )
             .await;
         match result {
@@ -119,7 +119,7 @@ impl SDK {
         path: PathIdentifierInput,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
         let path_string = match path {
             PathIdentifierInput::Path(ref path_struct) => {
@@ -149,7 +149,7 @@ impl SDK {
                 entity_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address.clone(),
+                rpc_address.clone(),
             )
             .await
             .map_err(SdkError::from);
@@ -185,7 +185,7 @@ impl SDK {
             state_root_hash: None,
             maybe_block_id: None,
             verbosity,
-            node_address,
+            rpc_address,
         })
         .await
         .map_err(SdkError::from)
@@ -252,13 +252,13 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
 
         let path = PathIdentifierInput::String("installer".to_string());
 
-        let (_, block_height) = get_block(&node_address.clone()).await;
+        let (_, block_height) = get_block(&rpc_address.clone()).await;
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
 
@@ -270,7 +270,7 @@ mod tests {
                 path,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -283,13 +283,13 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
 
         let path = PathIdentifierInput::String("installer".to_string());
 
-        let (_, block_height) = get_block(&node_address.clone()).await;
+        let (_, block_height) = get_block(&rpc_address.clone()).await;
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
         // Act
@@ -300,7 +300,7 @@ mod tests {
                 path,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -313,7 +313,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
         let error_message = "Invalid argument 'Path': Path is empty";
@@ -329,7 +329,7 @@ mod tests {
                 path,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -344,7 +344,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
         let error_message = "Invalid argument 'Path string': Path string is empty";
@@ -359,7 +359,7 @@ mod tests {
                 path,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -374,7 +374,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None);
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         let entity = get_entity_input().await;
 
@@ -389,7 +389,7 @@ mod tests {
                 path,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
