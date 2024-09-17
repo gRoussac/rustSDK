@@ -43,7 +43,7 @@ impl SDK {
         }
     }
 
-    #[wasm_bindgen(js_name = "getNodeAddress")]
+    #[wasm_bindgen(js_name = "getRPCAddress")]
     pub fn get_rpc_address(&self, rpc_address: Option<String>) -> String {
         rpc_address
             .as_ref()
@@ -52,7 +52,7 @@ impl SDK {
             .unwrap_or_default()
     }
 
-    #[wasm_bindgen(js_name = "setNodeAddress")]
+    #[wasm_bindgen(js_name = "setRPCAddress")]
     pub fn set_rpc_address(&mut self, rpc_address: Option<String>) -> Result<(), String> {
         self.rpc_address = rpc_address;
         Ok(())
