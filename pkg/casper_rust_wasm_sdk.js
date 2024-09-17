@@ -629,19 +629,19 @@ function __wbg_adapter_1119(arg0, arg1, arg2, arg3) {
 
 /**
 */
-export const PricingMode = Object.freeze({ Fixed:0,"0":"Fixed",Classic:1,"1":"Classic",Reserved:2,"2":"Reserved", });
-/**
-*/
-export const Verbosity = Object.freeze({ Low:0,"0":"Low",Medium:1,"1":"Medium",High:2,"2":"High", });
-/**
-*/
-export const TransactionKind = Object.freeze({ InvocableEntity:0,"0":"InvocableEntity",InvocableEntityAlias:1,"1":"InvocableEntityAlias",Package:2,"2":"Package",PackageAlias:3,"3":"PackageAlias",Session:4,"4":"Session",Transfer:5,"5":"Transfer",AddBid:6,"6":"AddBid",Delegate:7,"7":"Delegate",Undelegate:8,"8":"Undelegate",Redelegate:9,"9":"Redelegate",WithdrawBid:10,"10":"WithdrawBid", });
+export const TransferTargetKind = Object.freeze({ PublicKey:0,"0":"PublicKey",AccountHash:1,"1":"AccountHash",URef:2,"2":"URef", });
 /**
 */
 export const TransactionCategory = Object.freeze({ Mint:0,"0":"Mint",Auction:1,"1":"Auction",InstallUpgrade:2,"2":"InstallUpgrade",Large:3,"3":"Large",Medium:4,"4":"Medium",Small:5,"5":"Small", });
 /**
 */
-export const TransferTargetKind = Object.freeze({ PublicKey:0,"0":"PublicKey",AccountHash:1,"1":"AccountHash",URef:2,"2":"URef", });
+export const Verbosity = Object.freeze({ Low:0,"0":"Low",Medium:1,"1":"Medium",High:2,"2":"High", });
+/**
+*/
+export const PricingMode = Object.freeze({ Fixed:0,"0":"Fixed",Classic:1,"1":"Classic",Reserved:2,"2":"Reserved", });
+/**
+*/
+export const TransactionKind = Object.freeze({ InvocableEntity:0,"0":"InvocableEntity",InvocableEntityAlias:1,"1":"InvocableEntityAlias",Package:2,"2":"Package",PackageAlias:3,"3":"PackageAlias",Session:4,"4":"Session",Transfer:5,"5":"Transfer",AddBid:6,"6":"AddBid",Delegate:7,"7":"Delegate",Undelegate:8,"8":"Undelegate",Redelegate:9,"9":"Redelegate",WithdrawBid:10,"10":"WithdrawBid", });
 
 const AccessRightsFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
@@ -8050,14 +8050,14 @@ export class SDK {
     * @param {string | undefined} [rpc_address]
     * @returns {string}
     */
-    getNodeAddress(rpc_address) {
+    getRPCAddress(rpc_address) {
         let deferred2_0;
         let deferred2_1;
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len0 = WASM_VECTOR_LEN;
-            wasm.sdk_getNodeAddress(retptr, this.__wbg_ptr, ptr0, len0);
+            wasm.sdk_getRPCAddress(retptr, this.__wbg_ptr, ptr0, len0);
             var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
             var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
             deferred2_0 = r0;
@@ -8071,12 +8071,12 @@ export class SDK {
     /**
     * @param {string | undefined} [rpc_address]
     */
-    setNodeAddress(rpc_address) {
+    setRPCAddress(rpc_address) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len0 = WASM_VECTOR_LEN;
-            wasm.sdk_setNodeAddress(retptr, this.__wbg_ptr, ptr0, len0);
+            wasm.sdk_setRPCAddress(retptr, this.__wbg_ptr, ptr0, len0);
             var r0 = getDataViewMemory0().getInt32(retptr + 4 * 0, true);
             var r1 = getDataViewMemory0().getInt32(retptr + 4 * 1, true);
             if (r1) {
