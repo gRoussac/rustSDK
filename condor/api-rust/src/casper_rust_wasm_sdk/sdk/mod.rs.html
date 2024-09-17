@@ -114,7 +114,7 @@
         }
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"getNodeAddress"</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"getRPCAddress"</span>)]
     </span><span class="kw">pub fn </span>get_rpc_address(<span class="kw-2">&amp;</span><span class="self">self</span>, rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; String {
         rpc_address
             .as_ref()
@@ -123,7 +123,7 @@
             .unwrap_or_default()
     }
 
-    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setNodeAddress"</span>)]
+    <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setRPCAddress"</span>)]
     </span><span class="kw">pub fn </span>set_rpc_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
         <span class="self">self</span>.rpc_address = rpc_address;
         <span class="prelude-val">Ok</span>(())
