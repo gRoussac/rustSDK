@@ -76,7 +76,7 @@ pub struct GetEntityOptions {
     pub entity_identifier_as_string: Option<String>,
     pub maybe_block_id_as_string: Option<String>,
     pub maybe_block_identifier: Option<BlockIdentifier>,
-    pub node_address: Option<String>,
+    pub rpc_address: Option<String>,
     pub verbosity: Option<Verbosity>,
 }
 
@@ -102,7 +102,7 @@ impl SDK {
     ///   - `maybe_block_id_as_string`: Optional string representation of the block ID.
     ///   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
     ///   - `verbosity`: Verbosity level for the output.
-    ///   - `node_address`: Address of the node to query.
+    ///   - `rpc_address`: Address of the node to query.
     ///
     /// # Returns
     ///
@@ -123,7 +123,7 @@ impl SDK {
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         let maybe_block_identifier = if let Some(maybe_block_identifier) = maybe_block_identifier {
@@ -140,7 +140,7 @@ impl SDK {
                 entity_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .await;
         match result {
@@ -171,7 +171,7 @@ impl SDK {
     /// * `entity_identifier_as_string` - An optional string representing the entity identifier.
     /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -186,7 +186,7 @@ impl SDK {
         entity_identifier_as_string: Option<String>,
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetAddressableEntityResult>, SdkError> {
         let entity_identifier = if let Some(entity_identifier) = entity_identifier {
             entity_identifier
@@ -207,7 +207,7 @@ impl SDK {
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_entity_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
                 &entity_identifier.to_string(),
@@ -225,7 +225,7 @@ impl SDK {
                 };
             get_entity_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
-                &self.get_node_address(node_address),
+                &self.get_rpc_address(rpc_address),
                 self.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
                 entity_identifier.into(),
@@ -292,7 +292,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -301,7 +301,7 @@ mod tests {
                 None,
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
         // Assert
@@ -314,7 +314,7 @@ mod tests {
         let sdk = SDK::new(None, None);
         let entity_identifier_as_string = get_entity_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -323,7 +323,7 @@ mod tests {
                 Some(entity_identifier_as_string),
                 None,
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -339,7 +339,7 @@ mod tests {
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
-        let (node_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -348,7 +348,7 @@ mod tests {
                 None,
                 Some(block_identifier),
                 verbosity,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 

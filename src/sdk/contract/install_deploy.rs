@@ -23,7 +23,7 @@ impl SDK {
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_amount` - The payment amount as a string.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -40,10 +40,10 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<PutDeployResult, JsError> {
         let result = self
-            .install_deploy(deploy_params, session_params, payment_amount, node_address)
+            .install_deploy(deploy_params, session_params, payment_amount, rpc_address)
             .await;
         match result {
             Ok(data) => Ok(data.result.into()),
@@ -66,7 +66,7 @@ impl SDK {
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_amount` - The payment amount as a string.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -82,7 +82,7 @@ impl SDK {
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: &str,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
         //log("install!");
         let payment_params = PaymentStrParams::default();
@@ -98,7 +98,7 @@ impl SDK {
         if let Err(err) = deploy {
             return Err(SdkError::from(err));
         }
-        self.put_deploy(deploy.unwrap().into(), None, node_address)
+        self.put_deploy(deploy.unwrap().into(), None, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -140,7 +140,7 @@ mod tests {
     async fn test_install_deploy_with_valid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -165,7 +165,7 @@ mod tests {
                 deploy_params,
                 session_params,
                 PAYMENT_AMOUNT,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -180,7 +180,7 @@ mod tests {
     async fn test_install_deploy_with_invalid_input() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -214,7 +214,7 @@ mod tests {
                 deploy_params,
                 session_params,
                 "", // This is not valid payment amount
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 
@@ -228,7 +228,7 @@ mod tests {
     async fn test_install_deploy_without_secret_key() {
         // Arrange
         let sdk = SDK::new(None, None);
-        let (node_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -261,7 +261,7 @@ mod tests {
                 deploy_params,
                 session_params,
                 PAYMENT_AMOUNT,
-                Some(node_address),
+                Some(rpc_address),
             )
             .await;
 

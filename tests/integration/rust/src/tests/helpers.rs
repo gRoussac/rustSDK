@@ -1,7 +1,7 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY, SPECULATIVE_ADDRESS};
 use crate::config::{
-    DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
+    DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_RPC_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use casper_rust_wasm_sdk::types::addr::entity_addr::EntityAddr;
@@ -48,19 +48,19 @@ pub(crate) mod intern {
     };
     pub fn create_test_sdk(config: Option<TestConfig>) -> SDK {
         match config {
-            Some(config) => SDK::new(config.node_address, config.verbosity),
+            Some(config) => SDK::new(config.rpc_address, config.verbosity),
             None => SDK::new(None, None),
         }
     }
 
-    pub async fn get_main_purse(account_identifier_as_string: &str, node_address: &str) -> String {
+    pub async fn get_main_purse(account_identifier_as_string: &str, rpc_address: &str) -> String {
         let entity_result = create_test_sdk(None)
             .get_entity(
                 None,
                 Some(account_identifier_as_string.to_owned()),
                 None,
                 None,
-                Some(node_address.to_string()),
+                Some(rpc_address.to_string()),
             )
             .await
             .unwrap()
@@ -80,7 +80,7 @@ pub(crate) mod intern {
         dictionary_name: &str,
         dictionary_item_key: &str,
         get_state_root_hash: Option<&str>,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> String {
         let mut params = DictionaryItemStrParams::new();
         params.set_entity_named_key(contract_entity, dictionary_name, dictionary_item_key);
@@ -91,7 +91,7 @@ pub(crate) mod intern {
                 get_state_root_hash.unwrap_or_default(),
                 dictionary_item,
                 None,
-                node_address,
+                rpc_address,
             )
             .await;
         let get_dictionary_item = get_dictionary_item.unwrap();
@@ -117,11 +117,11 @@ pub(crate) mod intern {
     pub async fn get_dictionnary_uref(
         contract_entity: &str,
         dictionary_name: &str,
-        node_address: Option<String>,
+        rpc_address: Option<String>,
     ) -> String {
         let entity_identifier = EntityIdentifier::from_formatted_str(contract_entity).ok();
         let get_entity = create_test_sdk(None)
-            .get_entity(entity_identifier, None, None, None, node_address)
+            .get_entity(entity_identifier, None, None, None, rpc_address)
             .await
             .unwrap();
 
@@ -152,7 +152,7 @@ pub(crate) mod intern {
         }
         *cep78_reinstall_guard = true;
 
-        let (node_address, event_address, chain_name) = network_constants;
+        let (rpc_address, event_address, chain_name) = network_constants;
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(chain_name);
@@ -178,7 +178,7 @@ pub(crate) mod intern {
             .install(
                 transaction_params,
                 transaction_bytes.into(),
-                Some(node_address.to_string()),
+                Some(rpc_address.to_string()),
             )
             .await;
         assert!(!install
@@ -210,7 +210,7 @@ pub(crate) mod intern {
                 transaction_hash,
                 Some(true),
                 None,
-                Some(node_address.to_string()),
+                Some(rpc_address.to_string()),
             )
             .await;
         let get_transaction = get_transaction.unwrap();
@@ -226,8 +226,8 @@ pub(crate) mod intern {
 }
 
 pub fn get_network_constants() -> (String, String, String, String) {
-    let default_node_address =
-        env::var("NODE_ADDRESS").unwrap_or_else(|_| DEFAULT_NODE_ADDRESS.to_string());
+    let default_rpc_address =
+        env::var("RPC_ADDRESS").unwrap_or_else(|_| DEFAULT_RPC_ADDRESS.to_string());
     let default_event_address =
         env::var("EVENT_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENT_ADDRESS.to_string());
     let default_speculative_address =
@@ -235,7 +235,7 @@ pub fn get_network_constants() -> (String, String, String, String) {
     let chain_name = env::var("CHAIN_NAME").unwrap_or_else(|_| DEFAULT_CHAIN_NAME.to_string());
 
     (
-        default_node_address,
+        default_rpc_address,
         default_event_address,
         default_speculative_address,
         chain_name,
@@ -339,7 +339,7 @@ pub async fn install_cep78_if_needed(
 
 pub async fn get_contract_cep78_hash_keys(
     account_hash: &str,
-    node_address: &str,
+    rpc_address: &str,
 ) -> (String, String) {
     let entity_identifier = EntityIdentifier::from_formatted_str(account_hash).ok();
     let get_entity = create_test_sdk(None)
@@ -348,7 +348,7 @@ pub async fn get_contract_cep78_hash_keys(
             None,
             None,
             None,
-            Some(node_address.to_string()),
+            Some(rpc_address.to_string()),
         )
         .await
         .unwrap();
@@ -383,7 +383,7 @@ pub async fn mint_nft(
     secret_key: &str,
     network_constants: (&str, &str, &str),
 ) {
-    let (node_address, event_address, chain_name) = network_constants;
+    let (rpc_address, event_address, chain_name) = network_constants;
 
     let mut transaction_params = TransactionStrParams::default();
     transaction_params.set_chain_name(chain_name);
@@ -412,7 +412,7 @@ pub async fn mint_nft(
         .call_entrypoint(
             builder_params,
             transaction_params,
-            Some(node_address.to_string()),
+            Some(rpc_address.to_string()),
         )
         .await;
     let result = &test_call_entrypoint.as_ref().unwrap().result;
@@ -437,9 +437,9 @@ pub async fn mint_nft(
     );
 }
 
-pub async fn get_block(node_address: &str) -> (String, u64) {
+pub async fn get_block(rpc_address: &str) -> (String, u64) {
     let get_block = create_test_sdk(None)
-        .get_block(None, None, Some(node_address.to_string()))
+        .get_block(None, None, Some(rpc_address.to_string()))
         .await;
     match get_block {
         Err(err) => {
