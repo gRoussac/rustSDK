@@ -171,27 +171,6 @@ export function encodeLowerBlake2b(meta_data: string): any;
 export function makeDictionaryItemKey(key: Key, value: string): string;
 /**
 */
-export enum PricingMode {
-  Fixed = 0,
-  Classic = 1,
-  Reserved = 2,
-}
-/**
-*/
-export enum TransferTargetKind {
-  PublicKey = 0,
-  AccountHash = 1,
-  URef = 2,
-}
-/**
-*/
-export enum Verbosity {
-  Low = 0,
-  Medium = 1,
-  High = 2,
-}
-/**
-*/
 export enum TransactionCategory {
   Mint = 0,
   Auction = 1,
@@ -214,6 +193,27 @@ export enum TransactionKind {
   Undelegate = 8,
   Redelegate = 9,
   WithdrawBid = 10,
+}
+/**
+*/
+export enum PricingMode {
+  Fixed = 0,
+  Classic = 1,
+  Reserved = 2,
+}
+/**
+*/
+export enum TransferTargetKind {
+  PublicKey = 0,
+  AccountHash = 1,
+  URef = 2,
+}
+/**
+*/
+export enum Verbosity {
+  Low = 0,
+  Medium = 1,
+  High = 2,
 }
 /**
 */
@@ -2076,7 +2076,7 @@ export class SDK {
 * # Arguments
 *
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `node_address` - An optional string specifying the node address to use for the request.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
 *
 * # Returns
 *
@@ -2086,16 +2086,16 @@ export class SDK {
 *
 * Returns a `JsError` if there is an error during the retrieval process.
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetNodeStatusResult>}
 */
-  get_node_status(verbosity?: Verbosity, node_address?: string): Promise<GetNodeStatusResult>;
+  get_node_status(verbosity?: Verbosity, rpc_address?: string): Promise<GetNodeStatusResult>;
 /**
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetNodeStatusResult>}
 */
-  info_get_status(verbosity?: Verbosity, node_address?: string): Promise<GetNodeStatusResult>;
+  info_get_status(verbosity?: Verbosity, rpc_address?: string): Promise<GetNodeStatusResult>;
 /**
 * Parses dictionary item options from a JsValue.
 *
@@ -2370,7 +2370,7 @@ export class SDK {
 *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
 *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
 *   - `verbosity`: Verbosity level for the output.
-*   - `node_address`: Address of the node to query.
+*   - `rpc_address`: Address of the node to query.
 *
 * # Returns
 *
@@ -2395,22 +2395,22 @@ export class SDK {
 * # Arguments
 *
 * * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
+* * `rpc_address` - Optional rpc address.
 *
 * # Returns
 *
 * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetPeersResult>}
 */
-  get_peers(verbosity?: Verbosity, node_address?: string): Promise<GetPeersResult>;
+  get_peers(verbosity?: Verbosity, rpc_address?: string): Promise<GetPeersResult>;
 /**
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetPeersResult>}
 */
-  info_get_peers(verbosity?: Verbosity, node_address?: string): Promise<GetPeersResult>;
+  info_get_peers(verbosity?: Verbosity, rpc_address?: string): Promise<GetPeersResult>;
 /**
 * Parses transaction options from a JsValue.
 *
@@ -2492,7 +2492,7 @@ export class SDK {
 * * `deploy_params` - The deployment parameters.
 * * `payment_params` - The payment parameters.
 * * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
 *
 * # Returns
 *
@@ -2503,10 +2503,10 @@ export class SDK {
 * @param {DeployStrParams} deploy_params
 * @param {PaymentStrParams} payment_params
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutDeployResult>}
 */
-  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
 /**
 * Parses balance options from a JsValue.
 *
@@ -2610,7 +2610,7 @@ export class SDK {
 *
 * * `deploy` - The `Deploy` object to be sent.
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `node_address` - An optional string specifying the node address to use for the request.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
 *
 * # Returns
 *
@@ -2621,18 +2621,18 @@ export class SDK {
 * Returns a `JsError` if there is an error during the deploy process.
 * @param {Deploy} deploy
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutDeployResult>}
 */
-  put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
 /**
 * JavaScript Alias for `put_deploy`.
 * @param {Deploy} deploy
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutDeployResult>}
 */
-  account_put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  account_put_deploy(deploy: Deploy, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
 /**
 * Parses query balance options from a JsValue.
 *
@@ -2673,7 +2673,7 @@ export class SDK {
 * * `builder_params` - Transaction Builder parameters.
 * * `transaction_params` - Transactionment parameters for the transaction.
 * * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
+* * `rpc_address` - Optional rpc address.
 *
 * # Returns
 *
@@ -2681,10 +2681,10 @@ export class SDK {
 * @param {TransactionBuilderParams} builder_params
 * @param {TransactionStrParams} transaction_params
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<SpeculativeExecTxnResult>}
 */
-  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecTxnResult>;
+  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
 /**
 * JavaScript function for transactioning with deserialized parameters.
 *
@@ -2693,7 +2693,7 @@ export class SDK {
 * * `transaction_params` - Transaction parameters.
 * * `builder_params` - Session parameters.
 * * `verbosity` - An optional verbosity level.
-* * `node_address` - An optional node address.
+* * `rpc_address` - An optional rpc address.
 *
 * # Returns
 *
@@ -2701,10 +2701,10 @@ export class SDK {
 * @param {TransactionBuilderParams} builder_params
 * @param {TransactionStrParams} transaction_params
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+  transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
 /**
 * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
 * Legacy alias
@@ -2782,7 +2782,7 @@ export class SDK {
 *.
 * * `transaction_params` - Transaction parameters.
 * * `transaction_bytes` - Transaction Bytes to install
-* * `node_address` - An optional node address to send the request to.
+* * `rpc_address` - An optional rpc address to send the request to.
 *
 * # Returns
 *
@@ -2793,24 +2793,24 @@ export class SDK {
 * Returns a `JsError` if there is an error during the installation.
 * @param {TransactionStrParams} transaction_params
 * @param {Bytes} transaction_bytes
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, node_address?: string): Promise<PutTransactionResult>;
+  install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string): Promise<PutTransactionResult>;
 /**
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @param {Verbosity | undefined} [verbosity]
 */
-  constructor(node_address?: string, verbosity?: Verbosity);
+  constructor(rpc_address?: string, verbosity?: Verbosity);
 /**
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {string}
 */
-  getNodeAddress(node_address?: string): string;
+  getNodeAddress(rpc_address?: string): string;
 /**
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 */
-  setNodeAddress(node_address?: string): void;
+  setNodeAddress(rpc_address?: string): void;
 /**
 * @param {Verbosity | undefined} [verbosity]
 * @returns {Verbosity}
@@ -2827,7 +2827,7 @@ export class SDK {
 *
 * * `transaction_params` - Transaction parameters.
 * * `builder_params` - Transaction Builder parameters.
-* * `node_address` - An optional node address to send the request to.
+* * `rpc_address` - An optional rpc address to send the request to.
 *
 * # Returns
 *
@@ -2838,10 +2838,10 @@ export class SDK {
 * Returns a `JsError` if there is an error during the call.
 * @param {TransactionBuilderParams} builder_params
 * @param {TransactionStrParams} transaction_params
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, node_address?: string): Promise<PutTransactionResult>;
+  call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string): Promise<PutTransactionResult>;
 /**
 * Installs a smart contract with the specified parameters and returns the result.
 *
@@ -2850,7 +2850,7 @@ export class SDK {
 * * `deploy_params` - The deploy parameters.
 * * `session_params` - The session parameters.
 * * `payment_amount` - The payment amount as a string.
-* * `node_address` - An optional node address to send the request to.
+* * `rpc_address` - An optional rpc address to send the request to.
 *
 * # Returns
 *
@@ -2862,10 +2862,10 @@ export class SDK {
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {string} payment_amount
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutDeployResult>}
 */
-  install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
 /**
 * JavaScript function for deploying with deserialized parameters.
 *
@@ -2875,7 +2875,7 @@ export class SDK {
 * * `session_params` - Session parameters.
 * * `payment_params` - Payment parameters.
 * * `verbosity` - An optional verbosity level.
-* * `node_address` - An optional node address.
+* * `rpc_address` - An optional rpc address.
 *
 * # Returns
 *
@@ -2884,10 +2884,10 @@ export class SDK {
 * @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutDeployResult>}
 */
-  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
+  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<PutDeployResult>;
 /**
 * @param {any} options
 * @returns {getAccountOptions}
@@ -2906,7 +2906,7 @@ export class SDK {
 *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
 *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
 *   - `verbosity`: Verbosity level for the output.
-*   - `node_address`: Address of the node to query.
+*   - `rpc_address`: Address of the node to query.
 *
 * # Returns
 *
@@ -2968,29 +2968,29 @@ export class SDK {
 * # Arguments
 *
 * * `verbosity` - An optional `Verbosity` parameter.
-* * `node_address` - An optional node address as a string.
+* * `rpc_address` - An optional rpc address as a string.
 *
 * # Returns
 *
 * A `Result` containing either a `GetChainspecResult` or a `JsError` in case of an error.
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetChainspecResult>}
 */
-  get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
+  get_chainspec(verbosity?: Verbosity, rpc_address?: string): Promise<GetChainspecResult>;
 /**
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetChainspecResult>}
 */
-  info_get_chainspec(verbosity?: Verbosity, node_address?: string): Promise<GetChainspecResult>;
+  info_get_chainspec(verbosity?: Verbosity, rpc_address?: string): Promise<GetChainspecResult>;
 /**
 * Retrieves validator changes using the provided options.
 *
 * # Arguments
 *
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `node_address` - An optional string specifying the node address to use for the request.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
 *
 * # Returns
 *
@@ -3000,23 +3000,23 @@ export class SDK {
 *
 * Returns a `JsError` if there is an error during the retrieval process.
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetValidatorChangesResult>}
 */
-  get_validator_changes(verbosity?: Verbosity, node_address?: string): Promise<GetValidatorChangesResult>;
+  get_validator_changes(verbosity?: Verbosity, rpc_address?: string): Promise<GetValidatorChangesResult>;
 /**
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<GetValidatorChangesResult>}
 */
-  info_get_validator_change(verbosity?: Verbosity, node_address?: string): Promise<GetValidatorChangesResult>;
+  info_get_validator_change(verbosity?: Verbosity, rpc_address?: string): Promise<GetValidatorChangesResult>;
 /**
 * Lists available RPCs using the provided options.
 *
 * # Arguments
 *
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `node_address` - An optional string specifying the node address to use for the request.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
 *
 * # Returns
 *
@@ -3026,10 +3026,10 @@ export class SDK {
 *
 * Returns a `JsError` if there is an error during the listing process.
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<ListRpcsResult>}
 */
-  list_rpcs(verbosity?: Verbosity, node_address?: string): Promise<ListRpcsResult>;
+  list_rpcs(verbosity?: Verbosity, rpc_address?: string): Promise<ListRpcsResult>;
 /**
 * Parses query balance options from a JsValue.
 *
@@ -3093,7 +3093,7 @@ export class SDK {
 * * `transaction_params` - The transaction parameters.
 * * `maybe_id` - An optional transfer ID (defaults to a random number).
 * * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
 *
 * # Returns
 *
@@ -3104,10 +3104,10 @@ export class SDK {
 * @param {TransactionStrParams} transaction_params
 * @param {string | undefined} [maybe_id]
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
 /**
 * JS function for `make_deploy`.
 *
@@ -3194,7 +3194,7 @@ export class SDK {
 * * `deploy_params` - The deploy parameters.
 * * `session_params` - The session parameters.
 * * `payment_amount` - The payment amount as a string.
-* * `node_address` - An optional node address to send the request to.
+* * `rpc_address` - An optional rpc address to send the request to.
 *
 * # Returns
 *
@@ -3206,10 +3206,10 @@ export class SDK {
 * @param {DeployStrParams} deploy_params
 * @param {SessionStrParams} session_params
 * @param {string} payment_amount
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutDeployResult>}
 */
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
 /**
 * This function allows executing a deploy speculatively.
 *
@@ -3219,7 +3219,7 @@ export class SDK {
 * * `session_params` - Session parameters for the deploy.
 * * `payment_params` - Payment parameters for the deploy.
 * * `verbosity` - Optional verbosity level.
-* * `node_address` - Optional node address.
+* * `rpc_address` - Optional rpc address.
 *
 * # Returns
 *
@@ -3228,10 +3228,10 @@ export class SDK {
 * @param {SessionStrParams} session_params
 * @param {PaymentStrParams} payment_params
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<SpeculativeExecResult>}
 */
-  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
+  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
 /**
 * JS function for speculative transfer transaction.
 *
@@ -3243,7 +3243,7 @@ export class SDK {
 * * `maybe_id` - An optional transfer ID (defaults to a random number).
 * * `transaction_params` - The transactionment parameters.
 * * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
 *
 * # Returns
 *
@@ -3254,10 +3254,10 @@ export class SDK {
 * @param {TransactionStrParams} transaction_params
 * @param {string | undefined} [maybe_id]
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<SpeculativeExecTxnResult>}
 */
-  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecTxnResult>;
+  speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
 /**
 * JS function for `sign_deploy`.
 *
@@ -3297,7 +3297,7 @@ export class SDK {
 * * `deploy_params` - The deployment parameters.
 * * `payment_params` - The payment parameters.
 * * `verbosity` - The verbosity level for logging (optional).
-* * `node_address` - The address of the node to connect to (optional).
+* * `rpc_address` - The address of the node to connect to (optional).
 *
 * # Returns
 *
@@ -3308,10 +3308,10 @@ export class SDK {
 * @param {DeployStrParams} deploy_params
 * @param {PaymentStrParams} payment_params
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<SpeculativeExecResult>}
 */
-  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<SpeculativeExecResult>;
+  speculative_transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecResult>;
 /**
 * Puts a transaction using the provided options.
 *
@@ -3319,7 +3319,7 @@ export class SDK {
 *
 * * `transaction` - The `Transaction` object to be sent.
 * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-* * `node_address` - An optional string specifying the node address to use for the request.
+* * `rpc_address` - An optional string specifying the rpc address to use for the request.
 *
 * # Returns
 *
@@ -3330,18 +3330,18 @@ export class SDK {
 * Returns a `JsError` if there is an error during the transaction process.
 * @param {Transaction} transaction
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  put_transaction(transaction: Transaction, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+  put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
 /**
 * JavaScript Alias for `put_transaction`.
 * @param {Transaction} transaction
 * @param {Verbosity | undefined} [verbosity]
-* @param {string | undefined} [node_address]
+* @param {string | undefined} [rpc_address]
 * @returns {Promise<PutTransactionResult>}
 */
-  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, node_address?: string): Promise<PutTransactionResult>;
+  account_put_transaction(transaction: Transaction, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
 }
 /**
 */
@@ -4086,7 +4086,7 @@ export class getAccountOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4104,7 +4104,7 @@ export class getAuctionInfoOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4116,13 +4116,13 @@ export class getBalanceOptions {
   free(): void;
 /**
 */
-  node_address?: string;
-/**
-*/
   purse_uref?: URef;
 /**
 */
   purse_uref_as_string?: string;
+/**
+*/
+  rpc_address?: string;
 /**
 */
   state_root_hash?: Digest;
@@ -4146,7 +4146,7 @@ export class getBlockOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4164,7 +4164,7 @@ export class getBlockTransfersOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4185,7 +4185,7 @@ export class getDeployOptions {
   finalized_approvals?: boolean;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4203,7 +4203,7 @@ export class getDictionaryItemOptions {
   dictionary_item_params?: DictionaryItemStrParams;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   state_root_hash?: Digest;
@@ -4232,7 +4232,7 @@ export class getEntityOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4249,7 +4249,7 @@ export class getEraInfoOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4267,7 +4267,7 @@ export class getEraSummaryOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4286,9 +4286,9 @@ export class getSpeculativeExecDeployOptions {
 */
   deploy_as_string?: string;
 /**
-* The node address.
+* The rpc address.
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 * The verbosity level for logging.
 */
@@ -4300,9 +4300,9 @@ export class getSpeculativeExecDeployOptions {
 export class getSpeculativeExecTxnOptions {
   free(): void;
 /**
-* The node address.
+* The rpc address.
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 * The transaction to execute.
 */
@@ -4329,7 +4329,7 @@ export class getStateRootHashOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4344,7 +4344,7 @@ export class getTransactionOptions {
   finalized_approvals?: boolean;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   transaction_hash?: TransactionHash;
@@ -4368,13 +4368,13 @@ export class queryBalanceDetailsOptions {
   maybe_block_id_as_string?: string;
 /**
 */
-  node_address?: string;
-/**
-*/
   purse_identifier?: PurseIdentifier;
 /**
 */
   purse_identifier_as_string?: string;
+/**
+*/
+  rpc_address?: string;
 /**
 */
   state_root_hash?: Digest;
@@ -4398,13 +4398,13 @@ export class queryBalanceOptions {
   maybe_block_id_as_string?: string;
 /**
 */
-  node_address?: string;
-/**
-*/
   purse_identifier?: PurseIdentifier;
 /**
 */
   purse_identifier_as_string?: string;
+/**
+*/
+  rpc_address?: string;
 /**
 */
   state_root_hash?: Digest;
@@ -4427,7 +4427,7 @@ export class queryContractDictOptions {
   dictionary_item_params?: DictionaryItemStrParams;
 /**
 */
-  node_address?: string;
+  rpc_address?: string;
 /**
 */
   state_root_hash?: Digest;
@@ -4456,13 +4456,13 @@ export class queryContractKeyOptions {
   maybe_block_identifier?: BlockIdentifier;
 /**
 */
-  node_address?: string;
-/**
-*/
   path?: Path;
 /**
 */
   path_as_string?: string;
+/**
+*/
+  rpc_address?: string;
 /**
 */
   verbosity?: Verbosity;
@@ -4486,13 +4486,13 @@ export class queryGlobalStateOptions {
   maybe_block_id_as_string?: string;
 /**
 */
-  node_address?: string;
-/**
-*/
   path?: Path;
 /**
 */
   path_as_string?: string;
+/**
+*/
+  rpc_address?: string;
 /**
 */
   state_root_hash?: Digest;
