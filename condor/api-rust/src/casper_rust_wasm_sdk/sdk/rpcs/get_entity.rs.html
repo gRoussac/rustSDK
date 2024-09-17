@@ -452,7 +452,7 @@
     <span class="kw">pub </span>entity_identifier_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_id_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifier&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -478,7 +478,7 @@
     ///   - `maybe_block_id_as_string`: Optional string representation of the block ID.
     ///   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
     ///   - `verbosity`: Verbosity level for the output.
-    ///   - `node_address`: Address of the node to query.
+    ///   - `rpc_address`: Address of the node to query.
     ///
     /// # Returns
     ///
@@ -499,7 +499,7 @@
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         <span class="kw">let </span>maybe_block_identifier = <span class="kw">if let </span><span class="prelude-val">Some</span>(maybe_block_identifier) = maybe_block_identifier {
@@ -516,7 +516,7 @@
                 entity_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
@@ -547,7 +547,7 @@
     /// * `entity_identifier_as_string` - An optional string representing the entity identifier.
     /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -562,7 +562,7 @@
         entity_identifier_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
         maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifierInput&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetAddressableEntityResult&gt;, SdkError&gt; {
         <span class="kw">let </span>entity_identifier = <span class="kw">if let </span><span class="prelude-val">Some</span>(entity_identifier) = entity_identifier {
             entity_identifier
@@ -583,7 +583,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_entity_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="kw-2">&amp;</span>maybe_block_id,
                 <span class="kw-2">&amp;</span>entity_identifier.to_string(),
@@ -601,7 +601,7 @@
                 </span>};
             get_entity_lib(
                 JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
                 entity_identifier.into(),
@@ -668,7 +668,7 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>entity_identifier = get_entity_identifier();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -677,7 +677,7 @@
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
         <span class="comment">// Assert
@@ -690,7 +690,7 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>entity_identifier_as_string = get_entity_identifier().to_string();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -699,7 +699,7 @@
                 <span class="prelude-val">Some</span>(entity_identifier_as_string),
                 <span class="prelude-val">None</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -715,7 +715,7 @@
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(<span class="number">1</span>));
         <span class="kw">let </span>entity_identifier = get_entity_identifier();
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -724,7 +724,7 @@
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(block_identifier),
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 

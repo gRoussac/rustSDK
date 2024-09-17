@@ -395,27 +395,6 @@
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
-<a href="#410" id="410">410</a>
-<a href="#411" id="411">411</a>
-<a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
-<a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -448,7 +427,7 @@
     <span class="kw">pub </span>maybe_block_id_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>path_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>path: <span class="prelude-ty">Option</span>&lt;Path&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -506,7 +485,7 @@
                 path_input,
                 maybe_block_identifier,
                 options.verbosity,
-                options.node_address,
+                options.rpc_address,
             )
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
@@ -537,7 +516,7 @@
         path: PathIdentifierInput,
         maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifierInput&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_QueryGlobalStateResult&gt;, SdkError&gt; {
         <span class="kw">let </span>path_string = <span class="kw">match </span>path {
             PathIdentifierInput::Path(<span class="kw-2">ref </span>path_struct) =&gt; {
@@ -567,7 +546,7 @@
                 entity_identifier_as_string,
                 maybe_block_identifier,
                 verbosity,
-                node_address.clone(),
+                rpc_address.clone(),
             )
             .<span class="kw">await
             </span>.map_err(SdkError::from);
@@ -603,7 +582,7 @@
             state_root_hash: <span class="prelude-val">None</span>,
             maybe_block_id: <span class="prelude-val">None</span>,
             verbosity,
-            node_address,
+            rpc_address,
         })
         .<span class="kw">await
         </span>.map_err(SdkError::from)
@@ -670,13 +649,13 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>entity = get_entity_input().<span class="kw">await</span>;
 
         <span class="kw">let </span>path = PathIdentifierInput::String(<span class="string">"installer"</span>.to_string());
 
-        <span class="kw">let </span>(<span class="kw">_</span>, block_height) = get_block(<span class="kw-2">&amp;</span>node_address.clone()).<span class="kw">await</span>;
+        <span class="kw">let </span>(<span class="kw">_</span>, block_height) = get_block(<span class="kw-2">&amp;</span>rpc_address.clone()).<span class="kw">await</span>;
         <span class="kw">let </span>block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
 
@@ -688,7 +667,7 @@
                 path,
                 <span class="prelude-val">Some</span>(block_identifier),
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -701,13 +680,13 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>entity = get_entity_input().<span class="kw">await</span>;
 
         <span class="kw">let </span>path = PathIdentifierInput::String(<span class="string">"installer"</span>.to_string());
 
-        <span class="kw">let </span>(<span class="kw">_</span>, block_height) = get_block(<span class="kw-2">&amp;</span>node_address.clone()).<span class="kw">await</span>;
+        <span class="kw">let </span>(<span class="kw">_</span>, block_height) = get_block(<span class="kw-2">&amp;</span>rpc_address.clone()).<span class="kw">await</span>;
         <span class="kw">let </span>block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(block_height));
         <span class="comment">// Act
@@ -718,7 +697,7 @@
                 path,
                 <span class="prelude-val">Some</span>(block_identifier),
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -731,7 +710,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>entity = get_entity_input().<span class="kw">await</span>;
         <span class="kw">let </span>error_message = <span class="string">"Invalid argument 'Path': Path is empty"</span>;
@@ -741,14 +720,7 @@
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .query_contract_key(
-                <span class="prelude-val">Some</span>(entity),
-                <span class="prelude-val">None</span>,
-                path,
-                <span class="prelude-val">None</span>,
-                verbosity,
-                <span class="prelude-val">Some</span>(node_address),
-            )
+            .query_contract_key(<span class="prelude-val">Some</span>(entity), <span class="prelude-val">None</span>, path, <span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -762,7 +734,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>entity = get_entity_input().<span class="kw">await</span>;
         <span class="kw">let </span>error_message = <span class="string">"Invalid argument 'Path string': Path string is empty"</span>;
@@ -771,14 +743,7 @@
 
         // Act
         </span><span class="kw">let </span>result = sdk
-            .query_contract_key(
-                <span class="prelude-val">Some</span>(entity),
-                <span class="prelude-val">None</span>,
-                path,
-                <span class="prelude-val">None</span>,
-                verbosity,
-                <span class="prelude-val">Some</span>(node_address),
-            )
+            .query_contract_key(<span class="prelude-val">Some</span>(entity), <span class="prelude-val">None</span>, path, <span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert
@@ -792,7 +757,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>entity = get_entity_input().<span class="kw">await</span>;
 
@@ -801,14 +766,7 @@
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .query_contract_key(
-                <span class="prelude-val">Some</span>(entity),
-                <span class="prelude-val">None</span>,
-                path,
-                <span class="prelude-val">None</span>,
-                verbosity,
-                <span class="prelude-val">Some</span>(node_address),
-            )
+            .query_contract_key(<span class="prelude-val">Some</span>(entity), <span class="prelude-val">None</span>, path, <span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert

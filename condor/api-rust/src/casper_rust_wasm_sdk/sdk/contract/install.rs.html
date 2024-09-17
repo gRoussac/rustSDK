@@ -301,7 +301,7 @@
     ///.
     /// * `transaction_params` - Transaction parameters.
     /// * `transaction_bytes` - Transaction Bytes to install
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -315,10 +315,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         transaction_params: TransactionStrParams,
         transaction_bytes: Bytes,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutTransactionResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
-            </span>.install(transaction_params, transaction_bytes, node_address)
+            </span>.install(transaction_params, transaction_bytes, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -339,7 +339,7 @@
     ///
     /// * `transaction_params` - Transaction parameters.
     /// * `transaction_bytes` - Transaction Bytes to install
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -352,14 +352,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         transaction_params: TransactionStrParams,
         transaction_bytes: Bytes,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutTransactionResult&gt;, SdkError&gt; {
         <span class="comment">//log("install!");
         </span><span class="kw">let </span>builder_params = TransactionBuilderParams::new_session(
             <span class="prelude-val">Some</span>(transaction_bytes),
             <span class="prelude-val">Some</span>(TransactionCategory::InstallUpgrade),
         );
-        <span class="self">self</span>.transaction(builder_params, transaction_params, <span class="prelude-val">None</span>, node_address)
+        <span class="self">self</span>.transaction(builder_params, transaction_params, <span class="prelude-val">None</span>, rpc_address)
             .<span class="kw">await
     </span>}
 }
@@ -403,7 +403,7 @@
     </span><span class="kw">async fn </span>test_install_with_valid_input() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_params = TransactionStrParams::default();
@@ -425,7 +425,7 @@
             .install(
                 transaction_params,
                 transaction_bytes.into(),
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -439,7 +439,7 @@
     </span><span class="kw">async fn </span>test_install_with_invalid_input() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span>error_message = <span class="string">"The transaction sent to the network had an invalid chain name"</span>;
@@ -462,7 +462,7 @@
             .install(
                 transaction_params,
                 transaction_bytes.into(),
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -476,7 +476,7 @@
     </span><span class="kw">async fn </span>test_install_without_secret_key() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>initiator_addr = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
@@ -501,7 +501,7 @@
             .install(
                 transaction_params,
                 transaction_bytes.into(),
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 

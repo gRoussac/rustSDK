@@ -316,10 +316,6 @@
 <a href="#316" id="316">316</a>
 <a href="#317" id="317">317</a>
 <a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::types::block_identifier::BlockIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -407,7 +403,7 @@
 </span><span class="kw">pub struct </span>GetStateRootHashOptions {
     <span class="kw">pub </span>maybe_block_id_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifier&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -454,7 +450,7 @@
             maybe_block_id_as_string,
             maybe_block_identifier,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         <span class="kw">let </span>maybe_block_identifier = <span class="kw">if let </span><span class="prelude-val">Some</span>(maybe_block_identifier) = maybe_block_identifier {
@@ -466,7 +462,7 @@
         };
 
         <span class="kw">let </span>result = <span class="self">self
-            </span>.get_state_root_hash(maybe_block_identifier, verbosity, node_address)
+            </span>.get_state_root_hash(maybe_block_identifier, verbosity, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -507,7 +503,7 @@
     ///
     /// * `maybe_block_identifier` - An optional `BlockIdentifierInput` for specifying a block identifier.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -520,14 +516,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         maybe_block_identifier: <span class="prelude-ty">Option</span>&lt;BlockIdentifierInput&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetStateRootHashResult&gt;, SdkError&gt; {
         <span class="comment">//log("get_state_root_hash!");
 
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_state_root_hash_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="kw-2">&amp;</span>maybe_block_id,
             )
@@ -545,7 +541,7 @@
 
             get_state_root_hash_lib(
                 JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 maybe_block_identifier.map(Into::into),
             )
@@ -581,9 +577,9 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>result = sdk
-            .get_block(<span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(node_address.clone()))
+            .get_block(<span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(rpc_address.clone()))
             .<span class="kw">await</span>;
         <span class="kw">let </span>block_hash = BlockHash::from(
             <span class="kw-2">*</span>result
@@ -599,7 +595,7 @@
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_state_root_hash(<span class="prelude-val">Some</span>(block_identifier), verbosity, <span class="prelude-val">Some</span>(node_address))
+            .get_state_root_hash(<span class="prelude-val">Some</span>(block_identifier), verbosity, <span class="prelude-val">Some</span>(rpc_address))
             .<span class="kw">await</span>;
         <span class="comment">// Assert
         </span><span class="macro">assert!</span>(result.is_ok());
@@ -612,15 +608,11 @@
         <span class="kw">let </span>block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(<span class="number">1</span>));
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
-            .get_state_root_hash(
-                <span class="prelude-val">Some</span>(block_identifier),
-                verbosity,
-                <span class="prelude-val">Some</span>(node_address.clone()),
-            )
+            .get_state_root_hash(<span class="prelude-val">Some</span>(block_identifier), verbosity, <span class="prelude-val">Some</span>(rpc_address.clone()))
             .<span class="kw">await</span>;
 
         <span class="comment">// Assert

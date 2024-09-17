@@ -196,7 +196,7 @@
     ///
     /// * `deploy` - The `Deploy` object to be sent.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -210,9 +210,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy: Deploy,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutDeployResult, JsError&gt; {
-        <span class="kw">let </span>result = <span class="self">self</span>.put_deploy(deploy, verbosity, node_address).<span class="kw">await</span>;
+        <span class="kw">let </span>result = <span class="self">self</span>.put_deploy(deploy, verbosity, rpc_address).<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
             <span class="prelude-val">Err</span>(err) =&gt; {
@@ -229,9 +229,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy: Deploy,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutDeployResult, JsError&gt; {
-        <span class="self">self</span>.put_deploy_js_alias(deploy, verbosity, node_address)
+        <span class="self">self</span>.put_deploy_js_alias(deploy, verbosity, rpc_address)
             .<span class="kw">await
     </span>}
 }
@@ -243,7 +243,7 @@
     ///
     /// * `deploy` - The `Deploy` object to be sent.
     /// * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-    /// * `node_address` - An optional string specifying the node address to use for the request.
+    /// * `rpc_address` - An optional string specifying the rpc address to use for the request.
     ///
     /// # Returns
     ///
@@ -256,12 +256,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         deploy: Deploy,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutDeployResult&gt;, Error&gt; {
         <span class="comment">//log("account_put_deploy!");
         </span>put_deploy(
             JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
             <span class="self">self</span>.get_verbosity(verbosity).into(),
             deploy.into(),
         )
@@ -324,11 +324,11 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>deploy = get_deploy();
 
         <span class="comment">// Act
-        </span><span class="kw">let </span>result = sdk.put_deploy(deploy, verbosity, <span class="prelude-val">Some</span>(node_address)).<span class="kw">await</span>;
+        </span><span class="kw">let </span>result = sdk.put_deploy(deploy, verbosity, <span class="prelude-val">Some</span>(rpc_address)).<span class="kw">await</span>;
 
         <span class="comment">// Assert
         </span><span class="macro">assert!</span>(result.is_ok());

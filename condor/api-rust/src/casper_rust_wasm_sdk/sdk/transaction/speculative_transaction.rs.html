@@ -258,7 +258,7 @@
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transactionment parameters for the transaction.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -270,10 +270,10 @@
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SpeculativeExecTxnResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
-            </span>.speculative_transaction(builder_params, transaction_params, verbosity, node_address)
+            </span>.speculative_transaction(builder_params, transaction_params, verbosity, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -293,7 +293,7 @@
     /// * `builder_params` - Transaction Builder parameters.
     /// * `transaction_params` - Transactionment parameters for the transaction.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -303,7 +303,7 @@
         builder_params: TransactionBuilderParams,
         transaction_params: TransactionStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_SpeculativeExecTxnResult&gt;, SdkError&gt; {
         <span class="comment">// log("speculative_transaction!");
         </span><span class="kw">let </span>transaction = make_transaction(
@@ -316,7 +316,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
         }
 
-        <span class="self">self</span>.speculative_exec(transaction.unwrap().into(), verbosity, node_address)
+        <span class="self">self</span>.speculative_exec(transaction.unwrap().into(), verbosity, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }

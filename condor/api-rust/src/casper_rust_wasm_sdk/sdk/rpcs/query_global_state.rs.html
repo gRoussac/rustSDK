@@ -564,10 +564,6 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::digest::Digest;
 <span class="kw">use </span><span class="kw">crate</span>::types::global_state_identifier::GlobalStateIdentifier;
 <span class="kw">use crate</span>::{
@@ -648,7 +644,7 @@
     <span class="kw">pub </span>key: <span class="prelude-ty">Option</span>&lt;Key&gt;,
     <span class="kw">pub </span>path_as_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>path: <span class="prelude-ty">Option</span>&lt;Path&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -732,7 +728,7 @@
     <span class="kw">pub </span>maybe_global_state_identifier: <span class="prelude-ty">Option</span>&lt;GlobalStateIdentifier&gt;,
     <span class="kw">pub </span>state_root_hash: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>maybe_block_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -760,7 +756,7 @@
             path_as_string,
             path,
             verbosity,
-            node_address,
+            rpc_address,
         } = options.unwrap_or_default();
 
         <span class="kw">let </span>key = <span class="kw">if let </span><span class="prelude-val">Some</span>(key) = key {
@@ -800,7 +796,7 @@
                 },
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity,
-                node_address,
+                rpc_address,
             }
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(hash) = state_root_hash_as_string {
             <span class="kw">let </span>state_root_hash_str = hash.to_string();
@@ -815,7 +811,7 @@
                 },
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity,
-                node_address,
+                rpc_address,
             }
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(maybe_block_id_as_string) = maybe_block_id_as_string {
             QueryGlobalStateParams {
@@ -825,7 +821,7 @@
                 state_root_hash: <span class="prelude-val">None</span>,
                 maybe_block_id: <span class="prelude-val">Some</span>(maybe_block_id_as_string),
                 verbosity,
-                node_address,
+                rpc_address,
             }
         } <span class="kw">else </span>{
             QueryGlobalStateParams {
@@ -835,7 +831,7 @@
                 state_root_hash: <span class="prelude-val">None</span>,
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity,
-                node_address,
+                rpc_address,
             }
         };
         <span class="prelude-val">Ok</span>(query_params)
@@ -863,7 +859,7 @@
             state_root_hash,
             maybe_block_id,
             verbosity,
-            node_address,
+            rpc_address,
         } = query_params;
 
         <span class="kw">let </span>key = <span class="kw">match </span>key {
@@ -899,7 +895,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(maybe_global_state_identifier) = maybe_global_state_identifier {
             query_global_state_lib(
                 JsonRpcId::from(rand::thread_rng().gen::&lt;i64&gt;().to_string()),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 maybe_global_state_identifier.into(),
                 key.unwrap().into(),
@@ -914,7 +910,7 @@
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(state_root_hash) = state_root_hash {
             query_global_state_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="string">""</span>,
                 <span class="kw-2">&amp;</span>state_root_hash,
@@ -926,7 +922,7 @@
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(maybe_block_id) = maybe_block_id {
             query_global_state_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="kw-2">&amp;</span>maybe_block_id,
                 <span class="string">""</span>,
@@ -937,11 +933,7 @@
             </span>.map_err(SdkError::from)
         } <span class="kw">else </span>{
             <span class="kw">let </span>state_root_hash = <span class="self">self
-                </span>.get_state_root_hash(
-                    <span class="prelude-val">None</span>,
-                    <span class="prelude-val">None</span>,
-                    <span class="prelude-val">Some</span>(<span class="self">self</span>.get_node_address(node_address.clone())),
-                )
+                </span>.get_state_root_hash(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.get_rpc_address(rpc_address.clone())))
                 .<span class="kw">await</span>;
 
             <span class="kw">let </span>state_root_hash_as_string: String = <span class="kw">match </span>state_root_hash {
@@ -955,7 +947,7 @@
 
             query_global_state_cli(
                 <span class="kw-2">&amp;</span>rand::thread_rng().gen::&lt;i64&gt;().to_string(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.get_node_address(node_address),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.get_rpc_address(rpc_address),
                 <span class="self">self</span>.get_verbosity(verbosity).into(),
                 <span class="string">""</span>,
                 <span class="kw-2">&amp;</span>state_root_hash_as_string,
@@ -996,7 +988,7 @@
                 state_root_hash: <span class="prelude-val">None</span>,
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity: <span class="prelude-val">None</span>,
-                node_address: <span class="prelude-val">None</span>,
+                rpc_address: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span>;
 
@@ -1022,7 +1014,7 @@
                 state_root_hash: <span class="prelude-val">None</span>,
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity: <span class="prelude-val">None</span>,
-                node_address: <span class="prelude-val">None</span>,
+                rpc_address: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span>;
 
@@ -1038,7 +1030,7 @@
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>global_state_identifier = GlobalStateIdentifier::from_block_height(<span class="number">1</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -1049,7 +1041,7 @@
                 state_root_hash: <span class="prelude-val">None</span>,
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity,
-                node_address: <span class="prelude-val">Some</span>(node_address),
+                rpc_address: <span class="prelude-val">Some</span>(rpc_address),
             })
             .<span class="kw">await</span>;
 
@@ -1062,9 +1054,9 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>state_root_hash: Digest = sdk
-            .get_state_root_hash(<span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(node_address.clone()))
+            .get_state_root_hash(<span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(rpc_address.clone()))
             .<span class="kw">await
             </span>.unwrap()
             .result
@@ -1080,7 +1072,7 @@
                 state_root_hash: <span class="prelude-val">Some</span>(state_root_hash.to_string()),
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity,
-                node_address: <span class="prelude-val">Some</span>(node_address),
+                rpc_address: <span class="prelude-val">Some</span>(rpc_address),
             })
             .<span class="kw">await</span>;
 
@@ -1093,7 +1085,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="comment">// Act
         </span><span class="kw">let </span>result = sdk
@@ -1104,7 +1096,7 @@
                 state_root_hash: <span class="prelude-val">None</span>,
                 maybe_block_id: <span class="prelude-val">Some</span>(<span class="string">"1"</span>.to_string()),
                 verbosity,
-                node_address: <span class="prelude-val">Some</span>(node_address),
+                rpc_address: <span class="prelude-val">Some</span>(rpc_address),
             })
             .<span class="kw">await</span>;
 
@@ -1128,7 +1120,7 @@
                 ),
                 maybe_block_id: <span class="prelude-val">None</span>,
                 verbosity: <span class="prelude-val">None</span>,
-                node_address: <span class="prelude-val">None</span>,
+                rpc_address: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span>;
 

@@ -269,7 +269,7 @@
     /// * `deploy_params` - The deployment parameters.
     /// * `payment_params` - The payment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -285,7 +285,7 @@
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SpeculativeExecResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
             </span>.speculative_transfer(
@@ -295,7 +295,7 @@
                 deploy_params,
                 payment_params,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
@@ -319,7 +319,7 @@
     /// * `deploy_params` - The deployment parameters.
     /// * `payment_params` - The payment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -334,7 +334,7 @@
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_SpeculativeExecResult&gt;, SdkError&gt; {
         <span class="comment">// log("speculative_transfer!");
         </span><span class="kw">let </span>transfer_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(transfer_id) = transfer_id {
@@ -356,7 +356,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
         }
 
-        <span class="self">self</span>.speculative_exec_deploy(deploy.unwrap().into(), verbosity, node_address)
+        <span class="self">self</span>.speculative_exec_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }

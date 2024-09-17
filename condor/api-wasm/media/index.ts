@@ -2,8 +2,8 @@ import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams,
 const fs = require('fs').promises;
 const http = require('http');
 
-const node_address = 'http://localhost:11101';
-const sdk = new SDK(node_address);
+const rpc_address = 'http://localhost:11101';
+const sdk = new SDK(rpc_address);
 
 // const server = http.createServer(async (req, res) => {
 //   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -105,8 +105,8 @@ const example5 = async () => {
 
 // transfer_transaction
 const example6 = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -164,8 +164,8 @@ const example7 = async () => {
 
 // transaction
 const example8 = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -189,8 +189,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // put_transaction
 const example9 = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -218,8 +218,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // put_transaction transfer_transaction
 const example10 = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -249,9 +249,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // install
 const example11 = async () => {
-  const node_address = 'http://127.0.0.1:11101';
+  const rpc_address = 'http://127.0.0.1:11101';
   const events_address = 'http://127.0.0.1:18101/events';
-  const sdk = new SDK(node_address);
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -304,9 +304,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // call_entrypoint
 const example12 = async () => {
-  const node_address = 'http://127.0.0.1:11101';
+  const rpc_address = 'http://127.0.0.1:11101';
   const events_address = 'http://127.0.0.1:18101/events';
-  const sdk = new SDK(node_address);
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -466,8 +466,8 @@ const example5_legacy = async () => {
 
 // transfer
 const example6_legacy = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -526,8 +526,8 @@ const example7_legacy = async () => {
 
 // deploy
 const example8_legacy = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -552,8 +552,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // put_deploy
 const example9_legacy = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -585,8 +585,8 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // put_deploy transfer
 const example10_legacy = async () => {
-  const node_address = 'http://127.0.0.1:11101';
-  const sdk = new SDK(node_address);
+  const rpc_address = 'http://127.0.0.1:11101';
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -616,9 +616,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // install_deploy
 const example11_legacy = async () => {
-  const node_address = 'http://127.0.0.1:11101';
+  const rpc_address = 'http://127.0.0.1:11101';
   const events_address = 'http://127.0.0.1:18101/events';
-  const sdk = new SDK(node_address);
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
@@ -676,9 +676,9 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
 
 // call_entrypoint_deploy
 const example12_legacy = async () => {
-  const node_address = 'http://127.0.0.1:11101';
+  const rpc_address = 'http://127.0.0.1:11101';
   const events_address = 'http://127.0.0.1:18101/events';
-  const sdk = new SDK(node_address);
+  const sdk = new SDK(rpc_address);
   const chain_name = 'casper-net-1';
   const secret_key = `-----BEGIN PRIVATE KEY-----
 MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI

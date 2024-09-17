@@ -311,7 +311,7 @@
     <span class="kw">pub </span>state_root_hash: <span class="prelude-ty">Option</span>&lt;Digest&gt;,
     <span class="kw">pub </span>dictionary_item_params: <span class="prelude-ty">Option</span>&lt;DictionaryItemStrParams&gt;,
     <span class="kw">pub </span>dictionary_item_identifier: <span class="prelude-ty">Option</span>&lt;DictionaryItemIdentifier&gt;,
-    <span class="kw">pub </span>node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -355,7 +355,7 @@
     /// * `state_root_hash` - State root hash.
     /// * `dictionary_item` - Dictionary item input.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -365,10 +365,10 @@
         state_root_hash: <span class="kw">impl </span>ToDigest,
         dictionary_item: DictionaryItemInput,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_GetDictionaryItemResult&gt;, SdkError&gt; {
         <span class="comment">// log("query_contract_dict!");
-        </span><span class="self">self</span>.get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
+        </span><span class="self">self</span>.get_dictionary_item(state_root_hash, dictionary_item, verbosity, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }
@@ -413,12 +413,12 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>dictionary_item = get_dictionary_item(<span class="bool-val">false</span>).<span class="kw">await</span>;
 
         <span class="kw">let </span>state_root_hash: Digest = sdk
-            .get_state_root_hash(<span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(node_address.clone()))
+            .get_state_root_hash(<span class="prelude-val">None</span>, verbosity, <span class="prelude-val">Some</span>(rpc_address.clone()))
             .<span class="kw">await
             </span>.unwrap()
             .result
@@ -432,7 +432,7 @@
                 state_root_hash,
                 dictionary_item,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -445,7 +445,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>state_root_hash = <span class="string">""</span>;
 
         <span class="comment">// Act
@@ -454,7 +454,7 @@
                 state_root_hash,
                 get_dictionary_item(<span class="bool-val">false</span>).<span class="kw">await</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
         <span class="comment">// Assert
@@ -466,7 +466,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>state_root_hash = <span class="string">""</span>;
 
         <span class="comment">// Act
@@ -475,7 +475,7 @@
                 state_root_hash,
                 get_dictionary_item(<span class="bool-val">false</span>).<span class="kw">await</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -488,7 +488,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
         <span class="kw">let </span>state_root_hash = <span class="string">""</span>;
 
         <span class="comment">// Act
@@ -497,7 +497,7 @@
                 state_root_hash,
                 get_dictionary_item(<span class="bool-val">true</span>).<span class="kw">await</span>,
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -510,7 +510,7 @@
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>verbosity = <span class="prelude-val">Some</span>(Verbosity::High);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = get_network_constants();
 
         <span class="kw">let </span>error_message =
             <span class="string">"Failed to parse dictionary item address as a key: unknown prefix for key"</span>;
@@ -524,7 +524,7 @@
                 state_root_hash,
                 DictionaryItemInput::Params(params),
                 verbosity,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 

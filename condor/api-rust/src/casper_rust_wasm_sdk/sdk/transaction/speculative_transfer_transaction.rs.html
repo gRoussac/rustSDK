@@ -245,7 +245,7 @@
     /// * `maybe_id` - An optional transfer ID (defaults to a random number).
     /// * `transaction_params` - The transactionment parameters.
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -260,7 +260,7 @@
         transaction_params: TransactionStrParams,
         maybe_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SpeculativeExecTxnResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
             </span>.speculative_transfer_transaction(
@@ -270,7 +270,7 @@
                 transaction_params,
                 maybe_id,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
@@ -294,7 +294,7 @@
     /// * `transaction_params` - The transactionment parameters.
     /// * `maybe_id` - An optional transfer ID (defaults to a random number).
     /// * `verbosity` - The verbosity level for logging (optional).
-    /// * `node_address` - The address of the node to connect to (optional).
+    /// * `rpc_address` - The address of the node to connect to (optional).
     ///
     /// # Returns
     ///
@@ -308,7 +308,7 @@
         transaction_params: TransactionStrParams,
         maybe_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_SpeculativeExecTxnResult&gt;, SdkError&gt; {
         <span class="comment">// log("speculative_transfer_transaction!");
         </span><span class="kw">let </span>transaction = make_transfer_transaction(
@@ -319,7 +319,7 @@
             maybe_id,
         )<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.speculative_exec(transaction, verbosity, node_address)
+        <span class="self">self</span>.speculative_exec(transaction, verbosity, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }

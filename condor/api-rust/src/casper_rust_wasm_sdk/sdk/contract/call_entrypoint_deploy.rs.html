@@ -333,7 +333,7 @@
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_amount` - The payment amount as a string.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -350,13 +350,13 @@
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_amount: <span class="kw-2">&amp;</span>str,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PutDeployResult, JsError&gt; {
         <span class="kw">let </span>payment_params = PaymentStrParams::default();
         payment_params.set_payment_amount(payment_amount);
 
         <span class="kw">let </span>result = <span class="self">self
-            </span>.call_entrypoint_deploy(deploy_params, session_params, payment_params, node_address)
+            </span>.call_entrypoint_deploy(deploy_params, session_params, payment_params, rpc_address)
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(data) =&gt; <span class="prelude-val">Ok</span>(data.result.into()),
@@ -378,7 +378,7 @@
     /// * `deploy_params` - The deploy parameters.
     /// * `session_params` - The session parameters.
     /// * `payment_params` - The payment parameters.
-    /// * `node_address` - An optional node address to send the request to.
+    /// * `rpc_address` - An optional rpc address to send the request to.
     ///
     /// # Returns
     ///
@@ -394,7 +394,7 @@
         deploy_params: DeployStrParams,
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_PutDeployResult&gt;, SdkError&gt; {
         <span class="comment">//log("call_entrypoint_deploy!");
         </span><span class="kw">let </span>deploy = make_deploy(
@@ -405,7 +405,7 @@
             <span class="bool-val">false</span>,
         )<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.put_deploy(deploy.into(), <span class="prelude-val">None</span>, node_address)
+        <span class="self">self</span>.put_deploy(deploy.into(), <span class="prelude-val">None</span>, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }
@@ -452,7 +452,7 @@
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_valid_input() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
@@ -475,7 +475,7 @@
                 deploy_params,
                 session_params,
                 payment_params,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -489,7 +489,7 @@
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_with_invalid_input() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
@@ -522,7 +522,7 @@
                 deploy_params,
                 session_params,
                 payment_params,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 
@@ -536,7 +536,7 @@
     </span><span class="kw">async fn </span>test_call_entrypoint_deploy_without_secret_key() {
         <span class="comment">// Arrange
         </span><span class="kw">let </span>sdk = SDK::new(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>(node_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
+        <span class="kw">let </span>(rpc_address, <span class="kw">_</span>, <span class="kw">_</span>, chain_name) = get_network_constants();
         <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
 
@@ -567,7 +567,7 @@
                 deploy_params,
                 session_params,
                 payment_params,
-                <span class="prelude-val">Some</span>(node_address),
+                <span class="prelude-val">Some</span>(rpc_address),
             )
             .<span class="kw">await</span>;
 

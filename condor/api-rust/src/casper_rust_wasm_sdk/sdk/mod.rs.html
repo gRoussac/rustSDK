@@ -94,7 +94,7 @@
 
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">pub struct </span>SDK {
-    node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
 }
 
@@ -107,25 +107,25 @@
 <span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>SDK {
     <span class="attr">#[wasm_bindgen(constructor)]
-    </span><span class="kw">pub fn </span>new(node_address: <span class="prelude-ty">Option</span>&lt;String&gt;, verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;, verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;) -&gt; <span class="self">Self </span>{
         SDK {
-            node_address,
+            rpc_address,
             verbosity,
         }
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"getNodeAddress"</span>)]
-    </span><span class="kw">pub fn </span>get_node_address(<span class="kw-2">&amp;</span><span class="self">self</span>, node_address: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; String {
-        node_address
+    </span><span class="kw">pub fn </span>get_rpc_address(<span class="kw-2">&amp;</span><span class="self">self</span>, rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; String {
+        rpc_address
             .as_ref()
             .cloned()
-            .or_else(|| <span class="self">self</span>.node_address.as_ref().map(String::to_owned))
+            .or_else(|| <span class="self">self</span>.rpc_address.as_ref().map(String::to_owned))
             .unwrap_or_default()
     }
 
     <span class="attr">#[wasm_bindgen(js_name = <span class="string">"setNodeAddress"</span>)]
-    </span><span class="kw">pub fn </span>set_node_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node_address: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
-        <span class="self">self</span>.node_address = node_address;
+    </span><span class="kw">pub fn </span>set_rpc_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="self">self</span>.rpc_address = rpc_address;
         <span class="prelude-val">Ok</span>(())
     }
 

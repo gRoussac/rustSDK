@@ -262,7 +262,7 @@
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -276,7 +276,7 @@
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SpeculativeExecResult, JsError&gt; {
         <span class="kw">let </span>result = <span class="self">self
             </span>.speculative_deploy(
@@ -284,7 +284,7 @@
                 session_params,
                 payment_params,
                 verbosity,
-                node_address,
+                rpc_address,
             )
             .<span class="kw">await</span>;
         <span class="kw">match </span>result {
@@ -306,7 +306,7 @@
     /// * `session_params` - Session parameters for the deploy.
     /// * `payment_params` - Payment parameters for the deploy.
     /// * `verbosity` - Optional verbosity level.
-    /// * `node_address` - Optional node address.
+    /// * `rpc_address` - Optional rpc address.
     ///
     /// # Returns
     ///
@@ -319,7 +319,7 @@
         session_params: SessionStrParams,
         payment_params: PaymentStrParams,
         verbosity: <span class="prelude-ty">Option</span>&lt;Verbosity&gt;,
-        node_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        rpc_address: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessResponse&lt;_SpeculativeExecResult&gt;, SdkError&gt; {
         <span class="comment">// log("speculative_deploy!");
         </span><span class="kw">let </span>deploy = make_deploy(
@@ -334,7 +334,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(SdkError::from(err));
         }
 
-        <span class="self">self</span>.speculative_exec_deploy(deploy.unwrap().into(), verbosity, node_address)
+        <span class="self">self</span>.speculative_exec_deploy(deploy.unwrap().into(), verbosity, rpc_address)
             .<span class="kw">await
             </span>.map_err(SdkError::from)
     }
