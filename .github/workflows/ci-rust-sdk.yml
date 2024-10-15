@@ -55,6 +55,11 @@ jobs:
           echo "SECRET_KEY_USER_1=$(cat ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
           echo "SECRET_KEY_USER_2=$(cat ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
 
+      - name: Print GITHUB_ENV
+        run: |
+          echo "Contents of GITHUB_ENV:"
+          cat $GITHUB_ENV
+
       - name: Fmt
         uses: actions-rs/cargo@v1
         with:
