@@ -20,14 +20,25 @@ jobs:
         os: [ubuntu-22.04]
         node-version: [20.x]
     runs-on: ${{ matrix.os }}
+
+    services:
+      # Label used to access the service container
+      casper-nctl:
+        # Docker Hub image
+        image: gregoshop/casper-nctl:2.0
+    ports:
+      - 11101-11105:11101-11105
+      - 14101-14105:14101-14105
+      - 18101-18105:18101-18105
+      - 25101-25105:25101-25105
+      - 28101-28105:28101-28105
+    volumes:
+      - $PWD/assets/users:/app/casper-nctl/assets/net-1/users/
+
     env:
-      RPC_ADDRESS: http://127.0.0.1:7777/rpc
-      EVENT_ADDRESS: http://127.0.0.1:9999/events/main
-      SPECULTATIVE_ADDRESS: http://127.0.0.1:7778
-      # WARNING: These accounts, and their private keys, are publicly known.
-      # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
-      SECRET_KEY_USER_1: MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
-      SECRET_KEY_USER_2: MC4CAQAwBQYDK2VwBCIEIJTD9IlUYzuMHbvAiFel/uqd6V7vUtUD19IEQlo6SAFC
+      RPC_ADDRESS: http://127.0.0.1:11100
+      EVENT_ADDRESS: http://127.0.0.1:18101/events
+      SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
     steps:
       - uses: actions/checkout@v2
@@ -37,6 +48,13 @@ jobs:
           profile: minimal
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
+
+      # WARNING: These accounts, and their private keys, are publicly known.
+      # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+      - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
+        run: |
+          echo "SECRET_KEY_USER_1=$(cat ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(cat ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
 
       - name: Fmt
         uses: actions-rs/cargo@v1
