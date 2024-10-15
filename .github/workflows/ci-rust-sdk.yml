@@ -48,6 +48,11 @@ jobs:
           components: rustfmt, clippy
           target: wasm32-unknown-unknown
 
+      - name: List files in user-2 directory
+        run: |
+          echo "Listing files in ./assets/users/user-1/:"
+          ls -la ./assets/users/user-1/
+
       # WARNING: These accounts, and their private keys, are publicly known.
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
       - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
