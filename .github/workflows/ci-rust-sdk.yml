@@ -34,8 +34,6 @@ jobs:
           - 28101-28105:28101-28105
         volumes:
           - ./assets/users:/app/casper-nctl/assets/net-1/users/
-        command: /bin/sh -c "sleep 60 && ls /app/casper-nctl/assets/net-1/users/"
-
     env:
       RPC_ADDRESS: http://127.0.0.1:11100
       EVENT_ADDRESS: http://127.0.0.1:18101/events
