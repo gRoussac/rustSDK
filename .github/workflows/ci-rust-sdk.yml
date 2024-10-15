@@ -43,7 +43,7 @@ jobs:
       - name: List files in user-1 directory
         run: |
           echo "Listing files in ./assets/users/user-1/:"
-          ls -la ./assets/
+          ls -la ./assets/users/
 
       # WARNING: These accounts, and their private keys, are publicly known.
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
