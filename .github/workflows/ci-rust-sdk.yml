@@ -40,14 +40,6 @@ jobs:
       SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          components: rustfmt, clippy
-          target: wasm32-unknown-unknown
-
       - name: List files in user-1 directory
         run: |
           echo "Listing files in ./assets/users/user-1/:"
@@ -57,13 +49,26 @@ jobs:
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
       - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
         run: |
-          echo "SECRET_KEY_USER_1=$(cat ../assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
-          echo "SECRET_KEY_USER_2=$(cat ../assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_1=$(cat ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(cat ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
 
       - name: Print GITHUB_ENV
         run: |
           echo "Contents of GITHUB_ENV:"
           cat $GITHUB_ENV
+
+      - name: Fix permissions for assets
+        run: |
+          sudo chown -R $USER:$USER ./assets/users
+          sudo chmod -R 755 ./assets/users
+
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: rustfmt, clippy
+          target: wasm32-unknown-unknown
 
       - name: Fmt
         uses: actions-rs/cargo@v1
