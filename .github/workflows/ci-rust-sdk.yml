@@ -42,6 +42,16 @@ jobs:
       SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
     steps:
+      - name: Wait for the service to be ready
+        run: |
+          echo "Waiting for 60 seconds..."
+          sleep 60
+
+      - name: List files in the users directory
+        run: |
+          echo "Listing files in the users directory of the service container..."
+          docker exec ${{ job.services.casper-nctl.id }} ls /app/casper-nctl/assets/net-1/users/
+
       - name: List files in user-1 directory
         run: |
           echo "Listing files in ./assets/users/user-1/:"
