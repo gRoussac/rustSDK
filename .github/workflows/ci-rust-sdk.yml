@@ -21,29 +21,50 @@ jobs:
         node-version: [20.x]
     runs-on: ${{ matrix.os }}
 
-    services:
-      # Label used to access the service container
-      casper-nctl:
-        # Docker Hub image
-        image: gregoshop/casper-nctl:2.0
-        ports:
-          - 11101-11105:11101-11105
-          - 14101-14105:14101-14105
-          - 18101-18105:18101-18105
-          - 25101-25105:25101-25105
-          - 28101-28105:28101-28105
-        volumes:
-          - ./assets/users:/app/casper-nctl/assets/net-1/users/
+    # services:
+    #   # Label used to access the service container
+    #   casper-nctl:
+    #     # Docker Hub image
+    #     image: gregoshop/casper-nctl:2.0
+    #     ports:
+    #       - 11101-11105:11101-11105
+    #       - 14101-14105:14101-14105
+    #       - 18101-18105:18101-18105
+    #       - 25101-25105:25101-25105
+    #       - 28101-28105:28101-28105
+    #     volumes:
+    #       - ./assets/users:/app/casper-nctl/assets/net-1/users/
     env:
       RPC_ADDRESS: http://127.0.0.1:11101
       EVENT_ADDRESS: http://127.0.0.1:18101/events
       SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
     steps:
+      - name: Clone casper-nctl-2-docker repository
+        run: |
+          git clone git@github.com:gRoussac/casper-nctl-2-docker.git
+
+      - name: Build and start the service
+        run: |
+          cd casper-nctl-2-docker
+          make build-start 2.0
+
       - name: Wait for the service to be ready
         run: |
-          echo "Waiting for 10 seconds for nctl to boot and create accounts..."
-          sleep 10
+          echo "Waiting for the service to be ready on port 11101..."
+          for i in {1..30}; do # wait for up to 30 seconds
+            if nc -z localhost 11101; then
+              echo "Service is up!"
+              break
+            fi
+            echo "Waiting..."
+            sleep 1
+          done
+
+          # Check if the service is still not ready after 30 seconds
+          if ! nc -z localhost 11101; then
+            echo "Service did not start in time!"
+            exit 1
 
       # - name: List files in the users directory
       #   run: |
