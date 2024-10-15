@@ -65,7 +65,7 @@ jobs:
       - name: Delete user-1 directory
         run: |
           echo "Deleting ./assets/ directory..."
-          rm -rf ./assets/
+          sudo rm -rf ./assets/
 
       - name: Print GITHUB_ENV
         run: |
