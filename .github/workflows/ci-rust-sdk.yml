@@ -26,7 +26,22 @@ jobs:
       EVENT_ADDRESS: http://127.0.0.1:18101/events
       SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
+    # services:
+    #   # Label used to access the service container
+    #   casper-nctl:
+    #     # Docker Hub image
+    #     image: gregoshop/casper-nctl:2.0
+    #     ports:
+    #       - 11101-11105:11101-11105
+    #       - 14101-14105:14101-14105
+    #       - 18101-18105:18101-18105
+    #       - 25101-25105:25101-25105
+    #       - 28101-28105:28101-28105
+    #     volumes:
+    #       - ./assets/users:/app/casper-nctl/assets/net-1/users/
+
     steps:
+      # Replace by above service with docker image of stable 2.0
       - name: Clone casper-nctl-2-docker repository
         run: |
           git clone https://github.com/gRoussac/casper-nctl-2-docker.git
@@ -35,6 +50,7 @@ jobs:
         run: |
           cd casper-nctl-2-docker
           make build-start 2.0
+          cd ..
 
       - name: Wait for the service to be ready
         run: |
@@ -70,13 +86,13 @@ jobs:
       # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
       - name: Set SECRET_KEY_USER_1 and SECRET_KEY_USER_2 environment variables
         run: |
-          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
-          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_1=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-1/secret_key.pem)" >> $GITHUB_ENV
+          echo "SECRET_KEY_USER_2=$(sed -n '2p' ./casper-nctl-2-docker/assets/users/user-2/secret_key.pem)" >> $GITHUB_ENV
 
       - name: Delete user-1 directory
         run: |
-          echo "Deleting ./assets/ directory..."
-          sudo rm -rf ./assets/
+          echo "Deleting ./casper-nctl-2-docker directories..."
+          sudo rm -rf ./casper-nctl-2-docker
 
       - name: Print GITHUB_ENV
         run: |
