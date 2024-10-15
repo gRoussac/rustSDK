@@ -32,8 +32,8 @@ jobs:
           - 18101-18105:18101-18105
           - 25101-25105:25101-25105
           - 28101-28105:28101-28105
-        volumes:
-          - ./assets/users:/app/casper-nctl/assets/net-1/users/
+        # volumes:
+        #   - ./assets/users:/app/casper-nctl/assets/net-1/users/
     env:
       RPC_ADDRESS: http://127.0.0.1:11100
       EVENT_ADDRESS: http://127.0.0.1:18101/events
