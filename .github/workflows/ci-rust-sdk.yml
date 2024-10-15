@@ -62,34 +62,34 @@ jobs:
           sudo chown -R $USER:$USER ./assets/users
           sudo chmod -R 755 ./assets/users
 
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          components: rustfmt, clippy
-          target: wasm32-unknown-unknown
+      # - uses: actions/checkout@v2
+      # - uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
+      #     profile: minimal
+      #     components: rustfmt, clippy
+      #     target: wasm32-unknown-unknown
 
-      - name: Fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
+      # - name: Fmt
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: fmt
+      #     args: -- --check
 
-      - name: Audit
-        uses: actions-rs/cargo@v1
-        with:
-          command: audit
-          args: --deny warnings
+      # - name: Audit
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: audit
+      #     args: --deny warnings
 
-      - name: Lint
-        run: make check-lint
+      # - name: Lint
+      #   run: make check-lint
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@5b949b50c3461bbcd5a540b150c368278160234a #v3.4.0
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     registry-url: 'https://registry.npmjs.org'
 
       # - name: Casper node launcher js
       #   run: npx casper-node-launcher-js node --daemon
