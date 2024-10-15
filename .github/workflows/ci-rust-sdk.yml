@@ -35,7 +35,7 @@ jobs:
         volumes:
           - ./assets/users:/app/casper-nctl/assets/net-1/users/
     env:
-      RPC_ADDRESS: http://127.0.0.1:11100
+      RPC_ADDRESS: http://127.0.0.1:11101
       EVENT_ADDRESS: http://127.0.0.1:18101/events
       SPECULTATIVE_ADDRESS: http://127.0.0.1:25101
 
@@ -100,9 +100,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Casper node launcher js
-        run: npx casper-node-launcher-js node --daemon
 
       - name: Unit Tests
         run: make test
