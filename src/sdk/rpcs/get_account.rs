@@ -165,22 +165,22 @@ impl SDK {
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetAccountResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetAccountResult>, Box<SdkError>> {
         let account_identifier = if let Some(account_identifier) = account_identifier {
             account_identifier
         } else if let Some(account_identifier_as_string) = account_identifier_as_string.clone() {
             match parse_account_identifier(&account_identifier_as_string) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    return Err(err.into());
+                    return Err(Box::new(err.into()));
                 }
             }
         } else {
             let err = "Error: Missing account identifier";
-            return Err(SdkError::InvalidArgument {
+            return Err(Box::new(SdkError::InvalidArgument {
                 context: "get_account",
                 error: err.to_string(),
-            });
+            }));
         };
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_account_cli(
@@ -191,7 +191,7 @@ impl SDK {
                 &account_identifier.to_string(),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else {
             let maybe_block_identifier =
                 if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
@@ -209,7 +209,7 @@ impl SDK {
                 account_identifier.into(),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         }
     }
 }

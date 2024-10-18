@@ -166,7 +166,7 @@ impl SDK {
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetBlockTransfersResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetBlockTransfersResult>, Box<SdkError>> {
         //log("get_block_transfers!");
 
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
@@ -177,7 +177,7 @@ impl SDK {
                 &maybe_block_id,
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else {
             let maybe_block_identifier =
                 if let Some(BlockIdentifierInput::BlockIdentifier(maybe_block_identifier)) =
@@ -194,7 +194,7 @@ impl SDK {
                 maybe_block_identifier.map(Into::into),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         }
     }
 }

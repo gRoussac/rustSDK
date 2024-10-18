@@ -179,7 +179,7 @@ impl SDK {
     pub fn query_global_state_js_alias_params(
         &self,
         options: Option<QueryGlobalStateOptions>,
-    ) -> Result<QueryGlobalStateParams, SdkError> {
+    ) -> Result<QueryGlobalStateParams, Box<SdkError>> {
         let QueryGlobalStateOptions {
             global_state_identifier,
             state_root_hash_as_string,
@@ -199,10 +199,10 @@ impl SDK {
             Some(KeyIdentifierInput::String(key_as_string))
         } else {
             let err_msg = "Error: Missing Key as string or Key".to_string();
-            return Err(SdkError::InvalidArgument {
+            return Err(Box::new(SdkError::InvalidArgument {
                 context: "query_global_state_js_alias_params",
                 error: err_msg,
-            });
+            }));
         };
 
         let maybe_path = if let Some(path) = path {
@@ -283,7 +283,7 @@ impl SDK {
     pub async fn query_global_state(
         &self,
         query_params: QueryGlobalStateParams,
-    ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
+    ) -> Result<SuccessResponse<_QueryGlobalStateResult>, Box<SdkError>> {
         //log("query_global_state!");
 
         let QueryGlobalStateParams {
@@ -306,10 +306,10 @@ impl SDK {
 
         if key.is_none() {
             let err = "Error: Missing key from formatted string";
-            return Err(SdkError::InvalidArgument {
+            return Err(Box::new(SdkError::InvalidArgument {
                 context: "query_global_state",
                 error: err.to_string(),
-            });
+            }));
         }
 
         let path = if let Some(path) = path {
@@ -340,7 +340,7 @@ impl SDK {
                 },
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else if let Some(state_root_hash) = state_root_hash {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
@@ -352,7 +352,7 @@ impl SDK {
                 &path_str,
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else if let Some(maybe_block_id) = maybe_block_id {
             query_global_state_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
@@ -364,7 +364,7 @@ impl SDK {
                 &path_str,
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else {
             let state_root_hash = self
                 .get_state_root_hash(
@@ -391,7 +391,7 @@ impl SDK {
                 &path_str,
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         }
     }
 }

@@ -582,12 +582,12 @@ impl Deploy {
         })
     }
 
-    pub fn to_json_string(&self) -> Result<String, SdkError> {
-        serde_json::to_string(&self.0).map_err(SdkError::from)
+    pub fn to_json_string(&self) -> Result<String, Box<SdkError>> {
+        serde_json::to_string(&self.0).map_err(|err| Box::new(SdkError::from(err)))
     }
 
-    pub fn from_json_string(json_str: &str) -> Result<Deploy, SdkError> {
-        serde_json::from_str(json_str).map_err(Into::into)
+    pub fn from_json_string(json_str: &str) -> Result<Deploy, Box<SdkError>> {
+        serde_json::from_str(json_str).map_err(|err| Box::new(SdkError::from(err)))
     }
 
     // pub fn footprint(&self) -> DeployFootprint {

@@ -102,7 +102,7 @@ impl SDK {
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
+    ) -> Result<SuccessResponse<_SpeculativeExecResult>, Box<SdkError>> {
         // log("speculative_deploy!");
         let deploy = make_deploy(
             "",
@@ -110,7 +110,8 @@ impl SDK {
             session_str_params_to_casper_client(&session_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        )?;
+        )
+        .map_err(|err| Box::new(SdkError::from(err)))?;
 
         self.speculative_exec(
             deploy.into(),
@@ -119,7 +120,6 @@ impl SDK {
             node_address,
         )
         .await
-        .map_err(SdkError::from)
     }
 }
 

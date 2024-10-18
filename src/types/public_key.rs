@@ -16,14 +16,14 @@ use super::sdk_error::SdkError;
 pub struct PublicKey(_PublicKey);
 
 impl PublicKey {
-    pub fn new(public_key_hex_str: &str) -> Result<PublicKey, SdkError> {
+    pub fn new(public_key_hex_str: &str) -> Result<PublicKey, Box<SdkError>> {
         let bytes = match hex::decode(public_key_hex_str) {
             Ok(bytes) => bytes,
             Err(err) => {
-                return Err(SdkError::FailedToDecodeHex {
+                return Err(Box::new(SdkError::FailedToDecodeHex {
                     context: "PublicKey::new",
                     error: format!("{:?}", err),
-                });
+                }));
             }
         };
 
@@ -31,10 +31,10 @@ impl PublicKey {
         let (public_key, _) = match _PublicKey::from_bytes(&bytes) {
             Ok(result) => result,
             Err(err) => {
-                return Err(SdkError::FailedToParsePublicKeyBytes {
+                return Err(Box::new(SdkError::FailedToParsePublicKeyBytes {
                     context: "PublicKey::new",
                     error: err,
-                });
+                }));
             }
         };
 
