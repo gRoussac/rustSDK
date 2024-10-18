@@ -130,7 +130,7 @@ impl SDK {
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, Box<SdkError>> {
         //log("deploy!");
         let deploy = make_deploy(
             "",
@@ -138,12 +138,13 @@ impl SDK {
             session_str_params_to_casper_client(&session_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        )?;
+        )
+        .map_err(|err| Box::new(SdkError::from(err)))?;
 
         // Send the deploy to the network and handle any errors.
         self.put_deploy(deploy.into(), verbosity, node_address)
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
     }
 }
 

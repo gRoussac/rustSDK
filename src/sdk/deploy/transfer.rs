@@ -95,7 +95,7 @@ impl SDK {
         payment_params: PaymentStrParams,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_PutDeployResult>, SdkError> {
+    ) -> Result<SuccessResponse<_PutDeployResult>, Box<SdkError>> {
         //log("transfer!");
         let transfer_id = if let Some(transfer_id) = transfer_id {
             transfer_id
@@ -110,11 +110,12 @@ impl SDK {
             deploy_str_params_to_casper_client(&deploy_params),
             payment_str_params_to_casper_client(&payment_params),
             false,
-        )?;
+        )
+        .map_err(|err| Box::new(SdkError::from(err)))?;
 
         self.put_deploy(deploy.into(), verbosity, node_address)
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
     }
 }
 

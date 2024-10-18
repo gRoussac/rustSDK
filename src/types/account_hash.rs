@@ -15,13 +15,13 @@ use wasm_bindgen::prelude::*;
 pub struct AccountHash(_AccountHash);
 
 impl AccountHash {
-    pub fn new(account_hash_hex_str: &str) -> Result<Self, SdkError> {
+    pub fn new(account_hash_hex_str: &str) -> Result<Self, Box<SdkError>> {
         hex::decode(account_hash_hex_str)
             .map(|bytes| {
                 if bytes.len() != ACCOUNT_HASH_LENGTH {
-                    Err(SdkError::FailedToParseAccountHashLength {
+                    Err(Box::new(SdkError::FailedToParseAccountHashLength {
                         context: "AccountHash::new",
-                    })
+                    }))
                 } else {
                     let mut array = [0u8; ACCOUNT_HASH_LENGTH];
                     array.copy_from_slice(&bytes);
@@ -34,7 +34,7 @@ impl AccountHash {
             })?
     }
 
-    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, SdkError> {
+    pub fn from_formatted_str(formatted_str: &str) -> Result<Self, Box<SdkError>> {
         let account_hash = _AccountHash::from_formatted_str(formatted_str).map_err(|error| {
             SdkError::FailedToParseAccountHash {
                 context: "AccountHash::from_formatted_str",

@@ -206,7 +206,7 @@ impl SDK {
         dictionary_item_input: DictionaryItemInput,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetDictionaryItemResult>, Box<SdkError>> {
         // log("state_get_dictionary_item!");
 
         let state_root_hash = if state_root_hash.is_empty() {
@@ -239,7 +239,7 @@ impl SDK {
                 dictionary_item_str_params_to_casper_client(&dictionary_item_params),
             )
             .await
-            .map_err(SdkError::from),
+            .map_err(|err| Box::new(SdkError::from(err))),
             DictionaryItemInput::Identifier(dictionary_item_identifier) => get_dictionary_item_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
                 &self.get_node_address(node_address),
@@ -248,7 +248,7 @@ impl SDK {
                 dictionary_item_identifier.into(),
             )
             .await
-            .map_err(SdkError::from),
+            .map_err(|err| Box::new(SdkError::from(err))),
         }
     }
 }

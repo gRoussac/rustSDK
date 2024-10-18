@@ -78,11 +78,9 @@ impl SDK {
     pub async fn query_contract_key(
         &self,
         query_params: QueryGlobalStateParams,
-    ) -> Result<SuccessResponse<_QueryGlobalStateResult>, SdkError> {
+    ) -> Result<SuccessResponse<_QueryGlobalStateResult>, Box<SdkError>> {
         //log("query_contract_key!");
-        self.query_global_state(query_params)
-            .await
-            .map_err(SdkError::from)
+        self.query_global_state(query_params).await
     }
 }
 

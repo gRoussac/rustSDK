@@ -79,7 +79,7 @@ impl SDK {
         transfer_id: Option<String>,
         deploy_params: DeployStrParams,
         payment_params: PaymentStrParams,
-    ) -> Result<Deploy, SdkError> {
+    ) -> Result<Deploy, Box<SdkError>> {
         // log("make_transfer");
         make_transfer(
             amount,
@@ -88,7 +88,6 @@ impl SDK {
             deploy_params,
             payment_params,
         )
-        .map_err(SdkError::from)
     }
 }
 
@@ -99,7 +98,7 @@ pub(crate) fn make_transfer(
     transfer_id: Option<String>,
     deploy_params: DeployStrParams,
     payment_params: PaymentStrParams,
-) -> Result<Deploy, SdkError> {
+) -> Result<Deploy, Box<SdkError>> {
     let transfer_id = if let Some(transfer_id) = transfer_id {
         transfer_id
     } else {
@@ -115,7 +114,7 @@ pub(crate) fn make_transfer(
         false,
     )
     .map(Into::into)
-    .map_err(SdkError::from)
+    .map_err(|err| Box::new(SdkError::from(err)))
 }
 
 #[cfg(test)]

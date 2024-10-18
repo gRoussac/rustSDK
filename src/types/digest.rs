@@ -12,7 +12,7 @@ use wasm_bindgen::prelude::*;
 pub struct Digest(_Digest);
 
 impl Digest {
-    pub fn new(digest_hex_str: &str) -> Result<Digest, SdkError> {
+    pub fn new(digest_hex_str: &str) -> Result<Digest, Box<SdkError>> {
         Digest::try_from(digest_hex_str)
     }
 
@@ -20,7 +20,7 @@ impl Digest {
         self.0.value()
     }
 
-    pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, SdkError> {
+    pub fn from_raw(bytes: Vec<u8>) -> Result<Digest, Box<SdkError>> {
         let hex_string = hex::encode(bytes);
         Digest::try_from(&hex_string[..])
     }
@@ -107,8 +107,8 @@ impl From<[u8; _Digest::LENGTH]> for Digest {
 }
 
 impl TryFrom<&str> for Digest {
-    type Error = SdkError;
-    fn try_from(digest_hex_str: &str) -> Result<Self, Self::Error> {
+    type Error = Box<SdkError>;
+    fn try_from(digest_hex_str: &str) -> Result<Self, Box<SdkError>> {
         let bytes = hex::decode(digest_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
             context: "Digest::try_from",
             error: format!("Decoding hex string {:?}", err),
@@ -117,10 +117,10 @@ impl TryFrom<&str> for Digest {
         if bytes.len() != _Digest::LENGTH {
             let context = "Invalid Digest length".to_string();
             let digest_error = DigestError::IncorrectDigestLength(bytes.len());
-            return Err(SdkError::FailedToParseDigest {
+            return Err(Box::new(SdkError::FailedToParseDigest {
                 context,
                 error: digest_error,
-            });
+            }));
         }
 
         let mut digest_bytes = [0u8; _Digest::LENGTH];

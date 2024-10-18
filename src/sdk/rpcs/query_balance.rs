@@ -209,7 +209,7 @@ impl SDK {
         maybe_block_id: Option<String>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_QueryBalanceResult>, SdkError> {
+    ) -> Result<SuccessResponse<_QueryBalanceResult>, Box<SdkError>> {
         //log("query_balance!");
 
         let purse_identifier: PurseIdentifier = if let Some(purse_identifier) = purse_identifier {
@@ -218,15 +218,15 @@ impl SDK {
             match parse_purse_identifier(&purse_id) {
                 Ok(parsed) => parsed.into(),
                 Err(err) => {
-                    return Err(err.into());
+                    return Err(Box::new(err.into()));
                 }
             }
         } else {
             let err = "Error: Missing purse identifier";
-            return Err(SdkError::InvalidArgument {
+            return Err(Box::new(SdkError::InvalidArgument {
                 context: "query_balance",
                 error: err.to_string(),
-            });
+            }));
         };
 
         if let Some(maybe_global_state_identifier) = maybe_global_state_identifier {
@@ -238,7 +238,7 @@ impl SDK {
                 purse_identifier.into(),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else if maybe_global_state_identifier.is_none() {
             query_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
@@ -248,7 +248,7 @@ impl SDK {
                 purse_identifier.into(),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else if let Some(state_root_hash) = state_root_hash {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
@@ -259,7 +259,7 @@ impl SDK {
                 &purse_identifier.to_string(),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         } else {
             query_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
@@ -270,7 +270,7 @@ impl SDK {
                 &purse_identifier.to_string(),
             )
             .await
-            .map_err(SdkError::from)
+            .map_err(|err| Box::new(SdkError::from(err)))
         }
     }
 }

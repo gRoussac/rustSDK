@@ -176,7 +176,7 @@ impl SDK {
         maybe_block_identifier: Option<BlockIdentifierInput>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_SpeculativeExecResult>, SdkError> {
+    ) -> Result<SuccessResponse<_SpeculativeExecResult>, Box<SdkError>> {
         //log("speculative_exec!");
 
         let maybe_block_identifier =
@@ -195,7 +195,7 @@ impl SDK {
             deploy.into(),
         )
         .await
-        .map_err(SdkError::from)
+        .map_err(|err| Box::new(SdkError::from(err)))
     }
 }
 

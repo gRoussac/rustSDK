@@ -15,7 +15,7 @@ use casper_client::types::DeployHash as _DeployHashClient;
 pub struct DeployHash(_DeployHash);
 
 impl DeployHash {
-    pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, SdkError> {
+    pub fn new(deploy_hash_hex_str: &str) -> Result<DeployHash, Box<SdkError>> {
         let bytes =
             hex::decode(deploy_hash_hex_str).map_err(|err| SdkError::FailedToDecodeHex {
                 context: "DeployHash::new",
@@ -26,7 +26,7 @@ impl DeployHash {
         Self::from_digest(Digest::from(hash))
     }
 
-    pub fn from_digest(digest: Digest) -> Result<DeployHash, SdkError> {
+    pub fn from_digest(digest: Digest) -> Result<DeployHash, Box<SdkError>> {
         Ok(_DeployHash::new(digest.value()).into())
     }
 }

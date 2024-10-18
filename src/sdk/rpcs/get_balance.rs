@@ -210,7 +210,7 @@ impl SDK {
         purse_uref: GetBalanceInput,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetBalanceResult>, Box<SdkError>> {
         //log("get_balance!");
         let state_root_hash = if state_root_hash.is_empty() {
             let state_root_hash = self
@@ -241,7 +241,7 @@ impl SDK {
                 purse_uref.into(),
             )
             .await
-            .map_err(SdkError::from),
+            .map_err(|err| Box::new(SdkError::from(err))),
             GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
                 &rand::thread_rng().gen::<i64>().to_string(),
                 &self.get_node_address(node_address),
@@ -250,7 +250,7 @@ impl SDK {
                 &purse_uref,
             )
             .await
-            .map_err(SdkError::from),
+            .map_err(|err| Box::new(SdkError::from(err))),
         }
     }
 }

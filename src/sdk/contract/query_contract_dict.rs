@@ -87,11 +87,10 @@ impl SDK {
         dictionary_item: DictionaryItemInput,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
-    ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
+    ) -> Result<SuccessResponse<_GetDictionaryItemResult>, Box<SdkError>> {
         // log("query_contract_dict!");
         self.get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
             .await
-            .map_err(SdkError::from)
     }
 }
 
