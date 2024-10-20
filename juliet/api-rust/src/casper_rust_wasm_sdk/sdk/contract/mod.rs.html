@@ -92,6 +92,15 @@
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>call_entrypoint;
 <span class="kw">pub mod </span>install;
 <span class="kw">pub mod </span>query_contract_dict;
@@ -102,9 +111,13 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use crate</span>::{helpers::public_key_from_secret_key, types::public_key::PublicKey};
 <span class="attr">#[cfg(test)]
+</span><span class="kw">use </span>once_cell::sync::Lazy;
+<span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>sdk_tests::config::{DICTIONARY_ITEM_KEY, DICTIONARY_NAME};
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>sdk_tests::tests::helpers::mint_nft;
+<span class="attr">#[cfg(test)]
+</span><span class="kw">use </span>std::sync::Mutex;
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub async fn </span>install_cep78() -&gt; String {
@@ -133,35 +146,40 @@
 }
 
 <span class="attr">#[cfg(test)]
+</span><span class="kw">static </span>CONTRACT_CEP78_HASH: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt; = Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
+
+<span class="attr">#[cfg(test)]
 </span><span class="kw">pub async fn </span>get_dictionary_item(as_params: bool) -&gt; DictionaryItemInput {
     <span class="kw">use </span>sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
-    <span class="kw">static </span><span class="kw-2">mut </span>CONTRACT_CEP78_HASH: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span>(node_address, event_address, chain_name) = get_network_constants();
 
-    <span class="kw">unsafe </span>{
-        <span class="kw">if </span>CONTRACT_CEP78_HASH.is_none() {
-            <span class="kw">let </span>contract_cep78_hash = install_cep78().<span class="kw">await</span>;
-            <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
-            <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
-            <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
-            <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
-            mint_nft(
-                <span class="kw-2">&amp;</span>contract_cep78_hash,
-                <span class="kw-2">&amp;</span>account,
-                <span class="kw-2">&amp;</span>account_hash,
-                <span class="kw-2">&amp;</span>secret_key,
-                (<span class="kw-2">&amp;</span>node_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
-            )
-            .<span class="kw">await</span>;
-            CONTRACT_CEP78_HASH = <span class="prelude-val">Some</span>(contract_cep78_hash);
-        }
-        <span class="kw">if </span>as_params {
-            get_dictionary_item_params_input(CONTRACT_CEP78_HASH.as_ref().unwrap()).<span class="kw">await
-        </span>} <span class="kw">else </span>{
-            get_dictionary_item_input(CONTRACT_CEP78_HASH.as_ref().unwrap()).<span class="kw">await
-        </span>}
+    <span class="kw">let </span><span class="kw-2">mut </span>contract_cep78_hash = CONTRACT_CEP78_HASH.lock().unwrap();
+
+    <span class="kw">if </span>contract_cep78_hash.is_none() {
+        <span class="kw">let </span>new_contract_cep78_hash = install_cep78().<span class="kw">await</span>;
+        <span class="kw">let </span>secret_key = get_user_secret_key(<span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>account = public_key_from_secret_key(<span class="kw-2">&amp;</span>secret_key).unwrap();
+        <span class="kw">let </span>public_key = PublicKey::new(<span class="kw-2">&amp;</span>account).unwrap();
+        <span class="kw">let </span>account_hash = public_key.to_account_hash().to_formatted_string();
+
+        mint_nft(
+            <span class="kw-2">&amp;</span>new_contract_cep78_hash,
+            <span class="kw-2">&amp;</span>account,
+            <span class="kw-2">&amp;</span>account_hash,
+            <span class="kw-2">&amp;</span>secret_key,
+            (<span class="kw-2">&amp;</span>node_address, <span class="kw-2">&amp;</span>event_address, <span class="kw-2">&amp;</span>chain_name),
+        )
+        .<span class="kw">await</span>;
+
+        <span class="kw-2">*</span>contract_cep78_hash = <span class="prelude-val">Some</span>(new_contract_cep78_hash);
     }
+
+    <span class="kw">if </span>as_params {
+        get_dictionary_item_params_input(contract_cep78_hash.as_ref().unwrap()).<span class="kw">await
+    </span>} <span class="kw">else </span>{
+        get_dictionary_item_input(contract_cep78_hash.as_ref().unwrap()).<span class="kw">await
+    </span>}
 }
 
 <span class="attr">#[cfg(test)]

@@ -280,6 +280,10 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::rpcs::speculative_exec::SpeculativeExecResult;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
@@ -410,32 +414,36 @@
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use crate</span>::{helpers::public_key_from_secret_key, types::block_identifier::BlockIdentifier};
+    <span class="kw">use </span>once_cell::sync::Lazy;
     <span class="kw">use </span>sdk_tests::{
         config::{ARGS_SIMPLE, HELLO_CONTRACT, PAYMENT_AMOUNT, WASM_PATH},
         tests::helpers::{get_network_constants, get_user_secret_key, read_wasm_file},
     };
+    <span class="kw">use </span>std::sync::Mutex;
 
-    <span class="kw">fn </span>get_session_params() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>SessionStrParams {
-        <span class="kw">static </span><span class="kw-2">mut </span>SESSION_PARAMS: <span class="prelude-ty">Option</span>&lt;SessionStrParams&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">static </span>SESSION_PARAMS: Lazy&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;SessionStrParams&gt;&gt;&gt; = Lazy::new(|| Mutex::new(<span class="prelude-val">None</span>));
 
-        <span class="kw">unsafe </span>{
-            <span class="kw">if </span>SESSION_PARAMS.is_none() {
-                <span class="kw">let </span><span class="kw-2">mut </span>session_params = SessionStrParams::default();
-                <span class="kw">let </span>file_path = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{WASM_PATH}{HELLO_CONTRACT}"</span>);
-                <span class="kw">let </span>module_bytes = <span class="kw">match </span>read_wasm_file(file_path) {
-                    <span class="prelude-val">Ok</span>(module_bytes) =&gt; module_bytes,
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                        <span class="macro">eprintln!</span>(<span class="string">"Error reading file: {:?}"</span>, err);
-                        <span class="macro">unimplemented!</span>()
-                    }
-                };
-                session_params.set_session_bytes(module_bytes.into());
-                <span class="kw">let </span>args_simple: Vec&lt;String&gt; = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
-                session_params.set_session_args(args_simple);
-                SESSION_PARAMS = <span class="prelude-val">Some</span>(session_params);
-            }
-            SESSION_PARAMS.as_ref().unwrap()
+    <span class="kw">fn </span>get_session_params() -&gt; SessionStrParams {
+        <span class="kw">let </span><span class="kw-2">mut </span>session_params = SESSION_PARAMS.lock().unwrap();
+
+        <span class="kw">if </span>session_params.is_none() {
+            <span class="kw">let </span><span class="kw-2">mut </span>new_session_params = SessionStrParams::default();
+            <span class="kw">let </span>file_path = <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{WASM_PATH}{HELLO_CONTRACT}"</span>);
+            <span class="kw">let </span>module_bytes = <span class="kw">match </span>read_wasm_file(file_path) {
+                <span class="prelude-val">Ok</span>(module_bytes) =&gt; module_bytes,
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="macro">eprintln!</span>(<span class="string">"Error reading file: {:?}"</span>, err);
+                    <span class="macro">unimplemented!</span>()
+                }
+            };
+            new_session_params.set_session_bytes(module_bytes.into());
+            <span class="kw">let </span>args_simple: Vec&lt;String&gt; = ARGS_SIMPLE.iter().map(|s| s.to_string()).collect();
+            new_session_params.set_session_args(args_simple);
+
+            <span class="kw-2">*</span>session_params = <span class="prelude-val">Some</span>(new_session_params);
         }
+
+        session_params.clone().unwrap()
     }
 
     <span class="comment">// TODO speculative_exec not available in 1.6
