@@ -248,6 +248,18 @@ const gasPriceTolerance: InputField = {
   e2e: 'gasPriceToleranceElt'
 };
 
+const additionalComputationFactor: InputField = {
+  id: 'additionalComputationFactorElt',
+  type: 'search',
+  wrap_class: 'col-xl-2 mb-2',
+  class: 'form-control',
+  label: 'Computation Factor',
+  name: 'additional_computation_factor',
+  controlName: 'additionalComputationFactor',
+  placeholder: '0, empty default',
+  e2e: 'additionalComputationFactorElt',
+  disabled_when: ['fixedPricingMode']
+};
 
 const sessionNameInput: InputField = {
   id: 'sessionNameElt',
@@ -629,7 +641,7 @@ const getSpeculativeTransferFields: InputContainer[][] = [
 ];
 
 const installFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor },],
   [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: argsSimpleInput }],
   [{ textarea: argsJson }],
@@ -646,7 +658,7 @@ const makeDeployFields: InputContainer[][] = [
 ];
 
 const makeTransactionFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
   [{ wasm_button: true }, { select: selectTransactionCategory }],
   [{ input: entityHash, required: true }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias, required: true }],
@@ -664,7 +676,7 @@ const speculativeTransactionFields: InputContainer[][] = [
 ];
 
 const callEntrypointFields: InputContainer[][] = [
-  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }],
+  [{ input: paymentAmount, required: true }, { input: ttlInput }, { input: gasPriceTolerance }, { select: selectPricingMode }, { input: additionalComputationFactor }],
   [{ input: entityHash }, { input: callPackage }, { input: versionInput }],
   [{ input: entityAlias }],
   [{ input: entryPointInput }],
