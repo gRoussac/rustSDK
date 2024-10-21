@@ -6,7 +6,7 @@ import { FormService } from '@util/form';
 import { ResultService } from '@util/result';
 import { State, StateService } from '@util/state';
 import { SDK_TOKEN } from '@util/wasm';
-import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, TransactionCategory, PricingMode, EntityAddr } from 'casper-sdk';
+import { BlockHash, BlockIdentifier, Bytes, CasperWallet, Deploy, DeployStrParams, DictionaryItemIdentifier, DictionaryItemStrParams, Digest, GlobalStateIdentifier, PaymentStrParams, SDK, SessionStrParams, TransactionStrParams, Verbosity, getBlockOptions, getStateRootHashOptions, getTimestamp, hexToString, jsonPrettyPrint, TransactionBuilderParams, Transaction, AddressableEntityHash, PackageHash, PricingMode, EntityAddr } from 'casper-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -1344,8 +1344,8 @@ export class ClientService {
     }
 
     if (wasm) {
-      const transaction_category: TransactionCategory = this.getIdentifier('selectTransactionCategory')?.value?.trim();
-      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm), transaction_category);
+      const is_install_upgrade: boolean = this.getIdentifier('selectTransactionCategory')?.value?.trim() === 'true';
+      builder_params = TransactionBuilderParams.newSession(Bytes.fromUint8Array(wasm), is_install_upgrade);
     }
 
     return builder_params;

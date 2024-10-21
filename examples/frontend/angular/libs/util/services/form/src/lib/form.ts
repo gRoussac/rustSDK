@@ -1,5 +1,5 @@
 import { config } from "@util/config";
-import { PricingMode, TransactionCategory } from "casper-sdk";
+import { PricingMode } from "casper-sdk";
 
 export type option = {
   value: string,
@@ -547,10 +547,8 @@ const selectTransactionCategory: InputField = {
   controlName: 'selectTransactionCategory',
   e2e: 'selectTransactionCategoryElt',
   options: [
-    { value: TransactionCategory.InstallUpgrade.toString(), label: "Install & Upgrade", default: config['default_transaction_category'] === TransactionCategory.InstallUpgrade },
-    { value: TransactionCategory.Large.toString(), label: "Large", default: config['default_transaction_category'] === TransactionCategory.Large },
-    { value: TransactionCategory.Medium.toString(), label: "Medium", default: config['default_transaction_category'] === TransactionCategory.Medium },
-    { value: TransactionCategory.Small.toString(), label: "Small", default: config['default_transaction_category'] === TransactionCategory.Small },
+    { value: "true", label: "Install & Upgrade", default: config['default_is_install_upgrade'] === true },
+    { value: "false", label: "Session", default: config['default_is_install_upgrade'] === false },
   ],
   enabled_when: ['has_wasm']
 };
