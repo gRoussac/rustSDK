@@ -16,6 +16,7 @@ export const config: EnvironmentConfig = {
   standard_payment_amount: '100000000',
   default_pricing_mode: PricingMode.Fixed,
   default_gas_price_tolerance: '1',
+  default_additional_computation_factor: '0',
   default_is_install_upgrade: true,
   action_needs_secret_key,
   action_needs_public_key,
