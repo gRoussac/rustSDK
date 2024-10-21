@@ -2362,56 +2362,6 @@ export class SDK {
    */
   make_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams): Transaction;
   /**
-   * Parses state root hash options from a JsValue.
-   *
-   * # Arguments
-   *
-   * * `options` - A JsValue containing state root hash options to be parsed.
-   *
-   * # Returns
-   *
-   * Parsed state root hash options as a `GetStateRootHashOptions` struct.
-   * @param {any} options
-   * @returns {getStateRootHashOptions}
-   */
-  get_state_root_hash_options(options: any): getStateRootHashOptions;
-  /**
-   * Retrieves state root hash information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   * @param {getStateRootHashOptions | undefined} [options]
-   * @returns {Promise<GetStateRootHashResult>}
-   */
-  get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
-  /**
-   * Retrieves state root hash information using the provided options (alias for `get_state_root_hash`).
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   * @param {getStateRootHashOptions | undefined} [options]
-   * @returns {Promise<GetStateRootHashResult>}
-   */
-  chain_get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
-  /**
    * JS function for speculative transfer transaction.
    *
    * # Arguments
@@ -2438,121 +2388,29 @@ export class SDK {
    */
   speculative_transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
   /**
-   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-   * Legacy alias
+   * Installs a smart contract with the specified parameters and returns the result.
    *
    * # Arguments
    *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `timeout_duration` - An optional timeout duration in seconds.
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_amount` - The payment amount as a string.
+   * * `rpc_address` - An optional rpc address to send the request to.
    *
    * # Returns
    *
-   * A `Watcher` instance.
-   * @param {string} events_url
-   * @param {number | undefined} [timeout_duration]
-   * @returns {Watcher}
-   */
-  watchDeploy(events_url: string, timeout_duration?: number): Watcher;
-  /**
-   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
    *
-   * # Arguments
+   * # Errors
    *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A `Watcher` instance.
-   * @param {string} events_url
-   * @param {number | undefined} [timeout_duration]
-   * @returns {Watcher}
-   */
-  watchTransaction(events_url: string, timeout_duration?: number): Watcher;
-  /**
-   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-   * Legacy alias
-   *
-   * # Arguments
-   *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `deploy_hash` - The deploy hash to wait for.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-   * @param {string} events_url
-   * @param {string} deploy_hash
-   * @param {number | undefined} [timeout_duration]
-   * @returns {Promise<Promise<any>>}
-   */
-  waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number): Promise<Promise<any>>;
-  /**
-   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-   *
-   * # Arguments
-   *
-   * * `events_url` - The URL to monitor for transaction events.
-   * * `target_hash` - The transaction hash to wait for.
-   * * `timeout_duration` - An optional timeout duration in seconds.
-   *
-   * # Returns
-   *
-   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-   * @param {string} events_url
-   * @param {string} target_hash
-   * @param {number | undefined} [timeout_duration]
-   * @returns {Promise<Promise<any>>}
-   */
-  waitTransaction(events_url: string, target_hash: string, timeout_duration?: number): Promise<Promise<any>>;
-  /**
-   * This function allows executing a transaction speculatively.
-   *
-   * # Arguments
-   *
-   * * `builder_params` - Transaction Builder parameters.
-   * * `transaction_params` - Transactionment parameters for the transaction.
-   * * `verbosity` - Optional verbosity level.
-   * * `rpc_address` - Optional rpc address.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-   * @param {TransactionBuilderParams} builder_params
-   * @param {TransactionStrParams} transaction_params
-   * @param {Verbosity | undefined} [verbosity]
+   * Returns a `JsError` if there is an error during the installation.
+   * @param {DeployStrParams} deploy_params
+   * @param {SessionStrParams} session_params
+   * @param {string} payment_amount
    * @param {string | undefined} [rpc_address]
-   * @returns {Promise<SpeculativeExecTxnResult>}
+   * @returns {Promise<PutDeployResult>}
    */
-  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
-  /**
-   * JS function for transaction transferring funds.
-   *
-   * # Arguments
-   *
-   * * `maybe_source` - Optional transfer source uref.
-   * * `target_account` - The target account.
-   * * `amount` - The amount to transfer.
-   * * `transaction_params` - The transaction parameters.
-   * * `maybe_id` - An optional transfer ID (defaults to a random number).
-   * * `verbosity` - The verbosity level for logging (optional).
-   * * `rpc_address` - The address of the node to connect to (optional).
-   *
-   * # Returns
-   *
-   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
-   * @param {URef | undefined} maybe_source
-   * @param {string} target_account
-   * @param {string} amount
-   * @param {TransactionStrParams} transaction_params
-   * @param {string | undefined} [maybe_id]
-   * @param {Verbosity | undefined} [verbosity]
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutTransactionResult>}
-   */
-  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+  install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
   /**
    * Parses deploy options from a JsValue.
    *
@@ -2672,6 +2530,26 @@ export class SDK {
    */
   speculative_exec(options?: getSpeculativeExecTxnOptions): Promise<SpeculativeExecTxnResult>;
   /**
+   * This function allows executing a transaction speculatively.
+   *
+   * # Arguments
+   *
+   * * `builder_params` - Transaction Builder parameters.
+   * * `transaction_params` - Transactionment parameters for the transaction.
+   * * `verbosity` - Optional verbosity level.
+   * * `rpc_address` - Optional rpc address.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+   * @param {TransactionBuilderParams} builder_params
+   * @param {TransactionStrParams} transaction_params
+   * @param {Verbosity | undefined} [verbosity]
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<SpeculativeExecTxnResult>}
+   */
+  speculative_transaction(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, verbosity?: Verbosity, rpc_address?: string): Promise<SpeculativeExecTxnResult>;
+  /**
    * JS function for `make_transfer_transaction`.
    *
    * # Arguments
@@ -2693,30 +2571,6 @@ export class SDK {
    * @returns {Transaction}
    */
   make_transfer_transaction(maybe_source: URef | undefined, target: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string): Transaction;
-  /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_amount` - The payment amount as a string.
-   * * `rpc_address` - An optional rpc address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the call.
-   * @param {DeployStrParams} deploy_params
-   * @param {SessionStrParams} session_params
-   * @param {string} payment_amount
-   * @param {string | undefined} [rpc_address]
-   * @returns {Promise<PutDeployResult>}
-   */
-  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
   /**
    * Installs a smart contract with the specified parameters and returns the result.
    *
@@ -2886,7 +2740,7 @@ export class SDK {
    */
   query_global_state(options?: queryGlobalStateOptions): Promise<QueryGlobalStateResult>;
   /**
-   * Installs a smart contract with the specified parameters and returns the result.
+   * Calls a smart contract entry point with the specified parameters and returns the result.
    *
    * # Arguments
    *
@@ -2901,14 +2755,14 @@ export class SDK {
    *
    * # Errors
    *
-   * Returns a `JsError` if there is an error during the installation.
+   * Returns a `JsError` if there is an error during the call.
    * @param {DeployStrParams} deploy_params
    * @param {SessionStrParams} session_params
    * @param {string} payment_amount
    * @param {string | undefined} [rpc_address]
    * @returns {Promise<PutDeployResult>}
    */
-  install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
+  call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string): Promise<PutDeployResult>;
   /**
    * Deserialize query_contract_key_options from a JavaScript object.
    * @param {any} options
@@ -2921,6 +2775,152 @@ export class SDK {
    * @returns {Promise<QueryGlobalStateResult>}
    */
   query_contract_key(options?: queryContractKeyOptions): Promise<QueryGlobalStateResult>;
+  /**
+   * Parses state root hash options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing state root hash options to be parsed.
+   *
+   * # Returns
+   *
+   * Parsed state root hash options as a `GetStateRootHashOptions` struct.
+   * @param {any} options
+   * @returns {getStateRootHashOptions}
+   */
+  get_state_root_hash_options(options: any): getStateRootHashOptions;
+  /**
+   * Retrieves state root hash information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   * @param {getStateRootHashOptions | undefined} [options]
+   * @returns {Promise<GetStateRootHashResult>}
+   */
+  get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
+  /**
+   * Retrieves state root hash information using the provided options (alias for `get_state_root_hash`).
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   * @param {getStateRootHashOptions | undefined} [options]
+   * @returns {Promise<GetStateRootHashResult>}
+   */
+  chain_get_state_root_hash(options?: getStateRootHashOptions): Promise<GetStateRootHashResult>;
+  /**
+   * JS function for transaction transferring funds.
+   *
+   * # Arguments
+   *
+   * * `maybe_source` - Optional transfer source uref.
+   * * `target_account` - The target account.
+   * * `amount` - The amount to transfer.
+   * * `transaction_params` - The transaction parameters.
+   * * `maybe_id` - An optional transfer ID (defaults to a random number).
+   * * `verbosity` - The verbosity level for logging (optional).
+   * * `rpc_address` - The address of the node to connect to (optional).
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the transfer or a `JsError` in case of an error.
+   * @param {URef | undefined} maybe_source
+   * @param {string} target_account
+   * @param {string} amount
+   * @param {TransactionStrParams} transaction_params
+   * @param {string | undefined} [maybe_id]
+   * @param {Verbosity | undefined} [verbosity]
+   * @param {string | undefined} [rpc_address]
+   * @returns {Promise<PutTransactionResult>}
+   */
+  transfer_transaction(maybe_source: URef | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string, verbosity?: Verbosity, rpc_address?: string): Promise<PutTransactionResult>;
+  /**
+   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+   * Legacy alias
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A `Watcher` instance.
+   * @param {string} events_url
+   * @param {number | undefined} [timeout_duration]
+   * @returns {Watcher}
+   */
+  watchDeploy(events_url: string, timeout_duration?: number): Watcher;
+  /**
+   * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A `Watcher` instance.
+   * @param {string} events_url
+   * @param {number | undefined} [timeout_duration]
+   * @returns {Watcher}
+   */
+  watchTransaction(events_url: string, timeout_duration?: number): Watcher;
+  /**
+   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+   * Legacy alias
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `deploy_hash` - The deploy hash to wait for.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+   * @param {string} events_url
+   * @param {string} deploy_hash
+   * @param {number | undefined} [timeout_duration]
+   * @returns {Promise<Promise<any>>}
+   */
+  waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number): Promise<Promise<any>>;
+  /**
+   * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+   *
+   * # Arguments
+   *
+   * * `events_url` - The URL to monitor for transaction events.
+   * * `target_hash` - The transaction hash to wait for.
+   * * `timeout_duration` - An optional timeout duration in seconds.
+   *
+   * # Returns
+   *
+   * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+   * @param {string} events_url
+   * @param {string} target_hash
+   * @param {number | undefined} [timeout_duration]
+   * @returns {Promise<Promise<any>>}
+   */
+  waitTransaction(events_url: string, target_hash: string, timeout_duration?: number): Promise<Promise<any>>;
   /**
    * This function allows executing a deploy speculatively.
    *
