@@ -41,7 +41,7 @@ e2e-test: start-app run-e2e-tests
 doc:
 	cargo doc --package casper-rust-wasm-sdk --no-deps
 	cp -r target/doc/* docs/api-rust/
-	npx typedoc --options typedoc.json
+	npx typedoc --options typedoc.json && rm -rf docs/api-wasm/media
 
 build: pack
 	cd examples/frontend/angular/ && npm install && npm run build && cd .
