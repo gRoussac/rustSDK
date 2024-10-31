@@ -2435,7 +2435,7 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Binary Port
 
-- [Binary methods](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/)
+- [Binary methods](https://casper-ecosystem.github.io/rustSDK/condor/api-wasm/classes/SDK.html#Methods)
 
 ## Casper Wallet
 
