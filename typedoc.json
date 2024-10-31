@@ -2,7 +2,13 @@
   "name": "api-wasm",
   "entryPoints": ["pkg/casper_rust_wasm_sdk.d.ts"],
   "out": "docs/api-wasm",
-  "exclude": ["**/tests/**", "**/examples/**", "**/README.md", "**/*.md"],
+  "exclude": [
+    "**/tests/**",
+    "**/examples/**",
+    "**/*+(index|.spec|.e2e).ts",
+    "**/*.md",
+    "**/*.tsx"
+  ],
   "highlightLanguages": [
     "typescript",
     "javascript",
@@ -10,5 +16,6 @@
     "json",
     "rust",
     "toml"
-  ]
+  ],
+  "disableSources": true
 }

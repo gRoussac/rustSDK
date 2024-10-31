@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/dictionary_item_identifier.rs`."><title>dictionary_item_identifier.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (d84b90375 2024-05-19)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/types/dictionary_item_identifier.rs`."><title>dictionary_item_identifier.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-590a400c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="casper_rust_wasm_sdk" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (759e07f06 2024-10-30)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">casper_rust_wasm_sdk/types/</div>dictionary_item_identifier.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -139,15 +140,7 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::{key::Key, sdk_error::SdkError};
+<a href="#142" id="142">142</a></pre></div><pre class="rust"><code><span class="kw">use super</span>::{key::Key, sdk_error::SdkError};
 <span class="kw">use </span>casper_client::rpcs::DictionaryItemIdentifier <span class="kw">as </span>_DictionaryItemIdentifier;
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>gloo_utils::format::JsValueSerdeExt;
@@ -164,12 +157,10 @@
         account_hash: <span class="kw-2">&amp;</span>str,
         dictionary_name: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(account_hash).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, Box&lt;SdkError&gt;&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(account_hash).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::AccountNamedKey {
@@ -184,12 +175,10 @@
         contract_addr: <span class="kw-2">&amp;</span>str,
         dictionary_name: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(contract_addr).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, Box&lt;SdkError&gt;&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(contract_addr).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::ContractNamedKey {
@@ -203,17 +192,16 @@
     </span><span class="kw">pub fn </span>new_from_seed_uref(
         seed_uref: <span class="kw-2">&amp;</span>str,
         dictionary_item_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(seed_uref).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, Box&lt;SdkError&gt;&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(seed_uref).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>uref = key
-            .into_uref()
-            .ok_or_else(|| SdkError::CustomError(<span class="string">"Key is not a URef"</span>.to_string()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>uref = key.into_uref().ok_or_else(|| SdkError::CustomError {
+            context: <span class="string">"Conversion to URef failed"</span>,
+            error: <span class="string">"Key is not a URef"</span>.to_string(),
+        })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::URef {
             seed_uref: <span class="kw-2">*</span>uref,
@@ -224,12 +212,10 @@
     <span class="comment">// static context
     </span><span class="kw">pub fn </span>new_from_dictionary_key(
         dictionary_key: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, SdkError&gt; {
-        <span class="kw">let </span>key = Key::from_formatted_str(dictionary_key).map_err(|err| {
-            SdkError::CustomError(<span class="macro">format!</span>(
-                <span class="string">"Failed to parse key from formatted string: {:?}"</span>,
-                err
-            ))
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DictionaryItemIdentifier, Box&lt;SdkError&gt;&gt; {
+        <span class="kw">let </span>key = Key::from_formatted_str(dictionary_key).map_err(|err| SdkError::CustomError {
+            context: <span class="string">"Failed to parse key from formatted string"</span>,
+            error: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, err),
         })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(_DictionaryItemIdentifier::Dictionary(
             key.to_formatted_string(),
