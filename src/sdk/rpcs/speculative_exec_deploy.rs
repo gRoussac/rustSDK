@@ -1,6 +1,6 @@
-#[cfg(target_arch = "wasm32")]
-use crate::types::block_hash::BlockHash;
 use crate::types::deploy::Deploy;
+#[cfg(target_arch = "wasm32")]
+use crate::types::hash::block_hash::BlockHash;
 use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},
     SDK,
@@ -195,7 +195,7 @@ mod tests {
     fn get_deploy() -> Deploy {
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
         let deploy_params =
             DeployStrParams::new(&chain_name, &account, Some(secret_key), None, None, None);
         let payment_params = PaymentStrParams::default();
@@ -214,7 +214,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy = get_deploy();
         let error_message = "builder error";
 
@@ -231,9 +231,9 @@ mod tests {
     #[ignore]
     async fn _test_speculative_exec_deploy() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, _) = get_network_constants();
+        let (_, _, default_speculative_address, _, _) = get_network_constants();
         let deploy = get_deploy();
         // Act
         let result = sdk
@@ -247,7 +247,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let deploy = get_deploy();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use super::deploy::PutDeployResult;
+use crate::deploy::deploy::PutDeployResult;
 use crate::{
     types::{
         deploy_params::{
@@ -138,9 +138,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_valid_transfer_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -170,9 +170,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_valid_transfer_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Invalid Deploy";
 
@@ -205,9 +205,9 @@ mod tests {
     #[tokio::test]
     async fn test_transfer_with_invalid_transfer_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let error_message = "Missing a required arg - exactly one of the following must be provided: [\"payment_amount\", \"payment_hash\", \"payment_name\", \"payment_package_hash\", \"payment_package_name\", \"payment_path\", \"has_payment_bytes\"]";
         let secret_key = get_user_secret_key(None).unwrap();

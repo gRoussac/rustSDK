@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_hash::BlockHash;
+use crate::types::hash::block_hash::BlockHash;
 use crate::types::transaction::Transaction;
 use crate::{
     types::{sdk_error::SdkError, verbosity::Verbosity},
@@ -186,7 +186,7 @@ mod tests {
     fn get_transaction() -> Transaction {
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
@@ -206,7 +206,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let transaction = get_transaction();
         let error_message = "builder error";
 
@@ -223,9 +223,9 @@ mod tests {
     #[ignore]
     async fn _test_speculative_exec() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, _) = get_network_constants();
+        let (_, _, default_speculative_address, _, _) = get_network_constants();
         let transaction = get_transaction();
 
         // Act
@@ -241,7 +241,7 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_exec_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let transaction = get_transaction();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

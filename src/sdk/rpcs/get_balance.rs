@@ -262,8 +262,8 @@ mod tests {
     };
 
     async fn get_main_purse() -> URef {
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -293,7 +293,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         let error_message = "builder error";
 
@@ -316,8 +316,8 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_purse_uref() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
 
         // Act
@@ -332,8 +332,8 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_purse_uref_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let purse_uref =
             GetBalanceInput::PurseUrefAsString(get_main_purse().await.to_formatted_string());
 
@@ -349,8 +349,8 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, Some(Verbosity::High), Some(rpc_address.clone()))
@@ -379,7 +379,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_balance_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
         let purse_uref = GetBalanceInput::PurseUref(get_main_purse().await);
         // Act

@@ -112,7 +112,7 @@ mod tests {
     fn get_transaction() -> Transaction {
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
-        let (_, _, _, chain_name) = get_network_constants();
+        let (_, _, _, _, chain_name) = get_network_constants();
 
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
@@ -132,7 +132,7 @@ mod tests {
     #[tokio::test]
     async fn test_put_transaction_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
         let transaction = get_transaction();
 
@@ -148,9 +148,9 @@ mod tests {
     #[tokio::test]
     async fn test_put_transaction() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let transaction = get_transaction();
 
         // Act
@@ -165,7 +165,7 @@ mod tests {
     #[tokio::test]
     async fn test_put_transaction_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
         let transaction = get_transaction();
 

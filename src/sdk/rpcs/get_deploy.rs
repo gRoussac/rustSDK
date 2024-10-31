@@ -1,6 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::deploy::Deploy;
-use crate::types::deploy_hash::DeployHash;
+use crate::types::hash::deploy_hash::DeployHash;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_deploy, rpcs::results::GetDeployResult as _GetDeployResult, Error, JsonRpcId,
@@ -208,7 +208,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let error_message = "builder error";
 
@@ -225,10 +225,10 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_invalid_deploy_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -243,9 +243,9 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_valid_deploy_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -282,9 +282,9 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_finalized_approvals() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
@@ -327,7 +327,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let deploy_hash = DeployHash::from_digest([1u8; 32].into()).unwrap();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

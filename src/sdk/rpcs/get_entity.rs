@@ -1,17 +1,18 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
+use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
-        block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier,
-        sdk_error::SdkError, verbosity::Verbosity,
+        identifier::{block_identifier::BlockIdentifierInput, entity_identifier::EntityIdentifier},
+        sdk_error::SdkError,
+        verbosity::Verbosity,
     },
     SDK,
 };
-use casper_client::cli::parse::entity_identifier as parse_entity_identifier;
 use casper_client::{
-    cli::get_entity as get_entity_cli, get_entity as get_entity_lib,
-    rpcs::results::GetAddressableEntityResult as _GetAddressableEntityResult, JsonRpcId,
-    SuccessResponse,
+    cli::{get_entity as get_entity_cli, parse::entity_identifier as parse_entity_identifier},
+    get_entity as get_entity_lib,
+    rpcs::results::GetAddressableEntityResult as _GetAddressableEntityResult,
+    JsonRpcId, SuccessResponse,
 };
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
@@ -241,7 +242,7 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        types::{block_identifier::BlockIdentifier, public_key::PublicKey},
+        types::{identifier::block_identifier::BlockIdentifier, public_key::PublicKey},
     };
     use sdk_tests::tests::helpers::{
         get_enable_addressable_entity, get_network_constants, get_user_secret_key,
@@ -258,7 +259,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_entity_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
         let entity_identifier = get_entity_identifier();
 
@@ -276,7 +277,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_entity_with_missing_entity() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Error: Missing entity identifier";
 
         // Act
@@ -294,10 +295,10 @@ mod tests {
             return;
         }
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -319,10 +320,10 @@ mod tests {
             return;
         }
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let entity_identifier_as_string = get_entity_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -345,12 +346,12 @@ mod tests {
             return;
         }
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let entity_identifier = get_entity_identifier();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -370,7 +371,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_entity_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let entity_identifier = get_entity_identifier();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

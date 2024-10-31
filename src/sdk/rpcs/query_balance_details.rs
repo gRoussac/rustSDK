@@ -1,14 +1,17 @@
 #[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
-use crate::types::{
-    global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
-};
 use crate::{
-    types::{sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        identifier::{
+            global_state_identifier::GlobalStateIdentifier, purse_identifier::PurseIdentifier,
+        },
+        sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
-use casper_client::cli::parse::purse_identifier as parse_purse_identifier;
 use casper_client::{
+    cli::parse::purse_identifier as parse_purse_identifier,
     cli::query_balance_details as query_balance_details_cli,
     query_balance_details as query_balance_details_lib,
     rpcs::results::QueryBalanceDetailsResult as _QueryBalanceDetailsResult, JsonRpcId,
@@ -313,7 +316,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -338,7 +341,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_missing_purse() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Error: Missing purse identifier";
 
         // Act
@@ -356,10 +359,10 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_global_state_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         // Act
         let result = sdk
             .query_balance_details(
@@ -380,9 +383,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, verbosity, Some(rpc_address.clone()))
             .await
@@ -412,9 +415,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_block_id() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -435,9 +438,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_purse_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -459,9 +462,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_purse_identifier_as_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -483,7 +486,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_balance_details_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

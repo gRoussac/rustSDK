@@ -1,3 +1,4 @@
+pub mod binary_port;
 #[allow(hidden_glob_reexports)]
 pub(crate) mod deploy;
 pub mod rpcs;
@@ -24,21 +25,27 @@ use crate::types::verbosity::Verbosity;
 #[wasm_bindgen]
 pub struct SDK {
     rpc_address: Option<String>,
+    node_address: Option<String>,
     verbosity: Option<Verbosity>,
 }
 
 impl Default for SDK {
     fn default() -> Self {
-        Self::new(None, None)
+        Self::new(None, None, None)
     }
 }
 
 #[wasm_bindgen]
 impl SDK {
     #[wasm_bindgen(constructor)]
-    pub fn new(rpc_address: Option<String>, verbosity: Option<Verbosity>) -> Self {
+    pub fn new(
+        rpc_address: Option<String>,
+        node_address: Option<String>,
+        verbosity: Option<Verbosity>,
+    ) -> Self {
         SDK {
             rpc_address,
+            node_address,
             verbosity,
         }
     }
@@ -55,6 +62,21 @@ impl SDK {
     #[wasm_bindgen(js_name = "setRPCAddress")]
     pub fn set_rpc_address(&mut self, rpc_address: Option<String>) -> Result<(), String> {
         self.rpc_address = rpc_address;
+        Ok(())
+    }
+
+    #[wasm_bindgen(js_name = "getNodeAddress")]
+    pub fn get_node_address(&self, node_address: Option<String>) -> String {
+        node_address
+            .as_ref()
+            .cloned()
+            .or_else(|| self.node_address.as_ref().map(String::to_owned))
+            .unwrap_or_default()
+    }
+
+    #[wasm_bindgen(js_name = "setNodeAddress")]
+    pub fn set_node_address(&mut self, node_address: Option<String>) -> Result<(), String> {
+        self.node_address = node_address;
         Ok(())
     }
 

@@ -3,7 +3,8 @@ const fs = require('fs').promises;
 const http = require('http');
 
 const rpc_address = 'http://localhost:11101';
-const sdk = new SDK(rpc_address);
+const node_address = 'localhost:28101';
+const sdk = new SDK(rpc_address, node_address);
 
 // const server = http.createServer(async (req, res) => {
 //   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -55,6 +56,14 @@ const example3 = async () => {
   const get_peers = await sdk.get_peers();
 
   const peers = get_peers.peers;
+  peers.forEach((peer) => {
+    console.log(peer);
+  });
+};
+
+// get_peers binary
+const example3_binary = async () => {
+  const peers = await sdk.get_binary_peers();
   peers.forEach((peer) => {
     console.log(peer);
   });
@@ -787,4 +796,4 @@ const example14_legacy = async () => {
   console.log(deploy_signed.toJson());
 };
 
-// example1();
+example3_binary();

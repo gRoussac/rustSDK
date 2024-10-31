@@ -1,6 +1,6 @@
+use crate::types::hash::transaction_hash::TransactionHash;
 #[cfg(target_arch = "wasm32")]
 use crate::types::transaction::Transaction;
-use crate::types::transaction_hash::TransactionHash;
 use crate::{types::verbosity::Verbosity, SDK};
 use casper_client::{
     get_transaction, rpcs::results::GetTransactionResult as _GetTransactionResult, Error,
@@ -215,7 +215,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let error_message = "builder error";
 
@@ -233,10 +233,10 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_invalid_transaction_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -250,9 +250,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_valid_transaction_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -290,9 +290,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_finalized_approvals() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -335,7 +335,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_transaction_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let transaction_hash = TransactionHash::from_raw(&[1u8; 32]).unwrap();
         let error_message = "error sending request for url (http://localhost/rpc)";
 

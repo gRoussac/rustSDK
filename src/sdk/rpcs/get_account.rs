@@ -1,9 +1,12 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
+use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
     types::{
-        account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
-        sdk_error::SdkError, verbosity::Verbosity,
+        identifier::{
+            account_identifier::AccountIdentifier, block_identifier::BlockIdentifierInput,
+        },
+        sdk_error::SdkError,
+        verbosity::Verbosity,
     },
     SDK,
 };
@@ -248,7 +251,7 @@ mod tests {
     use super::*;
     use crate::{
         helpers::public_key_from_secret_key,
-        types::{block_identifier::BlockIdentifier, public_key::PublicKey},
+        types::{identifier::block_identifier::BlockIdentifier, public_key::PublicKey},
     };
     use sdk_tests::tests::helpers::{
         get_enable_addressable_entity, get_network_constants, get_user_secret_key,
@@ -267,7 +270,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_account_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
         let account_identifier = get_account_identifier();
 
@@ -286,7 +289,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_account_with_missing_account() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Error: Missing account identifier";
 
         // Act
@@ -305,10 +308,10 @@ mod tests {
             return;
         }
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -331,10 +334,10 @@ mod tests {
             return;
         }
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let account_identifier_as_string = get_account_identifier().to_string();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -358,12 +361,12 @@ mod tests {
             return;
         }
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let account_identifier = get_account_identifier();
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -384,7 +387,7 @@ mod tests {
     #[allow(deprecated)]
     async fn test_get_account_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let account_identifier = get_account_identifier();
         let error_message = "error sending request for url (http://localhost/rpc)";
 
