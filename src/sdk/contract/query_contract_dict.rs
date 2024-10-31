@@ -5,7 +5,7 @@ use crate::types::digest::Digest;
 #[cfg(target_arch = "wasm32")]
 use crate::types::{
     deploy_params::dictionary_item_str_params::DictionaryItemStrParams,
-    dictionary_item_identifier::DictionaryItemIdentifier,
+    identifier::dictionary_item_identifier::DictionaryItemIdentifier,
 };
 use crate::{
     rpcs::get_dictionary_item::DictionaryItemInput,
@@ -110,7 +110,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -132,9 +132,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let dictionary_item = get_dictionary_item(false).await;
 
@@ -164,9 +164,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_empty_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -185,9 +185,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_valid_identifier_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -207,9 +207,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_valid_params_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash = "";
 
         // Act
@@ -229,9 +229,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_invalid_params_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key";
@@ -258,7 +258,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_contract_dict_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act

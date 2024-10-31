@@ -1,9 +1,12 @@
 #[cfg(target_arch = "wasm32")]
-use crate::types::block_identifier::BlockIdentifier;
-#[cfg(target_arch = "wasm32")]
 use crate::types::digest::Digest;
+#[cfg(target_arch = "wasm32")]
+use crate::types::identifier::block_identifier::BlockIdentifier;
 use crate::{
-    types::{block_identifier::BlockIdentifierInput, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        identifier::block_identifier::BlockIdentifierInput, sdk_error::SdkError,
+        verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
@@ -236,13 +239,15 @@ impl SDK {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{block_hash::BlockHash, block_identifier::BlockIdentifier};
+    use crate::types::{
+        hash::block_hash::BlockHash, identifier::block_identifier::BlockIdentifier,
+    };
     use sdk_tests::tests::helpers::get_network_constants;
 
     #[tokio::test]
     async fn test_get_state_root_hash_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -257,9 +262,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_state_root_hash_with_block_id_string() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let result = sdk
             .get_block(None, verbosity, Some(rpc_address.clone()))
             .await;
@@ -286,11 +291,11 @@ mod tests {
     #[tokio::test]
     async fn test_get_state_root_hash_with_block_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let block_identifier =
             BlockIdentifierInput::BlockIdentifier(BlockIdentifier::from_height(1));
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -303,7 +308,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_state_root_hash_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

@@ -126,7 +126,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_peers_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -141,9 +141,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_peers_with_specific_arguments() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk.get_peers(verbosity, Some(rpc_address)).await;
@@ -154,7 +154,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_peers_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
 

@@ -1,10 +1,16 @@
 use crate::{
     debug::error,
     types::{
-        account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
-        cl::bytes::Bytes, package_hash::PackageHash, public_key::PublicKey, uref::URef,
+        cl::bytes::Bytes,
+        hash::{
+            account_hash::AccountHash, addressable_entity_hash::AddressableEntityHash,
+            package_hash::PackageHash,
+        },
+        public_key::PublicKey,
+        uref::URef,
     },
 };
+
 use casper_client::cli::TransactionBuilderParams as _TransactionBuilderParams;
 use casper_types::{TransferTarget as _TransferTarget, U512};
 use wasm_bindgen::prelude::*;
@@ -128,7 +134,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Transfer,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source,
@@ -158,7 +163,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -188,7 +192,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -221,7 +224,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Package,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -253,7 +255,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::PackageAlias,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: Some(entry_point.to_string()),
             maybe_source: None,
@@ -287,7 +288,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::AddBid,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -319,7 +319,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Delegate,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -351,7 +350,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Undelegate,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -384,7 +382,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Redelegate,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,
@@ -412,7 +409,6 @@ impl TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::WithdrawBid,
             is_install_upgrade: Some(false),
-            // transaction_category: None,
             transaction_bytes: None,
             entry_point: None,
             maybe_source: None,

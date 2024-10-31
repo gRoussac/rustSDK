@@ -118,7 +118,7 @@ mod tests {
     #[tokio::test]
     async fn test_install_deploy_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let deploy_params = DeployStrParams::new("", "", None, None, None, None);
         let session_params = SessionStrParams::default();
 
@@ -139,8 +139,8 @@ mod tests {
     #[tokio::test]
     async fn test_install_deploy_with_valid_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -179,8 +179,8 @@ mod tests {
     #[tokio::test]
     async fn test_install_deploy_with_invalid_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -227,8 +227,8 @@ mod tests {
     #[tokio::test]
     async fn test_install_deploy_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
-        let (rpc_address, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(None, None, None);
+        let (rpc_address, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 
@@ -274,8 +274,8 @@ mod tests {
     #[tokio::test]
     async fn test_install_deploy_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
-        let (_, _, _, chain_name) = get_network_constants();
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
+        let (_, _, _, _, chain_name) = get_network_constants();
         let secret_key = get_user_secret_key(None).unwrap();
         let account = public_key_from_secret_key(&secret_key).unwrap();
 

@@ -32,7 +32,7 @@ pub async fn install_cep78() -> String {
     let account = public_key_from_secret_key(&secret_key).unwrap();
     let public_key = PublicKey::new(&account).unwrap();
     let account_hash = public_key.to_account_hash().to_formatted_string();
-    let (rpc_address, event_address, _, chain_name) = get_network_constants();
+    let (rpc_address, event_address, _, _, chain_name) = get_network_constants();
     install_cep78_if_needed(
         &account,
         &secret_key,
@@ -52,7 +52,7 @@ static CONTRACT_CEP78_KEY: Lazy<TokioMutex<Option<String>>> = Lazy::new(|| Tokio
 pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
     use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
 
-    let (rpc_address, event_address, _, chain_name) = get_network_constants();
+    let (rpc_address, event_address, _, _, chain_name) = get_network_constants();
     let mut contract_key = CONTRACT_CEP78_KEY.lock().await; // Use the async lock
 
     if contract_key.is_none() {
@@ -88,7 +88,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
 
 #[cfg(test)]
 async fn get_dictionary_item_input(entity_addr: &str) -> DictionaryItemInput {
-    use crate::types::dictionary_item_identifier::DictionaryItemIdentifier;
+    use crate::types::identifier::dictionary_item_identifier::DictionaryItemIdentifier;
 
     DictionaryItemInput::Identifier(
         DictionaryItemIdentifier::new_from_entity_info(

@@ -4,8 +4,8 @@ use crate::{
         deploy_params::dictionary_item_str_params::{
             dictionary_item_str_params_to_casper_client, DictionaryItemStrParams,
         },
-        dictionary_item_identifier::DictionaryItemIdentifier,
         digest::ToDigest,
+        identifier::dictionary_item_identifier::DictionaryItemIdentifier,
         sdk_error::SdkError,
         verbosity::Verbosity,
     },
@@ -19,7 +19,6 @@ use casper_client::{
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use rand::Rng;
-
 #[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
@@ -259,7 +258,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "builder error";
 
         // Act
@@ -281,9 +280,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let dictionary_item = get_dictionary_item(false).await;
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, verbosity, Some(rpc_address.clone()))
@@ -311,9 +310,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_empty_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -332,9 +331,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_valid_identifier_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -353,9 +352,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_valid_params_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -374,9 +373,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_invalid_params_input() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         let error_message =
             "Failed to parse dictionary item address as a key: unknown prefix for key";
@@ -403,7 +402,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_dictionary_item_with_error() {
         // Arrange
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
         let error_message = "error sending request for url (http://localhost/rpc)";
 
         // Act

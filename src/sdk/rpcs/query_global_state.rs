@@ -1,7 +1,8 @@
-use crate::types::digest::Digest;
-use crate::types::global_state_identifier::GlobalStateIdentifier;
 use crate::{
-    types::{key::Key, path::Path, sdk_error::SdkError, verbosity::Verbosity},
+    types::{
+        digest::Digest, identifier::global_state_identifier::GlobalStateIdentifier, key::Key,
+        path::Path, sdk_error::SdkError, verbosity::Verbosity,
+    },
     SDK,
 };
 use casper_client::{
@@ -410,7 +411,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_none_values() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message = "Failed to parse state identifier";
 
         // Act
@@ -435,7 +436,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_missing_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let error_message =
             "Invalid argument 'query_global_state': Error: Missing key from formatted string";
 
@@ -461,10 +462,10 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_global_state_identifier() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let global_state_identifier = GlobalStateIdentifier::from_block_height(1);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -486,9 +487,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_state_root_hash() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
         let state_root_hash: Digest = sdk
             .get_state_root_hash(None, verbosity, Some(rpc_address.clone()))
             .await
@@ -517,9 +518,9 @@ mod tests {
     #[tokio::test]
     async fn test_query_global_state_with_block_id() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (rpc_address, _, _, _) = get_network_constants();
+        let (rpc_address, _, _, _, _) = get_network_constants();
 
         // Act
         let result = sdk
@@ -540,7 +541,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_global_state_with_error() {
-        let sdk = SDK::new(Some("http://localhost".to_string()), None);
+        let sdk = SDK::new(Some("http://localhost".to_string()), None, None);
 
         let error_message = "error sending request for url (http://localhost/rpc)";
         // Act

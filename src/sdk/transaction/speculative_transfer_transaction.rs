@@ -120,9 +120,9 @@ mod tests {
     #[ignore]
     async fn _test_speculative_transfer_transaction_with_valid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, chain_name) = get_network_constants();
+        let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -152,9 +152,9 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_transfer_transaction_with_valid_params_without_secret_key() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, chain_name) = get_network_constants();
+        let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
         let secret_key = get_user_secret_key(None).unwrap();
         let initiator_addr = public_key_from_secret_key(&secret_key).unwrap();
@@ -184,9 +184,9 @@ mod tests {
     #[tokio::test]
     async fn test_speculative_transfer_transaction_with_invalid_params() {
         // Arrange
-        let sdk = SDK::new(None, None);
+        let sdk = SDK::new(None, None, None);
         let verbosity = Some(Verbosity::High);
-        let (_, _, default_speculative_address, chain_name) = get_network_constants();
+        let (_, _, default_speculative_address, _, chain_name) = get_network_constants();
 
         let error_message = "Node request failure";
         let secret_key = get_user_secret_key(None).unwrap();
