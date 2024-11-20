@@ -183,26 +183,19 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_38(arg0, arg1) {
-    wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hae2e6541fe204983(arg0, arg1);
+    wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hd1bf6ecddece6326(arg0, arg1);
 }
 
 function __wbg_adapter_41(arg0, arg1, arg2) {
-    wasm.closure969_externref_shim(arg0, arg1, arg2);
+    wasm.closure958_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_48(arg0, arg1, arg2) {
-    wasm.closure1166_externref_shim(arg0, arg1, arg2);
+    wasm.closure1148_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_51(arg0, arg1, arg2) {
-    wasm.closure1174_externref_shim(arg0, arg1, arg2);
-}
-
-function passArray8ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 1, 1) >>> 0;
-    getUint8ArrayMemory0().set(arg, ptr / 1);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
+    wasm.closure1160_externref_shim(arg0, arg1, arg2);
 }
 
 function takeFromExternrefTable0(idx) {
@@ -211,9 +204,11 @@ function takeFromExternrefTable0(idx) {
     return value;
 }
 
-function getArrayU8FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1, 1) >>> 0;
+    getUint8ArrayMemory0().set(arg, ptr / 1);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
 }
 
 function _assertClass(instance, klass) {
@@ -227,6 +222,16 @@ function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();
     wasm.__wbindgen_export_2.set(idx, obj);
     return idx;
+}
+
+function passArrayJsValueToWasm0(array, malloc) {
+    const ptr = malloc(array.length * 4, 4) >>> 0;
+    const mem = getDataViewMemory0();
+    for (let i = 0; i < array.length; i++) {
+        mem.setUint32(ptr + 4 * i, addToExternrefTable0(array[i]), true);
+    }
+    WASM_VECTOR_LEN = array.length;
+    return ptr;
 }
 /**
  * Converts a hexadecimal string to a regular string.
@@ -256,6 +261,10 @@ export function hexToString(hex_string) {
     }
 }
 
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
 /**
  * Converts a hexadecimal string to a Uint8Array.
  *
@@ -525,14 +534,15 @@ export function makeDictionaryItemKey(key, value) {
     }
 }
 
-function passArrayJsValueToWasm0(array, malloc) {
-    const ptr = malloc(array.length * 4, 4) >>> 0;
+function getArrayJsValueFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
     const mem = getDataViewMemory0();
-    for (let i = 0; i < array.length; i++) {
-        mem.setUint32(ptr + 4 * i, addToExternrefTable0(array[i]), true);
+    const result = [];
+    for (let i = ptr; i < ptr + 4 * len; i += 4) {
+        result.push(wasm.__wbindgen_export_2.get(mem.getUint32(i, true)));
     }
-    WASM_VECTOR_LEN = array.length;
-    return ptr;
+    wasm.__externref_drop_slice(ptr, len);
+    return result;
 }
 
 function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
@@ -545,19 +555,8 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(idx);
     }
 }
-
-function getArrayJsValueFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    const mem = getDataViewMemory0();
-    const result = [];
-    for (let i = ptr; i < ptr + 4 * len; i += 4) {
-        result.push(wasm.__wbindgen_export_2.get(mem.getUint32(i, true)));
-    }
-    wasm.__externref_drop_slice(ptr, len);
-    return result;
-}
-function __wbg_adapter_1205(arg0, arg1, arg2, arg3) {
-    wasm.closure1724_externref_shim(arg0, arg1, arg2, arg3);
+function __wbg_adapter_1211(arg0, arg1, arg2, arg3) {
+    wasm.closure1697_externref_shim(arg0, arg1, arg2, arg3);
 }
 
 export const PricingMode = Object.freeze({ Fixed:0,"0":"Fixed",Classic:1,"1":"Classic",Reserved:2,"2":"Reserved", });
@@ -2823,7 +2822,7 @@ export class EntityIdentifier {
     static fromPublicKey(key) {
         _assertClass(key, PublicKey);
         var ptr0 = key.__destroy_into_raw();
-        const ret = wasm.accountidentifier_fromPublicKey(ptr0);
+        const ret = wasm.entityidentifier_fromPublicKey(ptr0);
         return EntityIdentifier.__wrap(ret);
     }
     /**
@@ -2833,7 +2832,7 @@ export class EntityIdentifier {
     static fromAccountHash(account_hash) {
         _assertClass(account_hash, AccountHash);
         var ptr0 = account_hash.__destroy_into_raw();
-        const ret = wasm.accountidentifier_fromAccountHash(ptr0);
+        const ret = wasm.entityidentifier_fromAccountHash(ptr0);
         return EntityIdentifier.__wrap(ret);
     }
     /**
@@ -5713,7 +5712,7 @@ export class PurseIdentifier {
     constructor(key) {
         _assertClass(key, PublicKey);
         var ptr0 = key.__destroy_into_raw();
-        const ret = wasm.accountidentifier_fromPublicKey(ptr0);
+        const ret = wasm.purseidentifier_fromPublicKey(ptr0);
         this.__wbg_ptr = ret >>> 0;
         PurseIdentifierFinalization.register(this, this.__wbg_ptr, this);
         return this;
@@ -5725,7 +5724,7 @@ export class PurseIdentifier {
     static fromAccountHash(account_hash) {
         _assertClass(account_hash, AccountHash);
         var ptr0 = account_hash.__destroy_into_raw();
-        const ret = wasm.accountidentifier_fromAccountHash(ptr0);
+        const ret = wasm.purseidentifier_fromAccountHash(ptr0);
         return PurseIdentifier.__wrap(ret);
     }
     /**
@@ -6095,6 +6094,96 @@ export class SDK {
         wasm.__wbg_sdk_free(ptr, 0);
     }
     /**
+     * Parses transaction options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing transaction options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed transaction options as a `GetTransactionOptions` struct.
+     * @param {any} options
+     * @returns {getTransactionOptions}
+     */
+    get_transaction_options(options) {
+        const ret = wasm.sdk_get_transaction_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getTransactionOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves transaction information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetTransactionOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetTransactionResult` or an error.
+     * @param {getTransactionOptions | undefined} [options]
+     * @returns {Promise<GetTransactionResult>}
+     */
+    get_transaction(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getTransactionOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_transaction(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves transaction information using the provided options, alias for `get_transaction`.
+     * @param {getTransactionOptions | undefined} [options]
+     * @returns {Promise<GetTransactionResult>}
+     */
+    info_get_transaction(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getTransactionOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_info_get_transaction(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Get options for speculative execution from a JavaScript value.
+     * @param {any} options
+     * @returns {getSpeculativeExecTxnOptions}
+     */
+    get_speculative_exec_options(options) {
+        const ret = wasm.sdk_get_speculative_exec_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getSpeculativeExecTxnOptions.__wrap(ret[0]);
+    }
+    /**
+     * JS function for speculative execution.
+     *
+     * # Arguments
+     *
+     * * `options` - The options for speculative execution.
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+     * @param {getSpeculativeExecTxnOptions | undefined} [options]
+     * @returns {Promise<SpeculativeExecTxnResult>}
+     */
+    speculative_exec(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getSpeculativeExecTxnOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
      * @param {any} options
      * @returns {getAccountOptions}
      */
@@ -6154,71 +6243,904 @@ export class SDK {
         return ret;
     }
     /**
-     * Parses balance options from a JsValue.
+     * Parses auction info options from a JsValue.
      *
      * # Arguments
      *
-     * * `options` - A JsValue containing balance options to be parsed.
+     * * `options` - A JsValue containing auction info options to be parsed.
      *
      * # Returns
      *
-     * Parsed balance options as a `GetBalanceOptions` struct.
+     * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
+     * or a `JsError` if deserialization fails.
      * @param {any} options
-     * @returns {getBalanceOptions}
+     * @returns {getAuctionInfoOptions}
      */
-    get_balance_options(options) {
-        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, options);
+    get_auction_info_options(options) {
+        const ret = wasm.sdk_get_auction_info_options(this.__wbg_ptr, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
-        return getBalanceOptions.__wrap(ret[0]);
+        return getAuctionInfoOptions.__wrap(ret[0]);
     }
     /**
-     * Retrieves balance information using the provided options.
+     * Retrieves auction information using the provided options.
      *
      * # Arguments
      *
-     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+     * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
      * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBalanceOptions | undefined} [options]
-     * @returns {Promise<GetBalanceResult>}
+     * @param {getAuctionInfoOptions | undefined} [options]
+     * @returns {Promise<GetAuctionInfoResult>}
      */
-    get_balance(options) {
+    get_auction_info(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getBalanceOptions);
+            _assertClass(options, getAuctionInfoOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_get_auction_info(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * JavaScript Alias for `get_balance`.
+     * @param {getAuctionInfoOptions | undefined} [options]
+     * @returns {Promise<GetAuctionInfoResult>}
+     */
+    state_get_auction_info_js_alias(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getAuctionInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_auction_info_js_alias(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Parses deploy options from a JsValue.
      *
      * # Arguments
      *
-     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
+     * * `options` - A JsValue containing deploy options to be parsed.
      *
      * # Returns
      *
-     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
-     * @param {getBalanceOptions | undefined} [options]
-     * @returns {Promise<GetBalanceResult>}
+     * Parsed deploy options as a `GetDeployOptions` struct.
+     * @param {any} options
+     * @returns {getDeployOptions}
      */
-    state_get_balance(options) {
+    get_deploy_options(options) {
+        const ret = wasm.sdk_get_deploy_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getDeployOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves deploy information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetDeployResult` or an error.
+     * @param {getDeployOptions | undefined} [options]
+     * @returns {Promise<GetDeployResult>}
+     */
+    get_deploy(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getBalanceOptions);
+            _assertClass(options, getDeployOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_get_deploy(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves deploy information using the provided options, alias for `get_deploy`.
+     * @param {getDeployOptions | undefined} [options]
+     * @returns {Promise<GetDeployResult>}
+     */
+    info_get_deploy(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDeployOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {any} options
+     * @returns {getEntityOptions}
+     */
+    get_entity_options(options) {
+        const ret = wasm.sdk_get_entity_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getEntityOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves entity information using the provided options.
+     *
+     * This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
+     *   - `entity_identifier`: Identifier for the entity.
+     *   - `entity_identifier_as_string`: String representation of the entity identifier.
+     *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
+     *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
+     *   - `verbosity`: Verbosity level for the output.
+     *   - `rpc_address`: Address of the node to query.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
+     * ```
+     * @param {getEntityOptions | undefined} [options]
+     * @returns {Promise<GetAddressableEntityResult>}
+     */
+    get_entity(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEntityOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_entity(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getEntityOptions | undefined} [options]
+     * @returns {Promise<GetAddressableEntityResult>}
+     */
+    state_get_entity(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEntityOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_entity(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {any} options
+     * @returns {getEraInfoOptions}
+     */
+    get_era_info_options(options) {
+        const ret = wasm.sdk_get_era_info_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getEraInfoOptions.__wrap(ret[0]);
+    }
+    /**
+     * @param {getEraInfoOptions | undefined} [options]
+     * @returns {Promise<GetEraInfoResult>}
+     */
+    get_era_info(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_era_info(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getEraInfoOptions | undefined} [options]
+     * @returns {Promise<GetEraInfoResult>}
+     */
+    chain_get_era_info_by_switch_block(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraInfoOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_era_info_by_switch_block(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JavaScript function for deploying with deserialized parameters.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - Deploy parameters.
+     * * `session_params` - Session parameters.
+     * * `payment_params` - Payment parameters.
+     * * `verbosity` - An optional verbosity level.
+     * * `rpc_address` - An optional rpc address.
+     *
+     * # Returns
+     *
+     * A result containing PutDeployResult or a JsError.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {PaymentStrParams} payment_params
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    deploy(deploy_params, session_params, payment_params, verbosity, rpc_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity, ptr3, len3);
+        return ret;
+    }
+    /**
+     * Retrieves peers asynchronously.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - Optional verbosity level.
+     * * `rpc_address` - Optional rpc address.
+     *
+     * # Returns
+     *
+     * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<GetPeersResult>}
+     */
+    get_peers(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<GetPeersResult>}
+     */
+    info_get_peers(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_info_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * Lists available RPCs using the provided options.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the listing process.
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<ListRpcsResult>}
+     */
+    list_rpcs(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_list_rpcs(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * JS function for `make_deploy`.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - The deploy parameters.
+     * * `session_params` - The session parameters.
+     * * `payment_params` - The payment parameters.
+     *
+     * # Returns
+     *
+     * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {PaymentStrParams} payment_params
+     * @returns {Deploy}
+     */
+    make_deploy(deploy_params, session_params, payment_params) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr2 = payment_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Deploy.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `sign_deploy`.
+     *
+     * # Arguments
+     *
+     * * `deploy` - The deploy to sign.
+     * * `secret_key` - The secret key for signing.
+     *
+     * # Returns
+     *
+     * The signed `Deploy`.
+     * @param {Deploy} deploy
+     * @param {string} secret_key
+     * @returns {Deploy}
+     */
+    sign_deploy(deploy, secret_key) {
+        _assertClass(deploy, Deploy);
+        var ptr0 = deploy.__destroy_into_raw();
+        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_sign_deploy(this.__wbg_ptr, ptr0, ptr1, len1);
+        return Deploy.__wrap(ret);
+    }
+    /**
+     * JS function for `make_transaction`.
+     *
+     * # Arguments
+     *
+     * * `builder_params` - Transaction Builder parameters.
+     * * `transaction_params` - The transaction parameters.
+     *
+     * # Returns
+     *
+     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
+     * @param {TransactionBuilderParams} builder_params
+     * @param {TransactionStrParams} transaction_params
+     * @returns {Transaction}
+     */
+    make_transaction(builder_params, transaction_params) {
+        _assertClass(builder_params, TransactionBuilderParams);
+        var ptr0 = builder_params.__destroy_into_raw();
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr1 = transaction_params.__destroy_into_raw();
+        const ret = wasm.sdk_make_transaction(this.__wbg_ptr, ptr0, ptr1);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Transaction.__wrap(ret[0]);
+    }
+    /**
+     * JS function for `sign_transaction`.
+     *
+     * # Arguments
+     *
+     * * `transaction` - The transaction to sign.
+     * * `secret_key` - The secret key for signing.
+     *
+     * # Returns
+     *
+     * The signed `Transaction`.
+     * @param {Transaction} transaction
+     * @param {string} secret_key
+     * @returns {Transaction}
+     */
+    sign_transaction(transaction, secret_key) {
+        _assertClass(transaction, Transaction);
+        var ptr0 = transaction.__destroy_into_raw();
+        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_sign_transaction(this.__wbg_ptr, ptr0, ptr1, len1);
+        return Transaction.__wrap(ret);
+    }
+    /**
+     * Deserialize query_contract_key_options from a JavaScript object.
+     * @param {any} options
+     * @returns {queryContractKeyOptions}
+     */
+    query_contract_key_options(options) {
+        const ret = wasm.sdk_query_contract_key_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryContractKeyOptions.__wrap(ret[0]);
+    }
+    /**
+     * JavaScript function for query_contract_key with deserialized options.
+     * @param {queryContractKeyOptions | undefined} [options]
+     * @returns {Promise<QueryGlobalStateResult>}
+     */
+    query_contract_key(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, queryContractKeyOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_query_contract_key(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Puts a deploy using the provided options.
+     *
+     * # Arguments
+     *
+     * * `deploy` - The `Deploy` object to be sent.
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the deploy process.
+     * @param {Deploy} deploy
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    put_deploy(deploy, verbosity, rpc_address) {
+        _assertClass(deploy, Deploy);
+        var ptr0 = deploy.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for `put_deploy`.
+     * @param {Deploy} deploy
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    account_put_deploy(deploy, verbosity, rpc_address) {
+        _assertClass(deploy, Deploy);
+        var ptr0 = deploy.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_account_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
+     * JS function for speculative transfer transaction.
+     *
+     * # Arguments
+     *
+     * * `maybe_source` - Optional transfer source uref.
+     * * `target_account` - The target account.
+     * * `amount` - The amount to transfer.
+     * * `maybe_id` - An optional transfer ID (defaults to a random number).
+     * * `transaction_params` - The transactionment parameters.
+     * * `verbosity` - The verbosity level for logging (optional).
+     * * `rpc_address` - The address of the node to connect to (optional).
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+     * @param {URef | undefined} maybe_source
+     * @param {string} target_account
+     * @param {string} amount
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | undefined} [maybe_id]
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<SpeculativeExecTxnResult>}
+     */
+    speculative_transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_source)) {
+            _assertClass(maybe_source, URef);
+            ptr0 = maybe_source.__destroy_into_raw();
+        }
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr3 = transaction_params.__destroy_into_raw();
+        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len4 = WASM_VECTOR_LEN;
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return ret;
+    }
+    /**
+     * Calls a smart contract entry point with the specified parameters and returns the result.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - The deploy parameters.
+     * * `session_params` - The session parameters.
+     * * `payment_amount` - The payment amount as a string.
+     * * `rpc_address` - An optional rpc address to send the request to.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the call.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {string} payment_amount
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    call_entrypoint_deploy(deploy_params, session_params, payment_amount, rpc_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_call_entrypoint_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        return ret;
+    }
+    /**
+     * Installs a smart contract with the specified parameters and returns the result.
+     *
+     * # Arguments
+     *.
+     * * `transaction_params` - Transaction parameters.
+     * * `transaction_bytes` - Transaction Bytes to install
+     * * `rpc_address` - An optional rpc address to send the request to.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the installation.
+     * @param {TransactionStrParams} transaction_params
+     * @param {Bytes} transaction_bytes
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    install(transaction_params, transaction_bytes, rpc_address) {
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr0 = transaction_params.__destroy_into_raw();
+        _assertClass(transaction_bytes, Bytes);
+        var ptr1 = transaction_bytes.__destroy_into_raw();
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
+        return ret;
+    }
+    /**
+     * JS function for speculative transfer.
+     *
+     * # Arguments
+     *
+     * * `amount` - The amount to transfer.
+     * * `target_account` - The target account.
+     * * `transfer_id` - An optional transfer ID (defaults to a random number).
+     * * `deploy_params` - The deployment parameters.
+     * * `payment_params` - The payment parameters.
+     * * `verbosity` - The verbosity level for logging (optional).
+     * * `rpc_address` - The address of the node to connect to (optional).
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+     * @param {string} amount
+     * @param {string} target_account
+     * @param {string | undefined} transfer_id
+     * @param {DeployStrParams} deploy_params
+     * @param {PaymentStrParams} payment_params
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<SpeculativeExecResult>}
+     */
+    speculative_transfer(amount, target_account, transfer_id, deploy_params, payment_params, verbosity, rpc_address) {
+        const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        var ptr2 = isLikeNone(transfer_id) ? 0 : passStringToWasm0(transfer_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr3 = deploy_params.__destroy_into_raw();
+        _assertClass(payment_params, PaymentStrParams);
+        var ptr4 = payment_params.__destroy_into_raw();
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+        return ret;
+    }
+    /**
+     * Puts a transaction using the provided options.
+     *
+     * # Arguments
+     *
+     * * `transaction` - The `Transaction` object to be sent.
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the transaction process.
+     * @param {Transaction} transaction
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    put_transaction(transaction, verbosity, rpc_address) {
+        _assertClass(transaction, Transaction);
+        var ptr0 = transaction.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for `put_transaction`.
+     * @param {Transaction} transaction
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    account_put_transaction(transaction, verbosity, rpc_address) {
+        _assertClass(transaction, Transaction);
+        var ptr0 = transaction.__destroy_into_raw();
+        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_account_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
+        return ret;
+    }
+    /**
+     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+     * Legacy alias
+     *
+     * # Arguments
+     *
+     * * `events_url` - The URL to monitor for transaction events.
+     * * `timeout_duration` - An optional timeout duration in seconds.
+     *
+     * # Returns
+     *
+     * A `Watcher` instance.
+     * @param {string} events_url
+     * @param {number | undefined} [timeout_duration]
+     * @returns {Watcher}
+     */
+    watchDeploy(events_url, timeout_duration) {
+        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_watchDeploy(this.__wbg_ptr, ptr0, len0, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
+        return Watcher.__wrap(ret);
+    }
+    /**
+     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
+     *
+     * # Arguments
+     *
+     * * `events_url` - The URL to monitor for transaction events.
+     * * `timeout_duration` - An optional timeout duration in seconds.
+     *
+     * # Returns
+     *
+     * A `Watcher` instance.
+     * @param {string} events_url
+     * @param {number | undefined} [timeout_duration]
+     * @returns {Watcher}
+     */
+    watchTransaction(events_url, timeout_duration) {
+        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_watchTransaction(this.__wbg_ptr, ptr0, len0, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
+        return Watcher.__wrap(ret);
+    }
+    /**
+     * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+     * Legacy alias
+     *
+     * # Arguments
+     *
+     * * `events_url` - The URL to monitor for transaction events.
+     * * `deploy_hash` - The deploy hash to wait for.
+     * * `timeout_duration` - An optional timeout duration in seconds.
+     *
+     * # Returns
+     *
+     * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+     * @param {string} events_url
+     * @param {string} deploy_hash
+     * @param {number | undefined} [timeout_duration]
+     * @returns {Promise<Promise<any>>}
+     */
+    waitDeploy(events_url, deploy_hash, timeout_duration) {
+        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(deploy_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_waitDeploy(this.__wbg_ptr, ptr0, len0, ptr1, len1, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
+        return ret;
+    }
+    /**
+     * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
+     *
+     * # Arguments
+     *
+     * * `events_url` - The URL to monitor for transaction events.
+     * * `target_hash` - The transaction hash to wait for.
+     * * `timeout_duration` - An optional timeout duration in seconds.
+     *
+     * # Returns
+     *
+     * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
+     * @param {string} events_url
+     * @param {string} target_hash
+     * @param {number | undefined} [timeout_duration]
+     * @returns {Promise<Promise<any>>}
+     */
+    waitTransaction(events_url, target_hash, timeout_duration) {
+        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(target_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_waitTransaction(this.__wbg_ptr, ptr0, len0, ptr1, len1, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
+        return ret;
+    }
+    /**
+     * Calls a smart contract entry point with the specified parameters and returns the result.
+     *
+     * # Arguments
+     *
+     * * `transaction_params` - Transaction parameters.
+     * * `builder_params` - Transaction Builder parameters.
+     * * `rpc_address` - An optional rpc address to send the request to.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the call.
+     * @param {TransactionBuilderParams} builder_params
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    call_entrypoint(builder_params, transaction_params, rpc_address) {
+        _assertClass(builder_params, TransactionBuilderParams);
+        var ptr0 = builder_params.__destroy_into_raw();
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr1 = transaction_params.__destroy_into_raw();
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
+        return ret;
+    }
+    /**
+     * Installs a smart contract with the specified parameters and returns the result.
+     *
+     * # Arguments
+     *
+     * * `deploy_params` - The deploy parameters.
+     * * `session_params` - The session parameters.
+     * * `payment_amount` - The payment amount as a string.
+     * * `rpc_address` - An optional rpc address to send the request to.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the installation.
+     * @param {DeployStrParams} deploy_params
+     * @param {SessionStrParams} session_params
+     * @param {string} payment_amount
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutDeployResult>}
+     */
+    install_deploy(deploy_params, session_params, payment_amount, rpc_address) {
+        _assertClass(deploy_params, DeployStrParams);
+        var ptr0 = deploy_params.__destroy_into_raw();
+        _assertClass(session_params, SessionStrParams);
+        var ptr1 = session_params.__destroy_into_raw();
+        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len3 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_install_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        return ret;
+    }
+    /**
+     * Parses block options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing block options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed block options as a `GetBlockOptions` struct.
+     * @param {any} options
+     * @returns {getBlockOptions}
+     */
+    get_block_options(options) {
+        const ret = wasm.sdk_get_block_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getBlockOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves block information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getBlockOptions | undefined} [options]
+     * @returns {Promise<GetBlockResult>}
+     */
+    get_block(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBlockOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_block(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for the `get_block`.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getBlockOptions | undefined} [options]
+     * @returns {Promise<GetBlockResult>}
+     */
+    chain_get_block(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBlockOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_block(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
@@ -6287,167 +7209,6 @@ export class SDK {
         var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
         const ret = wasm.sdk_info_get_status(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Parses query global state options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing query global state options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed query global state options as a `QueryGlobalStateOptions` struct.
-     * @param {any} options
-     * @returns {queryGlobalStateOptions}
-     */
-    query_global_state_options(options) {
-        const ret = wasm.sdk_query_global_state_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryGlobalStateOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves global state information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `QueryGlobalStateOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `QueryGlobalStateResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {queryGlobalStateOptions | undefined} [options]
-     * @returns {Promise<QueryGlobalStateResult>}
-     */
-    query_global_state(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, queryGlobalStateOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses block transfers options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing block transfers options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed block transfers options as a `GetBlockTransfersOptions` struct.
-     * @param {any} options
-     * @returns {getBlockTransfersOptions}
-     */
-    get_block_transfers_options(options) {
-        const ret = wasm.sdk_get_block_transfers_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getBlockTransfersOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves block transfers information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBlockTransfersOptions | undefined} [options]
-     * @returns {Promise<GetBlockTransfersResult>}
-     */
-    get_block_transfers(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBlockTransfersOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_block_transfers(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getBlockTransfersOptions | undefined} [options]
-     * @returns {Promise<GetBlockTransfersResult>}
-     */
-    chain_get_block_transfers(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBlockTransfersOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_block_transfers(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses deploy options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing deploy options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed deploy options as a `GetDeployOptions` struct.
-     * @param {any} options
-     * @returns {getDeployOptions}
-     */
-    get_deploy_options(options) {
-        const ret = wasm.sdk_get_deploy_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getDeployOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves deploy information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetDeployResult` or an error.
-     * @param {getDeployOptions | undefined} [options]
-     * @returns {Promise<GetDeployResult>}
-     */
-    get_deploy(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDeployOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_deploy(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Retrieves deploy information using the provided options, alias for `get_deploy`.
-     * @param {getDeployOptions | undefined} [options]
-     * @returns {Promise<GetDeployResult>}
-     */
-    info_get_deploy(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDeployOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_info_get_deploy(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
@@ -6523,62 +7284,6 @@ export class SDK {
         return ret;
     }
     /**
-     * Parses transaction options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing transaction options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed transaction options as a `GetTransactionOptions` struct.
-     * @param {any} options
-     * @returns {getTransactionOptions}
-     */
-    get_transaction_options(options) {
-        const ret = wasm.sdk_get_transaction_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getTransactionOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves transaction information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetTransactionOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetTransactionResult` or an error.
-     * @param {getTransactionOptions | undefined} [options]
-     * @returns {Promise<GetTransactionResult>}
-     */
-    get_transaction(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getTransactionOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_transaction(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Retrieves transaction information using the provided options, alias for `get_transaction`.
-     * @param {getTransactionOptions | undefined} [options]
-     * @returns {Promise<GetTransactionResult>}
-     */
-    info_get_transaction(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getTransactionOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_info_get_transaction(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
      * Parses query balance options from a JsValue.
      *
      * # Arguments
@@ -6625,71 +7330,151 @@ export class SDK {
         return ret;
     }
     /**
-     * Get options for speculative execution from a JavaScript value.
-     * @param {any} options
-     * @returns {getSpeculativeExecTxnOptions}
-     */
-    get_speculative_exec_options(options) {
-        const ret = wasm.sdk_get_speculative_exec_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getSpeculativeExecTxnOptions.__wrap(ret[0]);
-    }
-    /**
-     * JS function for speculative execution.
+     * Parses query balance options from a JsValue.
      *
      * # Arguments
      *
-     * * `options` - The options for speculative execution.
+     * * `options` - A JsValue containing query balance options to be parsed.
      *
      * # Returns
      *
-     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-     * @param {getSpeculativeExecTxnOptions | undefined} [options]
-     * @returns {Promise<SpeculativeExecTxnResult>}
+     * Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
+     * @param {any} options
+     * @returns {queryBalanceDetailsOptions}
      */
-    speculative_exec(options) {
+    query_balance_details_options(options) {
+        const ret = wasm.sdk_query_balance_details_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryBalanceDetailsOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves balance information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {queryBalanceDetailsOptions | undefined} [options]
+     * @returns {Promise<QueryBalanceDetailsResult>}
+     */
+    query_balance_details(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, getSpeculativeExecTxnOptions);
+            _assertClass(options, queryBalanceDetailsOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_speculative_exec(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_query_balance_details(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * Get options for speculative execution from a JavaScript value.
-     * @param {any} options
-     * @returns {getSpeculativeExecDeployOptions}
-     */
-    get_speculative_exec_deploy_options(options) {
-        const ret = wasm.sdk_get_speculative_exec_deploy_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getSpeculativeExecDeployOptions.__wrap(ret[0]);
-    }
-    /**
-     * JS function for speculative execution.
+     * This function allows executing a transaction speculatively.
      *
      * # Arguments
      *
-     * * `options` - The options for speculative execution.
+     * * `builder_params` - Transaction Builder parameters.
+     * * `transaction_params` - Transactionment parameters for the transaction.
+     * * `verbosity` - Optional verbosity level.
+     * * `rpc_address` - Optional rpc address.
      *
      * # Returns
      *
-     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
-     * @param {getSpeculativeExecDeployOptions | undefined} [options]
-     * @returns {Promise<SpeculativeExecResult>}
+     * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
+     * @param {TransactionBuilderParams} builder_params
+     * @param {TransactionStrParams} transaction_params
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<SpeculativeExecTxnResult>}
      */
-    speculative_exec_deploy(options) {
+    speculative_transaction(builder_params, transaction_params, verbosity, rpc_address) {
+        _assertClass(builder_params, TransactionBuilderParams);
+        var ptr0 = builder_params.__destroy_into_raw();
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr1 = transaction_params.__destroy_into_raw();
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_speculative_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
+        return ret;
+    }
+    /**
+     * JavaScript function for transactioning with deserialized parameters.
+     *
+     * # Arguments
+     *
+     * * `transaction_params` - Transaction parameters.
+     * * `builder_params` - Session parameters.
+     * * `verbosity` - An optional verbosity level.
+     * * `rpc_address` - An optional rpc address.
+     *
+     * # Returns
+     *
+     * A result containing PutTransactionResult or a JsError.
+     * @param {TransactionBuilderParams} builder_params
+     * @param {TransactionStrParams} transaction_params
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    transaction(builder_params, transaction_params, verbosity, rpc_address) {
+        _assertClass(builder_params, TransactionBuilderParams);
+        var ptr0 = builder_params.__destroy_into_raw();
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr1 = transaction_params.__destroy_into_raw();
+        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len2 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
+        return ret;
+    }
+    /**
+     * JS function for transaction transferring funds.
+     *
+     * # Arguments
+     *
+     * * `maybe_source` - Optional transfer source uref.
+     * * `target_account` - The target account.
+     * * `amount` - The amount to transfer.
+     * * `transaction_params` - The transaction parameters.
+     * * `maybe_id` - An optional transfer ID (defaults to a random number).
+     * * `verbosity` - The verbosity level for logging (optional).
+     * * `rpc_address` - The address of the node to connect to (optional).
+     *
+     * # Returns
+     *
+     * A `Result` containing the result of the transfer or a `JsError` in case of an error.
+     * @param {URef | undefined} maybe_source
+     * @param {string} target_account
+     * @param {string} amount
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | undefined} [maybe_id]
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<PutTransactionResult>}
+     */
+    transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
         let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getSpeculativeExecDeployOptions);
-            ptr0 = options.__destroy_into_raw();
+        if (!isLikeNone(maybe_source)) {
+            _assertClass(maybe_source, URef);
+            ptr0 = maybe_source.__destroy_into_raw();
         }
-        const ret = wasm.sdk_speculative_exec_deploy(this.__wbg_ptr, ptr0);
+        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr3 = transaction_params.__destroy_into_raw();
+        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len4 = WASM_VECTOR_LEN;
+        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len5 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
         return ret;
     }
     /**
@@ -6731,27 +7516,45 @@ export class SDK {
         return Deploy.__wrap(ret[0]);
     }
     /**
-     * JS function for `sign_transaction`.
+     * JS function for `make_transfer_transaction`.
      *
      * # Arguments
      *
-     * * `transaction` - The transaction to sign.
-     * * `secret_key` - The secret key for signing.
+     * * `maybe_source` - Optional transfer source uref.
+     * * `amount` - The transfer amount.
+     * * `target` - The target account.
+     * * `transaction_params` - The transaction parameters.
+     * * `maybe_id` - Optional transfer identifier.
      *
      * # Returns
      *
-     * The signed `Transaction`.
-     * @param {Transaction} transaction
-     * @param {string} secret_key
+     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
+     * @param {URef | undefined} maybe_source
+     * @param {string} target
+     * @param {string} amount
+     * @param {TransactionStrParams} transaction_params
+     * @param {string | undefined} [maybe_id]
      * @returns {Transaction}
      */
-    sign_transaction(transaction, secret_key) {
-        _assertClass(transaction, Transaction);
-        var ptr0 = transaction.__destroy_into_raw();
-        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    make_transfer_transaction(maybe_source, target, amount, transaction_params, maybe_id) {
+        let ptr0 = 0;
+        if (!isLikeNone(maybe_source)) {
+            _assertClass(maybe_source, URef);
+            ptr0 = maybe_source.__destroy_into_raw();
+        }
+        const ptr1 = passStringToWasm0(target, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_sign_transaction(this.__wbg_ptr, ptr0, ptr1, len1);
-        return Transaction.__wrap(ret);
+        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        _assertClass(transaction_params, TransactionStrParams);
+        var ptr3 = transaction_params.__destroy_into_raw();
+        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len4 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_make_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Transaction.__wrap(ret[0]);
     }
     /**
      * @param {string | undefined} [rpc_address]
@@ -6842,246 +7645,6 @@ export class SDK {
         if (ret[1]) {
             throw takeFromExternrefTable0(ret[0]);
         }
-    }
-    /**
-     * Parses auction info options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing auction info options to be parsed.
-     *
-     * # Returns
-     *
-     * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
-     * or a `JsError` if deserialization fails.
-     * @param {any} options
-     * @returns {getAuctionInfoOptions}
-     */
-    get_auction_info_options(options) {
-        const ret = wasm.sdk_get_auction_info_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getAuctionInfoOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves auction information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getAuctionInfoOptions | undefined} [options]
-     * @returns {Promise<GetAuctionInfoResult>}
-     */
-    get_auction_info(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getAuctionInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_auction_info(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getAuctionInfoOptions | undefined} [options]
-     * @returns {Promise<GetAuctionInfoResult>}
-     */
-    state_get_auction_info_js_alias(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getAuctionInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_auction_info_js_alias(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {any} options
-     * @returns {getEntityOptions}
-     */
-    get_entity_options(options) {
-        const ret = wasm.sdk_get_entity_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getEntityOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves entity information using the provided options.
-     *
-     * This function is an asynchronous JavaScript binding for the Rust `get_entity` method.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetEntityOptions` struct containing retrieval options, such as:
-     *   - `entity_identifier`: Identifier for the entity.
-     *   - `entity_identifier_as_string`: String representation of the entity identifier.
-     *   - `maybe_block_id_as_string`: Optional string representation of the block ID.
-     *   - `maybe_block_identifier`: Optional `BlockIdentifierInput` for specifying the block.
-     *   - `verbosity`: Verbosity level for the output.
-     *   - `rpc_address`: Address of the node to query.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetAddressableEntityResult` on success or a `JsError` on failure.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process, such as issues with the provided options or network errors.
-     * ```
-     * @param {getEntityOptions | undefined} [options]
-     * @returns {Promise<GetAddressableEntityResult>}
-     */
-    get_entity(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEntityOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_entity(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getEntityOptions | undefined} [options]
-     * @returns {Promise<GetAddressableEntityResult>}
-     */
-    state_get_entity(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEntityOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_entity(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses era summary options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing era summary options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed era summary options as a `GetEraSummaryOptions` struct.
-     * @param {any} options
-     * @returns {getEraSummaryOptions}
-     */
-    get_era_summary_options(options) {
-        const ret = wasm.sdk_get_era_summary_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getEraSummaryOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves era summary information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getEraSummaryOptions | undefined} [options]
-     * @returns {Promise<GetEraSummaryResult>}
-     */
-    get_era_summary(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraSummaryOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_era_summary(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getEraSummaryOptions | undefined} [options]
-     * @returns {Promise<GetEraSummaryResult>}
-     */
-    chain_get_era_summary(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraSummaryOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_era_summary(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Retrieves validator changes using the provided options.
-     *
-     * # Arguments
-     *
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<GetValidatorChangesResult>}
-     */
-    get_validator_changes(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_validator_changes(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<GetValidatorChangesResult>}
-     */
-    info_get_validator_change(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_info_get_validator_change(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Deserialize query_contract_key_options from a JavaScript object.
-     * @param {any} options
-     * @returns {queryContractKeyOptions}
-     */
-    query_contract_key_options(options) {
-        const ret = wasm.sdk_query_contract_key_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryContractKeyOptions.__wrap(ret[0]);
-    }
-    /**
-     * JavaScript function for query_contract_key with deserialized options.
-     * @param {queryContractKeyOptions | undefined} [options]
-     * @returns {Promise<QueryGlobalStateResult>}
-     */
-    query_contract_key(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, queryContractKeyOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_query_contract_key(this.__wbg_ptr, ptr0);
-        return ret;
     }
     /**
      * @param {string | undefined} [node_address]
@@ -7520,444 +8083,6 @@ export class SDK {
         return ret;
     }
     /**
-     * Parses block options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing block options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed block options as a `GetBlockOptions` struct.
-     * @param {any} options
-     * @returns {getBlockOptions}
-     */
-    get_block_options(options) {
-        const ret = wasm.sdk_get_block_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getBlockOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves block information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBlockOptions | undefined} [options]
-     * @returns {Promise<GetBlockResult>}
-     */
-    get_block(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBlockOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_block(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for the `get_block`.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getBlockOptions | undefined} [options]
-     * @returns {Promise<GetBlockResult>}
-     */
-    chain_get_block(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getBlockOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_block(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Parses dictionary item options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing dictionary item options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
-     * @param {any} options
-     * @returns {getDictionaryItemOptions}
-     */
-    get_dictionary_item_options(options) {
-        const ret = wasm.sdk_get_dictionary_item_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getDictionaryItemOptions.__wrap(ret[0]);
-    }
-    /**
-     * Retrieves dictionary item information using the provided options.
-     *
-     * # Arguments
-     *
-     * * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {getDictionaryItemOptions | undefined} [options]
-     * @returns {Promise<GetDictionaryItemResult>}
-     */
-    get_dictionary_item(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDictionaryItemOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `get_dictionary_item`
-     * @param {getDictionaryItemOptions | undefined} [options]
-     * @returns {Promise<GetDictionaryItemResult>}
-     */
-    state_get_dictionary_item(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getDictionaryItemOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {any} options
-     * @returns {getEraInfoOptions}
-     */
-    get_era_info_options(options) {
-        const ret = wasm.sdk_get_era_info_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return getEraInfoOptions.__wrap(ret[0]);
-    }
-    /**
-     * @param {getEraInfoOptions | undefined} [options]
-     * @returns {Promise<GetEraInfoResult>}
-     */
-    get_era_info(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_get_era_info(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * @param {getEraInfoOptions | undefined} [options]
-     * @returns {Promise<GetEraInfoResult>}
-     */
-    chain_get_era_info_by_switch_block(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, getEraInfoOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_chain_get_era_info_by_switch_block(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Retrieves peers asynchronously.
-     *
-     * # Arguments
-     *
-     * * `verbosity` - Optional verbosity level.
-     * * `rpc_address` - Optional rpc address.
-     *
-     * # Returns
-     *
-     * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<GetPeersResult>}
-     */
-    get_peers(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<GetPeersResult>}
-     */
-    info_get_peers(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_info_get_peers(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * Lists available RPCs using the provided options.
-     *
-     * # Arguments
-     *
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `ListRpcsResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the listing process.
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<ListRpcsResult>}
-     */
-    list_rpcs(verbosity, rpc_address) {
-        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_list_rpcs(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
-        return ret;
-    }
-    /**
-     * JavaScript function for transactioning with deserialized parameters.
-     *
-     * # Arguments
-     *
-     * * `transaction_params` - Transaction parameters.
-     * * `builder_params` - Session parameters.
-     * * `verbosity` - An optional verbosity level.
-     * * `rpc_address` - An optional rpc address.
-     *
-     * # Returns
-     *
-     * A result containing PutTransactionResult or a JsError.
-     * @param {TransactionBuilderParams} builder_params
-     * @param {TransactionStrParams} transaction_params
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    transaction(builder_params, transaction_params, verbosity, rpc_address) {
-        _assertClass(builder_params, TransactionBuilderParams);
-        var ptr0 = builder_params.__destroy_into_raw();
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr1 = transaction_params.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
-        return ret;
-    }
-    /**
-     * JS function for `make_deploy`.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_params` - The payment parameters.
-     *
-     * # Returns
-     *
-     * A `Result` containing the created `Deploy` or a `JsError` in case of an error.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {PaymentStrParams} payment_params
-     * @returns {Deploy}
-     */
-    make_deploy(deploy_params, session_params, payment_params) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return Deploy.__wrap(ret[0]);
-    }
-    /**
-     * JS function for `sign_deploy`.
-     *
-     * # Arguments
-     *
-     * * `deploy` - The deploy to sign.
-     * * `secret_key` - The secret key for signing.
-     *
-     * # Returns
-     *
-     * The signed `Deploy`.
-     * @param {Deploy} deploy
-     * @param {string} secret_key
-     * @returns {Deploy}
-     */
-    sign_deploy(deploy, secret_key) {
-        _assertClass(deploy, Deploy);
-        var ptr0 = deploy.__destroy_into_raw();
-        const ptr1 = passStringToWasm0(secret_key, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_sign_deploy(this.__wbg_ptr, ptr0, ptr1, len1);
-        return Deploy.__wrap(ret);
-    }
-    /**
-     * Deserialize query_contract_dict_options from a JavaScript object.
-     * @param {any} options
-     * @returns {queryContractDictOptions}
-     */
-    query_contract_dict_options(options) {
-        const ret = wasm.sdk_query_contract_dict_options(this.__wbg_ptr, options);
-        if (ret[2]) {
-            throw takeFromExternrefTable0(ret[1]);
-        }
-        return queryContractDictOptions.__wrap(ret[0]);
-    }
-    /**
-     * JavaScript function for query_contract_dict with deserialized options.
-     * @param {queryContractDictOptions | undefined} [options]
-     * @returns {Promise<GetDictionaryItemResult>}
-     */
-    query_contract_dict(options) {
-        let ptr0 = 0;
-        if (!isLikeNone(options)) {
-            _assertClass(options, queryContractDictOptions);
-            ptr0 = options.__destroy_into_raw();
-        }
-        const ret = wasm.sdk_query_contract_dict(this.__wbg_ptr, ptr0);
-        return ret;
-    }
-    /**
-     * Puts a transaction using the provided options.
-     *
-     * # Arguments
-     *
-     * * `transaction` - The `Transaction` object to be sent.
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the transaction process.
-     * @param {Transaction} transaction
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    put_transaction(transaction, verbosity, rpc_address) {
-        _assertClass(transaction, Transaction);
-        var ptr0 = transaction.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `put_transaction`.
-     * @param {Transaction} transaction
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    account_put_transaction(transaction, verbosity, rpc_address) {
-        _assertClass(transaction, Transaction);
-        var ptr0 = transaction.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_account_put_transaction(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * This function allows executing a transaction speculatively.
-     *
-     * # Arguments
-     *
-     * * `builder_params` - Transaction Builder parameters.
-     * * `transaction_params` - Transactionment parameters for the transaction.
-     * * `verbosity` - Optional verbosity level.
-     * * `rpc_address` - Optional rpc address.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `SpeculativeExecTxnResult` or a `JsError` in case of an error.
-     * @param {TransactionBuilderParams} builder_params
-     * @param {TransactionStrParams} transaction_params
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<SpeculativeExecTxnResult>}
-     */
-    speculative_transaction(builder_params, transaction_params, verbosity, rpc_address) {
-        _assertClass(builder_params, TransactionBuilderParams);
-        var ptr0 = builder_params.__destroy_into_raw();
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr1 = transaction_params.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transaction(this.__wbg_ptr, ptr0, ptr1, isLikeNone(verbosity) ? 3 : verbosity, ptr2, len2);
-        return ret;
-    }
-    /**
-     * Calls a smart contract entry point with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `transaction_params` - Transaction parameters.
-     * * `builder_params` - Transaction Builder parameters.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the call.
-     * @param {TransactionBuilderParams} builder_params
-     * @param {TransactionStrParams} transaction_params
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    call_entrypoint(builder_params, transaction_params, rpc_address) {
-        _assertClass(builder_params, TransactionBuilderParams);
-        var ptr0 = builder_params.__destroy_into_raw();
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr1 = transaction_params.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
-        return ret;
-    }
-    /**
      * This function allows executing a deploy speculatively.
      *
      * # Arguments
@@ -8032,517 +8157,391 @@ export class SDK {
         return ret;
     }
     /**
-     * JS function for speculative transfer.
+     * Parses balance options from a JsValue.
      *
      * # Arguments
      *
-     * * `amount` - The amount to transfer.
-     * * `target_account` - The target account.
-     * * `transfer_id` - An optional transfer ID (defaults to a random number).
-     * * `deploy_params` - The deployment parameters.
-     * * `payment_params` - The payment parameters.
-     * * `verbosity` - The verbosity level for logging (optional).
-     * * `rpc_address` - The address of the node to connect to (optional).
+     * * `options` - A JsValue containing balance options to be parsed.
      *
      * # Returns
      *
-     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-     * @param {string} amount
-     * @param {string} target_account
-     * @param {string | undefined} transfer_id
-     * @param {DeployStrParams} deploy_params
-     * @param {PaymentStrParams} payment_params
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<SpeculativeExecResult>}
-     */
-    speculative_transfer(amount, target_account, transfer_id, deploy_params, payment_params, verbosity, rpc_address) {
-        const ptr0 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        var ptr2 = isLikeNone(transfer_id) ? 0 : passStringToWasm0(transfer_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr3 = deploy_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr4 = payment_params.__destroy_into_raw();
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transfer(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, ptr4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
-        return ret;
-    }
-    /**
-     * Puts a deploy using the provided options.
-     *
-     * # Arguments
-     *
-     * * `deploy` - The `Deploy` object to be sent.
-     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the deploy process.
-     * @param {Deploy} deploy
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    put_deploy(deploy, verbosity, rpc_address) {
-        _assertClass(deploy, Deploy);
-        var ptr0 = deploy.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * JavaScript Alias for `put_deploy`.
-     * @param {Deploy} deploy
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    account_put_deploy(deploy, verbosity, rpc_address) {
-        _assertClass(deploy, Deploy);
-        var ptr0 = deploy.__destroy_into_raw();
-        var ptr1 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_account_put_deploy(this.__wbg_ptr, ptr0, isLikeNone(verbosity) ? 3 : verbosity, ptr1, len1);
-        return ret;
-    }
-    /**
-     * JS function for transaction transferring funds.
-     *
-     * # Arguments
-     *
-     * * `maybe_source` - Optional transfer source uref.
-     * * `target_account` - The target account.
-     * * `amount` - The amount to transfer.
-     * * `transaction_params` - The transaction parameters.
-     * * `maybe_id` - An optional transfer ID (defaults to a random number).
-     * * `verbosity` - The verbosity level for logging (optional).
-     * * `rpc_address` - The address of the node to connect to (optional).
-     *
-     * # Returns
-     *
-     * A `Result` containing the result of the transfer or a `JsError` in case of an error.
-     * @param {URef | undefined} maybe_source
-     * @param {string} target_account
-     * @param {string} amount
-     * @param {TransactionStrParams} transaction_params
-     * @param {string | undefined} [maybe_id]
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_source)) {
-            _assertClass(maybe_source, URef);
-            ptr0 = maybe_source.__destroy_into_raw();
-        }
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr3 = transaction_params.__destroy_into_raw();
-        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len4 = WASM_VECTOR_LEN;
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
-        return ret;
-    }
-    /**
-     * Installs a smart contract with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_amount` - The payment amount as a string.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the installation.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {string} payment_amount
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    install_deploy(deploy_params, session_params, payment_amount, rpc_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
-        return ret;
-    }
-    /**
-     * JavaScript function for deploying with deserialized parameters.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - Deploy parameters.
-     * * `session_params` - Session parameters.
-     * * `payment_params` - Payment parameters.
-     * * `verbosity` - An optional verbosity level.
-     * * `rpc_address` - An optional rpc address.
-     *
-     * # Returns
-     *
-     * A result containing PutDeployResult or a JsError.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {PaymentStrParams} payment_params
-     * @param {Verbosity | undefined} [verbosity]
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
-     */
-    deploy(deploy_params, session_params, payment_params, verbosity, rpc_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        _assertClass(payment_params, PaymentStrParams);
-        var ptr2 = payment_params.__destroy_into_raw();
-        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, isLikeNone(verbosity) ? 3 : verbosity, ptr3, len3);
-        return ret;
-    }
-    /**
-     * Parses query balance options from a JsValue.
-     *
-     * # Arguments
-     *
-     * * `options` - A JsValue containing query balance options to be parsed.
-     *
-     * # Returns
-     *
-     * Parsed query balance options as a `QueryBalanceDetailsOptions` struct.
+     * Parsed balance options as a `GetBalanceOptions` struct.
      * @param {any} options
-     * @returns {queryBalanceDetailsOptions}
+     * @returns {getBalanceOptions}
      */
-    query_balance_details_options(options) {
-        const ret = wasm.sdk_query_balance_details_options(this.__wbg_ptr, options);
+    get_balance_options(options) {
+        const ret = wasm.sdk_get_balance_options(this.__wbg_ptr, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
-        return queryBalanceDetailsOptions.__wrap(ret[0]);
+        return getBalanceOptions.__wrap(ret[0]);
     }
     /**
      * Retrieves balance information using the provided options.
      *
      * # Arguments
      *
-     * * `options` - An optional `QueryBalanceDetailsOptions` struct containing retrieval options.
+     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * A `Result` containing either a `QueryBalanceDetailsResult` or a `JsError` in case of an error.
+     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
      *
      * # Errors
      *
      * Returns a `JsError` if there is an error during the retrieval process.
-     * @param {queryBalanceDetailsOptions | undefined} [options]
-     * @returns {Promise<QueryBalanceDetailsResult>}
+     * @param {getBalanceOptions | undefined} [options]
+     * @returns {Promise<GetBalanceResult>}
      */
-    query_balance_details(options) {
+    get_balance(options) {
         let ptr0 = 0;
         if (!isLikeNone(options)) {
-            _assertClass(options, queryBalanceDetailsOptions);
+            _assertClass(options, getBalanceOptions);
             ptr0 = options.__destroy_into_raw();
         }
-        const ret = wasm.sdk_query_balance_details(this.__wbg_ptr, ptr0);
+        const ret = wasm.sdk_get_balance(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * JS function for speculative transfer transaction.
+     * JavaScript Alias for `get_balance`.
      *
      * # Arguments
      *
-     * * `maybe_source` - Optional transfer source uref.
-     * * `target_account` - The target account.
-     * * `amount` - The amount to transfer.
-     * * `maybe_id` - An optional transfer ID (defaults to a random number).
-     * * `transaction_params` - The transactionment parameters.
-     * * `verbosity` - The verbosity level for logging (optional).
-     * * `rpc_address` - The address of the node to connect to (optional).
+     * * `options` - An optional `GetBalanceOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
-     * @param {URef | undefined} maybe_source
-     * @param {string} target_account
-     * @param {string} amount
-     * @param {TransactionStrParams} transaction_params
-     * @param {string | undefined} [maybe_id]
+     * A `Result` containing either a `GetBalanceResult` or a `JsError` in case of an error.
+     * @param {getBalanceOptions | undefined} [options]
+     * @returns {Promise<GetBalanceResult>}
+     */
+    state_get_balance(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBalanceOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_balance(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Parses block transfers options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing block transfers options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed block transfers options as a `GetBlockTransfersOptions` struct.
+     * @param {any} options
+     * @returns {getBlockTransfersOptions}
+     */
+    get_block_transfers_options(options) {
+        const ret = wasm.sdk_get_block_transfers_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getBlockTransfersOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves block transfers information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getBlockTransfersOptions | undefined} [options]
+     * @returns {Promise<GetBlockTransfersResult>}
+     */
+    get_block_transfers(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBlockTransfersOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_block_transfers(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getBlockTransfersOptions | undefined} [options]
+     * @returns {Promise<GetBlockTransfersResult>}
+     */
+    chain_get_block_transfers(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getBlockTransfersOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_block_transfers(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Parses dictionary item options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing dictionary item options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed dictionary item options as a `GetDictionaryItemOptions` struct.
+     * @param {any} options
+     * @returns {getDictionaryItemOptions}
+     */
+    get_dictionary_item_options(options) {
+        const ret = wasm.sdk_get_dictionary_item_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getDictionaryItemOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves dictionary item information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetDictionaryItemOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetDictionaryItemResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getDictionaryItemOptions | undefined} [options]
+     * @returns {Promise<GetDictionaryItemResult>}
+     */
+    get_dictionary_item(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDictionaryItemOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_dictionary_item(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * JavaScript Alias for `get_dictionary_item`
+     * @param {getDictionaryItemOptions | undefined} [options]
+     * @returns {Promise<GetDictionaryItemResult>}
+     */
+    state_get_dictionary_item(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getDictionaryItemOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_state_get_dictionary_item(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Parses era summary options from a JsValue.
+     *
+     * # Arguments
+     *
+     * * `options` - A JsValue containing era summary options to be parsed.
+     *
+     * # Returns
+     *
+     * Parsed era summary options as a `GetEraSummaryOptions` struct.
+     * @param {any} options
+     * @returns {getEraSummaryOptions}
+     */
+    get_era_summary_options(options) {
+        const ret = wasm.sdk_get_era_summary_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return getEraSummaryOptions.__wrap(ret[0]);
+    }
+    /**
+     * Retrieves era summary information using the provided options.
+     *
+     * # Arguments
+     *
+     * * `options` - An optional `GetEraSummaryOptions` struct containing retrieval options.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetEraSummaryResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {getEraSummaryOptions | undefined} [options]
+     * @returns {Promise<GetEraSummaryResult>}
+     */
+    get_era_summary(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraSummaryOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_get_era_summary(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * @param {getEraSummaryOptions | undefined} [options]
+     * @returns {Promise<GetEraSummaryResult>}
+     */
+    chain_get_era_summary(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getEraSummaryOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_chain_get_era_summary(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Retrieves validator changes using the provided options.
+     *
+     * # Arguments
+     *
+     * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+     * * `rpc_address` - An optional string specifying the rpc address to use for the request.
+     *
+     * # Returns
+     *
+     * A `Result` containing either a `GetValidatorChangesResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
      * @param {Verbosity | undefined} [verbosity]
      * @param {string | undefined} [rpc_address]
-     * @returns {Promise<SpeculativeExecTxnResult>}
+     * @returns {Promise<GetValidatorChangesResult>}
      */
-    speculative_transfer_transaction(maybe_source, target_account, amount, transaction_params, maybe_id, verbosity, rpc_address) {
-        let ptr0 = 0;
-        if (!isLikeNone(maybe_source)) {
-            _assertClass(maybe_source, URef);
-            ptr0 = maybe_source.__destroy_into_raw();
-        }
-        const ptr1 = passStringToWasm0(target_account, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr3 = transaction_params.__destroy_into_raw();
-        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len4 = WASM_VECTOR_LEN;
-        var ptr5 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len5 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_speculative_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4, isLikeNone(verbosity) ? 3 : verbosity, ptr5, len5);
+    get_validator_changes(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_get_validator_changes(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
         return ret;
     }
     /**
-     * JS function for `make_transaction`.
+     * @param {Verbosity | undefined} [verbosity]
+     * @param {string | undefined} [rpc_address]
+     * @returns {Promise<GetValidatorChangesResult>}
+     */
+    info_get_validator_change(verbosity, rpc_address) {
+        var ptr0 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sdk_info_get_validator_change(this.__wbg_ptr, isLikeNone(verbosity) ? 3 : verbosity, ptr0, len0);
+        return ret;
+    }
+    /**
+     * Parses query global state options from a JsValue.
      *
      * # Arguments
      *
-     * * `builder_params` - Transaction Builder parameters.
-     * * `transaction_params` - The transaction parameters.
+     * * `options` - A JsValue containing query global state options to be parsed.
      *
      * # Returns
      *
-     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
-     * @param {TransactionBuilderParams} builder_params
-     * @param {TransactionStrParams} transaction_params
-     * @returns {Transaction}
+     * Parsed query global state options as a `QueryGlobalStateOptions` struct.
+     * @param {any} options
+     * @returns {queryGlobalStateOptions}
      */
-    make_transaction(builder_params, transaction_params) {
-        _assertClass(builder_params, TransactionBuilderParams);
-        var ptr0 = builder_params.__destroy_into_raw();
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr1 = transaction_params.__destroy_into_raw();
-        const ret = wasm.sdk_make_transaction(this.__wbg_ptr, ptr0, ptr1);
+    query_global_state_options(options) {
+        const ret = wasm.sdk_query_global_state_options(this.__wbg_ptr, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
-        return Transaction.__wrap(ret[0]);
+        return queryGlobalStateOptions.__wrap(ret[0]);
     }
     /**
-     * JS function for `make_transfer_transaction`.
+     * Retrieves global state information using the provided options.
      *
      * # Arguments
      *
-     * * `maybe_source` - Optional transfer source uref.
-     * * `amount` - The transfer amount.
-     * * `target` - The target account.
-     * * `transaction_params` - The transaction parameters.
-     * * `maybe_id` - Optional transfer identifier.
+     * * `options` - An optional `QueryGlobalStateOptions` struct containing retrieval options.
      *
      * # Returns
      *
-     * A `Result` containing the created `Transaction` or a `JsError` in case of an error.
-     * @param {URef | undefined} maybe_source
-     * @param {string} target
-     * @param {string} amount
-     * @param {TransactionStrParams} transaction_params
-     * @param {string | undefined} [maybe_id]
-     * @returns {Transaction}
+     * A `Result` containing either a `QueryGlobalStateResult` or a `JsError` in case of an error.
+     *
+     * # Errors
+     *
+     * Returns a `JsError` if there is an error during the retrieval process.
+     * @param {queryGlobalStateOptions | undefined} [options]
+     * @returns {Promise<QueryGlobalStateResult>}
      */
-    make_transfer_transaction(maybe_source, target, amount, transaction_params, maybe_id) {
+    query_global_state(options) {
         let ptr0 = 0;
-        if (!isLikeNone(maybe_source)) {
-            _assertClass(maybe_source, URef);
-            ptr0 = maybe_source.__destroy_into_raw();
+        if (!isLikeNone(options)) {
+            _assertClass(options, queryGlobalStateOptions);
+            ptr0 = options.__destroy_into_raw();
         }
-        const ptr1 = passStringToWasm0(target, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr3 = transaction_params.__destroy_into_raw();
-        var ptr4 = isLikeNone(maybe_id) ? 0 : passStringToWasm0(maybe_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len4 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_make_transfer_transaction(this.__wbg_ptr, ptr0, ptr1, len1, ptr2, len2, ptr3, ptr4, len4);
+        const ret = wasm.sdk_query_global_state(this.__wbg_ptr, ptr0);
+        return ret;
+    }
+    /**
+     * Get options for speculative execution from a JavaScript value.
+     * @param {any} options
+     * @returns {getSpeculativeExecDeployOptions}
+     */
+    get_speculative_exec_deploy_options(options) {
+        const ret = wasm.sdk_get_speculative_exec_deploy_options(this.__wbg_ptr, options);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
-        return Transaction.__wrap(ret[0]);
+        return getSpeculativeExecDeployOptions.__wrap(ret[0]);
     }
     /**
-     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-     * Legacy alias
+     * JS function for speculative execution.
      *
      * # Arguments
      *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `timeout_duration` - An optional timeout duration in seconds.
+     * * `options` - The options for speculative execution.
      *
      * # Returns
      *
-     * A `Watcher` instance.
-     * @param {string} events_url
-     * @param {number | undefined} [timeout_duration]
-     * @returns {Watcher}
+     * A `Result` containing the result of the speculative execution or a `JsError` in case of an error.
+     * @param {getSpeculativeExecDeployOptions | undefined} [options]
+     * @returns {Promise<SpeculativeExecResult>}
      */
-    watchDeploy(events_url, timeout_duration) {
-        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_watchDeploy(this.__wbg_ptr, ptr0, len0, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
-        return Watcher.__wrap(ret);
-    }
-    /**
-     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A `Watcher` instance.
-     * @param {string} events_url
-     * @param {number | undefined} [timeout_duration]
-     * @returns {Watcher}
-     */
-    watchTransaction(events_url, timeout_duration) {
-        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_watchTransaction(this.__wbg_ptr, ptr0, len0, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
-        return Watcher.__wrap(ret);
-    }
-    /**
-     * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-     * Legacy alias
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `deploy_hash` - The deploy hash to wait for.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-     * @param {string} events_url
-     * @param {string} deploy_hash
-     * @param {number | undefined} [timeout_duration]
-     * @returns {Promise<Promise<any>>}
-     */
-    waitDeploy(events_url, deploy_hash, timeout_duration) {
-        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(deploy_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_waitDeploy(this.__wbg_ptr, ptr0, len0, ptr1, len1, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
+    speculative_exec_deploy(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, getSpeculativeExecDeployOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_speculative_exec_deploy(this.__wbg_ptr, ptr0);
         return ret;
     }
     /**
-     * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `target_hash` - The transaction hash to wait for.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-     * @param {string} events_url
-     * @param {string} target_hash
-     * @param {number | undefined} [timeout_duration]
-     * @returns {Promise<Promise<any>>}
+     * Deserialize query_contract_dict_options from a JavaScript object.
+     * @param {any} options
+     * @returns {queryContractDictOptions}
      */
-    waitTransaction(events_url, target_hash, timeout_duration) {
-        const ptr0 = passStringToWasm0(events_url, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(target_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_waitTransaction(this.__wbg_ptr, ptr0, len0, ptr1, len1, !isLikeNone(timeout_duration), isLikeNone(timeout_duration) ? 0 : timeout_duration);
-        return ret;
+    query_contract_dict_options(options) {
+        const ret = wasm.sdk_query_contract_dict_options(this.__wbg_ptr, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return queryContractDictOptions.__wrap(ret[0]);
     }
     /**
-     * Calls a smart contract entry point with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_amount` - The payment amount as a string.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the call.
-     * @param {DeployStrParams} deploy_params
-     * @param {SessionStrParams} session_params
-     * @param {string} payment_amount
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutDeployResult>}
+     * JavaScript function for query_contract_dict with deserialized options.
+     * @param {queryContractDictOptions | undefined} [options]
+     * @returns {Promise<GetDictionaryItemResult>}
      */
-    call_entrypoint_deploy(deploy_params, session_params, payment_amount, rpc_address) {
-        _assertClass(deploy_params, DeployStrParams);
-        var ptr0 = deploy_params.__destroy_into_raw();
-        _assertClass(session_params, SessionStrParams);
-        var ptr1 = session_params.__destroy_into_raw();
-        const ptr2 = passStringToWasm0(payment_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        var ptr3 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint_deploy(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
-        return ret;
-    }
-    /**
-     * Installs a smart contract with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *.
-     * * `transaction_params` - Transaction parameters.
-     * * `transaction_bytes` - Transaction Bytes to install
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the installation.
-     * @param {TransactionStrParams} transaction_params
-     * @param {Bytes} transaction_bytes
-     * @param {string | undefined} [rpc_address]
-     * @returns {Promise<PutTransactionResult>}
-     */
-    install(transaction_params, transaction_bytes, rpc_address) {
-        _assertClass(transaction_params, TransactionStrParams);
-        var ptr0 = transaction_params.__destroy_into_raw();
-        _assertClass(transaction_bytes, Bytes);
-        var ptr1 = transaction_bytes.__destroy_into_raw();
-        var ptr2 = isLikeNone(rpc_address) ? 0 : passStringToWasm0(rpc_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2);
+    query_contract_dict(options) {
+        let ptr0 = 0;
+        if (!isLikeNone(options)) {
+            _assertClass(options, queryContractDictOptions);
+            ptr0 = options.__destroy_into_raw();
+        }
+        const ret = wasm.sdk_query_contract_dict(this.__wbg_ptr, ptr0);
         return ret;
     }
 }
@@ -8954,7 +8953,7 @@ export class SpeculativeExecTxnResult {
      * @returns {BlockHash}
      */
     get block_hash() {
-        const ret = wasm.speculativeexecresult_block_hash(this.__wbg_ptr);
+        const ret = wasm.speculativeexectxnresult_block_hash(this.__wbg_ptr);
         return BlockHash.__wrap(ret);
     }
     /**
@@ -9542,15 +9541,22 @@ export class TransactionBuilderParams {
     /**
      * @param {Bytes | undefined} [transaction_bytes]
      * @param {boolean | undefined} [is_install_upgrade]
+     * @param {bigint | undefined} [transferred_value]
+     * @param {Bytes | undefined} [seed]
      * @returns {TransactionBuilderParams}
      */
-    static newSession(transaction_bytes, is_install_upgrade) {
+    static newSession(transaction_bytes, is_install_upgrade, transferred_value, seed) {
         let ptr0 = 0;
         if (!isLikeNone(transaction_bytes)) {
             _assertClass(transaction_bytes, Bytes);
             ptr0 = transaction_bytes.__destroy_into_raw();
         }
-        const ret = wasm.transactionbuilderparams_newSession(ptr0, isLikeNone(is_install_upgrade) ? 0xFFFFFF : is_install_upgrade ? 1 : 0);
+        let ptr1 = 0;
+        if (!isLikeNone(seed)) {
+            _assertClass(seed, Bytes);
+            ptr1 = seed.__destroy_into_raw();
+        }
+        const ret = wasm.transactionbuilderparams_newSession(ptr0, isLikeNone(is_install_upgrade) ? 0xFFFFFF : is_install_upgrade ? 1 : 0, !isLikeNone(transferred_value), isLikeNone(transferred_value) ? BigInt(0) : transferred_value, ptr1);
         return TransactionBuilderParams.__wrap(ret);
     }
     /**
@@ -9576,59 +9582,63 @@ export class TransactionBuilderParams {
     /**
      * @param {AddressableEntityHash} entity_hash
      * @param {string} entry_point
+     * @param {bigint | undefined} [transferred_value]
      * @returns {TransactionBuilderParams}
      */
-    static newInvocableEntity(entity_hash, entry_point) {
+    static newInvocableEntity(entity_hash, entry_point, transferred_value) {
         _assertClass(entity_hash, AddressableEntityHash);
         var ptr0 = entity_hash.__destroy_into_raw();
         const ptr1 = passStringToWasm0(entry_point, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.transactionbuilderparams_newInvocableEntity(ptr0, ptr1, len1);
+        const ret = wasm.transactionbuilderparams_newInvocableEntity(ptr0, ptr1, len1, !isLikeNone(transferred_value), isLikeNone(transferred_value) ? BigInt(0) : transferred_value);
         return TransactionBuilderParams.__wrap(ret);
     }
     /**
      * @param {string} entity_alias
      * @param {string} entry_point
+     * @param {bigint | undefined} [transferred_value]
      * @returns {TransactionBuilderParams}
      */
-    static newInvocableEntityAlias(entity_alias, entry_point) {
+    static newInvocableEntityAlias(entity_alias, entry_point, transferred_value) {
         const ptr0 = passStringToWasm0(entity_alias, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(entry_point, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.transactionbuilderparams_newInvocableEntityAlias(ptr0, len0, ptr1, len1);
+        const ret = wasm.transactionbuilderparams_newInvocableEntityAlias(ptr0, len0, ptr1, len1, !isLikeNone(transferred_value), isLikeNone(transferred_value) ? BigInt(0) : transferred_value);
         return TransactionBuilderParams.__wrap(ret);
     }
     /**
      * @param {PackageHash} package_hash
      * @param {string} entry_point
      * @param {string | undefined} [maybe_entity_version]
+     * @param {bigint | undefined} [transferred_value]
      * @returns {TransactionBuilderParams}
      */
-    static newPackage(package_hash, entry_point, maybe_entity_version) {
+    static newPackage(package_hash, entry_point, maybe_entity_version, transferred_value) {
         _assertClass(package_hash, PackageHash);
         var ptr0 = package_hash.__destroy_into_raw();
         const ptr1 = passStringToWasm0(entry_point, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         var ptr2 = isLikeNone(maybe_entity_version) ? 0 : passStringToWasm0(maybe_entity_version, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.transactionbuilderparams_newPackage(ptr0, ptr1, len1, ptr2, len2);
+        const ret = wasm.transactionbuilderparams_newPackage(ptr0, ptr1, len1, ptr2, len2, !isLikeNone(transferred_value), isLikeNone(transferred_value) ? BigInt(0) : transferred_value);
         return TransactionBuilderParams.__wrap(ret);
     }
     /**
      * @param {string} package_alias
      * @param {string} entry_point
      * @param {string | undefined} [maybe_entity_version]
+     * @param {bigint | undefined} [transferred_value]
      * @returns {TransactionBuilderParams}
      */
-    static newPackageAlias(package_alias, entry_point, maybe_entity_version) {
+    static newPackageAlias(package_alias, entry_point, maybe_entity_version, transferred_value) {
         const ptr0 = passStringToWasm0(package_alias, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(entry_point, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         var ptr2 = isLikeNone(maybe_entity_version) ? 0 : passStringToWasm0(maybe_entity_version, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len2 = WASM_VECTOR_LEN;
-        const ret = wasm.transactionbuilderparams_newPackageAlias(ptr0, len0, ptr1, len1, ptr2, len2);
+        const ret = wasm.transactionbuilderparams_newPackageAlias(ptr0, len0, ptr1, len1, ptr2, len2, !isLikeNone(transferred_value), isLikeNone(transferred_value) ? BigInt(0) : transferred_value);
         return TransactionBuilderParams.__wrap(ret);
     }
     /**
@@ -10293,8 +10303,11 @@ export class TransactionStrParams {
      * @param {string | undefined} [gas_price_tolerance]
      * @param {string | undefined} [receipt]
      * @param {boolean | undefined} [standard_payment]
+     * @param {string | undefined} [transferred_value]
+     * @param {string | undefined} [session_entry_point]
+     * @param {Bytes | undefined} [chunked_args]
      */
-    constructor(chain_name, initiator_addr, secret_key, timestamp, ttl, session_args_simple, session_args_json, pricing_mode, additional_computation_factor, payment_amount, gas_price_tolerance, receipt, standard_payment) {
+    constructor(chain_name, initiator_addr, secret_key, timestamp, ttl, session_args_simple, session_args_json, pricing_mode, additional_computation_factor, payment_amount, gas_price_tolerance, receipt, standard_payment, transferred_value, session_entry_point, chunked_args) {
         const ptr0 = passStringToWasm0(chain_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         var ptr1 = isLikeNone(initiator_addr) ? 0 : passStringToWasm0(initiator_addr, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -10317,7 +10330,16 @@ export class TransactionStrParams {
         var len9 = WASM_VECTOR_LEN;
         var ptr10 = isLikeNone(receipt) ? 0 : passStringToWasm0(receipt, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len10 = WASM_VECTOR_LEN;
-        const ret = wasm.transactionstrparams_new(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5, ptr6, len6, isLikeNone(pricing_mode) ? 3 : pricing_mode, ptr7, len7, ptr8, len8, ptr9, len9, ptr10, len10, isLikeNone(standard_payment) ? 0xFFFFFF : standard_payment ? 1 : 0);
+        var ptr11 = isLikeNone(transferred_value) ? 0 : passStringToWasm0(transferred_value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len11 = WASM_VECTOR_LEN;
+        var ptr12 = isLikeNone(session_entry_point) ? 0 : passStringToWasm0(session_entry_point, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len12 = WASM_VECTOR_LEN;
+        let ptr13 = 0;
+        if (!isLikeNone(chunked_args)) {
+            _assertClass(chunked_args, Bytes);
+            ptr13 = chunked_args.__destroy_into_raw();
+        }
+        const ret = wasm.transactionstrparams_new(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5, ptr6, len6, isLikeNone(pricing_mode) ? 3 : pricing_mode, ptr7, len7, ptr8, len8, ptr9, len9, ptr10, len10, isLikeNone(standard_payment) ? 0xFFFFFF : standard_payment ? 1 : 0, ptr11, len11, ptr12, len12, ptr13);
         this.__wbg_ptr = ret >>> 0;
         TransactionStrParamsFinalization.register(this, this.__wbg_ptr, this);
         return this;
@@ -10587,6 +10609,61 @@ export class TransactionStrParams {
      */
     set standard_payment(standard_payment) {
         wasm.transactionstrparams_set_standard_payment(this.__wbg_ptr, standard_payment);
+    }
+    /**
+     * @returns {string | undefined}
+     */
+    get transferred_value() {
+        const ret = wasm.transactionstrparams_transferred_value(this.__wbg_ptr);
+        let v1;
+        if (ret[0] !== 0) {
+            v1 = getStringFromWasm0(ret[0], ret[1]).slice();
+            wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        }
+        return v1;
+    }
+    /**
+     * @param {string} transferred_value
+     */
+    set transferred_value(transferred_value) {
+        const ptr0 = passStringToWasm0(transferred_value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.transactionstrparams_set_transferred_value(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @returns {string | undefined}
+     */
+    get session_entry_point() {
+        const ret = wasm.transactionstrparams_session_entry_point(this.__wbg_ptr);
+        let v1;
+        if (ret[0] !== 0) {
+            v1 = getStringFromWasm0(ret[0], ret[1]).slice();
+            wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+        }
+        return v1;
+    }
+    /**
+     * @param {string} session_entry_point
+     */
+    set session_entry_point(session_entry_point) {
+        const ptr0 = passStringToWasm0(session_entry_point, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.transactionstrparams_set_session_entry_point(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @returns {Bytes | undefined}
+     */
+    get chunked_args() {
+        const ret = wasm.transactionstrparams_chunked_args(this.__wbg_ptr);
+        return ret === 0 ? undefined : Bytes.__wrap(ret);
+    }
+    /**
+     * @param {Bytes} chunked_args
+     */
+    set chunked_args(chunked_args) {
+        _assertClass(chunked_args, Bytes);
+        var ptr0 = chunked_args.__destroy_into_raw();
+        wasm.transactionstrparams_set_chunked_args(this.__wbg_ptr, ptr0);
     }
 }
 
@@ -11251,7 +11328,7 @@ export class getAuctionInfoOptions {
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getaccountoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -11263,7 +11340,7 @@ export class getAuctionInfoOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getaccountoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -11948,7 +12025,7 @@ export class getEntityOptions {
     set entity_identifier_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_entity_identifier_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getaccountoptions_account_identifier_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {string | undefined}
@@ -11968,13 +12045,13 @@ export class getEntityOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getaccountoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getaccountoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -11986,7 +12063,7 @@ export class getEntityOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getaccountoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12006,20 +12083,20 @@ export class getEntityOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getaccountoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getentityoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getaccountoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getentityoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getaccountoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -12066,13 +12143,13 @@ export class getEraInfoOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblockoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getauctioninfooptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getblockoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getaccountoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12084,7 +12161,7 @@ export class getEraInfoOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getblockoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getaccountoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12104,20 +12181,20 @@ export class getEraInfoOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblockoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getauctioninfooptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getblockoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getauctioninfooptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getblockoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getauctioninfooptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -12166,13 +12243,13 @@ export class getEraSummaryOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getauctioninfooptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getblocktransfersoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getblocktransfersoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12184,7 +12261,7 @@ export class getEraSummaryOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getblocktransfersoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12204,20 +12281,20 @@ export class getEraSummaryOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getauctioninfooptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getblocktransfersoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getauctioninfooptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getblocktransfersoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getauctioninfooptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getblocktransfersoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -12376,7 +12453,7 @@ export class getSpeculativeExecTxnOptions {
     set transaction_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getspeculativeexecdeployoptions_deploy_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getspeculativeexectxnoptions_transaction_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * The transaction to execute.
@@ -12418,14 +12495,14 @@ export class getSpeculativeExecTxnOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getspeculativeexecdeployoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getspeculativeexectxnoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * The verbosity level for logging.
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getspeculativeexecdeployoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getspeculativeexectxnoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
@@ -12433,7 +12510,7 @@ export class getSpeculativeExecTxnOptions {
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getspeculativeexecdeployoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getspeculativeexectxnoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -12482,13 +12559,13 @@ export class getStateRootHashOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblocktransfersoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getblockoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getblocktransfersoptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getblockoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -12500,7 +12577,7 @@ export class getStateRootHashOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getblocktransfersoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_getblockoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12520,20 +12597,20 @@ export class getStateRootHashOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getblocktransfersoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_getblockoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getblocktransfersoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_getblockoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getblocktransfersoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_getblockoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -12582,7 +12659,7 @@ export class getTransactionOptions {
     set transaction_hash_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getdeployoptions_deploy_hash_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_gettransactionoptions_transaction_hash_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {TransactionHash | undefined}
@@ -12606,14 +12683,14 @@ export class getTransactionOptions {
      * @returns {boolean | undefined}
      */
     get finalized_approvals() {
-        const ret = wasm.__wbg_get_getdeployoptions_finalized_approvals(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_gettransactionoptions_finalized_approvals(this.__wbg_ptr);
         return ret === 0xFFFFFF ? undefined : ret !== 0;
     }
     /**
      * @param {boolean | undefined} [arg0]
      */
     set finalized_approvals(arg0) {
-        wasm.__wbg_set_getdeployoptions_finalized_approvals(this.__wbg_ptr, isLikeNone(arg0) ? 0xFFFFFF : arg0 ? 1 : 0);
+        wasm.__wbg_set_gettransactionoptions_finalized_approvals(this.__wbg_ptr, isLikeNone(arg0) ? 0xFFFFFF : arg0 ? 1 : 0);
     }
     /**
      * @returns {string | undefined}
@@ -12633,20 +12710,20 @@ export class getTransactionOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getdeployoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_gettransactionoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_getdeployoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_gettransactionoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_getdeployoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_gettransactionoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -12871,13 +12948,13 @@ export class queryBalanceOptions {
     set purse_identifier_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_querybalanceoptions_purse_identifier_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querybalancedetailsoptions_purse_identifier_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {PurseIdentifier | undefined}
      */
     get purse_identifier() {
-        const ret = wasm.__wbg_get_querybalanceoptions_purse_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querybalancedetailsoptions_purse_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : PurseIdentifier.__wrap(ret);
     }
     /**
@@ -12889,13 +12966,13 @@ export class queryBalanceOptions {
             _assertClass(arg0, PurseIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_querybalanceoptions_purse_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_querybalancedetailsoptions_purse_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {GlobalStateIdentifier | undefined}
      */
     get global_state_identifier() {
-        const ret = wasm.__wbg_get_querybalanceoptions_global_state_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querybalancedetailsoptions_global_state_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : GlobalStateIdentifier.__wrap(ret);
     }
     /**
@@ -12907,7 +12984,7 @@ export class queryBalanceOptions {
             _assertClass(arg0, GlobalStateIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_querybalanceoptions_global_state_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_querybalancedetailsoptions_global_state_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12927,13 +13004,13 @@ export class queryBalanceOptions {
     set state_root_hash_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_querybalanceoptions_state_root_hash_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querybalancedetailsoptions_state_root_hash_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Digest | undefined}
      */
     get state_root_hash() {
-        const ret = wasm.__wbg_get_querybalanceoptions_state_root_hash(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querybalancedetailsoptions_state_root_hash(this.__wbg_ptr);
         return ret === 0 ? undefined : Digest.__wrap(ret);
     }
     /**
@@ -12945,7 +13022,7 @@ export class queryBalanceOptions {
             _assertClass(arg0, Digest);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_querybalanceoptions_state_root_hash(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_querybalancedetailsoptions_state_root_hash(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -12965,7 +13042,7 @@ export class queryBalanceOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_querybalanceoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querybalancedetailsoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {string | undefined}
@@ -12985,20 +13062,20 @@ export class queryBalanceOptions {
     set rpc_address(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_querybalanceoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querybalancedetailsoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Verbosity | undefined}
      */
     get verbosity() {
-        const ret = wasm.__wbg_get_querybalanceoptions_verbosity(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querybalancedetailsoptions_verbosity(this.__wbg_ptr);
         return ret === 3 ? undefined : ret;
     }
     /**
      * @param {Verbosity | undefined} [arg0]
      */
     set verbosity(arg0) {
-        wasm.__wbg_set_querybalanceoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
+        wasm.__wbg_set_querybalancedetailsoptions_verbosity(this.__wbg_ptr, isLikeNone(arg0) ? 3 : arg0);
     }
 }
 
@@ -13165,7 +13242,7 @@ export class queryContractKeyOptions {
      * @returns {EntityIdentifier | undefined}
      */
     get entity_identifier() {
-        const ret = wasm.__wbg_get_getentityoptions_entity_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querycontractkeyoptions_entity_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : EntityIdentifier.__wrap(ret);
     }
     /**
@@ -13177,7 +13254,7 @@ export class queryContractKeyOptions {
             _assertClass(arg0, EntityIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getentityoptions_entity_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_querycontractkeyoptions_entity_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -13197,13 +13274,13 @@ export class queryContractKeyOptions {
     set entity_identifier_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_entity_identifier_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querycontractkeyoptions_entity_identifier_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {BlockIdentifier | undefined}
      */
     get maybe_block_identifier() {
-        const ret = wasm.__wbg_get_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_querycontractkeyoptions_maybe_block_identifier(this.__wbg_ptr);
         return ret === 0 ? undefined : BlockIdentifier.__wrap(ret);
     }
     /**
@@ -13215,7 +13292,7 @@ export class queryContractKeyOptions {
             _assertClass(arg0, BlockIdentifier);
             ptr0 = arg0.__destroy_into_raw();
         }
-        wasm.__wbg_set_getauctioninfooptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
+        wasm.__wbg_set_querycontractkeyoptions_maybe_block_identifier(this.__wbg_ptr, ptr0);
     }
     /**
      * @returns {string | undefined}
@@ -13235,7 +13312,7 @@ export class queryContractKeyOptions {
     set maybe_block_id_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querycontractkeyoptions_maybe_block_id_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {string | undefined}
@@ -13255,7 +13332,7 @@ export class queryContractKeyOptions {
     set path_as_string(arg0) {
         var ptr0 = isLikeNone(arg0) ? 0 : passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_getentityoptions_rpc_address(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_querycontractkeyoptions_path_as_string(this.__wbg_ptr, ptr0, len0);
     }
     /**
      * @returns {Path | undefined}
@@ -13558,33 +13635,97 @@ async function __wbg_load(module, imports) {
 function __wbg_get_imports() {
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbg_isConnected_f84ffbccb9898623 = function() { return handleError(function (arg0) {
-        const ret = arg0.isConnected();
-        return ret;
-    }, arguments) };
     imports.wbg.__wbindgen_error_new = function(arg0, arg1) {
         const ret = new Error(getStringFromWasm0(arg0, arg1));
-        return ret;
-    };
-    imports.wbg.__wbindgen_boolean_get = function(arg0) {
-        const v = arg0;
-        const ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
         return ret;
     };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         const ret = getStringFromWasm0(arg0, arg1);
         return ret;
     };
-    imports.wbg.__wbg_getblockresult_new = function(arg0) {
-        const ret = GetBlockResult.__wrap(arg0);
+    imports.wbg.__wbg_getdeployresult_new = function(arg0) {
+        const ret = GetDeployResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_getnodestatusresult_new = function(arg0) {
-        const ret = GetNodeStatusResult.__wrap(arg0);
+    imports.wbg.__wbg_puttransactionresult_new = function(arg0) {
+        const ret = PutTransactionResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getdictionaryitemresult_new = function(arg0) {
+        const ret = GetDictionaryItemResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_querybalanceresult_new = function(arg0) {
+        const ret = QueryBalanceResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_putdeployresult_new = function(arg0) {
+        const ret = PutDeployResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getpeersresult_new = function(arg0) {
+        const ret = GetPeersResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getbalanceresult_new = function(arg0) {
+        const ret = GetBalanceResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_geterasummaryresult_new = function(arg0) {
+        const ret = GetEraSummaryResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_requestSwitchAccount_0e44115ee2041c5e = function() { return handleError(function (arg0) {
+        const ret = arg0.requestSwitchAccount();
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbindgen_boolean_get = function(arg0) {
+        const v = arg0;
+        const ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
+        return ret;
+    };
+    imports.wbg.__wbg_querybalancedetailsresult_new = function(arg0) {
+        const ret = QueryBalanceDetailsResult.__wrap(arg0);
         return ret;
     };
     imports.wbg.__wbg_getchainspecresult_new = function(arg0) {
         const ret = GetChainspecResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getblockresult_new = function(arg0) {
+        const ret = GetBlockResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getvalidatorchangesresult_new = function(arg0) {
+        const ret = GetValidatorChangesResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_speculativeexecresult_new = function(arg0) {
+        const ret = SpeculativeExecResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_geterainforesult_new = function(arg0) {
+        const ret = GetEraInfoResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_queryglobalstateresult_new = function(arg0) {
+        const ret = QueryGlobalStateResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_transaction_new = function(arg0) {
+        const ret = Transaction.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_speculativeexectxnresult_new = function(arg0) {
+        const ret = SpeculativeExecTxnResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getaddressableentityresult_new = function(arg0) {
+        const ret = GetAddressableEntityResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_deploy_new = function(arg0) {
+        const ret = Deploy.__wrap(arg0);
         return ret;
     };
     imports.wbg.__wbg_getVersion_821280958b37ff1f = function() { return handleError(function (arg0) {
@@ -13599,106 +13740,42 @@ function __wbg_get_imports() {
         getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
         getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
     };
-    imports.wbg.__wbg_puttransactionresult_new = function(arg0) {
-        const ret = PutTransactionResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getbalanceresult_new = function(arg0) {
-        const ret = GetBalanceResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getvalidatorchangesresult_new = function(arg0) {
-        const ret = GetValidatorChangesResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getpeersresult_new = function(arg0) {
-        const ret = GetPeersResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_putdeployresult_new = function(arg0) {
-        const ret = PutDeployResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_listrpcsresult_new = function(arg0) {
-        const ret = ListRpcsResult.__wrap(arg0);
+    imports.wbg.__wbg_getblocktransfersresult_new = function(arg0) {
+        const ret = GetBlockTransfersResult.__wrap(arg0);
         return ret;
     };
     imports.wbg.__wbg_getauctioninforesult_new = function(arg0) {
         const ret = GetAuctionInfoResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_geterasummaryresult_new = function(arg0) {
-        const ret = GetEraSummaryResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_speculativeexecresult_new = function(arg0) {
-        const ret = SpeculativeExecResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getdictionaryitemresult_new = function(arg0) {
-        const ret = GetDictionaryItemResult.__wrap(arg0);
+    imports.wbg.__wbg_listrpcsresult_new = function(arg0) {
+        const ret = ListRpcsResult.__wrap(arg0);
         return ret;
     };
     imports.wbg.__wbg_getaccountresult_new = function(arg0) {
         const ret = GetAccountResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_getaddressableentityresult_new = function(arg0) {
-        const ret = GetAddressableEntityResult.__wrap(arg0);
+    imports.wbg.__wbg_getstateroothashresult_new = function(arg0) {
+        const ret = GetStateRootHashResult.__wrap(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getnodestatusresult_new = function(arg0) {
+        const ret = GetNodeStatusResult.__wrap(arg0);
         return ret;
     };
     imports.wbg.__wbg_gettransactionresult_new = function(arg0) {
         const ret = GetTransactionResult.__wrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_speculativeexectxnresult_new = function(arg0) {
-        const ret = SpeculativeExecTxnResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getdeployresult_new = function(arg0) {
-        const ret = GetDeployResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_transaction_new = function(arg0) {
-        const ret = Transaction.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_queryglobalstateresult_new = function(arg0) {
-        const ret = QueryGlobalStateResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_getstateroothashresult_new = function(arg0) {
-        const ret = GetStateRootHashResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_querybalancedetailsresult_new = function(arg0) {
-        const ret = QueryBalanceDetailsResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_geterainforesult_new = function(arg0) {
-        const ret = GetEraInfoResult.__wrap(arg0);
-        return ret;
-    };
     imports.wbg.__wbg_disconnectFromSite_2d2501f4e00e57c8 = function() { return handleError(function (arg0) {
         const ret = arg0.disconnectFromSite();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_querybalanceresult_new = function(arg0) {
-        const ret = QueryBalanceResult.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_deploy_new = function(arg0) {
-        const ret = Deploy.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbg_requestSwitchAccount_0e44115ee2041c5e = function() { return handleError(function (arg0) {
-        const ret = arg0.requestSwitchAccount();
+    imports.wbg.__wbg_isConnected_f84ffbccb9898623 = function() { return handleError(function (arg0) {
+        const ret = arg0.isConnected();
         return ret;
     }, arguments) };
-    imports.wbg.__wbg_getblocktransfersresult_new = function(arg0) {
-        const ret = GetBlockTransfersResult.__wrap(arg0);
-        return ret;
-    };
     imports.wbg.__wbg_signMessage_c2bf40612e99c084 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
         const ret = arg0.signMessage(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
         return ret;
@@ -13711,6 +13788,10 @@ function __wbg_get_imports() {
         const ret = arg0.getActivePublicKey();
         return ret;
     }, arguments) };
+    imports.wbg.__wbg_messages_new = function(arg0) {
+        const ret = Messages.__wrap(arg0);
+        return ret;
+    };
     imports.wbg.__wbindgen_cb_drop = function(arg0) {
         const obj = arg0.original;
         if (obj.cnt-- == 1) {
@@ -13720,23 +13801,11 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbg_messages_new = function(arg0) {
-        const ret = Messages.__wrap(arg0);
-        return ret;
-    };
-    imports.wbg.__wbindgen_is_undefined = function(arg0) {
-        const ret = arg0 === undefined;
-        return ret;
-    };
     imports.wbg.__wbg_error_d52bf4e1868fa715 = function(arg0, arg1) {
         console.error(getStringFromWasm0(arg0, arg1));
     };
     imports.wbg.__wbg_log_5199e4d2d51afa95 = function(arg0, arg1) {
         console.log(getStringFromWasm0(arg0, arg1));
-    };
-    imports.wbg.__wbindgen_jsval_eq = function(arg0, arg1) {
-        const ret = arg0 === arg1;
-        return ret;
     };
     imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
         const obj = arg1;
@@ -13744,23 +13813,31 @@ function __wbg_get_imports() {
         getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
         getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
     };
-    imports.wbg.__wbg_CasperWalletProvider_e342cf6a96cfbb6c = typeof CasperWalletProvider == 'function' ? CasperWalletProvider : notDefined('CasperWalletProvider');
-    imports.wbg.__wbg_messages_unwrap = function(arg0) {
-        const ret = Messages.__unwrap(arg0);
-        return ret;
-    };
     imports.wbg.__wbg_subscription_unwrap = function(arg0) {
         const ret = Subscription.__unwrap(arg0);
         return ret;
     };
-    imports.wbg.__wbg_sign_5740ada8ba2ef8c3 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
-        const ret = arg0.sign(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
+    imports.wbg.__wbg_messages_unwrap = function(arg0) {
+        const ret = Messages.__unwrap(arg0);
         return ret;
-    }, arguments) };
+    };
     imports.wbg.__wbindgen_is_null = function(arg0) {
         const ret = arg0 === null;
         return ret;
     };
+    imports.wbg.__wbindgen_is_undefined = function(arg0) {
+        const ret = arg0 === undefined;
+        return ret;
+    };
+    imports.wbg.__wbindgen_jsval_eq = function(arg0, arg1) {
+        const ret = arg0 === arg1;
+        return ret;
+    };
+    imports.wbg.__wbg_CasperWalletProvider_e342cf6a96cfbb6c = typeof CasperWalletProvider == 'function' ? CasperWalletProvider : notDefined('CasperWalletProvider');
+    imports.wbg.__wbg_sign_5740ada8ba2ef8c3 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+        const ret = arg0.sign(getStringFromWasm0(arg1, arg2), getStringFromWasm0(arg3, arg4));
+        return ret;
+    }, arguments) };
     imports.wbg.__wbindgen_is_function = function(arg0) {
         const ret = typeof(arg0) === 'function';
         return ret;
@@ -14111,7 +14188,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_1205(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_1211(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -14207,28 +14284,28 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper1671 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 537, __wbg_adapter_38);
+    imports.wbg.__wbindgen_closure_wrapper1500 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 536, __wbg_adapter_38);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper5370 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 970, __wbg_adapter_41);
+    imports.wbg.__wbindgen_closure_wrapper5314 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 959, __wbg_adapter_41);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper5372 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 970, __wbg_adapter_41);
+    imports.wbg.__wbindgen_closure_wrapper5316 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 959, __wbg_adapter_41);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper5374 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 970, __wbg_adapter_41);
+    imports.wbg.__wbindgen_closure_wrapper5318 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 959, __wbg_adapter_41);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper6066 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 1167, __wbg_adapter_48);
+    imports.wbg.__wbindgen_closure_wrapper5988 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 1149, __wbg_adapter_48);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper6086 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 1175, __wbg_adapter_51);
+    imports.wbg.__wbindgen_closure_wrapper6025 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 1161, __wbg_adapter_51);
         return ret;
     };
     imports.wbg.__wbindgen_init_externref_table = function() {

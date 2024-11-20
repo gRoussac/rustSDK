@@ -73,6 +73,8 @@ pub struct TransactionBuilderParams {
     new_validator: Option<PublicKey>,
     minimum_delegation_amount: Option<u64>,
     maximum_delegation_amount: Option<u64>,
+    transferred_value: Option<u64>,
+    seed: Option<Bytes>,
 }
 
 #[wasm_bindgen]
@@ -98,6 +100,8 @@ impl TransactionBuilderParams {
     pub fn new_session(
         transaction_bytes: Option<Bytes>,
         is_install_upgrade: Option<bool>,
+        transferred_value: Option<u64>,
+        seed: Option<Bytes>,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::Session,
@@ -120,6 +124,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value,
+            seed: seed.into(),
         }
     }
 
@@ -152,6 +158,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value: None,
+            seed: None,
         }
     }
 
@@ -159,6 +167,7 @@ impl TransactionBuilderParams {
     pub fn new_invocable_entity(
         entity_hash: AddressableEntityHash,
         entry_point: &str,
+        transferred_value: Option<u64>,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntity,
@@ -181,6 +190,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value,
+            seed: None,
         }
     }
 
@@ -188,6 +199,7 @@ impl TransactionBuilderParams {
     pub fn new_invocable_entity_alias(
         entity_alias: &str,
         entry_point: &str,
+        transferred_value: Option<u64>,
     ) -> TransactionBuilderParams {
         TransactionBuilderParams {
             kind: TransactionKind::InvocableEntityAlias,
@@ -210,6 +222,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value,
+            seed: None,
         }
     }
 
@@ -218,6 +232,7 @@ impl TransactionBuilderParams {
         package_hash: PackageHash,
         entry_point: &str,
         maybe_entity_version: Option<String>,
+        transferred_value: Option<u64>,
     ) -> TransactionBuilderParams {
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
 
@@ -242,6 +257,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value,
+            seed: None,
         }
     }
 
@@ -250,6 +267,7 @@ impl TransactionBuilderParams {
         package_alias: &str,
         entry_point: &str,
         maybe_entity_version: Option<String>,
+        transferred_value: Option<u64>,
     ) -> TransactionBuilderParams {
         let maybe_entity_version_as_u32 = parse_maybe_entity_version(maybe_entity_version);
         TransactionBuilderParams {
@@ -273,6 +291,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value,
+            seed: None,
         }
     }
 
@@ -306,6 +326,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: Some(minimum_delegation_amount),
             maximum_delegation_amount: Some(maximum_delegation_amount),
+            transferred_value: None,
+            seed: None,
         }
     }
 
@@ -337,6 +359,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value: None,
+            seed: None,
         }
     }
 
@@ -368,6 +392,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value: None,
+            seed: None,
         }
     }
 
@@ -400,6 +426,8 @@ impl TransactionBuilderParams {
             new_validator: Some(new_validator),
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value: None,
+            seed: None,
         }
     }
 
@@ -427,6 +455,8 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
+            transferred_value: None,
+            seed: None,
         }
     }
 
@@ -634,6 +664,17 @@ pub fn transaction_builder_params_to_casper_client(
                 .clone()
                 .unwrap_or_default()
                 .into(),
+            transferred_value: transaction_params.transferred_value.unwrap_or_default(),
+            seed: Some(
+                transaction_params
+                    .seed
+                    .as_ref() // Borrow the Option<cl::bytes::Bytes>
+                    .map_or(Bytes::default(), |seed| seed.clone()) // Handle None case manually
+                    .as_ref() // Borrow the inner Bytes
+                    .try_into() // Try to convert &[u8] to [u8; 32]
+                    .unwrap_or_default(), // Default array if conversion fails
+            ),
+            runtime: casper_types::TransactionRuntime::VmCasperV1, // TODo FIX Runtime
         },
         TransactionKind::Transfer => _TransactionBuilderParams::Transfer {
             maybe_source: transaction_params.maybe_source.clone().map(Into::into),
@@ -661,6 +702,8 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
+            transferred_value: transaction_params.transferred_value.unwrap_or_default(),
+            runtime: casper_types::TransactionRuntime::VmCasperV1, // TODo FIX Runtime
         },
         TransactionKind::InvocableEntityAlias => _TransactionBuilderParams::InvocableEntityAlias {
             entity_alias: transaction_params
@@ -671,6 +714,8 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
+            transferred_value: transaction_params.transferred_value.unwrap_or_default(),
+            runtime: casper_types::TransactionRuntime::VmCasperV1, // TODo FIX Runtime
         },
         TransactionKind::Package => _TransactionBuilderParams::Package {
             package_hash: transaction_params.package_hash.unwrap().into(),
@@ -679,6 +724,8 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
+            transferred_value: transaction_params.transferred_value.unwrap_or_default(),
+            runtime: casper_types::TransactionRuntime::VmCasperV1, // TODo FIX Runtime
         },
         TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAlias {
             package_alias: transaction_params
@@ -690,6 +737,8 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
+            transferred_value: transaction_params.transferred_value.unwrap_or_default(),
+            runtime: casper_types::TransactionRuntime::VmCasperV1, // TODo FIX Runtime
         },
         TransactionKind::AddBid => _TransactionBuilderParams::AddBid {
             public_key: transaction_params.public_key.clone().unwrap().into(),

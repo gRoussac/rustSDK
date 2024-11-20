@@ -1,3 +1,4 @@
+use base16::DecodeError;
 use casper_client::{
     cli::JsonArgsError,
     cli::{CliError, FromDecStrErr},
@@ -162,8 +163,16 @@ pub enum SdkError {
     #[error("Failed to parse a validator public key")]
     FailedToParseValidatorPublicKey,
 
+    /// Failed to parse base16 bytes.
+    #[error("Failed to parse base16 bytes: {0}")]
+    FailedToParseBase16(#[from] DecodeError),
+
     #[error("Conflicting arguments passed '{context}' {args:?}")]
     ConflictingArguments { context: String, args: Vec<String> },
+
+    /// Unexpected transaction args variant.
+    #[error("Unexpected transaction args variant")]
+    UnexpectedTransactionArgsVariant,
 
     #[error("Invalid CLValue error: {0}")]
     InvalidCLValue(String),
@@ -255,6 +264,12 @@ impl From<CliError> for SdkError {
             CliError::FailedToParsePackageAddr => SdkError::FailedToParsePackageAddr,
             CliError::FailedToParseTransferTarget => SdkError::FailedToParseTransferTarget,
             CliError::FailedToParseValidatorPublicKey => SdkError::FailedToParseValidatorPublicKey,
+            CliError::FailedToParseBase16(decode_error) => {
+                SdkError::FailedToParseBase16(decode_error)
+            }
+            CliError::UnexpectedTransactionArgsVariant => {
+                SdkError::UnexpectedTransactionArgsVariant
+            }
         }
     }
 }

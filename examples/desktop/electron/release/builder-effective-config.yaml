@@ -3,7 +3,7 @@ directories:
   buildResources: build
 appId: com.example.myapp
 productName: Casper Webclient
-compression: maximum
+compression: store
 win:
   target: portable
   icon: favicon.png
@@ -20,4 +20,4 @@ files:
 extraFiles:
   - from: ./../../frontend/angular/dist/casper
     to: frontend/angular/dist/casper
-electronVersion: 31.3.1
+electronVersion: 33.2.0

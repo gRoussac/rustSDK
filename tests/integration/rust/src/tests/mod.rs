@@ -227,8 +227,15 @@ pub async fn _run_example_7() {
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
     let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
+
+    // TODO Fix transferred_value
+    let transferred_value = None;
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        entity_addr.into(),
+        ENTRY_POINT,
+        transferred_value,
+    );
 
     let transaction = sdk
         .make_transaction(builder_params, transaction_params)
@@ -271,8 +278,15 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
     let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
+
+    // TODO Fix transferred_value
+    let transferred_value = None;
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        entity_addr.into(),
+        ENTRY_POINT,
+        transferred_value,
+    );
 
     let transaction = sdk
         .transaction(builder_params, transaction_params, None, None)
@@ -319,8 +333,15 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
     let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
+
+    // TODO Fix transferred_value
+    let transferred_value = None;
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        entity_addr.into(),
+        ENTRY_POINT,
+        transferred_value,
+    );
 
     let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
 
@@ -514,8 +535,15 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_session_args_simple(args);
 
     let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
+
+    // TODO Fix transferred_value
+    let transferred_value = None;
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        entity_addr.into(),
+        ENTRYPOINT_MINT,
+        transferred_value,
+    );
 
     let call_entrypoint_deploy = sdk
         .call_entrypoint(builder_params, transaction_params, None)
@@ -579,8 +607,15 @@ MC4CAQAwBQYDK2VwBCIEII8ULlk1CJ12ZQ+bScjBt/IxMAZNggClWqK56D1/7CbI
     transaction_params.set_ttl(Some(TTL.to_string()));
 
     let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
+
+    // TODO Fix transferred_value
+    let transferred_value = None;
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        entity_addr.into(),
+        ENTRY_POINT,
+        transferred_value,
+    );
 
     let mut transaction = sdk
         .make_transaction(builder_params, transaction_params)
@@ -619,8 +654,15 @@ pub async fn _run_example_14() {
     transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
     let entity_addr = EntityAddr::from_formatted_str(ENTITY_ADDR).unwrap();
-    let builder_params =
-        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRY_POINT);
+
+    // TODO Fix transferred_value
+    let transferred_value = None;
+
+    let builder_params = TransactionBuilderParams::new_invocable_entity(
+        entity_addr.into(),
+        ENTRY_POINT,
+        transferred_value,
+    );
 
     let transaction = sdk
         .make_transaction(builder_params, transaction_params)

@@ -33,12 +33,12 @@ impl From<_PricingMode> for PricingMode {
                 additional_computation_factor: _,
                 gas_price_tolerance: _,
             } => PricingMode::Fixed,
-            _PricingMode::Classic {
+            _PricingMode::PaymentLimited {
                 payment_amount: _,
                 gas_price_tolerance: _,
                 standard_payment: _,
             } => PricingMode::Classic,
-            _PricingMode::Reserved { receipt: _ } => PricingMode::Reserved,
+            _PricingMode::Prepaid { receipt: _ } => PricingMode::Reserved,
         }
     }
 }

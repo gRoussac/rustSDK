@@ -547,8 +547,8 @@ mod tests {
         tests::helpers::get_enable_addressable_entity,
     };
     use casper_rust_wasm_sdk::types::{
-        block_hash::BlockHash, block_identifier::BlockIdentifierInput,
-        global_state_identifier::GlobalStateIdentifier,
+        hash::block_hash::BlockHash, identifier::block_identifier::BlockIdentifierInput,
+        identifier::global_state_identifier::GlobalStateIdentifier,
     };
     use tokio::test;
 
