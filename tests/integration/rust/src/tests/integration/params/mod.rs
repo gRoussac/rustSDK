@@ -125,6 +125,9 @@ pub mod test_module {
             None,
             None,
             None,
+            None,
+            None,
+            None,
         );
         assert_eq!(transaction_params.chain_name().unwrap(), config.chain_name);
         assert_eq!(transaction_params.ttl().unwrap(), TTL);
@@ -200,8 +203,14 @@ pub mod test_module {
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
         let entity_hash: AddressableEntityHash = entity_addr.into();
 
-        let transaction_builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_hash.clone(), ENTRYPOINT_MINT);
+        // TODO Fix transferred_value
+        let transferred_value = None;
+
+        let transaction_builder_params = TransactionBuilderParams::new_invocable_entity(
+            entity_hash.clone(),
+            ENTRYPOINT_MINT,
+            transferred_value,
+        );
 
         assert_eq!(
             transaction_builder_params.entity_hash().unwrap(),

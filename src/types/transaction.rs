@@ -33,7 +33,7 @@ use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, Bytes as _Bytes, ToBytes},
     Approval, ApprovalsHash, AsymmetricType, Deploy, GasLimited, InitiatorAddr,
-    PublicKey as _PublicKey, RuntimeArgs, Timestamp, Transaction as _Transaction,
+    PublicKey as _PublicKey, RuntimeArgs, Timestamp, Transaction as _Transaction, TransactionArgs,
     TransactionEntryPoint, TransactionInvocationTarget, TransactionTarget, TransactionV1,
     URef as _URef, U512,
 };
@@ -576,9 +576,20 @@ impl Transaction {
     pub fn session_args(&self) -> RuntimeArgs {
         match &self.0 {
             _Transaction::Deploy(deploy) => deploy.session().args().clone(),
-            _Transaction::V1(transaction_v1) => transaction_v1
-                .deserialize_field::<RuntimeArgs>(ARGS_MAP_KEY)
-                .unwrap_or_default(),
+            _Transaction::V1(transaction_v1) => {
+                let args = transaction_v1
+                    .deserialize_field::<TransactionArgs>(ARGS_MAP_KEY)
+                    .map_err(|err| SdkError::FieldDeserialization {
+                        index: TARGET_MAP_KEY,
+                        error: format!("{:?}", err),
+                    })
+                    .unwrap();
+
+                match args {
+                    TransactionArgs::Named(runtime_args) => runtime_args,
+                    TransactionArgs::Bytesrepr(_) => unimplemented!(), // TODO Return TransactionArgs for new Bytesrepr
+                }
+            }
         }
     }
 
@@ -804,6 +815,8 @@ impl Transaction {
             new_version,
             new_transaction_bytes,
             new_is_install_upgrade,
+            new_transferred_value,
+            new_seed,
         }: NewBuilderParams,
     ) -> TransactionBuilderParams {
         let target = self
@@ -899,17 +912,23 @@ impl Transaction {
                     unimplemented!("unimplemented native entry point: {}", entry_point);
                 }
             },
-            TransactionTarget::Stored { id, runtime: _ } => match id {
+            TransactionTarget::Stored {
+                id,
+                runtime: _,
+                transferred_value,
+            } => match id {
                 casper_types::TransactionInvocationTarget::ByHash(hash) => {
                     TransactionBuilderParams::new_invocable_entity(
                         new_hash.unwrap_or(AddressableEntityHash::from_bytes(hash.into())),
                         &entry_point,
+                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
                 TransactionInvocationTarget::ByName(alias) => {
                     TransactionBuilderParams::new_invocable_entity_alias(
                         &new_alias.unwrap_or(alias.clone()),
                         &entry_point,
+                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
                 TransactionInvocationTarget::ByPackageHash { addr, version } => {
@@ -917,6 +936,7 @@ impl Transaction {
                         new_package_hash.unwrap_or(PackageHash::from_bytes(addr.into())),
                         &entry_point,
                         Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
+                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
                 TransactionInvocationTarget::ByPackageName { name, version } => {
@@ -924,6 +944,7 @@ impl Transaction {
                         &new_alias.unwrap_or(name.clone()),
                         &entry_point,
                         Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
+                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
             },
@@ -931,6 +952,8 @@ impl Transaction {
                 is_install_upgrade,
                 module_bytes: transaction_bytes,
                 runtime: _,
+                transferred_value,
+                seed,
             } => {
                 let default: _Bytes = transaction_bytes.clone();
                 let bytes_default = Bytes::default();
@@ -948,6 +971,11 @@ impl Transaction {
                 TransactionBuilderParams::new_session(
                     Some(new_transaction_bytes.into()),
                     Some(new_is_install_upgrade.unwrap_or(is_install_upgrade)),
+                    new_transferred_value.map_or(Some(transferred_value), Some),
+                    new_seed.map_or(
+                        seed.map(|s| Bytes::from(Vec::from(s))), // Convert [u8; 32] to Vec<u8> and then into Bytes
+                        Some,
+                    ),
                 )
             }
         }
@@ -963,6 +991,8 @@ struct NewBuilderParams<'a> {
     new_version: Option<u32>,
     new_transaction_bytes: Option<&'a Bytes>,
     new_is_install_upgrade: Option<bool>,
+    new_transferred_value: Option<u64>,
+    new_seed: Option<Bytes>,
 }
 
 impl From<Transaction> for _Transaction {

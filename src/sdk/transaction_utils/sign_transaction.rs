@@ -84,8 +84,15 @@ mod tests {
             "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
+
+        // TODO Fix transferred_value
+        let transferred_value = None;
+
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            entity_addr.into(),
+            ENTRYPOINT_MINT,
+            transferred_value,
+        );
 
         // Act
         let transaction = sdk
@@ -123,8 +130,15 @@ mod tests {
             "entity-contract-cfa781f5eb69c3eee952c2944ce9670a049f88c5e46b83fb5881ebe13fb98e6d",
         )
         .unwrap();
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
+
+        // TODO Fix transferred_value
+        let transferred_value = None;
+
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            entity_addr.into(),
+            ENTRYPOINT_MINT,
+            transferred_value,
+        );
 
         // Act
         let transaction = sdk

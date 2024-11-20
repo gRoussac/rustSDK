@@ -1,6 +1,7 @@
 use crate::helpers::get_current_timestamp;
 use crate::helpers::get_str_or_default;
 use crate::helpers::get_ttl_or_default;
+use crate::types::cl::bytes::Bytes;
 use crate::types::deploy_params::args_simple::ArgsSimple;
 use crate::types::pricing_mode::PricingMode;
 use casper_client::cli::TransactionStrParams as _TransactionStrParams;
@@ -24,6 +25,9 @@ pub struct TransactionStrParams {
     gas_price_tolerance: OnceCell<String>,
     receipt: OnceCell<String>,
     standard_payment: OnceCell<bool>,
+    transferred_value: OnceCell<String>,
+    session_entry_point: OnceCell<String>,
+    chunked_args: OnceCell<Bytes>,
 }
 
 const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Fixed;
@@ -49,6 +53,9 @@ impl TransactionStrParams {
         gas_price_tolerance: Option<String>,
         receipt: Option<String>,
         standard_payment: Option<bool>,
+        transferred_value: Option<String>,
+        session_entry_point: Option<String>,
+        chunked_args: Option<Bytes>,
     ) -> Self {
         let mut transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(chain_name);
@@ -88,6 +95,15 @@ impl TransactionStrParams {
         if let Some(standard_payment) = standard_payment {
             transaction_params.set_standard_payment(standard_payment);
         }
+        if let Some(transferred_value) = transferred_value {
+            transaction_params.set_transferred_value(&transferred_value);
+        }
+        if let Some(session_entry_point) = session_entry_point {
+            transaction_params.set_session_entry_point(&session_entry_point);
+        }
+        if let Some(chunked_args) = chunked_args {
+            transaction_params.set_chunked_args(chunked_args);
+        }
         transaction_params
     }
 
@@ -112,6 +128,9 @@ impl TransactionStrParams {
             None, // gas_price_tolerance
             None, // receipt
             None, // standard_payment
+            None, // transferred_value
+            None, // session_entry_point
+            None, // chunked_args
         )
     }
 
@@ -286,6 +305,40 @@ impl TransactionStrParams {
     pub fn set_standard_payment(&self, standard_payment: bool) {
         self.standard_payment.set(standard_payment).unwrap();
     }
+
+    #[wasm_bindgen(getter)]
+    pub fn transferred_value(&self) -> Option<String> {
+        self.transferred_value.get().cloned()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_transferred_value(&self, transferred_value: &str) {
+        self.transferred_value
+            .set(transferred_value.to_string())
+            .unwrap();
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn session_entry_point(&self) -> Option<String> {
+        self.session_entry_point.get().cloned()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_session_entry_point(&self, session_entry_point: &str) {
+        self.session_entry_point
+            .set(session_entry_point.to_string())
+            .unwrap();
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn chunked_args(&self) -> Option<Bytes> {
+        self.chunked_args.get().cloned()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_chunked_args(&self, chunked_args: Bytes) {
+        self.chunked_args.set(chunked_args).unwrap();
+    }
 }
 
 // Convert TransactionStrParams to casper_client::cli::TransactionStrParams
@@ -352,12 +405,32 @@ pub fn transaction_str_params_to_casper_client(
         receipt: get_str_or_default(transaction_params.receipt.get()),
         standard_payment: standard_payment_str,
         output_path: "",
+        transferred_value: get_str_or_default(transaction_params.transferred_value.get()),
+        session_entry_point: {
+            let entry_point = get_str_or_default(transaction_params.session_entry_point.get());
+            if entry_point.is_empty() {
+                None
+            } else {
+                Some(entry_point)
+            }
+        },
+        chunked_args: {
+            let chunked = transaction_params.chunked_args.get().map_or_else(
+                || Vec::new(),          // Default empty Vec if None
+                |bytes| bytes.to_vec(), // Convert &cl::bytes::Bytes to Vec<u8>
+            );
+            if chunked.is_empty() {
+                None // Return None if the Vec is empty
+            } else {
+                Some(chunked) // Return Some(Vec) if not empty
+            }
+        },
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use casper_types::Timestamp;
+    use casper_types::{bytesrepr::ToBytes, Timestamp};
 
     use super::*;
 
@@ -403,6 +476,19 @@ mod tests {
         let standard_payment = OnceCell::new();
         standard_payment.set(true).unwrap();
 
+        let transferred_value = OnceCell::new();
+        transferred_value.set("0".to_string()).unwrap();
+
+        let session_entry_point = OnceCell::new();
+        session_entry_point
+            .set("session_entry_point".to_string())
+            .unwrap();
+
+        let chunked_args = OnceCell::new();
+        chunked_args
+            .set(Bytes::from("json".to_bytes().unwrap()))
+            .unwrap();
+
         let transaction_params = TransactionStrParams {
             secret_key,
             timestamp,
@@ -417,6 +503,9 @@ mod tests {
             gas_price_tolerance,
             receipt,
             standard_payment,
+            transferred_value,
+            session_entry_point,
+            chunked_args,
         };
 
         let result = transaction_str_params_to_casper_client(&transaction_params);
@@ -434,6 +523,10 @@ mod tests {
         assert_eq!(result.additional_computation_factor, "0");
         assert_eq!(result.receipt, "receipt");
         assert_eq!(result.standard_payment, "true");
+        assert_eq!(result.transferred_value, "0");
+        assert_eq!(result.session_entry_point, Some("session_entry_point"));
+        // TODO FIX
+        //assert_eq!(result.chunked_args, Some());
     }
 
     #[test]
@@ -478,5 +571,8 @@ mod tests {
         assert_eq!(result.additional_computation_factor, "1");
         assert_eq!(result.receipt, "receipt");
         assert_eq!(result.standard_payment, "true");
+        assert_eq!(result.transferred_value, "");
+        assert_eq!(result.session_entry_point, None);
+        assert_eq!(result.chunked_args, None);
     }
 }

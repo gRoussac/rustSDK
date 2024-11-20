@@ -283,8 +283,14 @@ pub mod test_module {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        let builder_params =
-            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
+        // TODO Fix transferred_value
+        let transferred_value = None;
+
+        let builder_params = TransactionBuilderParams::new_invocable_entity(
+            entity_addr.into(),
+            ENTRYPOINT_MINT,
+            transferred_value,
+        );
 
         let test_call_entrypoint_transaction = create_test_sdk(Some(config))
             .call_entrypoint(builder_params, transaction_params, None)
