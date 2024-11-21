@@ -415,8 +415,9 @@ pub fn transaction_str_params_to_casper_client(
             }
         },
         chunked_args: {
+            let new_vec = || Vec::new();
             let chunked = transaction_params.chunked_args.get().map_or_else(
-                || Vec::new(),          // Default empty Vec if None
+                new_vec,                // Default empty Vec if None
                 |bytes| bytes.to_vec(), // Convert &cl::bytes::Bytes to Vec<u8>
             );
             if chunked.is_empty() {
