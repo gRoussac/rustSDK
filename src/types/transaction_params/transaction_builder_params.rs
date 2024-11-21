@@ -125,7 +125,7 @@ impl TransactionBuilderParams {
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
             transferred_value,
-            seed: seed.into(),
+            seed,
         }
     }
 
