@@ -1,4 +1,5 @@
 use crate::types::hash::account_hash::AccountHash;
+use crate::types::transaction_params::transaction_str_params::{DEFAULT_GAS_PRICE, DEFAULT_TTL};
 use crate::types::{key::Key, public_key::PublicKey, sdk_error::SdkError, verbosity::Verbosity};
 use base64::engine::general_purpose;
 use base64::Engine;
@@ -10,8 +11,8 @@ use blake2::{
 use casper_client::cli::JsonArg;
 use casper_types::{
     bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, CLValue,
-    DeployBuilder, Key as CasperTypesKey, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs,
-    SecretKey, TimeDiff, Timestamp,
+    Key as CasperTypesKey, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey,
+    TimeDiff, Timestamp,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -156,7 +157,7 @@ pub fn get_ttl_or_default(ttl: Option<&str>) -> String {
     if let Some(ttl) = ttl {
         ttl.to_string()
     } else {
-        DeployBuilder::DEFAULT_TTL.to_string()
+        DEFAULT_TTL.to_string()
     }
 }
 
@@ -202,7 +203,7 @@ pub fn parse_ttl(value: &str) -> Result<TimeDiff, SdkError> {
 ///
 /// The gas price or the default gas price if not provided.
 pub fn get_gas_price_or_default(gas_price: Option<u64>) -> u64 {
-    gas_price.unwrap_or(DeployBuilder::DEFAULT_GAS_PRICE)
+    gas_price.unwrap_or(DEFAULT_GAS_PRICE)
 }
 
 /// Gets the value as a string or returns an empty string if not provided.

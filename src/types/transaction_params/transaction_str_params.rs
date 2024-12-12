@@ -5,7 +5,6 @@ use crate::types::cl::bytes::Bytes;
 use crate::types::deploy_params::args_simple::ArgsSimple;
 use crate::types::pricing_mode::PricingMode;
 use casper_client::cli::TransactionStrParams as _TransactionStrParams;
-use casper_types::DeployBuilder;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
 
@@ -26,12 +25,14 @@ pub struct TransactionStrParams {
     receipt: OnceCell<String>,
     standard_payment: OnceCell<bool>,
     transferred_value: OnceCell<String>,
+    reserved_slots: OnceCell<Option<u32>>,
     session_entry_point: OnceCell<String>,
     chunked_args: OnceCell<Bytes>,
 }
 
 const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Fixed;
-const DEFAULT_GAS_PRICE: u64 = DeployBuilder::DEFAULT_GAS_PRICE;
+pub const DEFAULT_TTL: &str = "30m";
+pub const DEFAULT_GAS_PRICE: u64 = 1;
 const DEFAULT_ADDITIONAL_COMPUTATION_FACTOR: u8 = 0;
 const DEFAULT_STANDARD_PAYMENT: bool = false;
 

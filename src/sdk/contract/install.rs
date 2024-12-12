@@ -82,15 +82,8 @@ impl SDK {
     ) -> Result<SuccessResponse<_PutTransactionResult>, SdkError> {
         //log("install!");
         let is_install_upgrade = Some(true);
-        // TODO Fix transferred_value + seed
-        let transferred_value = None;
-        let seed = None;
-        let builder_params = TransactionBuilderParams::new_session(
-            Some(transaction_bytes),
-            is_install_upgrade,
-            transferred_value,
-            seed,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_session(Some(transaction_bytes), is_install_upgrade);
         self.transaction(builder_params, transaction_params, None, rpc_address)
             .await
     }

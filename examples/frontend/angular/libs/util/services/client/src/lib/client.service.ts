@@ -1307,7 +1307,7 @@ export class ClientService {
   }
 
   private get_builder_params(wasm?: Uint8Array): TransactionBuilderParams | undefined {
-    let builder_params: TransactionBuilderParams = new TransactionBuilderParams();
+    let builder_params;
 
     const entity_hash_input: string = this.getIdentifier('entityHash')?.value?.trim();
     const entity_name: string = this.getIdentifier('entityAlias')?.value?.trim();
