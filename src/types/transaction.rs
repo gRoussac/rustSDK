@@ -912,23 +912,17 @@ impl Transaction {
                     unimplemented!("unimplemented native entry point: {}", entry_point);
                 }
             },
-            TransactionTarget::Stored {
-                id,
-                runtime: _,
-                transferred_value,
-            } => match id {
+            TransactionTarget::Stored { id, runtime: _ } => match id {
                 casper_types::TransactionInvocationTarget::ByHash(hash) => {
                     TransactionBuilderParams::new_invocable_entity(
                         new_hash.unwrap_or(AddressableEntityHash::from_bytes(hash.into())),
                         &entry_point,
-                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
                 TransactionInvocationTarget::ByName(alias) => {
                     TransactionBuilderParams::new_invocable_entity_alias(
                         &new_alias.unwrap_or(alias.clone()),
                         &entry_point,
-                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
                 TransactionInvocationTarget::ByPackageHash { addr, version } => {
@@ -936,7 +930,6 @@ impl Transaction {
                         new_package_hash.unwrap_or(PackageHash::from_bytes(addr.into())),
                         &entry_point,
                         Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
-                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
                 TransactionInvocationTarget::ByPackageName { name, version } => {
@@ -944,7 +937,6 @@ impl Transaction {
                         &new_alias.unwrap_or(name.clone()),
                         &entry_point,
                         Some(new_version.unwrap_or(version.unwrap_or(1)).to_string()),
-                        new_transferred_value.map_or(Some(transferred_value), Some),
                     )
                 }
             },
@@ -952,8 +944,6 @@ impl Transaction {
                 is_install_upgrade,
                 module_bytes: transaction_bytes,
                 runtime: _,
-                transferred_value,
-                seed,
             } => {
                 let default: _Bytes = transaction_bytes.clone();
                 let bytes_default = Bytes::default();
@@ -971,11 +961,6 @@ impl Transaction {
                 TransactionBuilderParams::new_session(
                     Some(new_transaction_bytes.into()),
                     Some(new_is_install_upgrade.unwrap_or(is_install_upgrade)),
-                    new_transferred_value.map_or(Some(transferred_value), Some),
-                    new_seed.map_or(
-                        seed.map(|s| Bytes::from(Vec::from(s))), // Convert [u8; 32] to Vec<u8> and then into Bytes
-                        Some,
-                    ),
                 )
             }
         }
