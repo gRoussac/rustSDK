@@ -135,7 +135,7 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_balance(purse_uref, hash, verbosity, rpc_address)
+            self.get_balance(purse_uref, Some(hash.to_digest()), verbosity, rpc_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
             let hash = if !hash.is_empty() {
@@ -146,10 +146,10 @@ impl SDK {
             } else {
                 "".to_string()
             };
-            self.get_balance(purse_uref, hash.as_str(), verbosity, rpc_address)
+            self.get_balance(purse_uref, Some(hash.as_str()), verbosity, rpc_address)
                 .await
         } else {
-            self.get_balance(purse_uref, "", verbosity, rpc_address)
+            self.get_balance(purse_uref, None::<&str>, verbosity, rpc_address)
                 .await
         };
 
