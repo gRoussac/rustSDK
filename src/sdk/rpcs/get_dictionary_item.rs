@@ -268,8 +268,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -300,8 +300,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                state_root_hash,
                 dictionary_item,
+                state_root_hash,
                 verbosity,
                 Some(node_address),
             )
@@ -321,8 +321,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "",
                 get_dictionary_item(false).await,
+                "",
                 verbosity,
                 Some(node_address),
             )
@@ -342,8 +342,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "",
                 get_dictionary_item(false).await,
+                "",
                 verbosity,
                 Some(node_address),
             )
@@ -363,8 +363,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "",
                 get_dictionary_item(true).await,
+                "",
                 verbosity,
                 Some(node_address),
             )
@@ -390,8 +390,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                state_root_hash,
                 DictionaryItemInput::Params(params),
+                state_root_hash,
                 verbosity,
                 Some(node_address),
             )
@@ -412,8 +412,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 None,
                 None,
             )

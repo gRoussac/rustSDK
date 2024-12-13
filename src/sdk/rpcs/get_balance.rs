@@ -288,8 +288,8 @@ mod tests {
         // Act
         let result = sdk
             .get_balance(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 purse_uref,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -310,7 +310,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(node_address))
+            .get_balance(purse_uref, "", None, Some(node_address))
             .await;
 
         // Assert
@@ -327,7 +327,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(node_address))
+            .get_balance(purse_uref, "", None, Some(node_address))
             .await;
 
         // Assert
@@ -353,8 +353,8 @@ mod tests {
         // Act
         let result = sdk
             .get_balance(
-                state_root_hash.to_digest(),
                 purse_uref,
+                state_root_hash.to_digest(),
                 None,
                 Some(node_address),
             )
@@ -374,8 +374,8 @@ mod tests {
         // Act
         let result = sdk
             .get_balance(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 purse_uref,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 None,
                 None,
             )
