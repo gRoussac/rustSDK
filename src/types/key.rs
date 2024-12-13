@@ -46,8 +46,8 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "fromAccount")]
-    pub fn from_account_js_alias(key: AccountHash) -> Self {
-        Self::from_account(key)
+    pub fn from_account(key: AccountHash) -> Self {
+        Self(_Key::Account(key.into()))
     }
 
     #[wasm_bindgen]
@@ -117,8 +117,8 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]
-    pub fn to_formatted_string_js_alias(&self) -> String {
-        Self::to_formatted_string(self)
+    pub fn to_formatted_string(&self) -> String {
+        _Key::to_formatted_string(self.0)
     }
 
     #[wasm_bindgen(js_name = "fromFormattedString")]
@@ -165,8 +165,11 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "intoURef")]
-    pub fn into_uref_js_alias(self) -> Option<URef> {
-        Self::into_uref(self)
+    pub fn into_uref(self) -> Option<URef> {
+        match self.0 {
+            _Key::URef(uref) => Some(uref.into()),
+            _ => None,
+        }
     }
 
     #[wasm_bindgen(js_name = "urefToHash")]
@@ -197,21 +200,6 @@ impl Key {
                     error,
                 })
             })
-    }
-
-    pub fn to_formatted_string(&self) -> String {
-        _Key::to_formatted_string(self.0)
-    }
-
-    pub fn from_account(key: AccountHash) -> Self {
-        Self(_Key::Account(key.into()))
-    }
-
-    pub fn into_uref(self) -> Option<URef> {
-        match self.0 {
-            _Key::URef(uref) => Some(uref.into()),
-            _ => None,
-        }
     }
 }
 
