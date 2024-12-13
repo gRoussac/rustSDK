@@ -18,7 +18,7 @@
   "build": {
     "appId": "com.example.myapp",
     "productName": "Casper Webclient",
-    "compression": "maximum",
+    "compression": "store",
     "directories": {
       "output": "release"
     },
