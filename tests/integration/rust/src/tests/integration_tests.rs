@@ -187,7 +187,7 @@ pub mod test_module {
             "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538",
         )
         .unwrap();
-        let dictionary_item_key = make_dictionary_item_key(key, &value);
+        let dictionary_item_key = make_dictionary_item_key(&key, &value);
         assert_eq!(
             dictionary_item_key,
             "1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string()
