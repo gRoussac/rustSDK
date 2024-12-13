@@ -109,8 +109,8 @@ pub fn get_blake2b_hash(meta_data: &str) -> String {
 /// println!("Dictionary Item Key (Key/Value as Key): {}", dictionary_item_key);
 /// assert_eq!(dictionary_item_key,"1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string());
 /// ```
-pub fn make_dictionary_item_key<V: ToBytes>(key: Key, value: &V) -> String {
-    let key: CasperTypesKey = CasperTypesKey::from(key);
+pub fn make_dictionary_item_key<V: ToBytes>(key: &Key, value: &V) -> String {
+    let key: CasperTypesKey = CasperTypesKey::from(key.clone());
     let mut bytes_a = key.to_bytes().unwrap_or_default();
     let mut bytes_b = value.to_bytes().unwrap_or_default();
 
@@ -681,7 +681,7 @@ mod tests {
         )
         .unwrap();
         let value = U256::from(1);
-        let dictionary_item_key = make_dictionary_item_key(key, &value);
+        let dictionary_item_key = make_dictionary_item_key(&key, &value);
         assert_eq!(
             dictionary_item_key,
             "145f6211a24c0a8af16b47e7aa58431ea25172eb402903b3c25ac92b9784c7a9".to_string()
@@ -694,7 +694,7 @@ mod tests {
             "account-hash-e11bfffe63bf899ea07117af8a2bb43ef0078c0e38ebee6b6cb0b0e39c233538",
         )
         .unwrap();
-        let dictionary_item_key = make_dictionary_item_key(key, &value);
+        let dictionary_item_key = make_dictionary_item_key(&key, &value);
         assert_eq!(
             dictionary_item_key,
             "1e26dc82db208943c3785c0e11b9d78b9c408fee748c78dda5a5d016840dedca".to_string()

@@ -825,6 +825,7 @@ impl Transaction {
 
         match target {
             TransactionTarget::Native => match entry_point.as_str() {
+                // TODO
                 // "add_bid" => TransactionBuilderParams::new_add_bid(
                 //     self.public_key().clone(),
                 //     self.delegation_rate(),
