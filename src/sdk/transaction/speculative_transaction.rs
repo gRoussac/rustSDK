@@ -125,17 +125,12 @@ mod tests {
                     unimplemented!()
                 }
             };
-            // TODO Fix is_install_upgrade
+
             let is_install_upgrade = Some(true);
-            // TODO Fix transferred_value
-            let transferred_value = None;
-            let seed = None;
 
             let new_builder_params = TransactionBuilderParams::new_session(
                 Some(transaction_bytes.into()),
                 is_install_upgrade,
-                transferred_value,
-                seed,
             );
             *builder_params = Some(new_builder_params);
         }

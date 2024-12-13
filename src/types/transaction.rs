@@ -815,8 +815,6 @@ impl Transaction {
             new_version,
             new_transaction_bytes,
             new_is_install_upgrade,
-            new_transferred_value,
-            new_seed,
         }: NewBuilderParams,
     ) -> TransactionBuilderParams {
         let target = self
@@ -976,8 +974,6 @@ struct NewBuilderParams<'a> {
     new_version: Option<u32>,
     new_transaction_bytes: Option<&'a Bytes>,
     new_is_install_upgrade: Option<bool>,
-    new_transferred_value: Option<u64>,
-    new_seed: Option<Bytes>,
 }
 
 impl From<Transaction> for _Transaction {

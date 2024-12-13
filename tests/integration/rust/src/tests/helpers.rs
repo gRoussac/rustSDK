@@ -111,8 +111,8 @@ pub(crate) mod intern {
 
         let get_dictionary_item = create_test_sdk(None)
             .get_dictionary_item(
-                get_state_root_hash.unwrap_or_default(),
                 dictionary_item,
+                get_state_root_hash.unwrap_or_default(),
                 None,
                 rpc_address,
             )
@@ -477,13 +477,8 @@ pub async fn mint_nft(
 
     let entity_addr = EntityAddr::from_formatted_str(contract_cep78_key.into()).unwrap();
 
-    // TODO Fix transferred_value
-    let transferred_value = None;
-    let builder_params = TransactionBuilderParams::new_invocable_entity(
-        entity_addr.into(),
-        ENTRYPOINT_MINT,
-        transferred_value,
-    );
+    let builder_params =
+        TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
     let sdk = create_test_sdk(None);
     let test_call_entrypoint = sdk

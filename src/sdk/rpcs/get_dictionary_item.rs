@@ -148,13 +148,13 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_dictionary_item(hash, dictionary_item, verbosity, rpc_address)
+            self.get_dictionary_item(dictionary_item, hash, verbosity, rpc_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, rpc_address)
+            self.get_dictionary_item(dictionary_item, hash.as_str(), verbosity, rpc_address)
                 .await
         } else {
-            self.get_dictionary_item("", dictionary_item, verbosity, rpc_address)
+            self.get_dictionary_item(dictionary_item, "", verbosity, rpc_address)
                 .await
         };
 
@@ -202,8 +202,8 @@ impl SDK {
     /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_dictionary_item(
         &self,
-        state_root_hash: impl ToDigest,
         dictionary_item_input: DictionaryItemInput,
+        state_root_hash: impl ToDigest,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
@@ -264,8 +264,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -296,8 +296,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                state_root_hash,
                 dictionary_item,
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -317,8 +317,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "",
                 get_dictionary_item(false).await,
+                "",
                 verbosity,
                 Some(rpc_address),
             )
@@ -338,8 +338,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "",
                 get_dictionary_item(false).await,
+                "",
                 verbosity,
                 Some(rpc_address),
             )
@@ -359,8 +359,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "",
                 get_dictionary_item(true).await,
+                "",
                 verbosity,
                 Some(rpc_address),
             )
@@ -386,8 +386,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                state_root_hash,
                 DictionaryItemInput::Params(params),
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -408,8 +408,8 @@ mod tests {
         // Act
         let result = sdk
             .get_dictionary_item(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
                 None,
                 None,
             )

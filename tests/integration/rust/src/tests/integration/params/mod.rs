@@ -203,14 +203,8 @@ pub mod test_module {
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
         let entity_hash: AddressableEntityHash = entity_addr.into();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let transaction_builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_hash.clone(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let transaction_builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_hash.clone(), ENTRYPOINT_MINT);
 
         assert_eq!(
             transaction_builder_params.entity_hash().unwrap(),

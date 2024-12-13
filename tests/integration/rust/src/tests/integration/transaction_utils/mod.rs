@@ -21,14 +21,8 @@ pub mod test_module {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_DECIMALS,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_DECIMALS);
 
         let make_transaction = create_test_sdk(Some(config))
             .make_transaction(builder_params, transaction_params)
@@ -85,14 +79,8 @@ pub mod test_module {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_DECIMALS,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_DECIMALS);
 
         let make_transaction = create_test_sdk(Some(config.clone()))
             .make_transaction(builder_params, transaction_params)

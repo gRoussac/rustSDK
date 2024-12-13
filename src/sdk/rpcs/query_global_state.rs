@@ -141,32 +141,7 @@ impl SDK {
     }
 }
 
-/// Enum to represent input for KeyIdentifier.
-#[derive(Debug, Clone)]
-pub enum KeyIdentifierInput {
-    Key(Key),
-    String(String),
-}
-
-/// Enum to represent input for PathIdentifier.
-#[derive(Debug, Clone)]
-pub enum PathIdentifierInput {
-    Path(Path),
-    String(String),
-}
-
-/// Struct to store parameters for querying global state.
-#[derive(Debug)]
-pub struct QueryGlobalStateParams {
-    pub key: KeyIdentifierInput,
-    pub path: Option<PathIdentifierInput>,
-    pub maybe_global_state_identifier: Option<GlobalStateIdentifier>,
-    pub state_root_hash: Option<String>,
-    pub maybe_block_id: Option<String>,
-    pub rpc_address: Option<String>,
-    pub verbosity: Option<Verbosity>,
-}
-
+#[cfg(target_arch = "wasm32")]
 impl SDK {
     /// Builds parameters for querying global state based on the provided options.
     ///
@@ -271,7 +246,35 @@ impl SDK {
         };
         Ok(query_params)
     }
+}
 
+/// Enum to represent input for KeyIdentifier.
+#[derive(Debug, Clone)]
+pub enum KeyIdentifierInput {
+    Key(Key),
+    String(String),
+}
+
+/// Enum to represent input for PathIdentifier.
+#[derive(Debug, Clone)]
+pub enum PathIdentifierInput {
+    Path(Path),
+    String(String),
+}
+
+/// Struct to store parameters for querying global state.
+#[derive(Debug)]
+pub struct QueryGlobalStateParams {
+    pub key: KeyIdentifierInput,
+    pub path: Option<PathIdentifierInput>,
+    pub maybe_global_state_identifier: Option<GlobalStateIdentifier>,
+    pub state_root_hash: Option<String>,
+    pub maybe_block_id: Option<String>,
+    pub rpc_address: Option<String>,
+    pub verbosity: Option<Verbosity>,
+}
+
+impl SDK {
     /// Retrieves global state information based on the provided parameters.
     ///
     /// # Arguments

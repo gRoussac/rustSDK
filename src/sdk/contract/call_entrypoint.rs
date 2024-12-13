@@ -141,14 +141,8 @@ mod tests {
 
         let entity_addr = EntityAddr::from_formatted_str(&get_entity_key().await).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -179,14 +173,8 @@ mod tests {
         )
         .unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -220,14 +208,8 @@ mod tests {
         )
         .unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
@@ -260,14 +242,8 @@ mod tests {
         )
         .unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk
