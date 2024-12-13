@@ -135,7 +135,7 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_balance(hash, purse_uref, verbosity, node_address)
+            self.get_balance(purse_uref, hash, verbosity, node_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
             let hash = if !hash.is_empty() {
@@ -146,10 +146,10 @@ impl SDK {
             } else {
                 "".to_string()
             };
-            self.get_balance(&*hash, purse_uref, verbosity, node_address)
+            self.get_balance(purse_uref, hash.as_str(), verbosity, node_address)
                 .await
         } else {
-            self.get_balance("", purse_uref, verbosity, node_address)
+            self.get_balance(purse_uref, "", verbosity, node_address)
                 .await
         };
 
@@ -206,8 +206,8 @@ impl SDK {
     /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_balance(
         &self,
-        state_root_hash: impl ToDigest,
         purse_uref: GetBalanceInput,
+        state_root_hash: impl ToDigest,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetBalanceResult>, Box<SdkError>> {

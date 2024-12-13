@@ -166,6 +166,7 @@ pub struct QueryGlobalStateParams {
     pub verbosity: Option<Verbosity>,
 }
 
+#[cfg(target_arch = "wasm32")]
 impl SDK {
     /// Builds parameters for querying global state based on the provided options.
     ///
@@ -270,7 +271,9 @@ impl SDK {
         };
         Ok(query_params)
     }
+}
 
+impl SDK {
     /// Retrieves global state information based on the provided parameters.
     ///
     /// # Arguments
