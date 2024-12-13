@@ -1,16 +1,11 @@
 use super::account_hash::AccountHash;
-#[cfg(target_arch = "wasm32")]
 use super::addr::transfer_addr::TransferAddr;
-#[cfg(target_arch = "wasm32")]
 use super::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
-#[cfg(target_arch = "wasm32")]
 use super::deploy_hash::DeployHash;
-#[cfg(target_arch = "wasm32")]
 use super::era_id::EraId;
 use super::uref::URef;
 use crate::types::sdk_error::SdkError;
-use casper_types::bytesrepr::ToBytes;
-use casper_types::Key as _Key;
+use casper_types::{bytesrepr::ToBytes, Key as _Key};
 #[cfg(target_arch = "wasm32")]
 use gloo_utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
@@ -21,7 +16,6 @@ use wasm_bindgen::prelude::*;
 pub struct Key(_Key);
 
 #[wasm_bindgen]
-#[cfg(target_arch = "wasm32")]
 impl Key {
     #[wasm_bindgen(constructor)]
     pub fn new(key: Key) -> Result<Key, JsError> {
@@ -121,6 +115,7 @@ impl Key {
         _Key::to_formatted_string(self.0)
     }
 
+    #[cfg(target_arch = "wasm32")]
     #[wasm_bindgen(js_name = "fromFormattedString")]
     pub fn from_formatted_str_js_alias(formatted_str: &str) -> Result<Key, JsError> {
         Self::from_formatted_str(formatted_str)
