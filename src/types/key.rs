@@ -47,7 +47,7 @@ impl Key {
 
     #[wasm_bindgen(js_name = "fromAccount")]
     pub fn from_account_js_alias(key: AccountHash) -> Self {
-        Self::from_account(key.into())
+        Self::from_account(key)
     }
 
     #[wasm_bindgen]

@@ -89,7 +89,7 @@ pub(crate) mod intern {
         let get_dictionary_item = create_test_sdk(None)
             .get_dictionary_item(
                 dictionary_item,
-                get_state_root_hash.unwrap_or_default(),
+                Some(get_state_root_hash.unwrap_or_default()),
                 None,
                 node_address,
             )

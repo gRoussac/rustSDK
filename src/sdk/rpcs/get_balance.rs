@@ -135,7 +135,7 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_balance(purse_uref, hash, verbosity, node_address)
+            self.get_balance(purse_uref, Some(hash.to_digest()), verbosity, node_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
             let hash = if !hash.is_empty() {
@@ -146,10 +146,10 @@ impl SDK {
             } else {
                 "".to_string()
             };
-            self.get_balance(purse_uref, hash.as_str(), verbosity, node_address)
+            self.get_balance(purse_uref, Some(hash.as_str()), verbosity, node_address)
                 .await
         } else {
-            self.get_balance(purse_uref, "", verbosity, node_address)
+            self.get_balance(purse_uref, None::<&str>, verbosity, node_address)
                 .await
         };
 
@@ -207,12 +207,34 @@ impl SDK {
     pub async fn get_balance(
         &self,
         purse_uref: GetBalanceInput,
-        state_root_hash: impl ToDigest,
+        state_root_hash: Option<impl ToDigest>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetBalanceResult>, Box<SdkError>> {
         //log("get_balance!");
-        let state_root_hash = if state_root_hash.is_empty() {
+
+        let state_root_hash = if let Some(state_root_hash) = state_root_hash {
+            if state_root_hash.is_empty() {
+                let state_root_hash = self
+                    .get_state_root_hash(
+                        None,
+                        None,
+                        Some(self.get_node_address(node_address.clone())),
+                    )
+                    .await;
+
+                match state_root_hash {
+                    Ok(state_root_hash) => {
+                        let state_root_hash: Digest =
+                            state_root_hash.result.state_root_hash.unwrap().into();
+                        state_root_hash
+                    }
+                    Err(_) => "".to_digest(),
+                }
+            } else {
+                state_root_hash.to_digest()
+            }
+        } else {
             let state_root_hash = self
                 .get_state_root_hash(
                     None,
@@ -229,9 +251,8 @@ impl SDK {
                 }
                 Err(_) => "".to_digest(),
             }
-        } else {
-            state_root_hash.to_digest()
         };
+
         match purse_uref {
             GetBalanceInput::PurseUref(purse_uref) => get_balance_lib(
                 JsonRpcId::from(rand::thread_rng().gen::<i64>().to_string()),
@@ -289,7 +310,7 @@ mod tests {
         let result = sdk
             .get_balance(
                 purse_uref,
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
+                Some("7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"), // get_balance does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -310,7 +331,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance(purse_uref, "", None, Some(node_address))
+            .get_balance(purse_uref, None::<&str>, None, Some(node_address))
             .await;
 
         // Assert
@@ -327,7 +348,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance(purse_uref, "", None, Some(node_address))
+            .get_balance(purse_uref, None::<&str>, None, Some(node_address))
             .await;
 
         // Assert
@@ -352,12 +373,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance(
-                purse_uref,
-                state_root_hash.to_digest(),
-                None,
-                Some(node_address),
-            )
+            .get_balance(purse_uref, Some(state_root_hash), None, Some(node_address))
             .await;
 
         // Assert
@@ -375,7 +391,7 @@ mod tests {
         let result = sdk
             .get_balance(
                 purse_uref,
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
+                Some("7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"), // get_balance does not support empty string as state_root_hash
                 None,
                 None,
             )
