@@ -257,14 +257,14 @@ pub fn encode_lower_blake2b(meta_data: &str) -> JsValue {
 /// A string representing the formatted dictionary item key.
 ///
 #[wasm_bindgen(js_name = "makeDictionaryItemKey")]
-pub fn make_dictionary_item_key(key: Key, value: &str) -> Result<String, JsError> {
+pub fn make_dictionary_item_key(key: &Key, value: &str) -> Result<String, JsError> {
     // Try to parse value as U256, default to zero if unsuccessful
     let value_as_u256 = U256::from_dec_str(value).unwrap_or_default();
 
     // If value_as_u256 is zero, attempt to parse it as a key and return the result
     if value_as_u256 == U256::zero() {
         match Key::from_formatted_str(value) {
-            Ok(value_as_key) => Ok(make_dictionary_item_key_helper(key, &value_as_key)),
+            Ok(value_as_key) => Ok(make_dictionary_item_key_helper(&key, &value_as_key)),
             Err(err) => {
                 let error_text = format!("Error serializing key: {:?}", err);
                 Err(JsError::new(&error_text))
@@ -272,6 +272,6 @@ pub fn make_dictionary_item_key(key: Key, value: &str) -> Result<String, JsError
         }
     } else {
         // Otherwise, proceed with the original key and parsed value_as_u256
-        Ok(make_dictionary_item_key_helper(key, &value_as_u256))
+        Ok(make_dictionary_item_key_helper(&key, &value_as_u256))
     }
 }
