@@ -149,13 +149,18 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_dictionary_item(dictionary_item, hash, verbosity, node_address)
+            self.get_dictionary_item(dictionary_item, Some(hash), verbosity, node_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            self.get_dictionary_item(dictionary_item, hash.as_str(), verbosity, node_address)
-                .await
+            self.get_dictionary_item(
+                dictionary_item,
+                Some(hash.as_str()),
+                verbosity,
+                node_address,
+            )
+            .await
         } else {
-            self.get_dictionary_item(dictionary_item, "", verbosity, node_address)
+            self.get_dictionary_item(dictionary_item, None::<&str>, verbosity, node_address)
                 .await
         };
 
@@ -203,13 +208,34 @@ impl SDK {
     pub async fn get_dictionary_item(
         &self,
         dictionary_item_input: DictionaryItemInput,
-        state_root_hash: impl ToDigest,
+        state_root_hash: Option<impl ToDigest>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, Box<SdkError>> {
         // log("state_get_dictionary_item!");
 
-        let state_root_hash = if state_root_hash.is_empty() {
+        let state_root_hash = if let Some(state_root_hash) = state_root_hash {
+            if state_root_hash.is_empty() {
+                let state_root_hash = self
+                    .get_state_root_hash(
+                        None,
+                        None,
+                        Some(self.get_node_address(node_address.clone())),
+                    )
+                    .await;
+
+                match state_root_hash {
+                    Ok(state_root_hash) => {
+                        let state_root_hash: Digest =
+                            state_root_hash.result.state_root_hash.unwrap().into();
+                        state_root_hash
+                    }
+                    Err(_) => "".to_digest(),
+                }
+            } else {
+                state_root_hash.to_digest()
+            }
+        } else {
             let state_root_hash = self
                 .get_state_root_hash(
                     None,
@@ -226,8 +252,6 @@ impl SDK {
                 }
                 Err(_) => "".to_digest(),
             }
-        } else {
-            state_root_hash.to_digest()
         };
 
         match dictionary_item_input {
@@ -269,7 +293,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 get_dictionary_item(false).await,
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
+                Some("7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"), // get_dictionary_item does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -301,7 +325,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 dictionary_item,
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -322,7 +346,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 get_dictionary_item(false).await,
-                "",
+                None::<&str>,
                 verbosity,
                 Some(node_address),
             )
@@ -343,7 +367,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 get_dictionary_item(false).await,
-                "",
+                None::<&str>,
                 verbosity,
                 Some(node_address),
             )
@@ -364,7 +388,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 get_dictionary_item(true).await,
-                "",
+                None::<&str>,
                 verbosity,
                 Some(node_address),
             )
@@ -391,7 +415,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 DictionaryItemInput::Params(params),
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -413,7 +437,7 @@ mod tests {
         let result = sdk
             .get_dictionary_item(
                 get_dictionary_item(false).await,
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_dictionary_item does not support empty string as state_root_hash
+                Some("7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"), // get_dictionary_item does not support empty string as state_root_hash
                 None,
                 None,
             )

@@ -84,7 +84,7 @@ impl SDK {
     pub async fn query_contract_dict(
         &self,
         dictionary_item: DictionaryItemInput,
-        state_root_hash: impl ToDigest,
+        state_root_hash: Option<impl ToDigest>,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, Box<SdkError>> {
@@ -115,7 +115,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 get_dictionary_item(false).await,
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
+                Some("7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"), // query_contract_dict does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -149,7 +149,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 dictionary_item,
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -171,7 +171,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 get_dictionary_item(false).await,
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -193,7 +193,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 get_dictionary_item(false).await,
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -215,7 +215,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 get_dictionary_item(true).await,
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -242,7 +242,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 DictionaryItemInput::Params(params),
-                state_root_hash,
+                Some(state_root_hash),
                 verbosity,
                 Some(node_address),
             )
@@ -264,7 +264,7 @@ mod tests {
         let result = sdk
             .query_contract_dict(
                 get_dictionary_item(false).await,
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
+                Some("7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed"), // query_contract_dict does not support empty string as state_root_hash
                 None,
                 None,
             )

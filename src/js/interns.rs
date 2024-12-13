@@ -264,7 +264,7 @@ pub fn make_dictionary_item_key(key: &Key, value: &str) -> Result<String, JsErro
     // If value_as_u256 is zero, attempt to parse it as a key and return the result
     if value_as_u256 == U256::zero() {
         match Key::from_formatted_str(value) {
-            Ok(value_as_key) => Ok(make_dictionary_item_key_helper(&key, &value_as_key)),
+            Ok(value_as_key) => Ok(make_dictionary_item_key_helper(key, &value_as_key)),
             Err(err) => {
                 let error_text = format!("Error serializing key: {:?}", err);
                 Err(JsError::new(&error_text))
@@ -272,6 +272,6 @@ pub fn make_dictionary_item_key(key: &Key, value: &str) -> Result<String, JsErro
         }
     } else {
         // Otherwise, proceed with the original key and parsed value_as_u256
-        Ok(make_dictionary_item_key_helper(&key, &value_as_u256))
+        Ok(make_dictionary_item_key_helper(key, &value_as_u256))
     }
 }
