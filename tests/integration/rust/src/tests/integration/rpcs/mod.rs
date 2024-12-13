@@ -181,7 +181,7 @@ pub mod test_module {
         let purse_uref = GetBalanceInput::PurseUrefAsString(config.to_owned().purse_uref);
 
         let get_balance = create_test_sdk(Some(config))
-            .get_balance(state_root_hash, purse_uref, None, None)
+            .get_balance(purse_uref, state_root_hash, None, None)
             .await;
 
         let get_balance = get_balance.unwrap();
@@ -294,7 +294,7 @@ pub mod test_module {
         );
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk(Some(config))
-            .get_dictionary_item(state_root_hash, dictionary_item, None, None)
+            .get_dictionary_item(dictionary_item, state_root_hash, None, None)
             .await;
 
         let get_dictionary_item = get_dictionary_item.unwrap();
@@ -322,7 +322,7 @@ pub mod test_module {
         );
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk(Some(config))
-            .get_dictionary_item("", dictionary_item, None, None)
+            .get_dictionary_item(dictionary_item, "", None, None)
             .await;
 
         let get_dictionary_item = get_dictionary_item.unwrap();

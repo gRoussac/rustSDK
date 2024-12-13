@@ -83,13 +83,13 @@ impl SDK {
     /// A `Result` containing either a `SuccessResponse<_GetDictionaryItemResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_dict(
         &self,
-        state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
+        state_root_hash: impl ToDigest,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, SdkError> {
         // log("query_contract_dict!");
-        self.get_dictionary_item(state_root_hash, dictionary_item, verbosity, rpc_address)
+        self.get_dictionary_item(dictionary_item, state_root_hash, verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
     }
@@ -116,8 +116,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -150,8 +150,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                state_root_hash,
                 dictionary_item,
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -172,8 +172,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                state_root_hash,
                 get_dictionary_item(false).await,
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -193,8 +193,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                state_root_hash,
                 get_dictionary_item(false).await,
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -215,8 +215,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                state_root_hash,
                 get_dictionary_item(true).await,
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -242,8 +242,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                state_root_hash,
                 DictionaryItemInput::Params(params),
+                state_root_hash,
                 verbosity,
                 Some(rpc_address),
             )
@@ -264,8 +264,8 @@ mod tests {
         // Act
         let result = sdk
             .query_contract_dict(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
                 get_dictionary_item(false).await,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // query_contract_dict does not support empty string as state_root_hash
                 None,
                 None,
             )

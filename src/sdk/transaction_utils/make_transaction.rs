@@ -107,14 +107,8 @@ mod tests {
         )
         .unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);
@@ -141,13 +135,8 @@ mod tests {
         )
         .unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         // Act
         let result = sdk.make_transaction(builder_params, transaction_params);

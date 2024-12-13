@@ -71,11 +71,9 @@ pub struct TransactionBuilderParams {
     delegator: Option<PublicKey>,
     validator: Option<PublicKey>,
     new_validator: Option<PublicKey>,
-    minimum_delegation_amount: Option<u64>,
-    maximum_delegation_amount: Option<u64>,
-    transferred_value: Option<u64>,
-    seed: Option<Bytes>,
-    reserved_slots: Option<u32>,
+    minimum_delegation_amount: Option<Option<u64>>,
+    maximum_delegation_amount: Option<Option<u64>>,
+    reserved_slots: Option<Option<u32>>,
 }
 
 #[wasm_bindgen]
@@ -123,9 +121,7 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
             reserved_slots: None,
-            seed: None,
         }
     }
 
@@ -158,8 +154,6 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
-            seed: None,
             reserved_slots: None,
         }
     }
@@ -190,9 +184,7 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
             reserved_slots: None,
-            seed: None,
         }
     }
 
@@ -222,9 +214,7 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
             reserved_slots: None,
-            seed: None,
         }
     }
 
@@ -257,9 +247,7 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
             reserved_slots: None,
-            seed: None,
         }
     }
 
@@ -291,9 +279,7 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
             reserved_slots: None,
-            seed: None,
         }
     }
 
@@ -302,8 +288,8 @@ impl TransactionBuilderParams {
         public_key: PublicKey,
         delegation_rate: u8,
         amount: &str,
-        minimum_delegation_amount: u64,
-        maximum_delegation_amount: u64,
+        minimum_delegation_amount: Option<u64>,
+        maximum_delegation_amount: Option<u64>,
         reserved_slots: Option<u32>,
     ) -> TransactionBuilderParams {
         let amount = convert_amount(amount);
@@ -328,9 +314,7 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: Some(minimum_delegation_amount),
             maximum_delegation_amount: Some(maximum_delegation_amount),
-            transferred_value: None,
-            reserved_slots,
-            seed: None,
+            reserved_slots: Some(reserved_slots),
         }
     }
 
@@ -362,8 +346,6 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
-            seed: None,
             reserved_slots: None,
         }
     }
@@ -396,8 +378,6 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
-            seed: None,
             reserved_slots: None,
         }
     }
@@ -431,8 +411,6 @@ impl TransactionBuilderParams {
             new_validator: Some(new_validator),
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
-            seed: None,
             reserved_slots: None,
         }
     }
@@ -461,8 +439,6 @@ impl TransactionBuilderParams {
             new_validator: None,
             minimum_delegation_amount: None,
             maximum_delegation_amount: None,
-            transferred_value: None,
-            seed: None,
             reserved_slots: None,
         }
     }
@@ -630,21 +606,21 @@ impl TransactionBuilderParams {
 
     #[wasm_bindgen(getter)]
     pub fn minimum_delegation_amount(&self) -> Option<u64> {
-        self.minimum_delegation_amount
+        self.minimum_delegation_amount.unwrap_or(None)
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_minimum_delegation_amount(&mut self, minimum_delegation_amount: u64) {
+    pub fn set_minimum_delegation_amount(&mut self, minimum_delegation_amount: Option<u64>) {
         self.minimum_delegation_amount = Some(minimum_delegation_amount);
     }
 
     #[wasm_bindgen(getter)]
     pub fn maximum_delegation_amount(&self) -> Option<u64> {
-        self.maximum_delegation_amount
+        self.maximum_delegation_amount.unwrap_or(None)
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_maximum_delegation_amount(&mut self, maximum_delegation_amount: u64) {
+    pub fn set_maximum_delegation_amount(&mut self, maximum_delegation_amount: Option<u64>) {
         self.maximum_delegation_amount = Some(maximum_delegation_amount);
     }
 
@@ -699,7 +675,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODo FIX Runtime
+            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
         },
         TransactionKind::InvocableEntityAlias => _TransactionBuilderParams::InvocableEntityAlias {
             entity_alias: transaction_params
@@ -710,7 +686,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODo FIX Runtime
+            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
         },
         TransactionKind::Package => _TransactionBuilderParams::Package {
             package_hash: transaction_params.package_hash.unwrap().into(),
@@ -719,7 +695,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODo FIX Runtime
+            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
         },
         TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAlias {
             package_alias: transaction_params
@@ -731,15 +707,15 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODo FIX Runtime
+            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
         },
         TransactionKind::AddBid => _TransactionBuilderParams::AddBid {
             public_key: transaction_params.public_key.clone().unwrap().into(),
             delegation_rate: transaction_params.delegation_rate.unwrap(),
             amount: transaction_params.amount.unwrap_or_default(),
-            minimum_delegation_amount: transaction_params.minimum_delegation_amount,
-            maximum_delegation_amount: transaction_params.maximum_delegation_amount,
-            reserved_slots: transaction_params.reserved_slots,
+            minimum_delegation_amount: transaction_params.minimum_delegation_amount.unwrap(),
+            maximum_delegation_amount: transaction_params.maximum_delegation_amount.unwrap(),
+            reserved_slots: transaction_params.reserved_slots.unwrap(),
         },
         TransactionKind::Delegate => _TransactionBuilderParams::Delegate {
             delegator: transaction_params.delegator.clone().unwrap().into(),

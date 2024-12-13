@@ -39,14 +39,8 @@ pub mod test_module_transaction {
             "entity-contract-fd5b4bee73d43371afbbd8556d3e289c87affd5691bc1e6ef7472cd066963cf7";
         let entity_addr = EntityAddr::from_formatted_str(entity_hash_string).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
@@ -91,14 +85,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -204,14 +192,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
@@ -232,14 +214,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -275,13 +251,9 @@ pub mod test_module_transaction {
             Some(TTL.to_string()),
         );
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
         let builder_params = TransactionBuilderParams::new_invocable_entity_alias(
             CONTRACT_CEP78_KEY,
             ENTRYPOINT_MINT,
-            transferred_value,
         );
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
@@ -307,15 +279,8 @@ pub mod test_module_transaction {
         let package_hash =
             PackageHash::from_formatted_str(&config.contract_cep78_package_hash).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_package(
-            package_hash,
-            ENTRYPOINT_MINT,
-            None,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_package(package_hash, ENTRYPOINT_MINT, None);
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -352,16 +317,7 @@ pub mod test_module_transaction {
 
         let transaction_bytes: Bytes = Vec::from([0]).into();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-        let seed = None;
-
-        let builder_params = TransactionBuilderParams::new_session(
-            Some(transaction_bytes),
-            None,
-            transferred_value,
-            seed,
-        );
+        let builder_params = TransactionBuilderParams::new_session(Some(transaction_bytes), None);
 
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
@@ -520,14 +476,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -552,14 +502,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
@@ -581,14 +525,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
         assert!(transaction.verify());
@@ -607,14 +545,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -641,14 +573,8 @@ pub mod test_module_transaction {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();

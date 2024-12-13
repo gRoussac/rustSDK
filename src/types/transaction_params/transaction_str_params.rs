@@ -25,7 +25,6 @@ pub struct TransactionStrParams {
     receipt: OnceCell<String>,
     standard_payment: OnceCell<bool>,
     transferred_value: OnceCell<String>,
-    reserved_slots: OnceCell<Option<u32>>,
     session_entry_point: OnceCell<String>,
     chunked_args: OnceCell<Bytes>,
 }
@@ -105,6 +104,7 @@ impl TransactionStrParams {
         if let Some(chunked_args) = chunked_args {
             transaction_params.set_chunked_args(chunked_args);
         }
+
         transaction_params
     }
 

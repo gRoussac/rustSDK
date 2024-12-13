@@ -135,7 +135,7 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_balance(hash, purse_uref, verbosity, rpc_address)
+            self.get_balance(purse_uref, hash, verbosity, rpc_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
             let hash = if !hash.is_empty() {
@@ -146,10 +146,10 @@ impl SDK {
             } else {
                 "".to_string()
             };
-            self.get_balance(&*hash, purse_uref, verbosity, rpc_address)
+            self.get_balance(purse_uref, hash.as_str(), verbosity, rpc_address)
                 .await
         } else {
-            self.get_balance("", purse_uref, verbosity, rpc_address)
+            self.get_balance(purse_uref, "", verbosity, rpc_address)
                 .await
         };
 
@@ -208,8 +208,8 @@ impl SDK {
     /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_balance(
         &self,
-        state_root_hash: impl ToDigest,
         purse_uref: GetBalanceInput,
+        state_root_hash: impl ToDigest,
         verbosity: Option<Verbosity>,
         rpc_address: Option<String>,
     ) -> Result<SuccessResponse<_GetBalanceResult>, SdkError> {
@@ -300,8 +300,8 @@ mod tests {
         // Act
         let result = sdk
             .get_balance(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 purse_uref,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 None,
                 None,
             )
@@ -322,7 +322,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(rpc_address))
+            .get_balance(purse_uref, "", None, Some(rpc_address))
             .await;
 
         // Assert
@@ -339,7 +339,7 @@ mod tests {
 
         // Act
         let result = sdk
-            .get_balance("", purse_uref, None, Some(rpc_address))
+            .get_balance(purse_uref, "", None, Some(rpc_address))
             .await;
 
         // Assert
@@ -365,8 +365,8 @@ mod tests {
         // Act
         let result = sdk
             .get_balance(
-                state_root_hash.to_digest(),
                 purse_uref,
+                state_root_hash.to_digest(),
                 None,
                 Some(rpc_address),
             )
@@ -385,8 +385,8 @@ mod tests {
         // Act
         let result = sdk
             .get_balance(
-                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 purse_uref,
+                "7d3dc9c74fe93e83fe6cc7a9830ba223035ad4fd4fd464489640742069ca31ed", // get_balance does not support empty string as state_root_hash
                 None,
                 None,
             )

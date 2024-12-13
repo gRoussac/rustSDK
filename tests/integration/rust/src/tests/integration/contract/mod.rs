@@ -189,7 +189,7 @@ pub mod test_module {
         params.set_dictionary(&config.dictionary_key);
         let dictionary_item = DictionaryItemInput::Params(params);
         let query_contract_dict = create_test_sdk(Some(config))
-            .query_contract_dict(state_root_hash, dictionary_item, None, None)
+            .query_contract_dict(dictionary_item, state_root_hash, None, None)
             .await;
 
         let query_contract_dict = query_contract_dict.unwrap();
@@ -223,7 +223,7 @@ pub mod test_module {
         params.set_uref(&config.dictionary_uref, DICTIONARY_ITEM_KEY);
         let dictionary_item = DictionaryItemInput::Params(params);
         let query_contract_dict = create_test_sdk(Some(config))
-            .query_contract_dict(state_root_hash, dictionary_item, None, None)
+            .query_contract_dict(dictionary_item, state_root_hash, None, None)
             .await;
 
         let query_contract_dict = query_contract_dict.unwrap();
@@ -283,14 +283,8 @@ pub mod test_module {
 
         let entity_addr = EntityAddr::from_formatted_str(&config.contract_cep78_key).unwrap();
 
-        // TODO Fix transferred_value
-        let transferred_value = None;
-
-        let builder_params = TransactionBuilderParams::new_invocable_entity(
-            entity_addr.into(),
-            ENTRYPOINT_MINT,
-            transferred_value,
-        );
+        let builder_params =
+            TransactionBuilderParams::new_invocable_entity(entity_addr.into(), ENTRYPOINT_MINT);
 
         let test_call_entrypoint_transaction = create_test_sdk(Some(config))
             .call_entrypoint(builder_params, transaction_params, None)

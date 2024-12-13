@@ -502,7 +502,7 @@ mod tests {
         assert_eq!(ttl_value, "1h".to_string());
 
         let default_ttl = get_ttl_or_default(None);
-        assert_eq!(default_ttl, DeployBuilder::DEFAULT_TTL.to_string());
+        assert_eq!(default_ttl, DEFAULT_TTL.to_string());
     }
 
     #[test]
@@ -534,7 +534,7 @@ mod tests {
         assert_eq!(price, 100);
 
         let default_price = get_gas_price_or_default(None);
-        assert_eq!(default_price, DeployBuilder::DEFAULT_GAS_PRICE);
+        assert_eq!(default_price, DEFAULT_GAS_PRICE);
     }
 
     #[test]
