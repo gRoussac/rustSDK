@@ -149,13 +149,13 @@ impl SDK {
         };
 
         let result = if let Some(hash) = state_root_hash {
-            self.get_dictionary_item(hash, dictionary_item, verbosity, node_address)
+            self.get_dictionary_item(dictionary_item, hash, verbosity, node_address)
                 .await
         } else if let Some(hash) = state_root_hash_as_string.clone() {
-            self.get_dictionary_item(hash.as_str(), dictionary_item, verbosity, node_address)
+            self.get_dictionary_item(dictionary_item, hash.as_str(), verbosity, node_address)
                 .await
         } else {
-            self.get_dictionary_item("", dictionary_item, verbosity, node_address)
+            self.get_dictionary_item(dictionary_item, "", verbosity, node_address)
                 .await
         };
 
@@ -202,8 +202,8 @@ impl SDK {
     /// Returns a `SdkError` if there is an error during the retrieval process.
     pub async fn get_dictionary_item(
         &self,
-        state_root_hash: impl ToDigest,
         dictionary_item_input: DictionaryItemInput,
+        state_root_hash: impl ToDigest,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, Box<SdkError>> {

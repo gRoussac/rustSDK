@@ -88,8 +88,8 @@ pub(crate) mod intern {
         let dictionary_item = DictionaryItemInput::Params(params);
         let get_dictionary_item = create_test_sdk(None)
             .get_dictionary_item(
-                get_state_root_hash.unwrap_or_default(),
                 dictionary_item,
+                get_state_root_hash.unwrap_or_default(),
                 None,
                 node_address,
             )

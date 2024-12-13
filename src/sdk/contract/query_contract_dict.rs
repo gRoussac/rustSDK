@@ -83,13 +83,13 @@ impl SDK {
     /// A `Result` containing either a `SuccessResponse<GetDictionaryItemResult>` or a `SdkError` in case of an error.
     pub async fn query_contract_dict(
         &self,
-        state_root_hash: impl ToDigest,
         dictionary_item: DictionaryItemInput,
+        state_root_hash: impl ToDigest,
         verbosity: Option<Verbosity>,
         node_address: Option<String>,
     ) -> Result<SuccessResponse<_GetDictionaryItemResult>, Box<SdkError>> {
         // log("query_contract_dict!");
-        self.get_dictionary_item(state_root_hash, dictionary_item, verbosity, node_address)
+        self.get_dictionary_item(dictionary_item, state_root_hash, verbosity, node_address)
             .await
     }
 }

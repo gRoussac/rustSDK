@@ -1,7 +1,13 @@
+use super::account_hash::AccountHash;
+#[cfg(target_arch = "wasm32")]
 use super::addr::transfer_addr::TransferAddr;
+#[cfg(target_arch = "wasm32")]
 use super::addr::{dictionary_addr::DictionaryAddr, hash_addr::HashAddr, uref_addr::URefAddr};
+#[cfg(target_arch = "wasm32")]
+use super::deploy_hash::DeployHash;
+#[cfg(target_arch = "wasm32")]
 use super::era_id::EraId;
-use super::{account_hash::AccountHash, deploy_hash::DeployHash, uref::URef};
+use super::uref::URef;
 use crate::types::sdk_error::SdkError;
 use casper_types::bytesrepr::ToBytes;
 use casper_types::Key as _Key;
@@ -15,6 +21,7 @@ use wasm_bindgen::prelude::*;
 pub struct Key(_Key);
 
 #[wasm_bindgen]
+#[cfg(target_arch = "wasm32")]
 impl Key {
     #[wasm_bindgen(constructor)]
     pub fn new(key: Key) -> Result<Key, JsError> {
@@ -39,8 +46,8 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "fromAccount")]
-    pub fn from_account(key: AccountHash) -> Self {
-        Self(_Key::Account(key.into()))
+    pub fn from_account_js_alias(key: AccountHash) -> Self {
+        Self::from_account(key.into())
     }
 
     #[wasm_bindgen]
@@ -110,8 +117,8 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "toFormattedString")]
-    pub fn to_formatted_string(&self) -> String {
-        _Key::to_formatted_string(self.0)
+    pub fn to_formatted_string_js_alias(&self) -> String {
+        Self::to_formatted_string(self)
     }
 
     #[wasm_bindgen(js_name = "fromFormattedString")]
@@ -158,11 +165,8 @@ impl Key {
     }
 
     #[wasm_bindgen(js_name = "intoURef")]
-    pub fn into_uref(self) -> Option<URef> {
-        match self.0 {
-            _Key::URef(uref) => Some(uref.into()),
-            _ => None,
-        }
+    pub fn into_uref_js_alias(self) -> Option<URef> {
+        Self::into_uref(self)
     }
 
     #[wasm_bindgen(js_name = "urefToHash")]
@@ -193,6 +197,21 @@ impl Key {
                     error,
                 })
             })
+    }
+
+    pub fn to_formatted_string(&self) -> String {
+        _Key::to_formatted_string(self.0)
+    }
+
+    pub fn from_account(key: AccountHash) -> Self {
+        Self(_Key::Account(key.into()))
+    }
+
+    pub fn into_uref(self) -> Option<URef> {
+        match self.0 {
+            _Key::URef(uref) => Some(uref.into()),
+            _ => None,
+        }
     }
 }
 
