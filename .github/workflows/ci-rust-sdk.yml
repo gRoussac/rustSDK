@@ -63,7 +63,7 @@ jobs:
         run: |
           git clone --branch dist_folder https://github.com/casper-network/casper-node-launcher-js.git
           cd casper-node-launcher-js
-          npm install -g
+          npm install
           casper-node-launcher-js node --daemon
 
       - name: Unit Tests
