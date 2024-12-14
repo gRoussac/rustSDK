@@ -60,7 +60,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Casper node launcher js
-        git clone --branch dist_folder https://github.com/casper-network/casper-node-launcher-js.git
+        run: git clone --branch dist_folder https://github.com/casper-network/casper-node-launcher-js.git
         cd casper-node-launcher-js
         npm install
         node --daemon
