@@ -60,10 +60,11 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Casper node launcher js
-        run: git clone --branch dist_folder https://github.com/casper-network/casper-node-launcher-js.git
-        cd casper-node-launcher-js
-        npm install
-        node --daemon
+        run: |
+          git clone --branch dist_folder https://github.com/casper-network/casper-node-launcher-js.git
+          cd casper-node-launcher-js
+          npm install
+          node --daemon
 
       - name: Unit Tests
         run: make test
