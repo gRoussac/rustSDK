@@ -65,7 +65,7 @@ jobs:
           cd casper-node-launcher-js
           npm install
           npm run build
-          npx casper-node-launcher-js node
+          npx casper-node-launcher-js node --daemon
 
       - name: Unit Tests
         run: make test
