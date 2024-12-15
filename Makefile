@@ -28,11 +28,11 @@ integration-test:
 	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
 
 start-app:
-	(cd examples/frontend/angular/ && npm ci && npm run build-proxy-conf && npm start &) && \
+	(cd examples/frontend/angular/ && npm install && npm run build-proxy-conf && npm start &) && \
 	until curl -s -o /dev/null http://localhost:4200; do sleep 5; done
 
 run-e2e-tests:
-	cd tests/e2e && npm ci && npm test
+	cd tests/e2e && npm install && npm test
 
 e2e-test: start-app run-e2e-tests
 
