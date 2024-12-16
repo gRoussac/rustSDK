@@ -267,8 +267,6 @@ pub(crate) mod intern {
             .unwrap();
         assert_eq!(transaction.hash.to_string(), transaction_hash_as_string);
 
-        dbg!(&transaction_hash_as_string);
-
         let get_transaction = sdk
             .get_transaction(
                 transaction_hash,
@@ -433,6 +431,8 @@ pub async fn get_contract_cep78_hash_keys(
         .unwrap();
 
     let named_keys = account.named_keys.clone();
+
+    dbg!(&named_keys);
 
     let (_, contract_cep78_key) = named_keys
         .iter()

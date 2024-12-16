@@ -108,6 +108,7 @@ mod tests {
         // Arrange
         let sdk = SDK::new(None, None, None);
         let transaction_params = TransactionStrParams::default();
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         let transaction_bytes = Bytes::default();
 
         let error_message =
@@ -121,6 +122,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
+
         assert!(err_string.contains(error_message));
     }
 
@@ -173,6 +175,7 @@ mod tests {
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name("test");
         transaction_params.set_session_args_simple(ARGS.to_vec());
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let transaction_bytes = match read_wasm_file(&format!("{WASM_PATH}{HELLO_CONTRACT}")) {
             Ok(transaction_bytes) => transaction_bytes,

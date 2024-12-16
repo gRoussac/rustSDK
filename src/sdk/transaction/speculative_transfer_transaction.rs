@@ -195,6 +195,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_secret_key(&secret_key);
+        transaction_params.set_payment_amount(PAYMENT_TRANSFER_AMOUNT);
 
         // Act
         let result = sdk
