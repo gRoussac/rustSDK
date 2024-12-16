@@ -188,4 +188,28 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     let transaction = await this.clientService.transaction(false, true, this.wasm) as Transaction;
     return await this.binaryService.get_binary_try_speculative_execution(transaction);
   }
+
+  private async install_deploy() {
+    return await this.clientService.install_deploy(this.wasm);
+  }
+
+  private async install() {
+    return await this.clientService.install(this.wasm);
+  }
+
+  private async make_deploy() {
+    return await this.clientService.make_deploy(this.wasm);
+  }
+
+  private async make_transaction() {
+    return await this.clientService.make_transaction(this.wasm);
+  }
+
+  private async speculative_deploy() {
+    return await this.clientService.speculative_deploy(this.wasm);
+  }
+
+  private async speculative_transaction() {
+    return await this.clientService.speculative_transaction(this.wasm);
+  }
 }

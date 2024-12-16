@@ -427,6 +427,7 @@ export class ClientService {
     const gas_price_tolerance: string = this.getIdentifier('gasPriceTolerance')?.value?.trim() || '';
     const pricing_mode: PricingMode = this.getIdentifier('selectPricingMode')?.value?.trim() || '';
     const additional_computation_factor: string = this.getIdentifier('additionalComputationFactor')?.value?.trim() || '';
+
     if (!deploy_result && !this.public_key) {
       const err = "public_key is missing";
       err && (this.errorService.setError(err.toString()));
@@ -526,6 +527,7 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
+
     const wasmBuffer = wasm?.buffer;
     if (!wasmBuffer) {
       const err = "wasmBuffer is missing";
@@ -561,6 +563,7 @@ export class ClientService {
       err && (this.errorService.setError(err.toString()));
       return;
     }
+
     const wasmBuffer = wasm?.buffer;
     if (!wasmBuffer) {
       const err = "wasmBuffer is missing";
@@ -574,6 +577,17 @@ export class ClientService {
     );
     transaction_params.payment_amount = payment_amount;
     transaction_params = this.addTransactionArgs(transaction_params);
+
+    const gas_price_tolerance: string = this.getIdentifier('gasPriceTolerance')?.value?.trim() || '';
+    const pricing_mode: PricingMode = this.getIdentifier('selectPricingMode')?.value?.trim() || '';
+    const additional_computation_factor: string = this.getIdentifier('additionalComputationFactor')?.value?.trim() || '';
+
+    gas_price_tolerance && (transaction_params.gas_price_tolerance = gas_price_tolerance);
+    pricing_mode && (transaction_params.pricing_mode = pricing_mode);
+
+    if (pricing_mode == PricingMode.Fixed) {
+      transaction_params.additional_computation_factor = additional_computation_factor;
+    }
 
     try {
       const install = wasm && await this.sdk.install(

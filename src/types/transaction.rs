@@ -29,6 +29,7 @@ use crate::{
         transaction_params::transaction_builder_params::{TransferTarget, TransferTargetKind},
     },
 };
+use casper_types::PricingMode as _PricingMode;
 use casper_types::{
     account::AccountHash as _AccountHash,
     bytesrepr::{self, Bytes as _Bytes, ToBytes},
@@ -518,6 +519,25 @@ impl Transaction {
     }
 
     #[wasm_bindgen(getter)]
+    pub fn payment_amount(&self) -> Option<u64> {
+        match &self.0 {
+            _Transaction::Deploy(_deploy) => _deploy
+                .session()
+                .payment_amount(1u8)
+                .map(|g| g.value().as_u64()),
+            _Transaction::V1(transaction_v1) => {
+                if let _PricingMode::PaymentLimited { payment_amount, .. } =
+                    transaction_v1.pricing_mode()
+                {
+                    Some(*payment_amount)
+                } else {
+                    None
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter)]
     pub fn additional_computation_factor(&self) -> u8 {
         match &self.0 {
             _Transaction::Deploy(_deploy) => {
@@ -741,6 +761,26 @@ impl Transaction {
         } else {
             self.pricing_mode()
         };
+
+        if pricing_mode == PricingMode::Classic {
+            let payment_amount = if let Some(payment_amount) = transaction_params.payment_amount() {
+                payment_amount
+            } else {
+                self.payment_amount().unwrap_or_default().to_string()
+            };
+            if !payment_amount.is_empty() {
+                new_transaction_params.set_payment_amount(&payment_amount);
+            }
+        }
+
+        let standard_payment = if let Some(standard_payment) = transaction_params.standard_payment()
+        {
+            standard_payment
+        } else {
+            self.is_standard_payment()
+        };
+
+        new_transaction_params.set_standard_payment(standard_payment);
 
         let receipt = if pricing_mode == PricingMode::Reserved {
             if let Some(receipt) = transaction_params.receipt() {
@@ -1005,7 +1045,10 @@ impl From<TransactionV1> for Transaction {
 mod tests {
     use super::*;
     use crate::helpers::public_key_from_secret_key;
-    use sdk_tests::tests::helpers::{get_network_constants, get_user_secret_key};
+    use sdk_tests::{
+        config::PAYMENT_AMOUNT,
+        tests::helpers::{get_network_constants, get_user_secret_key},
+    };
 
     #[test]
     fn test_args_to_json_array() {
@@ -1033,6 +1076,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let builder_params = TransactionBuilderParams::default();
         let transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -1060,6 +1104,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let builder_params = TransactionBuilderParams::default();
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();
@@ -1083,6 +1128,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_chain_name(&chain_name);
         transaction_params.set_initiator_addr(&initiator_addr);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         let builder_params = TransactionBuilderParams::default();
         let mut transaction = Transaction::new_session(builder_params, transaction_params).unwrap();

@@ -29,7 +29,7 @@ pub struct TransactionStrParams {
     chunked_args: OnceCell<Bytes>,
 }
 
-const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Fixed;
+const DEFAULT_PRICING_MODE: PricingMode = PricingMode::Classic;
 pub const DEFAULT_TTL: &str = "30m";
 pub const DEFAULT_GAS_PRICE: u64 = 1;
 const DEFAULT_ADDITIONAL_COMPUTATION_FACTOR: u8 = 0;
@@ -358,6 +358,7 @@ pub fn transaction_str_params_to_casper_client(
     if transaction_params.gas_price_tolerance.get().is_none() {
         transaction_params.set_gas_price_tolerance(&DEFAULT_GAS_PRICE.to_string());
     }
+
     if transaction_params.standard_payment.get().is_none() {
         transaction_params.set_standard_payment(DEFAULT_STANDARD_PAYMENT);
     }

@@ -211,6 +211,7 @@ mod tests {
         let transaction_params = TransactionStrParams::default();
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name(&chain_name);
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
 
         // Act
         let result = sdk
@@ -225,6 +226,7 @@ mod tests {
         // Assert
         assert!(result.is_err());
         let err_string = result.err().unwrap().to_string();
+
         assert!(err_string.contains(error_message));
     }
 }

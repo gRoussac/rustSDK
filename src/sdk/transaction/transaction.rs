@@ -137,7 +137,6 @@ impl SDK {
                 return Err(SdkError::from(err));
             }
         };
-
         self.put_transaction(transaction.into(), verbosity, rpc_address)
             .await
             .map_err(SdkError::from)
@@ -258,6 +257,7 @@ mod tests {
         let secret_key = get_user_secret_key(None).unwrap();
 
         let transaction_params = TransactionStrParams::default();
+        transaction_params.set_payment_amount(PAYMENT_AMOUNT);
         transaction_params.set_secret_key(&secret_key);
         transaction_params.set_chain_name("");
 
