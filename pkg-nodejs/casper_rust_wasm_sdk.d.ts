@@ -1487,7 +1487,7 @@ export class SDK {
    */
   account_put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
   /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
+   * Installs a smart contract with the specified parameters and returns the result.
    *
    * # Arguments
    *
@@ -1502,9 +1502,9 @@ export class SDK {
    *
    * # Errors
    *
-   * Returns a `JsError` if there is an error during the call.
+   * Returns a `JsError` if there is an error during the installation.
    */
-  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
   /**
    * JS Alias for transferring funds.
    *
@@ -1524,7 +1524,7 @@ export class SDK {
    */
   transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
   /**
-   * Installs a smart contract with the specified parameters and returns the result.
+   * Calls a smart contract entry point with the specified parameters and returns the result.
    *
    * # Arguments
    *
@@ -1539,9 +1539,9 @@ export class SDK {
    *
    * # Errors
    *
-   * Returns a `JsError` if there is an error during the installation.
+   * Returns a `JsError` if there is an error during the call.
    */
-  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
   /**
    * JS Alias for speculative transfer.
    *

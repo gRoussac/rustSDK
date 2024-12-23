@@ -6127,7 +6127,7 @@ export class SDK {
         return ret;
     }
     /**
-     * Calls a smart contract entry point with the specified parameters and returns the result.
+     * Installs a smart contract with the specified parameters and returns the result.
      *
      * # Arguments
      *
@@ -6142,14 +6142,14 @@ export class SDK {
      *
      * # Errors
      *
-     * Returns a `JsError` if there is an error during the call.
+     * Returns a `JsError` if there is an error during the installation.
      * @param {DeployStrParams} deploy_params
      * @param {SessionStrParams} session_params
      * @param {string} payment_amount
      * @param {string | undefined} [node_address]
      * @returns {Promise<PutDeployResult>}
      */
-    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
+    install(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -6158,7 +6158,7 @@ export class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return ret;
     }
     /**
@@ -6203,7 +6203,7 @@ export class SDK {
         return ret;
     }
     /**
-     * Installs a smart contract with the specified parameters and returns the result.
+     * Calls a smart contract entry point with the specified parameters and returns the result.
      *
      * # Arguments
      *
@@ -6218,14 +6218,14 @@ export class SDK {
      *
      * # Errors
      *
-     * Returns a `JsError` if there is an error during the installation.
+     * Returns a `JsError` if there is an error during the call.
      * @param {DeployStrParams} deploy_params
      * @param {SessionStrParams} session_params
      * @param {string} payment_amount
      * @param {string | undefined} [node_address]
      * @returns {Promise<PutDeployResult>}
      */
-    install(deploy_params, session_params, payment_amount, node_address) {
+    call_entrypoint(deploy_params, session_params, payment_amount, node_address) {
         _assertClass(deploy_params, DeployStrParams);
         var ptr0 = deploy_params.__destroy_into_raw();
         _assertClass(session_params, SessionStrParams);
@@ -6234,7 +6234,7 @@ export class SDK {
         const len2 = WASM_VECTOR_LEN;
         var ptr3 = isLikeNone(node_address) ? 0 : passStringToWasm0(node_address, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len3 = WASM_VECTOR_LEN;
-        const ret = wasm.sdk_install(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
+        const ret = wasm.sdk_call_entrypoint(this.__wbg_ptr, ptr0, ptr1, ptr2, len2, ptr3, len3);
         return ret;
     }
     /**
@@ -9661,11 +9661,11 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper4297 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper4301 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 821, __wbg_adapter_36);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper4306 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper4310 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 828, __wbg_adapter_39);
         return ret;
     };

@@ -55,8 +55,8 @@ path = "src/main.rs"
 doc = false
 
 [patch.crates-io]
-casper-hashing = { version = "3.0.0", git = "https://github.com/casper-network/casper-node", branch = "dev" }
-casper-types = { version = "4.0.1", git = "https://github.com/casper-network/casper-node", branch = "dev" }
+casper-hashing = { version = "3.0.0", git = "https://github.com/casper-network/casper-node", rev = "cb932c54ce34f728e1ce1f1a78b5a0a5affed7c2" }
+casper-types = { version = "4.0.1", git = "https://github.com/casper-network/casper-node", rev = "cb932c54ce34f728e1ce1f1a78b5a0a5affed7c2" }
 casper-client = { version = "2.0.0", git = "https://github.com/casper-ecosystem/casper-client-rs", branch = "dev" }
 
 [profile.release]

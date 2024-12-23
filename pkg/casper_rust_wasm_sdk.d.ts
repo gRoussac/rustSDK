@@ -1487,7 +1487,7 @@ export class SDK {
    */
   account_put_deploy(deploy: Deploy, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
   /**
-   * Calls a smart contract entry point with the specified parameters and returns the result.
+   * Installs a smart contract with the specified parameters and returns the result.
    *
    * # Arguments
    *
@@ -1502,9 +1502,9 @@ export class SDK {
    *
    * # Errors
    *
-   * Returns a `JsError` if there is an error during the call.
+   * Returns a `JsError` if there is an error during the installation.
    */
-  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
   /**
    * JS Alias for transferring funds.
    *
@@ -1524,7 +1524,7 @@ export class SDK {
    */
   transfer(amount: string, target_account: string, transfer_id: string | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity, node_address?: string): Promise<PutDeployResult>;
   /**
-   * Installs a smart contract with the specified parameters and returns the result.
+   * Calls a smart contract entry point with the specified parameters and returns the result.
    *
    * # Arguments
    *
@@ -1539,9 +1539,9 @@ export class SDK {
    *
    * # Errors
    *
-   * Returns a `JsError` if there is an error during the installation.
+   * Returns a `JsError` if there is an error during the call.
    */
-  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
+  call_entrypoint(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string): Promise<PutDeployResult>;
   /**
    * JS Alias for speculative transfer.
    *
@@ -2215,9 +2215,9 @@ export interface InitOutput {
   readonly __wbg_get_failure_error_message: (a: number) => [number, number];
   readonly __wbg_get_success_cost: (a: number) => [number, number];
   readonly __wbg_get_deploysubscription_deployHash: (a: number) => [number, number];
-  readonly __wbg_hashaddr_free: (a: number, b: number) => void;
-  readonly hashaddr_new: (a: number, b: number) => [number, number, number];
+  readonly __wbg_transferaddr_free: (a: number, b: number) => void;
   readonly transferaddr_new: (a: number, b: number) => [number, number, number];
+  readonly urefaddr_new: (a: number, b: number) => [number, number, number];
   readonly __wbg_getauctioninforesult_free: (a: number, b: number) => void;
   readonly getauctioninforesult_api_version: (a: number) => any;
   readonly getauctioninforesult_auction_state: (a: number) => any;
@@ -2281,7 +2281,7 @@ export interface InitOutput {
   readonly __wbg_set_geterainfooptions_verbosity: (a: number, b: number) => void;
   readonly __wbg_set_geterainfooptions_maybe_block_id_as_string: (a: number, b: number, c: number) => void;
   readonly __wbg_set_geterainfooptions_node_address: (a: number, b: number, c: number) => void;
-  readonly __wbg_transferaddr_free: (a: number, b: number) => void;
+  readonly __wbg_urefaddr_free: (a: number, b: number) => void;
   readonly __wbg_get_geterainfooptions_maybe_block_id_as_string: (a: number) => [number, number];
   readonly __wbg_get_geterainfooptions_node_address: (a: number) => [number, number];
   readonly __wbg_get_geterainfooptions_verbosity: (a: number) => number;
@@ -2310,8 +2310,8 @@ export interface InitOutput {
   readonly casperwallet_switchAccount: (a: number) => any;
   readonly __wbg_dictionaryaddr_free: (a: number, b: number) => void;
   readonly dictionaryaddr_new: (a: number, b: number) => [number, number, number];
-  readonly __wbg_urefaddr_free: (a: number, b: number) => void;
-  readonly urefaddr_new: (a: number, b: number) => [number, number, number];
+  readonly __wbg_hashaddr_free: (a: number, b: number) => void;
+  readonly hashaddr_new: (a: number, b: number) => [number, number, number];
   readonly __wbg_contractpackagehash_free: (a: number, b: number) => void;
   readonly contractpackagehash_new_js_alias: (a: number, b: number) => [number, number, number];
   readonly contractpackagehash_fromFormattedStr: (a: number, b: number) => [number, number, number];
@@ -2492,7 +2492,7 @@ export interface InitOutput {
   readonly purseidentifier_toJson: (a: number) => any;
   readonly sdk_put_deploy: (a: number, b: number, c: number, d: number, e: number) => any;
   readonly sdk_account_put_deploy: (a: number, b: number, c: number, d: number, e: number) => any;
-  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
+  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
   readonly __wbg_sessionstrparams_free: (a: number, b: number) => void;
   readonly sessionstrparams_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number, t: number, u: number) => number;
   readonly sessionstrparams_session_hash: (a: number) => [number, number];
@@ -2524,7 +2524,7 @@ export interface InitOutput {
   readonly signatureresponse_get_signature_hex: (a: number) => [number, number];
   readonly signatureresponse_get_signature: (a: number) => [number, number];
   readonly sdk_transfer: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => any;
-  readonly sdk_install: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
+  readonly sdk_call_entrypoint: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => any;
   readonly __wbg_accessrights_free: (a: number, b: number) => void;
   readonly accessrights_NONE: () => number;
   readonly accessrights_READ: () => number;
