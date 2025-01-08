@@ -203,6 +203,29 @@ pub fn get_base64_key_from_package_hash(formatted_hash: &str) -> Result<String, 
     Ok(general_purpose::STANDARD.encode(key)) // base64.encode
 }
 
+/// Converts a formatted key hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_hash` - A hex-formatted string representing the key hash.
+/// Example: "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// Returns a `Result` containing the base64-encoded string on success.
+/// Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+///
+/// # Errors
+///
+/// This function returns an error if:
+/// - The input string is not a valid formatted key hash.
+/// - The conversion to bytes or base64 encoding fails.
+pub fn get_base64_key_from_key_hash(formatted_hash: &str) -> Result<String, Box<SdkError>> {
+    let key = Key::from_formatted_str(formatted_hash)?;
+    let key = key.to_bytes().unwrap();
+    Ok(general_purpose::STANDARD.encode(key)) // base64.encode
+}
+
 /// Gets the time to live (TTL) value or returns the default value if not provided.
 ///
 /// # Arguments
@@ -812,6 +835,19 @@ mod tests {
 
         // Call the function under test
         let result = get_base64_key_from_package_hash(input_hash).unwrap();
+
+        // Check the result against the expected output
+        assert_eq!(result, expected_output.to_string());
+    }
+
+    #[test]
+    fn test_get_base64_key_from_key_hash() {
+        // Test with a known input and expected output
+        let input_hash = "hash-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f";
+        let expected_output = "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf";
+
+        // Call the function under test
+        let result = get_base64_key_from_key_hash(input_hash).unwrap();
 
         // Check the result against the expected output
         assert_eq!(result, expected_output.to_string());
