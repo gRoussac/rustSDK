@@ -1,5 +1,7 @@
 use crate::helpers::{
-    get_base64_key_from_account_hash, get_blake2b_hash, get_current_timestamp, hex_to_uint8_vec,
+    get_base64_key_from_account_hash, get_base64_key_from_contract_hash,
+    get_base64_key_from_key_hash, get_base64_key_from_package_hash, get_blake2b_hash,
+    get_current_timestamp, hex_to_uint8_vec,
     make_dictionary_item_key as make_dictionary_item_key_helper, public_key_from_secret_key,
     secret_key_generate, secret_key_secp256k1_generate,
 };
