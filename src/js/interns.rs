@@ -221,6 +221,66 @@ pub fn get_base64_key_from_account_hash_js_alias(
     })
 }
 
+/// Converts a formatted contract hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_contract_hash` - A hex-formatted string representing the contract hash.
+///   Example: "contract-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// * `Ok(String)` - The base64-encoded string if the conversion succeeds.
+///   Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+/// * `Err(JsError)` - A JavaScript-compatible error if the conversion fails.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - The input string is not a valid formatted contract hash.
+/// - The conversion to bytes or base64 encoding fails.
+///
+/// This function is exposed to JavaScript with the alias `contractHashToBase64Key`.
+#[wasm_bindgen(js_name = "contractHashToBase64Key")]
+pub fn get_base64_key_from_contract_hash_js_alias(
+    formatted_contract_hash: &str,
+) -> Result<String, JsError> {
+    get_base64_key_from_contract_hash(formatted_contract_hash).map_err(|err| {
+        let error_text = format!("Error serializing contract hash: {:?}", err);
+        JsError::new(&error_text)
+    })
+}
+
+/// Converts a formatted contract package hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_package_hash` - A hex-formatted string representing the contract package hash.
+///   Example: "contract-package-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// * `Ok(String)` - The base64-encoded string if the conversion succeeds.
+///   Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+/// * `Err(JsError)` - A JavaScript-compatible error if the conversion fails.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - The input string is not a valid formatted contract package hash.
+/// - The conversion to bytes or base64 encoding fails.
+///
+/// This function is exposed to JavaScript with the alias `packageHashToBase64Key`.
+#[wasm_bindgen(js_name = "packageHashToBase64Key")]
+pub fn get_base64_key_from_package_hash_js_alias(
+    formatted_package_hash: &str,
+) -> Result<String, JsError> {
+    get_base64_key_from_package_hash(formatted_package_hash).map_err(|err| {
+        let error_text = format!("Error serializing package hash: {:?}", err);
+        JsError::new(&error_text)
+    })
+}
+
 /// Gets the current timestamp.
 ///
 /// # Returns

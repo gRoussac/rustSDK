@@ -1,6 +1,7 @@
 use crate::types::{
-    account_hash::AccountHash, key::Key, public_key::PublicKey, sdk_error::SdkError,
-    verbosity::Verbosity,
+    account_hash::AccountHash, contract_hash::ContractHash,
+    contract_package_hash::ContractPackageHash, key::Key, public_key::PublicKey,
+    sdk_error::SdkError, verbosity::Verbosity,
 };
 use base64::engine::general_purpose;
 use base64::Engine;
@@ -15,7 +16,8 @@ use casper_client::{
 };
 use casper_types::{
     bytesrepr::ToBytes, cl_value_to_json as cl_value_to_json_from_casper_types, CLValue,
-    Key as _Key, NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey,
+    ContractHash as _ContractHash, ContractPackageHash as _ContractPackageHash, Key as _Key,
+    NamedArg, PublicKey as CasperTypesPublicKey, RuntimeArgs, SecretKey,
 };
 use chrono::{DateTime, SecondsFormat, Utc};
 #[cfg(target_arch = "wasm32")]
@@ -141,9 +143,63 @@ pub fn make_dictionary_item_key<V: ToBytes>(key: &Key, value: &V) -> String {
 ///
 /// Returns a `Result` with the base64-encoded string on success, or a `FromStrError` on failure.
 /// Example: "ALSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
-pub fn get_base64_key_from_account_hash(account_hash: &str) -> Result<String, Box<SdkError>> {
-    let account_hash = AccountHash::from_formatted_str(account_hash)?;
+pub fn get_base64_key_from_account_hash(
+    formatted_account_hash: &str,
+) -> Result<String, Box<SdkError>> {
+    let account_hash = AccountHash::from_formatted_str(formatted_account_hash)?;
     let key = Key::from_account(account_hash).to_bytes().unwrap();
+    Ok(general_purpose::STANDARD.encode(key)) // base64.encode
+}
+
+/// Convert a formatted contract hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_hash` - A hex-formatted string representing the contract hash.
+///   Example: "contract-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// * `Ok(String)` - The base64-encoded string if the conversion succeeds.
+///   Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+/// * `Err(Box<SdkError>)` - An error if the input string is invalid or the encoding fails.
+///
+/// # Errors
+///
+/// This function returns an error if:
+/// - The input string is not a valid formatted contract hash.
+/// - The conversion to bytes or base64 encoding fails.
+pub fn get_base64_key_from_contract_hash(formatted_hash: &str) -> Result<String, Box<SdkError>> {
+    let hash = ContractHash::from_formatted_str(formatted_hash)?;
+    let key = _Key::from(Into::<_ContractHash>::into(hash))
+        .to_bytes()
+        .unwrap();
+    Ok(general_purpose::STANDARD.encode(key)) // base64.encode
+}
+
+/// Convert a formatted contract package hash to a base64-encoded string (CEP-18 key encoding).
+///
+/// # Arguments
+///
+/// * `formatted_hash` - A hex-formatted string representing the contract package hash.
+///   Example: "contract-package-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f"
+///
+/// # Returns
+///
+/// * `Ok(String)` - The base64-encoded string if the conversion succeeds.
+///   Example: "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf"
+/// * `Err(Box<SdkError>)` - An error if the input string is invalid or the encoding fails.
+///
+/// # Errors
+///
+/// This function returns an error if:
+/// - The input string is not a valid formatted contract package hash.
+/// - The conversion to bytes or base64 encoding fails.
+pub fn get_base64_key_from_package_hash(formatted_hash: &str) -> Result<String, Box<SdkError>> {
+    let hash = ContractPackageHash::from_formatted_str(formatted_hash)?;
+    let key = _Key::from(Into::<_ContractPackageHash>::into(hash))
+        .to_bytes()
+        .unwrap();
     Ok(general_purpose::STANDARD.encode(key)) // base64.encode
 }
 
@@ -728,6 +784,34 @@ mod tests {
 
         // Call the function under test
         let result = get_base64_key_from_account_hash(input_hash).unwrap();
+
+        // Check the result against the expected output
+        assert_eq!(result, expected_output.to_string());
+    }
+
+    #[test]
+    fn test_get_base64_key_from_contract_hash() {
+        // Test with a known input and expected output
+        let input_hash =
+            "contract-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f";
+        let expected_output = "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf";
+
+        // Call the function under test
+        let result = get_base64_key_from_contract_hash(input_hash).unwrap();
+
+        // Check the result against the expected output
+        assert_eq!(result, expected_output.to_string());
+    }
+
+    #[test]
+    fn test_get_base64_key_from_package_hash() {
+        // Test with a known input and expected output
+        let input_hash =
+            "contract-package-b485c074cef7ccaccd0302949d2043ab7133abdb14cfa87e8392945c0bd80a5f";
+        let expected_output = "AbSFwHTO98yszQMClJ0gQ6txM6vbFM+ofoOSlFwL2Apf";
+
+        // Call the function under test
+        let result = get_base64_key_from_package_hash(input_hash).unwrap();
 
         // Check the result against the expected output
         assert_eq!(result, expected_output.to_string());
