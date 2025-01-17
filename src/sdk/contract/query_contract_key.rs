@@ -23,9 +23,7 @@ pub struct QueryContractKeyOptions {
     pub state_root_hash_as_string: Option<String>,
     pub state_root_hash: Option<Digest>,
     pub maybe_block_id_as_string: Option<String>,
-    #[serde(rename = "key_as_string")]
     pub contract_key_as_string: Option<String>,
-    #[serde(rename = "key")]
     pub contract_key: Option<Key>,
     pub path_as_string: Option<String>,
     pub path: Option<Path>,
@@ -53,13 +51,41 @@ impl SDK {
         &self,
         options: Option<QueryContractKeyOptions>,
     ) -> Result<QueryGlobalStateResult, JsError> {
-        let js_value_options =
-            JsValue::from_serde::<QueryContractKeyOptions>(&options.unwrap_or_default());
-        if let Err(err) = js_value_options {
-            let err = &format!("Error serializing options:  {:?}", err);
-            return Err(JsError::new(err));
+        // Serialize QueryContractKeyOptions into JsValue
+        let js_value_options = JsValue::from_serde(&options.unwrap_or_default())
+            .map_err(|err| JsError::new(&format!("Error serializing options: {:?}", err)))?;
+
+        // Access contract_key_as_string and contract_key, and map them to key_as_string and key
+        let contract_key_as_string =
+            js_sys::Reflect::get(&js_value_options, &"contract_key_as_string".into())
+                .map_err(|_| JsError::new("Error getting 'contract_key_as_string'"))?
+                .as_string();
+
+        if let Some(contract_key_as_string) = contract_key_as_string {
+            js_sys::Reflect::set(
+                &js_value_options,
+                &"key_as_string".into(),
+                &JsValue::from(contract_key_as_string),
+            )
+            .map_err(|_| JsError::new("Error setting 'key_as_string'"))?;
         }
-        let options = self.query_global_state_options(js_value_options.unwrap())?;
+
+        let contract_key = js_sys::Reflect::get(&js_value_options, &"contract_key".into())
+            .map_err(|_| JsError::new("Error getting 'contract_key'"))?
+            .as_string();
+
+        if let Some(contract_key) = contract_key {
+            js_sys::Reflect::set(
+                &js_value_options,
+                &"key".into(),
+                &JsValue::from(contract_key),
+            )
+            .map_err(|_| JsError::new("Error setting 'key'"))?;
+        }
+
+        // Pass the manipulated JsValue to the next method
+        let options = self.query_global_state_options(js_value_options)?;
+
         self.query_global_state_js_alias(Some(options)).await
     }
 }
