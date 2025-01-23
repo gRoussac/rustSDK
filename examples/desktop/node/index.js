@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var casper_sdk_1 = require("casper-sdk");
 var fs = require('fs').promises;
 var http = require('http');
-var node_address = 'https://rpc.integration.casperlabs.io';
+var node_address = 'https://node.testnet.casper.network';
 var sdk = new casper_sdk_1.SDK(node_address);
 var server = http.createServer(function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var peers_object, peers_as_json;

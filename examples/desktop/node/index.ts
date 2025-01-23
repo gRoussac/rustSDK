@@ -2,7 +2,7 @@ import { DeployStrParams, PaymentStrParams, getTimestamp, SDK, SessionStrParams,
 const fs = require('fs').promises;
 const http = require('http');
 
-const node_address = 'https://rpc.integration.casperlabs.io';
+const node_address = 'https://node.testnet.casper.network';
 const sdk = new SDK(node_address);
 
 const server = http.createServer(async (req, res) => {

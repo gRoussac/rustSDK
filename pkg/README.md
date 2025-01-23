@@ -32,7 +32,7 @@ casper-rust-wasm-sdk = { version = "1.0.0", git = "https://github.com/casper-eco
 use casper_rust_wasm_sdk::{types::verbosity::Verbosity, SDK};
 
 let sdk = SDK::new(
-  Some("https://rpc.testnet.casperlabs.io".to_string()),
+  Some("https://node.testnet.casper.network".to_string()),
   Some(Verbosity::High)
 );
 ```
@@ -106,7 +106,7 @@ import init, {
   Verbosity,
 } from 'casper-sdk';
 
-const node_address = 'https://rpc.testnet.casperlabs.io';
+const node_address = 'https://node.testnet.casper.network';
 const verbosity = Verbosity.High;
 
 function App() {
@@ -260,7 +260,7 @@ const { SDK } = casper_sdk;
 // or with import
 import { SDK } from 'casper-sdk';
 
-const node_address = 'https://rpc.integration.casperlabs.io';
+const node_address = 'https://node.testnet.casper.network';
 const sdk = new SDK(node_address);
 console.log(sdk);
 ```

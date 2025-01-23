@@ -25,7 +25,7 @@ pub async fn run_tests_or_examples() {
 // get_deploy
 pub async fn _run_example_1() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("https://node.testnet.casper.network".to_string()),
         Some(Verbosity::High),
     );
     use casper_rust_wasm_sdk::types::deploy_hash::DeployHash;
@@ -48,7 +48,7 @@ pub async fn _run_example_1() {
 // get_auction_info
 pub async fn _run_example_2() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("https://node.testnet.casper.network".to_string()),
         Some(Verbosity::High),
     );
 
@@ -64,7 +64,7 @@ pub async fn _run_example_2() {
 // get_peers
 pub async fn _run_example_3() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("https://node.testnet.casper.network".to_string()),
         Some(Verbosity::High),
     );
 
@@ -79,7 +79,7 @@ pub async fn _run_example_3() {
 // get_block
 pub async fn _run_example_4() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("https://node.testnet.casper.network".to_string()),
         Some(Verbosity::High),
     );
 
@@ -93,7 +93,7 @@ pub async fn _run_example_4() {
 // make_transfer
 pub async fn _run_example_5() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("https://node.testnet.casper.network".to_string()),
         Some(Verbosity::High),
     );
 
@@ -183,7 +183,7 @@ pub async fn _run_example_6() {
 // make_deploy
 pub async fn _run_example_7() {
     let sdk = SDK::new(
-        Some("https://rpc.integration.casperlabs.io".to_string()),
+        Some("https://node.testnet.casper.network".to_string()),
         Some(Verbosity::High),
     );
 

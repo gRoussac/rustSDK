@@ -11,7 +11,7 @@
       class="badge rounded-pill bg-success mb-2 ellipsis-container px-2 me-xl-3"
       e2e-id="chain_name"
       [hidden]="!chain_name"
-      >{{ chain_name }}</span
+      >{{ chain_name || '' }}</span
     >
     <span
       class="badge rounded-pill bg-success mb-2 ellipsis-container px-2 me-xl-3"
@@ -51,7 +51,7 @@
               [selected]="changePort(peer) === node_address"
               *ngFor="let peer of peers; index as i"
             >
-              {{ changePort(peer) }} ({{ chain_name }})
+              {{ changePort(peer) }} ({{ chain_name || '' }})
             </option>
           </optgroup>
         </select>
