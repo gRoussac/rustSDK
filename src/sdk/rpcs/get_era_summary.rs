@@ -161,7 +161,7 @@ impl SDK {
         //log("get_era_summary!");
         if let Some(BlockIdentifierInput::String(maybe_block_id)) = maybe_block_identifier {
             get_era_summary_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,

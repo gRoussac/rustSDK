@@ -264,7 +264,7 @@ impl SDK {
             .await
             .map_err(|err| Box::new(SdkError::from(err))),
             GetBalanceInput::PurseUrefAsString(purse_uref) => get_balance_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
                 &state_root_hash.to_string(),

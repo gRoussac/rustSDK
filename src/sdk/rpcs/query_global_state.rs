@@ -346,7 +346,7 @@ impl SDK {
             .map_err(|err| Box::new(SdkError::from(err)))
         } else if let Some(state_root_hash) = state_root_hash {
             query_global_state_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
                 "",
@@ -358,7 +358,7 @@ impl SDK {
             .map_err(|err| Box::new(SdkError::from(err)))
         } else if let Some(maybe_block_id) = maybe_block_id {
             query_global_state_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
                 &maybe_block_id,
@@ -385,7 +385,7 @@ impl SDK {
                 Err(_) => "".to_string(),
             };
             query_global_state_cli(
-                &rand::thread_rng().gen::<i64>().to_string(),
+                &rand::thread_rng().gen::<u64>().to_string(),
                 &self.get_node_address(node_address),
                 self.get_verbosity(verbosity).into(),
                 "",
