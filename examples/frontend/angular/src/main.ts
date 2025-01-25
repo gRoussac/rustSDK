@@ -1,6 +1,6 @@
 
-import { HttpClientModule } from '@angular/common/http';
-import { enableProdMode, EnvironmentProviders, importProvidersFrom, Provider } from '@angular/core';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { enableProdMode, EnvironmentProviders, importProvidersFrom, ImportProvidersSource, Provider } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { NODE_ADDRESS, VERBOSITY, WASM_ASSET_PATH, WasmModule } from '@util/wasm';
 import { config, CONFIG, ENV, Network } from '@util/config';
@@ -29,7 +29,7 @@ const providers: Array<Provider | EnvironmentProviders> = [
   { provide: NODE_ADDRESS, useValue: (config['network'] as Network)?.node_address },
   { provide: VERBOSITY, useValue: Verbosity[config['verbosity'] as Verbosity] },
   importProvidersFrom([
-    HttpClientModule,
+    provideHttpClient(withInterceptorsFromDi()) as unknown as ImportProvidersSource,
     WasmModule,
     ResultModule
   ]),
