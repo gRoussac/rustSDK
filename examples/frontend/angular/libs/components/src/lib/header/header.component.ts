@@ -125,10 +125,8 @@ export class HeaderComponent implements AfterViewInit {
   private setNodeAddress() {
     if ((this.is_electron)) {
       this.sdk.setNodeAddress(this.node_address);
-    } else if (!this.is_production && this.is_docker) {
-      this.sdk.setNodeAddress(this.node_address);
     }
-    else if (this.is_production && this.is_docker) {
+    else if (this.is_docker) {
       this.sdk.setNodeAddress([
         this.config['default_protocol'],
         this.config['docker_gateway'],
@@ -137,7 +135,6 @@ export class HeaderComponent implements AfterViewInit {
         '/',
         this.node_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
     }
-
     else {
       const network = this.networks.find(x => x.node_address == this.node_address);
       network && this.sdk.setNodeAddress([this.window?.location?.href, network?.name].join(''));
