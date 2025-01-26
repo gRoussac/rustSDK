@@ -126,14 +126,14 @@ export class HeaderComponent implements AfterViewInit {
     if ((this.is_electron)) {
       this.sdk.setNodeAddress(this.node_address);
     }
-    else if (this.is_docker) {
+    else if (this.is_docker && this.is_production) {
       this.sdk.setNodeAddress([
         this.config['default_protocol'],
         this.config['docker_gateway'],
         ':',
         this.config['cors_anywhere_port'],
         '/',
-        this.node_address.replace(this.config['localhost'] as string, this.config['docker_gateway'] as string)].join(''));
+        this.node_address.replace(/localhost/g, this.config['docker_gateway'] as string)].join(''));
     }
     else {
       const network = this.networks.find(x => x.node_address == this.node_address);
