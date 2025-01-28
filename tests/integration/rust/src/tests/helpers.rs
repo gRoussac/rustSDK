@@ -1,7 +1,7 @@
 use self::intern::{create_test_sdk, install_cep78};
 use crate::config::{CONTRACT_CEP78_KEY, PACKAGE_CEP78_KEY};
 use crate::config::{
-    DEFAULT_CHAIN_NAME, DEFAULT_EVENT_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
+    DEFAULT_CHAIN_NAME, DEFAULT_EVENTS_ADDRESS, DEFAULT_NODE_ADDRESS, DEFAULT_SECRET_KEY_NAME,
     DEFAULT_SECRET_KEY_NCTL_PATH, ENTRYPOINT_MINT, PAYMENT_AMOUNT,
 };
 use casper_rust_wasm_sdk::deploy_watcher::watcher::EventParseResult;
@@ -159,7 +159,7 @@ pub(crate) mod intern {
         }
         *cep78_reinstall_guard = true;
 
-        let (node_address, event_address, chain_name) = network_constants;
+        let (node_address, events_address, chain_name) = network_constants;
 
         let deploy_params = DeployStrParams::new(
             chain_name,
@@ -205,7 +205,7 @@ pub(crate) mod intern {
         assert!(!deploy_hash_as_string.is_empty());
 
         let event_parse_result = sdk
-            .wait_deploy(event_address, &deploy_hash_as_string, None)
+            .wait_deploy(events_address, &deploy_hash_as_string, None)
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
@@ -229,11 +229,11 @@ pub(crate) mod intern {
 pub fn get_network_constants() -> (String, String, String) {
     let default_node_address =
         env::var("NODE_ADDRESS").unwrap_or_else(|_| DEFAULT_NODE_ADDRESS.to_string());
-    let default_event_address =
-        env::var("EVENT_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENT_ADDRESS.to_string());
+    let default_events_address =
+        env::var("EVENTS_ADDRESS").unwrap_or_else(|_| DEFAULT_EVENTS_ADDRESS.to_string());
     let chain_name = env::var("CHAIN_NAME").unwrap_or_else(|_| DEFAULT_CHAIN_NAME.to_string());
 
-    (default_node_address, default_event_address, chain_name)
+    (default_node_address, default_events_address, chain_name)
 }
 
 pub fn get_user_secret_key(user: Option<&str>) -> Result<String, std::io::Error> {
@@ -375,7 +375,7 @@ pub async fn mint_nft(
     secret_key: &str,
     network_constants: (&str, &str, &str),
 ) {
-    let (node_address, event_address, chain_name) = network_constants;
+    let (node_address, events_address, chain_name) = network_constants;
     let deploy_params = DeployStrParams::new(
         chain_name,
         account,
@@ -416,7 +416,7 @@ pub async fn mint_nft(
     assert!(!deploy_hash_as_string.is_empty());
 
     let event_parse_result = sdk
-        .wait_deploy(event_address, &deploy_hash_as_string, None)
+        .wait_deploy(events_address, &deploy_hash_as_string, None)
         .await
         .unwrap();
     let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();

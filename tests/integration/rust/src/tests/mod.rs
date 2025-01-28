@@ -2,7 +2,7 @@ pub mod helpers;
 pub mod integration;
 #[cfg(test)]
 pub mod integration_tests;
-use crate::{config::DEFAULT_EVENT_ADDRESS, tests::helpers::get_event_handler_fn};
+use crate::{config::DEFAULT_EVENTS_ADDRESS, tests::helpers::get_event_handler_fn};
 use casper_rust_wasm_sdk::{
     deploy_watcher::watcher::{DeploySubscription, EventHandlerFn, EventParseResult},
     helpers::public_key_from_secret_key,
@@ -407,7 +407,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     pub const PAYMENT_AMOUNT_CONTRACT_CEP78: &str = "500000000000";
     pub const WASM_PATH: &str = "../../wasm/";
     pub const CEP78_CONTRACT: &str = "cep78.wasm";
-    pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+    pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 
     let deploy_params = DeployStrParams::new(
         CHAIN_NAME,
@@ -443,7 +443,7 @@ pub async fn _run_example_11() -> Result<(), String> {
     let deploy_hash_as_string = deploy_hash.to_string();
     println!("wait deploy_hash {}", deploy_hash_as_string);
     let event_parse_result: EventParseResult = sdk
-        .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash_as_string, None)
+        .wait_deploy(DEFAULT_EVENTS_ADDRESS, &deploy_hash_as_string, None)
         .await
         .unwrap();
     println!("{:?}", event_parse_result);
@@ -512,7 +512,7 @@ pub async fn _run_example_12() {
     let deploy_hash_result = call_entrypoint.as_ref().unwrap().result.deploy_hash;
     let deploy_hash_string = DeployHash::from(deploy_hash_result).to_string();
     println!("watch deploy_hash {deploy_hash_string}");
-    let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, None);
+    let mut watcher = sdk.watch_deploy(DEFAULT_EVENTS_ADDRESS, None);
 
     let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
     let deploy_hash_results = vec![deploy_hash_string.to_string().clone()];

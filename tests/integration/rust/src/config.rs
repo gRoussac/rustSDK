@@ -9,7 +9,7 @@ use std::time::{self, Duration};
 use tokio::sync::Mutex;
 
 pub const DEFAULT_NODE_ADDRESS: &str = "http://localhost:11101";
-pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+pub const DEFAULT_EVENTS_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
 pub const DEFAULT_CHAIN_NAME: &str = "casper-net-1";
 pub const DEFAULT_SECRET_KEY_NAME: &str = "secret_key.pem";
 // TODO fix mutex bug https://github.com/hyperium/hyper/issues/2112 lazy_static erroring with runtime dropped the dispatch task
@@ -60,7 +60,7 @@ pub const ARGS_JSON: &str = r#"[
 pub struct TestConfig {
     pub node_address: Option<String>,
     pub verbosity: Option<Verbosity>,
-    pub event_address: String,
+    pub events_address: String,
     pub chain_name: String,
     pub secret_key: String,
     pub account: String,
@@ -89,7 +89,7 @@ pub async fn initialize_test_config(
 
     dotenv().ok();
 
-    let (default_node_address, event_address, chain_name) = get_network_constants();
+    let (default_node_address, events_address, chain_name) = get_network_constants();
 
     let mut block_hash_initialized_guard = BLOCK_HASH_INITIALIZED.lock().await;
     if *block_hash_initialized_guard {
@@ -115,7 +115,7 @@ pub async fn initialize_test_config(
             &account,
             &secret_key,
             None,
-            (&default_node_address, &event_address, &chain_name),
+            (&default_node_address, &events_address, &chain_name),
         )
         .await
         .unwrap();
@@ -133,7 +133,7 @@ pub async fn initialize_test_config(
             &account,
             &account_hash,
             &secret_key,
-            (&default_node_address, &event_address, &chain_name),
+            (&default_node_address, &events_address, &chain_name),
         )
         .await;
 
@@ -160,7 +160,7 @@ pub async fn initialize_test_config(
     let config = TestConfig {
         node_address: Some(default_node_address.to_string()),
         verbosity: Some(Verbosity::High),
-        event_address,
+        events_address,
         account,
         secret_key,
         chain_name,

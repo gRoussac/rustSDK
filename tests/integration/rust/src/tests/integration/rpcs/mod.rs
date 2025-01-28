@@ -396,7 +396,7 @@ pub mod test_module {
         let deploy_hash_as_string = test_install().await;
 
         let event_parse_result = sdk
-            .wait_deploy(&config.event_address, &deploy_hash_as_string, None)
+            .wait_deploy(&config.events_address, &deploy_hash_as_string, None)
             .await
             .unwrap();
         let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
