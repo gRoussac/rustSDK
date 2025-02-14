@@ -94,10 +94,10 @@ async fn get_dictionary_item_input(contract_addr: &str) -> DictionaryItemInput {
 }
 
 #[cfg(test)]
-async fn get_dictionary_item_params_input(account_hash: &str) -> DictionaryItemInput {
+async fn get_dictionary_item_params_input(key: &str) -> DictionaryItemInput {
     use crate::types::deploy_params::dictionary_item_str_params::DictionaryItemStrParams;
 
     let mut params = DictionaryItemStrParams::new();
-    params.set_contract_named_key(account_hash, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
+    params.set_contract_named_key(key, DICTIONARY_NAME, DICTIONARY_ITEM_KEY);
     DictionaryItemInput::Params(params)
 }
