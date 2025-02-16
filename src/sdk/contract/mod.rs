@@ -14,7 +14,7 @@ use sdk_tests::config::{DICTIONARY_ITEM_KEY, DICTIONARY_NAME};
 #[cfg(test)]
 use sdk_tests::tests::helpers::mint_nft;
 #[cfg(test)]
-use std::sync::Mutex;
+use tokio::sync::Mutex as TokioMutex;
 
 #[cfg(test)]
 pub async fn install_cep78() -> String {
@@ -43,7 +43,7 @@ pub async fn install_cep78() -> String {
 }
 
 #[cfg(test)]
-static CONTRACT_CEP78_HASH: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
+static CONTRACT_CEP78_HASH: Lazy<TokioMutex<Option<String>>> = Lazy::new(|| TokioMutex::new(None));
 
 #[cfg(test)]
 pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
@@ -51,7 +51,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
 
     let (node_address, events_address, chain_name) = get_network_constants();
 
-    let mut contract_cep78_hash = CONTRACT_CEP78_HASH.lock().unwrap();
+    let mut contract_cep78_hash = CONTRACT_CEP78_HASH.lock().await;
 
     if contract_cep78_hash.is_none() {
         let new_contract_cep78_hash = install_cep78().await;
@@ -59,6 +59,9 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
         let account = public_key_from_secret_key(&secret_key).unwrap();
         let public_key = PublicKey::new(&account).unwrap();
         let account_hash = public_key.to_account_hash().to_formatted_string();
+
+        // Release the lock here before awaiting
+        drop(contract_cep78_hash);
 
         mint_nft(
             &new_contract_cep78_hash,
@@ -68,7 +71,7 @@ pub async fn get_dictionary_item(as_params: bool) -> DictionaryItemInput {
             (&node_address, &events_address, &chain_name),
         )
         .await;
-
+        contract_cep78_hash = CONTRACT_CEP78_HASH.lock().await;
         *contract_cep78_hash = Some(new_contract_cep78_hash);
     }
 

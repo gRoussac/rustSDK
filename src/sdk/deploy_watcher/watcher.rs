@@ -424,8 +424,8 @@ impl DeployWatcher {
                         .get("deploy_hash")
                         .and_then(|deploy_hash| deploy_hash.as_str())
                     {
-                        let mut deploy_hash_found = target_deploy_hash
-                            .map_or(false, |target_hash| target_hash == deploy_hash_processed);
+                        let mut deploy_hash_found =
+                            target_deploy_hash == Some(deploy_hash_processed);
 
                         let deploy_processed: Option<DeployProcessed> =
                             serde_json::from_value(deploy.unwrap().clone()).ok();
