@@ -709,8 +709,8 @@ export class ClientService {
 
   async query_contract_key() {
     const state_root_hash: string = this.getIdentifier('stateRootHash')?.value?.trim();
-    const key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
-    if (!key_as_string) {
+    const contract_key_as_string: string = this.getIdentifier('queryKey')?.value?.trim();
+    if (!contract_key_as_string) {
       const err = "key_as_string is missing";
       this.errorService.setError(err.toString());
       return;
@@ -718,7 +718,7 @@ export class ClientService {
     const path_as_string: string = this.getIdentifier('queryPath')?.value.toString().trim().replace(/^\/+|\/+$/g, '');
     const query_contract_key_options = this.sdk.query_contract_key_options({
       state_root_hash_as_string: state_root_hash || '',
-      key_as_string,
+      contract_key_as_string,
       path_as_string,
     });
     try {
