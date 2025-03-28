@@ -1,4 +1,4 @@
-import { Verbosity } from "casper-sdk";
+import { Verbosity } from 'casper-rust-wasm-sdk';
 
 export type State = {
   node_address?: string;

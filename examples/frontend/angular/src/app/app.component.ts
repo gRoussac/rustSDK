@@ -1,9 +1,28 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild, } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { CONFIG, ENV, EnvironmentConfig } from '@util/config';
 import { SDK_TOKEN } from '@util/wasm';
-import { SDK, PeerEntry } from "casper-sdk";
-import { ResultComponent, HeaderComponent, ErrorComponent, StatusComponent, ActionComponent, SubmitActionComponent, PublicKeyComponent, SecretKeyComponent, FormComponent } from '@components';
+import { SDK, PeerEntry } from 'casper-rust-wasm-sdk';
+import {
+  ResultComponent,
+  HeaderComponent,
+  ErrorComponent,
+  StatusComponent,
+  ActionComponent,
+  SubmitActionComponent,
+  PublicKeyComponent,
+  SecretKeyComponent,
+  FormComponent,
+} from '@components';
 import { Subscription } from 'rxjs';
 import { State, StateService } from '@util/state';
 import { ResultService } from '@util/result';
@@ -55,7 +74,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly formService: FormService,
     private readonly errorService: ErrorService,
     private readonly storageService: StorageService,
-  ) { }
+  ) {}
 
   async ngOnInit(): Promise<void> {
     console.info(this.sdk);
@@ -66,14 +85,18 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setStateSubscription() {
-    this.stateSubscription = this.stateService.getState().subscribe((state: State) => {
-      state.action && (this.action = state.action);
-    });
+    this.stateSubscription = this.stateService
+      .getState()
+      .subscribe((state: State) => {
+        state.action && (this.action = state.action);
+      });
   }
 
   async ngAfterViewInit() {
     const no_mark_for_check = true;
-    const action = this.storageService.get('action') || this.config['default_action'].toString();
+    const action =
+      this.storageService.get('action') ||
+      this.config['default_action'].toString();
     try {
       if (action == this.config['default_action'].toString()) {
         await this.handleAction(action, true);
@@ -84,7 +107,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.errorService.setError(error as string);
     }
     this.stateService.setState({
-      action
+      action,
     });
     this.setStateSubscription();
   }
@@ -92,11 +115,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   async selectAction(action: string) {
     await this.cleanResult();
     this.stateService.setState({
-      action
+      action,
     });
     await this.handleAction(action);
     this.storageService.setState({
-      action
+      action,
     });
   }
 
@@ -113,13 +136,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async handleAction(action: string, exec?: boolean) {
-    const fn = (this as unknown as { [key: string]: () => Promise<void>; })[action];
+    const fn = (this as unknown as { [key: string]: () => Promise<void> })[
+      action
+    ];
     if (fn && typeof fn === 'function') {
       if (exec) {
         try {
           await fn.bind(this)();
-        }
-        catch (error) {
+        } catch (error) {
           this.errorService.setError(error as string);
         }
       }
@@ -144,7 +168,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async deploy(deploy_result = true, speculative?: boolean) {
-    return await this.clientService.deploy(deploy_result, speculative, this.wasm);
+    return await this.clientService.deploy(
+      deploy_result,
+      speculative,
+      this.wasm,
+    );
   }
 
   private async get_account(account_identifier_param: string) {
@@ -197,9 +225,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async get_state_root_hash(no_mark_for_check?: boolean) {
-    const state_root_hash = await this.clientService.get_state_root_hash(no_mark_for_check);
+    const state_root_hash =
+      await this.clientService.get_state_root_hash(no_mark_for_check);
     this.stateService.setState({
-      state_root_hash
+      state_root_hash,
     });
     return state_root_hash;
   }
@@ -263,5 +292,4 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private async transfer(deploy_result = true, speculative?: boolean) {
     return await this.clientService.transfer(deploy_result, speculative);
   }
-
 }

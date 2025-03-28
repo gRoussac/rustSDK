@@ -1,11 +1,25 @@
-import { Verbosity } from "casper-sdk";
+import { Verbosity } from 'casper-rust-wasm-sdk';
 
 export type EnvironmentConfig = {
   [key: string]: string | object | Verbosity;
 };
 
-const action_needs_secret_key = ['deploy', 'transfer', 'put_deploy', 'speculative_deploy', 'speculative_transfer', 'speculative_exec', 'sign_deploy', 'call_entrypoint', 'install'];
-const action_needs_public_key = ['make_deploy', 'make_transfer', ...action_needs_secret_key];
+const action_needs_secret_key = [
+  'deploy',
+  'transfer',
+  'put_deploy',
+  'speculative_deploy',
+  'speculative_transfer',
+  'speculative_exec',
+  'sign_deploy',
+  'call_entrypoint',
+  'install',
+];
+const action_needs_public_key = [
+  'make_deploy',
+  'make_transfer',
+  ...action_needs_secret_key,
+];
 
 export const config: EnvironmentConfig = {
   wasm_asset_path: 'assets/casper_rust_wasm_sdk_bg.wasm',
@@ -20,32 +34,32 @@ export const config: EnvironmentConfig = {
     'node-launcher': {
       node_address: 'http://localhost:7777',
       stream_address: 'http://localhost:9999/events/main',
-      chain_name: 'casper-net-1'
+      chain_name: 'casper-net-1',
     },
-    'ntcl': {
+    ntcl: {
       node_address: 'http://localhost:11101',
       stream_address: 'http://localhost:18101/events/main',
-      chain_name: 'casper-net-1'
+      chain_name: 'casper-net-1',
     },
-    'testnet': {
+    testnet: {
       node_address: 'https://node.testnet.casper.network',
       stream_address: 'https://node.testnet.casper.network/events/main',
-      chain_name: 'casper-test'
+      chain_name: 'casper-test',
     },
-    'mainnet': {
+    mainnet: {
       node_address: 'https://node.mainnet.casper.network',
       stream_address: 'https://node.mainnet.casper.network/events/main',
-      chain_name: 'casper'
+      chain_name: 'casper',
     },
-    'custom': {
+    custom: {
       node_address: 'http://135.181.115.109:7777',
       stream_address: 'http://135.181.115.109:9999/events/main',
-      chain_name: 'casper-test'
+      chain_name: 'casper-test',
     },
-    'dev': {
+    dev: {
       node_address: 'http://localhost:4200',
       stream_address: 'http://localhost:4200/events/main',
-      chain_name: 'casper-net-1'
+      chain_name: 'casper-net-1',
     },
   },
   localhost: 'localhost',
