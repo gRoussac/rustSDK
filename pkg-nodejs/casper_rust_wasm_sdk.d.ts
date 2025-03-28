@@ -1080,49 +1080,77 @@ export class QueryGlobalStateResult {
 export class SDK {
   free(): void;
   /**
-   * JavaScript alias for deploying with deserialized parameters.
+   * Parses block transfers options from a JsValue.
    *
    * # Arguments
    *
-   * * `deploy_params` - Deploy parameters.
-   * * `session_params` - Session parameters.
-   * * `payment_params` - Payment parameters.
-   * * `verbosity` - An optional verbosity level.
-   * * `node_address` - An optional node address.
+   * * `options` - A JsValue containing block transfers options to be parsed.
    *
    * # Returns
    *
-   * A result containing PutDeployResult or a JsError.
+   * Parsed block transfers options as a `GetBlockTransfersOptions` struct.
    */
-  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, node_address?: string | null): Promise<PutDeployResult>;
+  get_block_transfers_options(options: any): getBlockTransfersOptions;
   /**
-   * Parses deploy options from a JsValue.
+   * Retrieves block transfers information using the provided options.
    *
    * # Arguments
    *
-   * * `options` - A JsValue containing deploy options to be parsed.
+   * * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
    *
    * # Returns
    *
-   * Parsed deploy options as a `GetDeployOptions` struct.
+   * A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
    */
-  get_deploy_options(options: any): getDeployOptions;
+  get_block_transfers(options?: getBlockTransfersOptions | null): Promise<GetBlockTransfersResult>;
   /**
-   * Retrieves deploy information using the provided options.
+   * Parses state root hash options from a JsValue.
    *
    * # Arguments
    *
-   * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
+   * * `options` - A JsValue containing state root hash options to be parsed.
    *
    * # Returns
    *
-   * A `Result` containing either a `GetDeployResult` or an error.
+   * Parsed state root hash options as a `GetStateRootHashOptions` struct.
    */
-  get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
+  get_state_root_hash_options(options: any): getStateRootHashOptions;
   /**
-   * Retrieves deploy information using the provided options, alias for `get_deploy_js_alias`.
+   * Retrieves state root hash information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
    */
-  info_get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
+  get_state_root_hash(options?: getStateRootHashOptions | null): Promise<GetStateRootHashResult>;
+  /**
+   * Retrieves state root hash information using the provided options (alias for `get_state_root_hash_js_alias`).
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  chain_get_state_root_hash(options?: getStateRootHashOptions | null): Promise<GetStateRootHashResult>;
   /**
    * Parses query balance options from a JsValue.
    *
@@ -1168,34 +1196,24 @@ export class SDK {
    */
   speculative_exec(options?: getSpeculativeExecOptions | null): Promise<SpeculativeExecResult>;
   /**
-   * Parses auction info options from a JsValue.
+   * JavaScript alias for deploying with deserialized parameters.
    *
    * # Arguments
    *
-   * * `options` - A JsValue containing auction info options to be parsed.
+   * * `deploy_params` - Deploy parameters.
+   * * `session_params` - Session parameters.
+   * * `payment_params` - Payment parameters.
+   * * `verbosity` - An optional verbosity level.
+   * * `node_address` - An optional node address.
    *
    * # Returns
    *
-   * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
-   * or a `JsError` if deserialization fails.
+   * A result containing PutDeployResult or a JsError.
    */
-  get_auction_info_options(options: any): getAuctionInfoOptions;
-  /**
-   * Retrieves auction information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  get_auction_info(options?: getAuctionInfoOptions | null): Promise<GetAuctionInfoResult>;
+  deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, verbosity?: Verbosity | null, node_address?: string | null): Promise<PutDeployResult>;
+  get_account_options(options: any): getAccountOptions;
+  get_account(options?: getAccountOptions | null): Promise<GetAccountResult>;
+  state_get_account_info(options?: getAccountOptions | null): Promise<GetAccountResult>;
   get_era_info_options(options: any): getEraInfoOptions;
   get_era_info(options?: getEraInfoOptions | null): Promise<GetEraInfoResult>;
   /**
@@ -1226,6 +1244,36 @@ export class SDK {
    * Returns a `JsError` if there is an error during the retrieval process.
    */
   get_era_summary(options?: getEraSummaryOptions | null): Promise<GetEraSummaryResult>;
+  /**
+   * Retrieves node status information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
+   * * `node_address` - An optional string specifying the node address to use for the request.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  get_node_status(verbosity?: Verbosity | null, node_address?: string | null): Promise<GetNodeStatusResult>;
+  /**
+   * Retrieves peers asynchronously.
+   *
+   * # Arguments
+   *
+   * * `verbosity` - Optional verbosity level.
+   * * `node_address` - Optional node address.
+   *
+   * # Returns
+   *
+   * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
+   */
+  get_peers(verbosity?: Verbosity | null, node_address?: string | null): Promise<GetPeersResult>;
   /**
    * Parses query global state options from a JsValue.
    *
@@ -1262,6 +1310,26 @@ export class SDK {
    * JavaScript alias for query_contract_key with deserialized options.
    */
   query_contract_key(options?: queryContractKeyOptions | null): Promise<QueryGlobalStateResult>;
+  /**
+   * JS Alias for speculative transfer.
+   *
+   * # Arguments
+   *
+   * * `amount` - The amount to transfer.
+   * * `target_account` - The target account.
+   * * `transfer_id` - An optional transfer ID (defaults to a random number).
+   * * `deploy_params` - The deployment parameters.
+   * * `payment_params` - The payment parameters.
+   * * `maybe_block_id_as_string` - An optional block ID as a string.
+   * * `maybe_block_identifier` - An optional block identifier.
+   * * `verbosity` - The verbosity level for logging (optional).
+   * * `node_address` - The address of the node to connect to (optional).
+   *
+   * # Returns
+   *
+   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   */
+  speculative_transfer(amount: string, target_account: string, transfer_id: string | null | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string | null, maybe_block_identifier?: BlockIdentifier | null, verbosity?: Verbosity | null, node_address?: string | null): Promise<SpeculativeExecResult>;
   /**
    * Calls a smart contract entry point with the specified parameters and returns the result.
    *
@@ -1322,93 +1390,33 @@ export class SDK {
    */
   state_get_balance(options?: getBalanceOptions | null): Promise<GetBalanceResult>;
   /**
-   * Parses block options from a JsValue.
+   * Parses deploy options from a JsValue.
    *
    * # Arguments
    *
-   * * `options` - A JsValue containing block options to be parsed.
+   * * `options` - A JsValue containing deploy options to be parsed.
    *
    * # Returns
    *
-   * Parsed block options as a `GetBlockOptions` struct.
+   * Parsed deploy options as a `GetDeployOptions` struct.
    */
-  get_block_options(options: any): getBlockOptions;
+  get_deploy_options(options: any): getDeployOptions;
   /**
-   * Retrieves block information using the provided options.
+   * Retrieves deploy information using the provided options.
    *
    * # Arguments
    *
-   * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+   * * `options` - An optional `GetDeployOptions` struct containing retrieval options.
    *
    * # Returns
    *
-   * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
+   * A `Result` containing either a `GetDeployResult` or an error.
    */
-  get_block(options?: getBlockOptions | null): Promise<GetBlockResult>;
+  get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
   /**
-   * JS Alias for the `get_block` method to maintain compatibility.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
+   * Retrieves deploy information using the provided options, alias for `get_deploy_js_alias`.
    */
-  chain_get_block(options?: getBlockOptions | null): Promise<GetBlockResult>;
-  /**
-   * Parses state root hash options from a JsValue.
-   *
-   * # Arguments
-   *
-   * * `options` - A JsValue containing state root hash options to be parsed.
-   *
-   * # Returns
-   *
-   * Parsed state root hash options as a `GetStateRootHashOptions` struct.
-   */
-  get_state_root_hash_options(options: any): getStateRootHashOptions;
-  /**
-   * Retrieves state root hash information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  get_state_root_hash(options?: getStateRootHashOptions | null): Promise<GetStateRootHashResult>;
-  /**
-   * Retrieves state root hash information using the provided options (alias for `get_state_root_hash_js_alias`).
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetStateRootHashOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetStateRootHashResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  chain_get_state_root_hash(options?: getStateRootHashOptions | null): Promise<GetStateRootHashResult>;
+  info_get_deploy(options?: getDeployOptions | null): Promise<GetDeployResult>;
   /**
    * JS Alias for `make_transfer`.
    *
@@ -1452,68 +1460,84 @@ export class SDK {
    * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
    */
   waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
-  /**
-   * Deserialize query_contract_dict_options from a JavaScript object.
-   */
-  query_contract_dict_options(options: any): queryContractDictOptions;
-  /**
-   * JavaScript alias for query_contract_dict with deserialized options.
-   */
-  query_contract_dict(options?: queryContractDictOptions | null): Promise<GetDictionaryItemResult>;
   constructor(node_address?: string | null, verbosity?: Verbosity | null);
   getNodeAddress(node_address?: string | null): string;
   setNodeAddress(node_address?: string | null): void;
   getVerbosity(verbosity?: Verbosity | null): Verbosity;
   setVerbosity(verbosity?: Verbosity | null): void;
   /**
-   * This function allows executing a deploy speculatively.
+   * Parses auction info options from a JsValue.
    *
    * # Arguments
    *
-   * * `deploy_params` - Deployment parameters for the deploy.
-   * * `session_params` - Session parameters for the deploy.
-   * * `payment_params` - Payment parameters for the deploy.
-   * * `maybe_block_id_as_string` - An optional block ID as a string.
-   * * `maybe_block_identifier` - Optional block identifier.
-   * * `verbosity` - Optional verbosity level.
-   * * `node_address` - Optional node address.
+   * * `options` - A JsValue containing auction info options to be parsed.
    *
    * # Returns
    *
-   * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
+   * Result containing parsed auction info options as a `GetAuctionInfoOptions` struct,
+   * or a `JsError` if deserialization fails.
    */
-  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string | null, maybe_block_identifier?: BlockIdentifier | null, verbosity?: Verbosity | null, node_address?: string | null): Promise<SpeculativeExecResult>;
-  get_account_options(options: any): getAccountOptions;
-  get_account(options?: getAccountOptions | null): Promise<GetAccountResult>;
-  state_get_account_info(options?: getAccountOptions | null): Promise<GetAccountResult>;
+  get_auction_info_options(options: any): getAuctionInfoOptions;
   /**
-   * Parses block transfers options from a JsValue.
+   * Retrieves auction information using the provided options.
    *
    * # Arguments
    *
-   * * `options` - A JsValue containing block transfers options to be parsed.
+   * * `options` - An optional `GetAuctionInfoOptions` struct containing retrieval options.
    *
    * # Returns
    *
-   * Parsed block transfers options as a `GetBlockTransfersOptions` struct.
-   */
-  get_block_transfers_options(options: any): getBlockTransfersOptions;
-  /**
-   * Retrieves block transfers information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `options` - An optional `GetBlockTransfersOptions` struct containing retrieval options.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetBlockTransfersResult` or a `JsError` in case of an error.
+   * A `Result` containing either a `GetAuctionInfoResult` or a `JsError` in case of an error.
    *
    * # Errors
    *
    * Returns a `JsError` if there is an error during the retrieval process.
    */
-  get_block_transfers(options?: getBlockTransfersOptions | null): Promise<GetBlockTransfersResult>;
+  get_auction_info(options?: getAuctionInfoOptions | null): Promise<GetAuctionInfoResult>;
+  /**
+   * Parses block options from a JsValue.
+   *
+   * # Arguments
+   *
+   * * `options` - A JsValue containing block options to be parsed.
+   *
+   * # Returns
+   *
+   * Parsed block options as a `GetBlockOptions` struct.
+   */
+  get_block_options(options: any): getBlockOptions;
+  /**
+   * Retrieves block information using the provided options.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  get_block(options?: getBlockOptions | null): Promise<GetBlockResult>;
+  /**
+   * JS Alias for the `get_block` method to maintain compatibility.
+   *
+   * # Arguments
+   *
+   * * `options` - An optional `GetBlockOptions` struct containing retrieval options.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `GetBlockResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the retrieval process.
+   */
+  chain_get_block(options?: getBlockOptions | null): Promise<GetBlockResult>;
   /**
    * Asynchronously retrieves the chainspec.
    *
@@ -1559,36 +1583,6 @@ export class SDK {
    * JS Alias for `get_dictionary_item_js_alias`
    */
   state_get_dictionary_item(options?: getDictionaryItemOptions | null): Promise<GetDictionaryItemResult>;
-  /**
-   * Retrieves node status information using the provided options.
-   *
-   * # Arguments
-   *
-   * * `verbosity` - An optional `Verbosity` level for controlling the output verbosity.
-   * * `node_address` - An optional string specifying the node address to use for the request.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `GetNodeStatusResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the retrieval process.
-   */
-  get_node_status(verbosity?: Verbosity | null, node_address?: string | null): Promise<GetNodeStatusResult>;
-  /**
-   * Retrieves peers asynchronously.
-   *
-   * # Arguments
-   *
-   * * `verbosity` - Optional verbosity level.
-   * * `node_address` - Optional node address.
-   *
-   * # Returns
-   *
-   * A `Result` containing `GetPeersResult` or a `JsError` if an error occurs.
-   */
-  get_peers(verbosity?: Verbosity | null, node_address?: string | null): Promise<GetPeersResult>;
   /**
    * Retrieves validator changes using the provided options.
    *
@@ -1638,25 +1632,45 @@ export class SDK {
    */
   make_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams): Deploy;
   /**
-   * JS Alias for speculative transfer.
+   * JS Alias for `sign_deploy`.
    *
    * # Arguments
    *
-   * * `amount` - The amount to transfer.
-   * * `target_account` - The target account.
-   * * `transfer_id` - An optional transfer ID (defaults to a random number).
-   * * `deploy_params` - The deployment parameters.
-   * * `payment_params` - The payment parameters.
-   * * `maybe_block_id_as_string` - An optional block ID as a string.
-   * * `maybe_block_identifier` - An optional block identifier.
-   * * `verbosity` - The verbosity level for logging (optional).
-   * * `node_address` - The address of the node to connect to (optional).
+   * * `deploy` - The deploy to sign.
+   * * `secret_key` - The secret key for signing.
    *
    * # Returns
    *
-   * A `Result` containing the result of the speculative transfer or a `JsError` in case of an error.
+   * The signed `Deploy`.
    */
-  speculative_transfer(amount: string, target_account: string, transfer_id: string | null | undefined, deploy_params: DeployStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string | null, maybe_block_identifier?: BlockIdentifier | null, verbosity?: Verbosity | null, node_address?: string | null): Promise<SpeculativeExecResult>;
+  sign_deploy(deploy: Deploy, secret_key: string): Deploy;
+  /**
+   * Installs a smart contract with the specified parameters and returns the result.
+   *
+   * # Arguments
+   *
+   * * `deploy_params` - The deploy parameters.
+   * * `session_params` - The session parameters.
+   * * `payment_amount` - The payment amount as a string.
+   * * `node_address` - An optional node address to send the request to.
+   *
+   * # Returns
+   *
+   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
+   *
+   * # Errors
+   *
+   * Returns a `JsError` if there is an error during the installation.
+   */
+  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string | null): Promise<PutDeployResult>;
+  /**
+   * Deserialize query_contract_dict_options from a JavaScript object.
+   */
+  query_contract_dict_options(options: any): queryContractDictOptions;
+  /**
+   * JavaScript alias for query_contract_dict with deserialized options.
+   */
+  query_contract_dict(options?: queryContractDictOptions | null): Promise<GetDictionaryItemResult>;
   /**
    * JS Alias for transferring funds.
    *
@@ -1700,37 +1714,23 @@ export class SDK {
    */
   account_put_deploy(deploy: Deploy, verbosity?: Verbosity | null, node_address?: string | null): Promise<PutDeployResult>;
   /**
-   * JS Alias for `sign_deploy`.
+   * This function allows executing a deploy speculatively.
    *
    * # Arguments
    *
-   * * `deploy` - The deploy to sign.
-   * * `secret_key` - The secret key for signing.
+   * * `deploy_params` - Deployment parameters for the deploy.
+   * * `session_params` - Session parameters for the deploy.
+   * * `payment_params` - Payment parameters for the deploy.
+   * * `maybe_block_id_as_string` - An optional block ID as a string.
+   * * `maybe_block_identifier` - Optional block identifier.
+   * * `verbosity` - Optional verbosity level.
+   * * `node_address` - Optional node address.
    *
    * # Returns
    *
-   * The signed `Deploy`.
+   * A `Result` containing either a `SpeculativeExecResult` or a `JsError` in case of an error.
    */
-  sign_deploy(deploy: Deploy, secret_key: string): Deploy;
-  /**
-   * Installs a smart contract with the specified parameters and returns the result.
-   *
-   * # Arguments
-   *
-   * * `deploy_params` - The deploy parameters.
-   * * `session_params` - The session parameters.
-   * * `payment_amount` - The payment amount as a string.
-   * * `node_address` - An optional node address to send the request to.
-   *
-   * # Returns
-   *
-   * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-   *
-   * # Errors
-   *
-   * Returns a `JsError` if there is an error during the installation.
-   */
-  install(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, node_address?: string | null): Promise<PutDeployResult>;
+  speculative_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_params: PaymentStrParams, maybe_block_id_as_string?: string | null, maybe_block_identifier?: BlockIdentifier | null, verbosity?: Verbosity | null, node_address?: string | null): Promise<SpeculativeExecResult>;
 }
 export class SessionStrParams {
   free(): void;
