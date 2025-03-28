@@ -7,21 +7,21 @@
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.10",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
+    "@types/node": "^22.13.14",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
     "bootstrap": "^5.3.3",
     "casper-sdk": "file:../../../pkg",
     "http-proxy-middleware": "^3.0.3",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.8",
     "react-dom": "^19.0.0",
-    "typescript": "^5.7.3",
+    "typescript": "^5.8",
     "web-vitals": "^4.2.4"
   },
   "devDependencies": {
     "react-scripts": "^5.0.1",
-    "@babel/plugin-proposal-private-property-in-object": "7.21.11"
+    "@babel/plugin-transform-private-property-in-object": "7.25.9"
   },
   "scripts": {
     "start": "react-scripts start",
