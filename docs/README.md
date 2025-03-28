@@ -1339,7 +1339,7 @@ console.log(call_entrypoint_result_as_json.deploy_hash);
 
 ### Desktop Electron demo app
 
-<details>
+<details open>
   <summary><strong><code>Example of usage of the SDK in a Desktop application</code></strong></summary>
 
 <br>
