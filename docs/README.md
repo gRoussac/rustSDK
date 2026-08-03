@@ -2,18 +2,6 @@
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
-## Clone
-
-Prefer a shallow or blobless clone for day-to-day work (full history is large for no good reason if you only need tip):
-
-```bash
-git clone --depth 1 -b dev https://github.com/Interchouette-ITC/casper-rust-wasm-sdk.git
-# or
-git clone --filter=blob:none --sparse -b dev https://github.com/Interchouette-ITC/casper-rust-wasm-sdk.git
-```
-
-If your local clone predates the history cleanup that removed committed desktop installers from git history, re-clone or `git fetch origin && git reset --hard origin/dev` (do not merge old history back in).
-
 You can use the Casper Rust/Wasm SDK in two ways:
 
 - In a <strong>Rust application</strong> by importing the SDK crate.
@@ -2373,7 +2361,7 @@ $ npm start
 $ npm build
 ```
 
-Download pre-built desktop demos from the **[GitHub Releases](https://github.com/Interchouette-ITC/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
+Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 Never commit AppImage / Snap / `.exe` / `.zip` installers under `examples/desktop/electron/release/` (or the legacy `desktop/electron/release/` path). Keep only `.gitkeep` in git; publish binaries on Releases.
 
