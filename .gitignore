@@ -17,3 +17,17 @@ Cargo.lock
 *.pem
 
 .env
+.github_credentials
+.cursor
+
+# Desktop Electron installers - ship via GitHub Releases only, never commit
+examples/desktop/electron/release/*
+!examples/desktop/electron/release/.gitkeep
+desktop/electron/release/*
+!desktop/electron/release/.gitkeep
+*.AppImage
+*.snap
+**/electron/release/*.exe
+**/electron/release/*.zip
+**/electron/release/*.blockmap
+**/electron/release/builder-debug.yml
