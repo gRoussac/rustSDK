@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * SPA host + optional MCP proxy (evaluator-style).
+ * SPA host + optional MCP proxy.
  * Serves /app/dist on PORT (default 8080).
- * When ENABLE_MCP_PROXY=1, proxies /mcp → http://127.0.0.1:8790/mcp
+ * When ENABLE_MCP_PROXY=1, proxies /mcp → http://127.0.0.1:5790/mcp
  */
 import http from 'http';
 import fs from 'fs';
@@ -11,7 +11,7 @@ import { URL } from 'url';
 
 const PORT = Number(process.env.PORT || 8080);
 const DIST = process.env.DIST_DIR || '/app/dist';
-const MCP_UPSTREAM = process.env.MCP_UPSTREAM || 'http://127.0.0.1:8790';
+const MCP_UPSTREAM = process.env.MCP_UPSTREAM || 'http://127.0.0.1:5790';
 const ENABLE_MCP_PROXY =
   process.env.ENABLE_MCP_PROXY === '1' ||
   process.env.ENABLE_MCP_PROXY === 'true' ||

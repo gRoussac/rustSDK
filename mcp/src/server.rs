@@ -12,7 +12,7 @@ use crate::{format, sdk_handle, tools};
 pub struct CasperSdkMcp;
 
 /// Default HTTP bind address for Streamable MCP.
-pub const DEFAULT_HTTP_LISTEN: &str = "0.0.0.0:8790";
+pub const DEFAULT_HTTP_LISTEN: &str = "0.0.0.0:5790";
 
 // Keep in sync with Cargo.toml `version` (enforced by unit test below).
 #[mcp_server(name = "casper-rust-wasm-sdk", version = "2.2.2")]
@@ -1201,8 +1201,6 @@ Registered tools
 
 Pending tool groups
 {pending_block}
-
-Compose with sibling MCPs: casper-nctl-2-docker (:8788), kms-secp256k1-api (:8789).
 "#,
         version = env!("CARGO_PKG_VERSION"),
         listen = DEFAULT_HTTP_LISTEN,

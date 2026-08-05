@@ -56,8 +56,8 @@ ENV APP_VERSION=$APP_VERSION
 ENV GIT_SHA=$GIT_SHA
 ENV ENABLE_MCP=1
 ENV ENABLE_MCP_PROXY=1
-ENV CASPER_SDK_MCP_ADDR=127.0.0.1:8790
-ENV MCP_UPSTREAM=http://127.0.0.1:8790
+ENV CASPER_SDK_MCP_ADDR=127.0.0.1:5790
+ENV MCP_UPSTREAM=http://127.0.0.1:5790
 ENV RUST_LOG=warn
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
@@ -73,9 +73,9 @@ COPY --chown=node:node docker/entrypoint.sh /app/entrypoint.sh
 COPY --chown=node:node docker/serve.mjs /app/serve.mjs
 RUN chmod +x /app/entrypoint.sh /usr/local/bin/casper-rust-wasm-sdk-mcp
 
-EXPOSE 8080 8790
+EXPOSE 8080 5790
 
-# web (default): SPA on :8080 + MCP on :8790, /mcp proxied on :8080
+# web (default): SPA on :8080 + MCP on loopback :5790, /mcp proxied on :8080
 # mcp: run the MCP binary only (stdio or --http)
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["web"]

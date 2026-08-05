@@ -1,5 +1,5 @@
 # MCP via unified webclient image (SPA :8080 + /mcp proxy).
-# Do not publish container :8790 to the host — that port is NCTL's.
+# Publishes host :8080 only; MCP listens on container loopback :5790.
 # Use: make mcp-http / make mcp-http-stop
 # Hosted: https://casper-webclient.interchouette.net/mcp
 services:
