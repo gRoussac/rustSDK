@@ -14,15 +14,15 @@ Inventory: [TOOLS.md](TOOLS.md). Patterns: [PATTERNS.md](PATTERNS.md). MCP clien
 | **HTTP (Docker)**  | `make mcp-http` → webclient SPA                         | `http://127.0.0.1:8080/mcp` (`ENABLE_MCP=1`)        |
 | **stdio (Docker)** | `docker run -i … --entrypoint casper-rust-wasm-sdk-mcp` | `interchouette/casper-webclient:dev`                |
 | **stdio (host)**   | `make run-mcp`                                          | cargo; for local debug                              |
-| **HTTP (host)**    | `make run-mcp-http`                                     | cargo on `127.0.0.1:8081` (do not use host `:8790`) |
+| **HTTP (host)**    | `make run-mcp-http`                                     | cargo on `127.0.0.1:5790`                           |
 
 ```bash
 make mcp-http           # webclient → http://127.0.0.1:8080/mcp
 make mcp-http-stop
 make run-mcp            # stdio (host cargo)
-make run-mcp-http       # HTTP host on 127.0.0.1:8081
+make run-mcp-http       # HTTP host on 127.0.0.1:5790
 make mcp-test
-make mcp-test-live      # ignored tests vs live NCTL (CASPER_RPC_URL)
+make mcp-test-live      # ignored tests vs live local node (CASPER_RPC_URL)
 ```
 
 ## Env
@@ -30,14 +30,14 @@ make mcp-test-live      # ignored tests vs live NCTL (CASPER_RPC_URL)
 | Variable              | Role                                    | Default                          |
 | --------------------- | --------------------------------------- | -------------------------------- |
 | `ENABLE_MCP`          | Start MCP inside webclient (`web` mode) | `1`                              |
-| `CASPER_SDK_MCP_HTTP` | Use HTTP transport (binary)             | off (stdio) / on (web loopback)  |
-| `CASPER_SDK_MCP_ADDR` | HTTP bind inside container              | `127.0.0.1:8790` (loopback only) |
+| `MCP_HTTP` | Use HTTP transport (binary)             | off (stdio) / on (web loopback)  |
+| `CASPER_SDK_MCP_ADDR` | HTTP bind                               | `0.0.0.0:5790` (host) / `127.0.0.1:5790` (webclient loopback) |
 | `CASPER_RPC_URL`      | JSON-RPC                                | `http://127.0.0.1:11101`         |
 | `CASPER_NODE_URL`     | Binary port                             | `127.0.0.1:28101`                |
 | `CASPER_VERBOSITY`    | `low` / `medium` / `high`               | `low`                            |
 | `RUST_LOG`            | tracing filter (stderr, no ANSI)        | `warn`                           |
 
-Docker containers reach host NCTL via `host.docker.internal`.
+Docker containers reach the host node via `host.docker.internal`.
 
 ## Features
 
@@ -72,6 +72,6 @@ Hub tags for `interchouette/casper-webclient`: **`dev`**, **`latest`**, and the 
 | Server name (example)       | Transport | Backing                                                                        |
 | --------------------------- | --------- | ------------------------------------------------------------------------------ |
 | `casper-rust-wasm-sdk`      | stdio     | `interchouette/casper-webclient:dev` (`--entrypoint casper-rust-wasm-sdk-mcp`) |
-| `casper-rust-wasm-sdk-http` | HTTP      | `http://127.0.0.1:8080/mcp` (or the hosted URL above)                          |
+| `casper-rust-wasm-sdk-http` | HTTP      | `http://127.0.0.1:8080/mcp` (webclient) or `http://127.0.0.1:5790/mcp` (host) |
 
 Full sample: [mcp.json.example](mcp.json.example).

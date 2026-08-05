@@ -21,7 +21,7 @@ services:
       # NETWORK_NODE_URL: Optional, overrides selected network's node_address
       # Example: ws://casper-nctl.casper-box:4300/?targetPort=28101&targetHost=...
       - NETWORK_NODE_URL=${NETWORK_NODE_URL:-}
-      # MCP in-process (evaluator-style). DISABLE with ENABLE_MCP=0.
+      # MCP in-process with the SPA. DISABLE with ENABLE_MCP=0.
       - ENABLE_MCP=${ENABLE_MCP:-1}
       - CASPER_RPC_URL=${CASPER_RPC_URL:-http://host.docker.internal:11101}
       - CASPER_NODE_URL=${CASPER_NODE_URL:-host.docker.internal:28101}

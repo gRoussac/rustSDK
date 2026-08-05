@@ -1,7 +1,6 @@
 # MCP patterns
 
-Primary templates: **kms-secp256k1-api/mcp** (best overall) + **casper-nctl-2-docker/mcp**.
-tvscreener-rs = in-crate MCP; use it only for path-dep-on-lib style of tool bodies.
+How this product’s `mcp/` crate is laid out, built, and run.
 
 ---
 
@@ -57,20 +56,20 @@ Release profile (family): `lto`, `codegen-units=1`, `panic=abort`, `strip=symbol
 
 | Flag       | Env                   | Default        |
 | ---------- | --------------------- | -------------- |
-| `--http`   | `CASPER_SDK_MCP_HTTP` | false (stdio)  |
-| `--listen` | `CASPER_SDK_MCP_ADDR` | `0.0.0.0:8790` |
+| `--http`   | `MCP_HTTP` | false (stdio)  |
+| `--listen` | `CASPER_SDK_MCP_ADDR` | `0.0.0.0:5790` |
 
 SDK env: `CASPER_RPC_URL`, `CASPER_NODE_URL`, `CASPER_VERBOSITY`, `RUST_LOG`.
 
-Ports in family: 8787 tvs / 8788 nctl / 8789 kms / **8790 sdk**.
+HTTP MCP for this product: **`5790`**. Webclient SPA proxies `/mcp` on **`8080`**.
 
 ---
 
-## Logging (copy kms)
+## Logging
 
 - Writer: **stderr**
 - Default filter: **warn** (`RUST_LOG` override)
-- `with_ansi(false)` — Cursor treats stderr noise as `[error]`
+- `with_ansi(false)` — avoid ANSI so clients do not treat colored stderr as errors
 
 ---
 
@@ -94,7 +93,7 @@ Stub empty `ResourceHandler` / `PromptHandler` (`invalid_params` on unknown).
 
 ---
 
-## Version sync test (prefer kms needle)
+## Version sync test
 
 ```rust
 let needle = format!(
@@ -113,19 +112,19 @@ assert!(include_str!("server.rs").contains(&needle));
 | `mcp-build` | release build of mcp package |
 | `run-mcp` | stdio (host cargo) |
 | `mcp-http` | webclient Docker → `http://127.0.0.1:8080/mcp` |
-| `run-mcp-http` | host cargo HTTP on `127.0.0.1:8081` (not NCTL `:8790`) |
+| `run-mcp-http` | host cargo HTTP on `127.0.0.1:5790` |
 | `mcp-test` | `cargo test -p casper-rust-wasm-sdk-mcp` |
 
 Runtime image: `interchouette/casper-webclient:{dev,latest,$APP_VERSION}`. See [mcp.json.example](mcp.json.example).
 
 ---
 
-## Copy vs differ
+## Layout notes
 
-| Copy from kms/nctl | Differ for rustSDK |
+| Choice | Why |
 | --- | --- |
-| Separate `mcp/` crate, mcpkit 0.7 | Path-dep on SDK lib (in-process) |
-| clap `--http` / `--listen` | MCP embedded in webclient image |
-| stderr warn logging | No HTTP client to wrap an API |
-| `run` / `run_http` + empty resources/prompts | Host `:8790` is NCTL; use `:8080/mcp` |
-| Version sync test | Keep mcpkit off wasm root crate |
+| Separate `mcp/` crate, mcpkit | keep mcpkit off the wasm root crate |
+| Path-dep on SDK lib | in-process tools, not an HTTP proxy of the SDK |
+| clap `--http` / `--listen` | stdio or Streamable HTTP from one binary |
+| MCP embedded in webclient image | SPA `:8080` + loopback MCP `:5790` + `/mcp` proxy |
+| stderr warn logging | quiet default for MCP clients |
