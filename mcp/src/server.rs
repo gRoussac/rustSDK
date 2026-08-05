@@ -1175,6 +1175,130 @@ impl CasperSdkMcp {
     ) -> ToolOutput {
         tools::write::get_binary_try_accept_transaction(transaction_json, node_address).await
     }
+
+    // --- watcher (feature = "watcher") / SSE (feature = "SSE") ---
+
+    #[tool(description = "Wait for TransactionProcessed on node SSE for a transaction hash")]
+    async fn sdk_wait_transaction(
+        &self,
+        events_url: String,
+        transaction_hash: String,
+        timeout_ms: Option<u64>,
+    ) -> ToolOutput {
+        #[cfg(feature = "watcher")]
+        {
+            tools::watcher::wait_transaction(events_url, transaction_hash, timeout_ms).await
+        }
+        #[cfg(not(feature = "watcher"))]
+        {
+            let _ = (events_url, transaction_hash, timeout_ms);
+            tools::feature_disabled("watcher")
+        }
+    }
+
+    #[tool(
+        description = "Collect up to max_events matching event_names from node SSE (JSON array or comma list)"
+    )]
+    #[allow(non_snake_case)]
+    async fn sdk_SSE_collect(
+        &self,
+        events_url: String,
+        event_names: String,
+        max_events: Option<u64>,
+        timeout_ms: Option<u64>,
+        start_from: Option<u64>,
+    ) -> ToolOutput {
+        #[cfg(feature = "SSE")]
+        {
+            tools::SSE::SSE_collect(events_url, event_names, max_events, timeout_ms, start_from)
+                .await
+        }
+        #[cfg(not(feature = "SSE"))]
+        {
+            let _ = (events_url, event_names, max_events, timeout_ms, start_from);
+            tools::feature_disabled("SSE")
+        }
+    }
+
+    #[tool(
+        description = "Load CES schemas for contract hash hexes; returns metadata JSON (include schemaHex for parse tools)"
+    )]
+    #[allow(non_snake_case)]
+    async fn sdk_CES_parser_create(
+        &self,
+        contract_hashes_json: String,
+        state_root_hash: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "SSE")]
+        {
+            tools::SSE::CES_parser_create(contract_hashes_json, state_root_hash, rpc_address).await
+        }
+        #[cfg(not(feature = "SSE"))]
+        {
+            let _ = (contract_hashes_json, state_root_hash, rpc_address);
+            tools::feature_disabled("SSE")
+        }
+    }
+
+    #[tool(
+        description = "Parse CES events from execution_result JSON using schemas_metadata_json from sdk_CES_parser_create"
+    )]
+    #[allow(non_snake_case)]
+    async fn sdk_CES_parse_execution_result(
+        &self,
+        schemas_metadata_json: String,
+        execution_result_json: String,
+    ) -> ToolOutput {
+        #[cfg(feature = "SSE")]
+        {
+            tools::SSE::CES_parse_execution_result(schemas_metadata_json, execution_result_json)
+        }
+        #[cfg(not(feature = "SSE"))]
+        {
+            let _ = (schemas_metadata_json, execution_result_json);
+            tools::feature_disabled("SSE")
+        }
+    }
+
+    #[tool(
+        description = "get_transaction then parse CES events for contract_hashes_json (JSON string array)"
+    )]
+    #[allow(non_snake_case)]
+    async fn sdk_CES_parse_transaction(
+        &self,
+        contract_hashes_json: String,
+        transaction_hash: String,
+        finalized_approvals: Option<bool>,
+        state_root_hash: Option<String>,
+        verbosity: Option<String>,
+        rpc_address: Option<String>,
+    ) -> ToolOutput {
+        #[cfg(feature = "SSE")]
+        {
+            tools::SSE::CES_parse_transaction(
+                contract_hashes_json,
+                transaction_hash,
+                finalized_approvals,
+                state_root_hash,
+                verbosity,
+                rpc_address,
+            )
+            .await
+        }
+        #[cfg(not(feature = "SSE"))]
+        {
+            let _ = (
+                contract_hashes_json,
+                transaction_hash,
+                finalized_approvals,
+                state_root_hash,
+                verbosity,
+                rpc_address,
+            );
+            tools::feature_disabled("SSE")
+        }
+    }
 }
 
 fn help_text() -> String {
