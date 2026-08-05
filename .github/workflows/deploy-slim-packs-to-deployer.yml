@@ -1,0 +1,142 @@
+name: deploy-slim-packs-to-deployer
+
+# Build casper-deployer-oriented slim packs and open a PR on Interchouette-ITC/casper-deployer.
+# Requires secret GH_PAT_DEPLOY (write to Interchouette/casper-deployer fork + PR on org).
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev]
+    paths:
+      - "src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Makefile"
+      - ".github/workflows/deploy-slim-packs-to-deployer.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  pack-and-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Build slim deployer packs
+        run: make pack-deployer
+
+      - name: Write MANIFEST.md
+        run: |
+          SHA=$(git rev-parse HEAD)
+          SHORT=$(git rev-parse --short HEAD)
+          WEB_SIZE=$(wc -c < pkg/casper_rust_wasm_sdk_bg.wasm)
+          NODE_SIZE=$(wc -c < pkg-nodejs/casper_rust_wasm_sdk_bg.wasm)
+          {
+            echo "# Vendored casper-rust-wasm-sdk packs"
+            echo
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| SDK version | 2.2.2 |"
+            echo "| SDK git SHA | \`$SHA\` (\`$SHORT\`) |"
+            echo "| Built with | \`make pack-deployer\` |"
+            echo
+            echo "## Feature sets"
+            echo
+            echo "| Pack | Target | Cargo features |"
+            echo "| --- | --- | --- |"
+            echo "| \`pkg/\` | browser (web) | \`transaction,helpers,watcher\` (\`--no-default-features\`) |"
+            echo "| \`pkg-nodejs/\` | Node (Nest API) | \`transaction,deploy,helpers\` (\`--no-default-features\`) |"
+            echo
+            echo "Dropped vs full default: \`binary-port\`, \`contract\`; browser also drops \`deploy\`; Node also drops \`watcher\`."
+            echo
+            echo "## Wasm sizes"
+            echo
+            echo "| File | Bytes |"
+            echo "| --- | --- |"
+            echo "| \`pkg/casper_rust_wasm_sdk_bg.wasm\` | $WEB_SIZE |"
+            echo "| \`pkg-nodejs/casper_rust_wasm_sdk_bg.wasm\` | $NODE_SIZE |"
+          } > MANIFEST.md
+
+      - name: Upload pack artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployer-slim-packs
+          path: |
+            pkg/
+            pkg-nodejs/
+            MANIFEST.md
+
+      - name: Checkout deployer fork
+        uses: actions/checkout@v5
+        with:
+          repository: Interchouette/casper-deployer
+          ref: dev
+          token: ${{ secrets.GH_PAT_DEPLOY }}
+          path: deployer
+
+      - name: Sync packs into deployer
+        run: |
+          set -e
+          DEST=deployer/casper-rust-wasm-sdk
+          rm -rf "$DEST/pkg" "$DEST/pkg-nodejs"
+          cp -a pkg "$DEST/pkg"
+          cp -a pkg-nodejs "$DEST/pkg-nodejs"
+          cp -a MANIFEST.md "$DEST/MANIFEST.md"
+
+      - name: Commit and push branch
+        working-directory: deployer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH="update-wasm-${GITHUB_RUN_ID}"
+          git checkout -b "$BRANCH"
+          git add casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg-nodejs casper-rust-wasm-sdk/MANIFEST.md
+          if git diff --cached --quiet; then
+            echo "No wasm pack changes; skipping PR"
+            echo "skip=true" >> "$GITHUB_ENV"
+          else
+            SDK_SHA=$(cd .. && git rev-parse --short HEAD)
+            git commit -m "chore(sdk): vendor slim wasm packs from ${SDK_SHA}"
+            git push origin "$BRANCH"
+            echo "skip=false" >> "$GITHUB_ENV"
+            echo "branch=$BRANCH" >> "$GITHUB_ENV"
+            echo "sdk_sha=$SDK_SHA" >> "$GITHUB_ENV"
+          fi
+
+      - name: Create Pull Request
+        if: env.skip != 'true'
+        working-directory: deployer
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT_DEPLOY }}
+        run: |
+          gh pr create \
+            --repo Interchouette-ITC/casper-deployer \
+            --base dev \
+            --head "Interchouette:${{ env.branch }}" \
+            --title "chore(sdk): vendor slim wasm packs (${{ env.sdk_sha }})" \
+            --body "$(cat <<EOF
+          ## Summary
+          Automated slim \`casper-rust-wasm-sdk\` pack landing from [casper-rust-wasm-sdk@${{ env.sdk_sha }}](https://github.com/Interchouette-ITC/casper-rust-wasm-sdk/commit/${{ env.sdk_sha }}).
+
+          - Browser \`pkg\`: \`transaction,helpers,watcher\`
+          - Node \`pkg-nodejs\`: \`transaction,deploy,helpers\`
+          - Built with \`make pack-deployer\`
+
+          See \`casper-rust-wasm-sdk/MANIFEST.md\`.
+
+          ## Test plan
+          - [ ] \`cd www && npm install && npm test\`
+          - [ ] Smoke frontend + Nest against local NCTL or testnet
+          EOF
+          )"

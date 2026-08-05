@@ -10,8 +10,13 @@ NODEJS_OUT_DIR = pkg-nodejs
 WASM_FEATURES_FULL =
 WASM_FEATURES_READ_ONLY = --no-default-features
 WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher
+# casper-deployer browser: make/sign/watch transactions + helpers (no deploy/contract/binary-port)
+WASM_FEATURES_FRONTEND = --no-default-features --features transaction,helpers,watcher
+# casper-deployer Nest API: reads + put_transaction + legacy put_deploy (no watcher/binary-port/contract)
+WASM_FEATURES_API = --no-default-features --features transaction,deploy,helpers
 
-.PHONY: all web nodejs clean build doc web-full web-read-only web-transaction nodejs-full nodejs-read-only
+.PHONY: all web nodejs clean build doc web-full web-read-only web-transaction \
+	nodejs-full nodejs-read-only web-frontend nodejs-api pack-deployer rename-nodejs-pkg
 
 pack: web nodejs
 
@@ -28,11 +33,26 @@ web-read-only:
 web-transaction:
 	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_TRANSACTION)
 
+web-frontend:
+	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_FRONTEND)
+
 nodejs-full:
 	wasm-pack build --target nodejs --release --out-dir $(NODEJS_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_FULL)
 
 nodejs-read-only:
 	wasm-pack build --target nodejs --release --out-dir $(NODEJS_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_READ_ONLY)
+
+nodejs-api:
+	wasm-pack build --target nodejs --release --out-dir $(NODEJS_OUT_DIR) $(CURRENT_DIR) $(WASM_FEATURES_API)
+	$(MAKE) rename-nodejs-pkg
+
+# Deployer product packs: slim browser pkg + slim Nest pkg-nodejs
+pack-deployer: web-frontend nodejs-api
+
+rename-nodejs-pkg:
+	@test -f $(NODEJS_OUT_DIR)/package.json
+	jq '.name = "casper-rust-wasm-sdk-nodejs"' $(NODEJS_OUT_DIR)/package.json > $(NODEJS_OUT_DIR)/package.json.tmp \
+		&& mv $(NODEJS_OUT_DIR)/package.json.tmp $(NODEJS_OUT_DIR)/package.json
 
 clean:
 	rm -rf $(WEB_OUT_DIR) $(NODEJS_OUT_DIR)
