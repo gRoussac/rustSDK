@@ -1,12 +1,19 @@
 use crate::{
     helpers::get_str_or_default,
-    types::{cl::bytes::Bytes, deploy_params::args_simple::ArgsSimple},
+    types::{cl::bytes::Bytes, deploy_params::args_simple::ArgsSimple, runtime_args::RuntimeArgs},
 };
 use casper_client::cli::SessionStrParams as _SessionStrParams;
-use js_sys::Array;
 use once_cell::sync::OnceCell;
 use wasm_bindgen::prelude::*;
 
+/// Legacy deploy session params. Prefer [`crate::types::transaction_params::transaction_str_params::TransactionStrParams`].
+///
+/// Session args setters (same idea as transaction params):
+/// - [`Self::set_session_args_simple`] — CLI-style string bag
+/// - [`Self::set_session_args_json`] — JSON string
+/// - [`Self::set_session_args`] — typed [`RuntimeArgs`]
+#[deprecated(note = "prefer TransactionStrParams")]
+#[allow(deprecated)]
 #[wasm_bindgen]
 #[derive(Default, Debug, Clone)]
 pub struct SessionStrParams {
@@ -24,6 +31,7 @@ pub struct SessionStrParams {
 }
 
 #[wasm_bindgen]
+#[allow(deprecated)]
 impl SessionStrParams {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::too_many_arguments)]
@@ -34,7 +42,7 @@ impl SessionStrParams {
         session_package_name: Option<String>,
         session_path: Option<String>,
         session_bytes: Option<Bytes>,
-        session_args_simple: Option<Array>,
+        session_args_simple: Option<Vec<String>>,
         session_args_json: Option<String>,
         session_version: Option<String>,
         session_entry_point: Option<String>,
@@ -154,13 +162,11 @@ impl SessionStrParams {
         self.session_args_simple.get().cloned()
     }
 
+    /// CLI-style simple args (`name:Type='value'`).
     #[wasm_bindgen(setter)]
-    pub fn set_session_args_simple(&mut self, session_args_simple: Array) {
-        let args: Vec<String> = session_args_simple
-            .iter()
-            .map(|value| value.as_string().unwrap_or_default())
-            .collect();
-        self.set_session_args(args);
+    pub fn set_session_args_simple(&mut self, session_args_simple: Vec<String>) {
+        let args_simple = ArgsSimple::from(session_args_simple);
+        self.session_args_simple.set(args_simple).unwrap();
     }
 
     // Getter and setter for session_args_json field
@@ -169,11 +175,20 @@ impl SessionStrParams {
         self.session_args_json.get().cloned()
     }
 
+    /// JSON session args string (human-typed or ByteArray bridge encoding).
     #[wasm_bindgen(setter)]
     pub fn set_session_args_json(&self, session_args_json: &str) {
         self.session_args_json
             .set(session_args_json.to_string())
             .unwrap();
+    }
+
+    /// Typed session args. Parameter type is [`RuntimeArgs`]; string setters stay separate.
+    pub fn set_session_args(&self, args: &RuntimeArgs) {
+        let json = args
+            .to_session_args_json_string()
+            .expect("RuntimeArgs to session args JSON");
+        self.set_session_args_json(&json);
     }
 
     // Getter and setter for session_version field
@@ -214,14 +229,8 @@ impl SessionStrParams {
     }
 }
 
-impl SessionStrParams {
-    pub fn set_session_args(&mut self, session_args_simple: Vec<String>) {
-        let args_simple = ArgsSimple::from(session_args_simple);
-        self.session_args_simple.set(args_simple).unwrap();
-    }
-}
-
 // Convert SessionStrParams to casper_client::cli::SessionStrParam
+#[allow(deprecated)]
 pub fn session_str_params_to_casper_client(
     session_params: &SessionStrParams,
 ) -> _SessionStrParams<'_> {
@@ -294,6 +303,7 @@ pub fn session_str_params_to_casper_client(
 }
 
 #[cfg(test)]
+#[allow(deprecated)]
 mod tests {
     use super::*;
 
@@ -339,5 +349,24 @@ mod tests {
         let result = session_str_params_to_casper_client(&session_params);
         let result_debug_output = format!("{result:?}");
         assert!(result_debug_output.contains("is_session_transfer: true"));
+    }
+
+    #[test]
+    fn test_set_session_args_from_runtime_args() {
+        use crate::types::cl::cl_value::CLValue;
+
+        let session_params = SessionStrParams::default();
+        let mut args = RuntimeArgs::new();
+        args.insert_cl_value("message", CLValue::from_t("hi".to_string()).unwrap());
+        session_params.set_session_args(&args);
+
+        let json = session_params.session_args_json().unwrap();
+        let parsed: Vec<serde_json::Value> = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert_eq!(parsed[0]["name"], "message");
+
+        let client = session_str_params_to_casper_client(&session_params);
+        let debug = format!("{client:?}");
+        assert!(debug.contains("session_args_json"));
     }
 }
