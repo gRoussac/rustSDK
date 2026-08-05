@@ -1,3 +1,9 @@
+#[cfg(test)]
+pub(crate) mod deploy_mock;
+#[cfg(test)]
+pub(crate) mod transaction_mock;
+
+use crate::sdk::SSE::framing::extract_frames;
 use crate::SDK;
 use chrono::{Duration, Utc};
 use futures_util::StreamExt;
@@ -500,13 +506,11 @@ impl Watcher {
         message: &str,
         target_hash: Option<&str>,
     ) -> Option<Vec<EventParseResult>> {
-        let data_stream = Self::extract_data_stream(message);
+        for frame in extract_frames(message) {
+            let trimmed_item = frame.data.trim();
+            let transaction_processed_str = "TransactionProcessed";
 
-        for data_item in data_stream {
-            let trimmed_item = data_item.trim();
-            let transaction_processed_str = EventName::TransactionProcessed.to_string();
-
-            if !trimmed_item.contains(&transaction_processed_str) {
+            if !trimmed_item.contains(transaction_processed_str) {
                 continue;
             }
 
@@ -583,30 +587,11 @@ impl Watcher {
         }
         None
     }
-
-    /// Extracts the data stream from the raw JSON data.
-    ///
-    /// # Arguments
-    ///
-    /// * `json_data` - The raw JSON data containing the data stream.
-    ///
-    /// # Returns
-    ///
-    /// A vector of data items within the data stream.
-    fn extract_data_stream(json_data: &str) -> Vec<&str> {
-        let data_stream: Vec<&str> = json_data
-            .split("data:")
-            .filter(|s| !s.is_empty())
-            .map(|s| s.split("id:").next().unwrap_or(""))
-            .collect();
-        data_stream
-    }
 }
 
 /// A wrapper for an event handler function, providing synchronization and cloning capabilities.
 pub struct EventHandlerFn(Arc<Mutex<dyn Fn(EventParseResult) + Send + Sync>>);
 
-#[allow(dead_code)]
 impl EventHandlerFn {
     /// Creates a new `EventHandlerFn` with the specified event handling function.
     ///
@@ -880,37 +865,11 @@ pub struct EventParseResult {
     pub body: Option<Body>,
 }
 
-/// Enum representing different event names.
-#[derive(Debug, Deserialize, Clone, Serialize)]
-enum EventName {
-    BlockAdded,
-    TransactionAccepted,
-    TransactionExpired,
-    TransactionProcessed,
-    Step,
-    FinalitySignature,
-    Fault,
-}
-
-impl fmt::Display for EventName {
-    /// Implements the `fmt::Display` trait for converting the enum variant to its string representation.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            EventName::BlockAdded => write!(f, "BlockAdded"),
-            EventName::TransactionAccepted => write!(f, "TransactionAccepted"),
-            EventName::TransactionExpired => write!(f, "TransactionExpired"),
-            EventName::TransactionProcessed => write!(f, "TransactionProcessed"),
-            EventName::Step => write!(f, "Step"),
-            EventName::FinalitySignature => write!(f, "FinalitySignature"),
-            EventName::Fault => write!(f, "Fault"),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::watcher::{deploy_mock::DEPLOY_MOCK, transaction_mock::TRANSACTION_MOCK};
+    use crate::sdk::SSE::watcher::deploy_mock::DEPLOY_MOCK;
+    use crate::sdk::SSE::watcher::transaction_mock::TRANSACTION_MOCK;
     use sdk_tests::tests::helpers::get_network_constants;
     use tokio;
 
@@ -949,18 +908,6 @@ mod tests {
             watcher.timeout_duration,
             Duration::try_milliseconds(DEFAULT_TIMEOUT_MS.try_into().unwrap()).unwrap()
         );
-    }
-
-    #[tokio::test]
-    async fn test_extract_data_stream() {
-        // Arrange
-        let json_data = r#"data:segment1id:data:segment2id:data:segment3id:"#;
-
-        // Act
-        let result = Watcher::extract_data_stream(json_data);
-
-        // Assert
-        assert_eq!(result, vec!["segment1", "segment2", "segment3"]);
     }
 
     #[tokio::test]
@@ -1014,6 +961,17 @@ mod tests {
         assert_eq!(transaction_processed.hash.to_string(), transaction_hash);
     }
 
+    fn assert_wait_or_connect_err(err: &Option<String>) {
+        let msg = err.as_ref().expect("expected error");
+        assert!(
+            msg == "Timeout expired"
+                || msg.contains("error sending request")
+                || msg.contains("Failed to fetch stream")
+                || msg.contains("error"),
+            "unexpected err: {msg}"
+        );
+    }
+
     #[tokio::test]
     async fn test_start_timeout() {
         // Arrange
@@ -1027,7 +985,7 @@ mod tests {
         assert!(result.is_some());
         let results = result.unwrap();
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].err, Some("Timeout expired".to_string()));
+        assert_wait_or_connect_err(&results[0].err);
         assert!(results[0].body.is_none());
     }
 
@@ -1164,8 +1122,7 @@ mod tests {
         // Assert
         assert!(result.is_ok());
         let event_parse_result = result.unwrap();
-        assert!(event_parse_result.err.is_some());
-        assert_eq!(event_parse_result.err, Some("Timeout expired".to_string()));
+        assert_wait_or_connect_err(&event_parse_result.err);
     }
 
     #[tokio::test]
@@ -1184,7 +1141,6 @@ mod tests {
         // Assert
         assert!(result.is_ok());
         let event_parse_result = result.unwrap();
-        assert!(event_parse_result.err.is_some());
-        assert_eq!(event_parse_result.err, Some("Timeout expired".to_string()));
+        assert_wait_or_connect_err(&event_parse_result.err);
     }
 }

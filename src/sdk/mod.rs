@@ -25,8 +25,15 @@ pub(crate) mod transaction_utils;
 #[cfg(feature = "transaction")]
 pub(crate) use transaction_utils::*;
 
-#[cfg(feature = "watcher")]
-pub mod watcher;
+#[cfg(feature = "SSE")]
+#[allow(non_snake_case)]
+#[path = "sse/mod.rs"]
+pub mod SSE;
+
+#[cfg(feature = "SSE")]
+pub mod watcher {
+    pub use crate::sdk::SSE::watcher::*;
+}
 
 #[cfg(feature = "contract")]
 pub(crate) mod contract;

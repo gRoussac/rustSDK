@@ -1,5 +1,7 @@
 //! Feature-gated tool modules.
 
+#[allow(non_snake_case)]
+pub mod SSE;
 pub mod binary_port;
 pub mod contract;
 pub mod deploy;
@@ -26,6 +28,8 @@ pub fn enabled_tool_groups() -> Vec<&'static str> {
     groups.push("contract");
     #[cfg(feature = "write")]
     groups.push("write");
+    #[cfg(feature = "SSE")]
+    groups.push("SSE");
     groups
 }
 
@@ -51,6 +55,8 @@ pub fn registered_tool_names() -> Vec<&'static str> {
     names.extend_from_slice(contract::tool_names());
     #[cfg(feature = "write")]
     names.extend_from_slice(write::tool_names());
+    #[cfg(feature = "SSE")]
+    names.extend_from_slice(SSE::tool_names());
     names
 }
 

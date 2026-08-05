@@ -5,9 +5,9 @@
 **Scope:** `casper-rust-wasm-sdk` native-callable methods under `src/sdk` and `src/helpers`.
 
 **Include:** `impl SDK` + public helpers that compile on non-`wasm32`.
-**Exclude:** `*_js_alias`, `*_options` taking `JsValue`, `CasperWallet`, Watcher streams, `binary_port/wasm32.rs`, wasm-only RPC protocol aliases returning `JsError`.
+**Exclude:** `*_js_alias`, `*_options` taking `JsValue`, `CasperWallet`, `binary_port/wasm32.rs`, wasm-only RPC protocol aliases returning `JsError`. Endless SSE `start()` loops stay wasm/native; MCP exposes bounded wait/collect + CES.
 
-**Features:** proposed MCP crate gates (`helpers` | `rpc` | `binary-port` | `transaction` | `deploy` | `contract` | `write`). Paths relative to `src/`.
+**Features:** proposed MCP crate gates (`helpers` | `rpc` | `binary-port` | `transaction` | `deploy` | `contract` | `write` | `SSE`). Paths relative to `src/`.
 
 **Legend:** `write` = submit on-chain, sign with secret, or binary accept. Local `make_*` builders are not write. Speculative exec is not write.
 
@@ -20,7 +20,7 @@
 | JS aliases              | `*_js_alias`, `transfer_transactionjs_alias`                |
 | JsValue options         | `get_*_options`, `query_*_options`                          |
 | Wallet                  | `src/js/wallet.rs` (`CasperWallet`)                         |
-| Watcher                 | `sdk/watcher/*`                                             |
+| Endless SSE streams     | `SSEClient::start` continuous loop (use `sdk_SSE_collect`)  |
 | wasm32 binary bindings  | `sdk/binary_port/wasm32.rs`                                 |
 | wasm32 RPC name aliases | `info_get_*`, `chain_get_*`, `state_get_*`, `account_put_*` |
 
@@ -195,6 +195,18 @@ Prefer dual-gate with domain feature where applicable (e.g. `transaction` + `wri
 
 ---
 
+## SSE — feature `SSE` (node SSE + CES)
+
+| Method / helper         | Path                 | MCP tool                         | Args                                                                     |
+| ----------------------- | -------------------- | -------------------------------- | ------------------------------------------------------------------------ |
+| `wait_transaction`      | `sdk/sse/watcher/`   | `sdk_wait_transaction`           | `events_url`, `transaction_hash`, `timeout_ms?`                          |
+| `SSEClient::collect`    | `sdk/sse/client.rs`  | `sdk_SSE_collect`                | `events_url`, `event_names`, `max_events?`, `timeout_ms?`, `start_from?` |
+| `CesParser::create`     | `sdk/sse/ces/`       | `sdk_ces_parser_create`          | `contract_hashes_json`, `state_root_hash?`, `rpc_address?`               |
+| `CesParser::parse_*`    | `sdk/sse/ces/`       | `sdk_ces_parse_execution_result` | `schemas_metadata_json`, `execution_result_json`                         |
+| `get_transaction` + CES | `sdk/sse/ces/` + rpc | `sdk_ces_parse_transaction`      | `contract_hashes_json`, `transaction_hash`, …                            |
+
+---
+
 ## Counts
 
 | Group                    | Methods  |
@@ -207,6 +219,7 @@ Prefer dual-gate with domain feature where applicable (e.g. `transaction` + `wri
 | deploy                   | 4        |
 | contract                 | 2        |
 | write                    | 13       |
+| SSE                      | 5        |
 | **Total tools (approx)** | **~104** |
 
 ---
