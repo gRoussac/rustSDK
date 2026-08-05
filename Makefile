@@ -124,7 +124,7 @@ docker-deploy-prod:
 .PHONY: docker-build docker-start docker-stop docker-start-prod docker-stop-prod
 
 # --- MCP (mcp/ crate; runtime via casper-webclient image) ---
-# Hub: interchouette/casper-webclient:{dev,latest}. Slim casper-rust-wasm-sdk-mcp Hub image is deprecated.
+# Hub: interchouette/casper-webclient:{dev,latest,$APP_VERSION}. Slim casper-rust-wasm-sdk-mcp Hub image is deprecated.
 
 WEBCLIENT_HUB_IMAGE ?= interchouette/casper-webclient
 CASPER_SDK_MCP_IMAGE ?= $(WEBCLIENT_HUB_IMAGE):dev
@@ -159,9 +159,5 @@ mcp-test-live:
 	CASPER_NODE_URL=$${CASPER_NODE_URL:-127.0.0.1:28101} \
 		cargo test -p casper-rust-wasm-sdk-mcp --lib -- --ignored --nocapture
 
-# HTTP (compose) + Docker stdio against live NCTL. Requires: make mcp-http, NCTL up.
-mcp-smoke:
-	CASPER_SDK_MCP_IMAGE=$(CASPER_SDK_MCP_IMAGE) bash mcp/scripts/smoke_transports.sh
-
 .PHONY: mcp-build mcp-http mcp-http-stop \
-	run-mcp run-mcp-http mcp-test mcp-test-live mcp-smoke
+	run-mcp run-mcp-http mcp-test mcp-test-live
