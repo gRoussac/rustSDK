@@ -23,13 +23,30 @@ exclude = [
   "tests/**",
 ]
 
+[features]
+default = ["full"]
+full = [
+  "transaction",
+  "deploy",
+  "contract",
+  "binary-port",
+  "watcher",
+  "helpers",
+]
+transaction = []
+deploy = []
+contract = []
+binary-port = ["dep:casper-binary-port", "dep:casper-binary-port-access"]
+watcher = []
+helpers = []
+
 [dependencies]
 casper-types = { version = "7.1.1", default-features = false, features = [
   "datasize",
 ] }
 casper-client = { version = "5", default-features = false }
-casper-binary-port = { version = "1.2.1" }
-casper-binary-port-access = { version = "0.1.0" }
+casper-binary-port = { version = "1.2.1", optional = true }
+casper-binary-port-access = { version = "0.1.0", optional = true }
 rand = { version = "0.9.2", default-features = false, features = [
   "thread_rng",
 ] }
@@ -70,6 +87,14 @@ doc = false
 
 [profile.release]
 lto = true
+codegen-units = 1
+opt-level = "s"
+strip = true
+panic = "abort"
+
+# Needs Binaryen/wasm-opt that accepts rustc's bulk-memory ops (--all-features).
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-O", "--all-features"]
 
 [dev-dependencies]
 sdk_tests = { path = "tests/integration/rust" }

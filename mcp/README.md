@@ -41,24 +41,23 @@ Docker containers reach host NCTL via `host.docker.internal` (compose sets `extr
 
 ## Features
 
-| Feature          | Tools                                                   |
-| ---------------- | ------------------------------------------------------- |
-| _(always)_       | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`    |
-| `helpers`        | utilities (keys, blake2b, motes, …)                     |
-| `rpc`            | JSON-RPC reads + speculative RPC                        |
-| `binary-port`    | binary-port queries (needs `CASPER_NODE_URL`)           |
-| `transaction`    | make / speculative transaction builders                 |
-| `deploy`         | legacy make / speculative deploy builders               |
-| `contract`       | `query_contract_dict`, `query_contract_key`             |
-| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` |
-| `full` (default) | all of the above                                        |
+MCP features enable the matching SDK features (`casper-rust-wasm-sdk` is `default-features = false`). Default is `full`.
+
+| Feature          | Tools                                                   | SDK feature                    |
+| ---------------- | ------------------------------------------------------- | ------------------------------ |
+| _(always)_       | `sdk_help`, `sdk_get_endpoints`, `sdk_set_endpoints`    | core RPC                       |
+| `helpers`        | utilities (keys, blake2b, motes, …)                     | `helpers`                      |
+| `rpc`            | JSON-RPC reads + speculative RPC                        | (always on in SDK)             |
+| `binary-port`    | binary-port queries (needs `CASPER_NODE_URL`)           | `binary-port`                  |
+| `transaction`    | make / speculative transaction builders                 | `transaction`                  |
+| `deploy`         | legacy make / speculative deploy builders               | `deploy`                       |
+| `contract`       | `query_contract_dict`, `query_contract_key`             | `contract`                     |
+| `write`          | sign/put/submit, install, call_entrypoint, `try_accept` | `transaction`+`deploy`+`contract` |
+| `full` (default) | all of the above                                        | all SDK optional features      |
 
 ```bash
 cargo build -p casper-rust-wasm-sdk-mcp
-cargo build -p casper-rust-wasm-sdk-mcp --no-default-features --features "rpc,helpers"
 ```
-
-> mcpkit may still compile tool handlers when a feature is off; `sdk_help` lists only enabled groups.
 
 ## Tools
 

@@ -29,16 +29,16 @@ full = [
   "write",
 ]
 rpc = []
-binary-port = []
-transaction = []
-deploy = []
-contract = []
-helpers = []
-write = []
+binary-port = ["casper-rust-wasm-sdk/binary-port"]
+transaction = ["casper-rust-wasm-sdk/transaction"]
+deploy = ["casper-rust-wasm-sdk/deploy"]
+contract = ["casper-rust-wasm-sdk/contract"]
+helpers = ["casper-rust-wasm-sdk/helpers"]
+write = ["transaction", "deploy", "contract"]
 
 [dependencies]
 anyhow = "1"
-casper-rust-wasm-sdk = { path = ".." }
+casper-rust-wasm-sdk = { path = "..", default-features = false }
 casper-types = { version = "7.0.0", default-features = false, features = [
   "datasize",
 ] }
