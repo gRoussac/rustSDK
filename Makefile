@@ -133,7 +133,7 @@ COMPOSE_MCP ?= docker/docker-compose.mcp.yml
 mcp-build:
 	cargo build -p casper-rust-wasm-sdk-mcp --release
 
-# Local HTTP via webclient (SPA :8080 + /mcp). Never binds host :8790 (NCTL).
+# Local HTTP via webclient (SPA :8080 + /mcp). MCP stays on container loopback.
 mcp-http:
 	-docker pull $(CASPER_SDK_MCP_IMAGE)
 	CASPER_SDK_MCP_IMAGE=$(CASPER_SDK_MCP_IMAGE) \
@@ -147,9 +147,9 @@ mcp-http-stop:
 run-mcp:
 	cargo run -p casper-rust-wasm-sdk-mcp --quiet --
 
-# Host cargo HTTP — use :8081 so we do not steal NCTL :8790.
+# Host cargo HTTP on this product's MCP port.
 run-mcp-http:
-	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:8081
+	cargo run -p casper-rust-wasm-sdk-mcp --quiet -- --http --listen 127.0.0.1:5790
 
 mcp-test:
 	cargo test -p casper-rust-wasm-sdk-mcp
