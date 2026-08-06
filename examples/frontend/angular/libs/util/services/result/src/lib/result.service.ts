@@ -11,6 +11,8 @@ export class ResultService {
 
   private readonly result = new Subject<Result>;
   private readonly window = this.document.defaultView;
+  /** Bumps on each setResult so a late highlight cannot overwrite a newer clear/result. */
+  private setResultGeneration = 0;
 
   constructor(
     private readonly highlightService: HighlightService,
@@ -21,15 +23,26 @@ export class ResultService {
     return this.result.asObservable();
   }
 
-  async setResult<T>(result: object | string) {
-    const res = result as T;
-    const resultHtml = await this.highlightService.highlightMessage<T>(
-      res
-    );
-    const isString = typeof result === 'string';
+  async setResult(result: object | string) {
+    const generation = ++this.setResultGeneration;
+    // Strings (clear / empty) skip the highlight worker.
+    if (typeof result === 'string') {
+      if (generation !== this.setResultGeneration) {
+        return;
+      }
+      this.result.next({
+        result,
+        resultHtml: result,
+      });
+      return;
+    }
+    const resultHtml = await this.highlightService.highlightMessage(result);
+    if (generation !== this.setResultGeneration) {
+      return;
+    }
     this.result.next({
-      result: isString ? res as string : JSON.stringify(res),
-      resultHtml: isString ? res as string : resultHtml,
+      result: JSON.stringify(result),
+      resultHtml,
     });
   }
 
