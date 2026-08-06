@@ -6,6 +6,7 @@ export const key_path_default =
   '../../../../NCTL/casper-node/utils/nctl/assets/net-1/users/user-1/';
 export const rpc_address_default = 'http://localhost:11101';
 export const app_address_default = 'http://localhost:4200';
+export const events_address_default = 'http://localhost:18101/events';
 export const chain_name_default = 'casper-net-1';
 export const enable_addressable_entity_default = false;
 
@@ -17,6 +18,8 @@ export const key_name = key_name_default;
 export const key_path = process.env.SECRET_KEY_NCTL_PATH || key_path_default;
 export const rpc_address = process.env.RPC_ADDRESS || rpc_address_default;
 export const app_address = process.env.APP_ADDRESS || app_address_default;
+export const events_address =
+  process.env.EVENTS_ADDRESS || events_address_default;
 export const chain_name = process.env.CHAIN_NAME || chain_name_default;
 export const enable_addressable_entity =
   process.env.ENABLE_ADDRESSABLE_ENTITY || enable_addressable_entity_default;
@@ -43,5 +46,5 @@ export const args_json = `[
 {"name": "nft_metadata_kind", "type": "U8", "value": 2},
 {"name": "identifier_mode", "type": "U8", "value": 0},
 {"name": "metadata_mutability", "type": "U8", "value": 0},
-{"name": "events_mode", "type": "U8", "value": 1}
+{"name": "events_mode", "type": "U8", "value": 2}
 ]`;

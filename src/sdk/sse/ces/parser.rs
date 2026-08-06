@@ -7,7 +7,7 @@ use crate::types::digest::Digest;
 use crate::types::identifier::global_state_identifier::GlobalStateIdentifier;
 use crate::SDK;
 use casper_types::{
-    bytesrepr::{FromBytes, ToBytes},
+    bytesrepr::{Bytes, FromBytes, ToBytes},
     CLType, CLValue,
 };
 use serde_json::Value;
@@ -105,7 +105,11 @@ impl CESParser {
         state_root_hash: Option<&str>,
         rpc_address: Option<String>,
     ) -> Result<ContractMetadata, String> {
-        let key = if contract_hash.starts_with("hash-") {
+        // NCTL/account named keys often use entity-contract-…; query_global_state
+        // expects hash-… (same remap as dictionary helpers).
+        let key = if contract_hash.starts_with("entity-contract-") {
+            contract_hash.replacen("entity-contract-", "hash-", 1)
+        } else if contract_hash.starts_with("hash-") {
             contract_hash.to_string()
         } else {
             format!("hash-{contract_hash}")
@@ -125,7 +129,10 @@ impl CESParser {
             .ok_or_else(|| format!("no CLValue bytes for schema uref {events_schema_uref}"))?;
         let schemas = parse_schemas_from_bytes(&schema_bytes)?;
 
-        let hash_hex = contract_hash.trim_start_matches("hash-").to_string();
+        let hash_hex = contract_hash
+            .trim_start_matches("hash-")
+            .trim_start_matches("entity-contract-")
+            .to_string();
 
         Ok(ContractMetadata {
             schemas,
@@ -243,9 +250,10 @@ fn new_dictionary_from_bytes(data: &[u8]) -> Result<Dictionary, String> {
     let (cl_value, rest) =
         CLValue::from_bytes(data).map_err(|e| format!("CLValue from_bytes: {e:?}"))?;
 
-    let list: Vec<u8> = cl_value
+    // casper_types rejects Vec<u8> via into_t; use Bytes then own the payload.
+    let list: Bytes = cl_value
         .into_t()
-        .map_err(|e| format!("expected List<U8>: {e:?}"))?;
+        .map_err(|e| format!("expected List<U8>/Bytes: {e:?}"))?;
 
     // After the typed CLValue, ces-js reads a u32 length then ByteArray(uref) then String(key).
     let (uref_len, rest) = u32::from_bytes(rest).map_err(|e| format!("uref len: {e:?}"))?;
@@ -262,7 +270,7 @@ fn new_dictionary_from_bytes(data: &[u8]) -> Result<Dictionary, String> {
     Ok(Dictionary {
         uref,
         key: dict_key,
-        value: list,
+        value: list.into(),
     })
 }
 
@@ -354,7 +362,7 @@ fn decode_clvalue_by_type(cl_type: CLType, bytes: &[u8]) -> Result<(CLValue, &[u
             Ok((CLValue::from_t(v).map_err(|e| format!("{e:?}"))?, rest))
         }
         CLType::List(inner) if *inner == CLType::U8 => {
-            let (v, rest) = Vec::<u8>::from_bytes(bytes).map_err(|e| format!("{e:?}"))?;
+            let (v, rest) = Bytes::from_bytes(bytes).map_err(|e| format!("{e:?}"))?;
             Ok((CLValue::from_t(v).map_err(|e| format!("{e:?}"))?, rest))
         }
         other => {
@@ -426,6 +434,8 @@ fn extract_ces_named_keys(
     let named_keys = contract_json
         .pointer("/Contract/named_keys")
         .or_else(|| contract_json.pointer("/contract/named_keys"))
+        .or_else(|| contract_json.pointer("/AddressableEntity/named_keys"))
+        .or_else(|| contract_json.pointer("/addressable_entity/named_keys"))
         .or_else(|| contract_json.get("named_keys"))
         .and_then(|v| v.as_array())
         .ok_or_else(|| "contract named_keys not found".to_string())?;
@@ -538,6 +548,13 @@ mod tests {
     }
 
     #[test]
+    fn parse_event_name_rejects_missing_prefix() {
+        let bytes = "Transfer".to_string().to_bytes().unwrap();
+        let err = parse_event_name_with_remainder(&bytes).unwrap_err();
+        assert!(err.contains("event_"));
+    }
+
+    #[test]
     fn schemas_roundtrip_empty() {
         let schemas = Schemas(BTreeMap::new());
         let bytes = schemas.to_bytes().unwrap();
@@ -560,5 +577,47 @@ mod tests {
         let (decoded, _) = Schemas::from_bytes(&bytes).unwrap();
         assert!(decoded.get("Transfer").is_some());
         assert_eq!(decoded.get("Transfer").unwrap().fields().len(), 2);
+    }
+
+    #[test]
+    fn parser_new_is_empty() {
+        let parser = CESParser::new();
+        assert_eq!(parser.contract_count(), 0);
+    }
+
+    #[test]
+    fn parse_execution_result_json_rejects_invalid_json() {
+        let parser = CESParser::new();
+        assert!(parser.parse_execution_result_json("not-json").is_err());
+    }
+
+    #[test]
+    fn parse_execution_result_requires_effects() {
+        let parser = CESParser::new();
+        let err = parser
+            .parse_execution_result_json(r#"{"Success":{"cost":"1"}}"#)
+            .unwrap_err();
+        assert!(err.contains("effects") || err.contains("transforms"));
+    }
+
+    #[test]
+    fn parse_transaction_processed_requires_execution_result() {
+        let parser = CESParser::new();
+        let err = parser
+            .parse_transaction_processed_json(r#"{"hash":"abc"}"#)
+            .unwrap_err();
+        assert!(err.contains("execution_result"));
+    }
+
+    #[test]
+    fn parse_execution_result_skips_non_dictionary_transforms() {
+        let parser = CESParser::new();
+        let json = r#"{
+            "effects": [
+                {"key": "account-hash-00", "transform": "Identity"}
+            ]
+        }"#;
+        let events = parser.parse_execution_result_json(json).unwrap();
+        assert!(events.is_empty());
     }
 }

@@ -7,7 +7,9 @@ CURRENT_DIR = .
 WEB_OUT_DIR = pkg
 NODEJS_OUT_DIR = pkg-nodejs
 
-WASM_FEATURES_FULL =
+# web-full / nodejs-full: default features plus SSE (SSEClient + CESParser).
+# Cargo `full` stays watcher-only for crate consumers; packs express the full SDK.
+WASM_FEATURES_FULL = --features SSE
 WASM_FEATURES_READ_ONLY = --no-default-features
 WASM_FEATURES_TRANSACTION = --no-default-features --features transaction,helpers,watcher
 
@@ -78,7 +80,7 @@ clean:
 	cargo clean
 
 test:
-	cargo test -- --test-threads=1 --nocapture
+	cargo test --features SSE -- --test-threads=1 --nocapture
 
 integration-test:
 	cd tests/integration/rust && cargo test -- --test-threads=1 --nocapture
