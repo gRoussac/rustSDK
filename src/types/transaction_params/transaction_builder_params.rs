@@ -78,6 +78,9 @@ pub struct TransactionBuilderParams {
     maximum_delegation_amount: Option<Option<u64>>,
     reserved_slots: Option<Option<u32>>,
     major_protocol_version: Option<ProtocolVersionMajor>,
+    /// Session/entity/package runtime. `None` uses kind default: Session → V2,
+    /// stored invocation (entity/package) → V1.
+    runtime: Option<TransactionRuntimeParams>,
 }
 
 #[wasm_bindgen]
@@ -127,6 +130,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -161,6 +165,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -192,6 +197,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -223,6 +229,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -267,6 +274,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version,
+            runtime: None,
         }
     }
 
@@ -310,6 +318,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version,
+            runtime: None,
         }
     }
 
@@ -346,6 +355,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: Some(maximum_delegation_amount),
             reserved_slots: Some(reserved_slots),
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -379,6 +389,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -413,6 +424,7 @@ impl TransactionBuilderParams {
             reserved_slots: None,
 
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -447,6 +459,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -476,6 +489,7 @@ impl TransactionBuilderParams {
             maximum_delegation_amount: None,
             reserved_slots: None,
             major_protocol_version: None,
+            runtime: None,
         }
     }
 
@@ -669,12 +683,113 @@ impl TransactionBuilderParams {
     pub fn set_is_install_upgrade(&mut self, is_install_upgrade: bool) {
         self.is_install_upgrade = Some(is_install_upgrade);
     }
+
+    /// True when runtime resolves to VmCasperV1.
+    #[wasm_bindgen(getter, js_name = "isRuntimeV1")]
+    pub fn is_runtime_v1(&self) -> bool {
+        matches!(
+            self.resolved_runtime(),
+            TransactionRuntimeParams::VmCasperV1
+        )
+    }
+
+    /// True when runtime resolves to VmCasperV2.
+    #[wasm_bindgen(getter, js_name = "isRuntimeV2")]
+    pub fn is_runtime_v2(&self) -> bool {
+        matches!(
+            self.resolved_runtime(),
+            TransactionRuntimeParams::VmCasperV2 { .. }
+        )
+    }
+
+    /// V2 `transferred_value`, or 0 for V1.
+    #[wasm_bindgen(getter, js_name = "runtimeTransferredValue")]
+    pub fn runtime_transferred_value(&self) -> u64 {
+        match self.resolved_runtime() {
+            TransactionRuntimeParams::VmCasperV2 {
+                transferred_value, ..
+            } => transferred_value,
+            TransactionRuntimeParams::VmCasperV1 => 0,
+        }
+    }
+
+    /// V2 installer seed bytes, if set.
+    #[wasm_bindgen(getter, js_name = "runtimeSeed")]
+    pub fn runtime_seed(&self) -> Option<Vec<u8>> {
+        match self.resolved_runtime() {
+            TransactionRuntimeParams::VmCasperV2 {
+                seed: Some(seed), ..
+            } => Some(seed.to_vec()),
+            _ => None,
+        }
+    }
+
+    /// Force VmCasperV1 (legacy).
+    #[wasm_bindgen(js_name = "setRuntimeV1")]
+    pub fn set_runtime_v1(&mut self) {
+        self.runtime = Some(TransactionRuntimeParams::VmCasperV1);
+    }
+
+    /// Set VmCasperV2. `seed` must be absent or exactly 32 bytes (invalid length is ignored).
+    #[wasm_bindgen(js_name = "setRuntimeV2")]
+    pub fn set_runtime_v2(&mut self, transferred_value: u64, seed: Option<Vec<u8>>) {
+        self.runtime = Some(runtime_v2(transferred_value, seed));
+    }
+}
+
+impl TransactionBuilderParams {
+    fn resolved_runtime(&self) -> TransactionRuntimeParams {
+        self.runtime
+            .clone()
+            .unwrap_or_else(|| default_runtime_for_kind(self.kind))
+    }
+}
+
+/// Session defaults to V2 (VM2-oriented installs). Stored entity/package calls
+/// default to V1 (classic CEP-78 and current on-chain fixtures).
+fn default_runtime_for_kind(kind: TransactionKind) -> TransactionRuntimeParams {
+    match kind {
+        TransactionKind::Session => default_runtime_v2(),
+        TransactionKind::InvocableEntity
+        | TransactionKind::InvocableEntityAlias
+        | TransactionKind::Package
+        | TransactionKind::PackageAlias => TransactionRuntimeParams::VmCasperV1,
+        // Transfer / auction kinds do not carry a session runtime field.
+        _ => default_runtime_v2(),
+    }
+}
+
+fn default_runtime_v2() -> TransactionRuntimeParams {
+    TransactionRuntimeParams::VmCasperV2 {
+        transferred_value: 0,
+        seed: None,
+    }
+}
+
+fn runtime_v2(transferred_value: u64, seed: Option<Vec<u8>>) -> TransactionRuntimeParams {
+    let seed = match seed {
+        Some(bytes) if bytes.len() == 32 => {
+            let mut arr = [0u8; 32];
+            arr.copy_from_slice(&bytes);
+            Some(arr)
+        }
+        Some(_) => {
+            error("set_runtime_v2: seed must be 32 bytes; ignoring seed");
+            None
+        }
+        None => None,
+    };
+    TransactionRuntimeParams::VmCasperV2 {
+        transferred_value,
+        seed,
+    }
 }
 
 // Convert TransactionBuilderParams to casper_client::cli::TransactionBuilderParams
 pub fn transaction_builder_params_to_casper_client(
     transaction_params: &TransactionBuilderParams,
 ) -> _TransactionBuilderParams<'_> {
+    let runtime = transaction_params.resolved_runtime();
     match transaction_params.kind {
         TransactionKind::Session => _TransactionBuilderParams::Session {
             is_install_upgrade: transaction_params.is_install_upgrade.unwrap_or_default(),
@@ -683,7 +798,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .clone()
                 .unwrap_or_default()
                 .into(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODo FIX Runtime
+            runtime,
         },
         TransactionKind::Transfer => _TransactionBuilderParams::Transfer {
             maybe_source: transaction_params.maybe_source.clone().map(Into::into),
@@ -711,7 +826,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
+            runtime,
         },
         TransactionKind::InvocableEntityAlias => _TransactionBuilderParams::InvocableEntityAlias {
             entity_alias: transaction_params
@@ -722,7 +837,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
+            runtime,
         },
         TransactionKind::Package => _TransactionBuilderParams::PackageWithMajorVersion {
             package_hash: transaction_params.package_hash.unwrap().into(),
@@ -731,7 +846,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
+            runtime,
             major_protocol_version: transaction_params.major_protocol_version,
         },
         TransactionKind::PackageAlias => _TransactionBuilderParams::PackageAliasWithMajorVersion {
@@ -744,7 +859,7 @@ pub fn transaction_builder_params_to_casper_client(
                 .entry_point
                 .as_deref()
                 .unwrap_or_default(),
-            runtime: TransactionRuntimeParams::VmCasperV1, // TODO FIX Runtime
+            runtime,
             major_protocol_version: transaction_params.major_protocol_version,
         },
         TransactionKind::AddBid => _TransactionBuilderParams::AddBid {
@@ -796,4 +911,56 @@ fn convert_amount(amount: &str) -> Option<U512> {
             error(&format!("Error converting amount: {err:?}"));
         })
         .ok()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_runtime_is_v2_for_session_v1_for_entity() {
+        let session = TransactionBuilderParams::new_session(None, None);
+        assert!(session.is_runtime_v2());
+        assert!(!session.is_runtime_v1());
+        assert_eq!(session.runtime_transferred_value(), 0);
+
+        let client = transaction_builder_params_to_casper_client(&session);
+        match client {
+            _TransactionBuilderParams::Session { runtime, .. } => {
+                assert!(matches!(
+                    runtime,
+                    TransactionRuntimeParams::VmCasperV2 {
+                        transferred_value: 0,
+                        seed: None
+                    }
+                ));
+            }
+            _ => panic!("expected Session"),
+        }
+
+        let entity = TransactionBuilderParams::new_invocable_entity_alias("cep78", "mint");
+        assert!(entity.is_runtime_v1());
+        assert!(!entity.is_runtime_v2());
+        let client = transaction_builder_params_to_casper_client(&entity);
+        match client {
+            _TransactionBuilderParams::InvocableEntityAlias { runtime, .. } => {
+                assert!(matches!(runtime, TransactionRuntimeParams::VmCasperV1));
+            }
+            _ => panic!("expected InvocableEntityAlias"),
+        }
+
+        let mut entity_v2 = entity;
+        entity_v2.set_runtime_v2(0, None);
+        assert!(entity_v2.is_runtime_v2());
+    }
+
+    #[test]
+    fn set_runtime_v2_with_seed() {
+        let mut params = TransactionBuilderParams::default();
+        let seed = vec![7u8; 32];
+        params.set_runtime_v2(42, Some(seed.clone()));
+        assert!(params.is_runtime_v2());
+        assert_eq!(params.runtime_transferred_value(), 42);
+        assert_eq!(params.runtime_seed(), Some(seed));
+    }
 }
