@@ -7,10 +7,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["jest", "node", "puppeteer"],
-    "baseUrl": "."
-  },
-  "paths": {
-    "casper-rust-wasm-sdk": ["../../../pkg-nodejs"]
+    "ignoreDeprecations": "6.0",
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["jest", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "casper-rust-wasm-sdk": ["../../../pkg-nodejs"]
+    }
   }
 }
