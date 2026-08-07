@@ -64,7 +64,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private wasm!: Uint8Array | undefined;
   private stateSubscription!: Subscription;
-  /** Bumped to ignore late cold-start RPC results after the user changes action. */
   private bootstrapGeneration = 0;
 
   constructor(
@@ -82,8 +81,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setStateSubscription();
   }
 
-  public async ngOnInit(): Promise<void> {
+  public ngOnInit(): void {
     console.info(this.sdk);
+    const action =
+      this.storageService.get('action') ||
+      this.config['default_action'].toString();
+    this.action = action;
+    this.stateService.setState({
+      action,
+      status_loading: true,
+    });
   }
 
   public ngOnDestroy() {
@@ -101,16 +108,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngAfterViewInit() {
     const action =
+      this.action ||
       this.storageService.get('action') ||
       this.config['default_action'].toString();
-    this.stateService.setState({
-      action,
-      status_loading: true,
-    });
     void this.bootstrapChainStatus(action);
   }
 
-  /** Cold-start status + SRH; must not block Action/form paint. */
   private async bootstrapChainStatus(action: string) {
     const generation = ++this.bootstrapGeneration;
     const no_mark_for_check = true;

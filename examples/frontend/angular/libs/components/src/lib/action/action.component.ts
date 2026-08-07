@@ -46,6 +46,10 @@ export class ActionComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   async ngAfterViewInit(): Promise<void> {
+    const seeded = this.stateService.getValue()?.action;
+    if (seeded) {
+      this.action = seeded;
+    }
     this.sdk_methods = Object.getOwnPropertyNames(
       Object.getPrototypeOf(this.sdk),
     )
