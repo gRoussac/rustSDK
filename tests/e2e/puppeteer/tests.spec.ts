@@ -11,6 +11,7 @@ import {
   selectAction,
   setWasm,
   submit,
+  waitForResult,
   get_state_root_hash,
   sign,
   screenshot,
@@ -2272,12 +2273,19 @@ describe('Angular App Tests', () => {
       );
       await test.page.type('[e2e-id="argsSimpleElt"]', config.args_simple);
       await setWasm(config.contract_hello);
+      await test.page.waitForSelector(
+        '[e2e-id="selectTransactionCategoryElt"]:not([disabled])'
+      );
+      await test.page.select(
+        '[e2e-id="selectTransactionCategoryElt"]',
+        'true'
+      );
       let transaction = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
       expect(transaction).toBeUndefined();
       await submit();
-      await test.page.waitForSelector('[e2e-id="result"]');
+      await waitForResult();
       transaction = await test.page.evaluate(() => {
         return document.querySelector('[e2e-id="result"]')?.textContent;
       });
