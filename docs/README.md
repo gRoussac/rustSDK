@@ -2685,7 +2685,6 @@ For a terminal UI over the same SDK (not Electron), see [Casperatatui](#casperat
 **Casperatatui** is a Casper TUI (terminal UI) based on [ratatui](https://ratatui.rs/), over the native Rust SDK. JSON-RPC and SSE only (no binary port).
 
 - Source: [`examples/desktop/casperatatui`](../examples/desktop/casperatatui)
-- Issue: [#123](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/123)
 - GitHub Releases / Pre-release [`dev-preview`](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases): linux binary `casperatatui-<label>-linux-x86_64`
 
 ```bash
@@ -2872,8 +2871,6 @@ Open tracking (not a full roadmap):
 - [#96](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/96) — explainer for node core: AE-off `entity-contract-…` vs `hash-…` on `query_global_state` (SDK remaps; permanent fix is upstream)
 - [#118](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/118) — C bindings (cdylib / cbindgen)
 - [#119](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/119) — Go bindings (cgo / native)
-
-Done (removed from this list): [#9](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/issues/9) Python / PyO3 face + parity ([#117](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/117), [#121](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/pull/121)). See [Python](#python).
 
 Mac desktop Electron build is still TODO (Windows / Linux demos ship on releases).
 
