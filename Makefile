@@ -203,6 +203,31 @@ mcp-test-live:
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
 
+# --- Casperatatui (examples/desktop/casperatatui) ---
+
+run-casperatatui:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo run -p casperatatui -- --preset nctl $(CASPERATATUI_ARGS) $(TUI_ARGS)
+
+build-casperatatui-release:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo build -p casperatatui --release
+
+# Not part of root wasm clippy matrix.
+check-lint-casperatatui:
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo clippy -p casperatatui --all-targets --no-deps -- -D warnings
+	env -u CARGO_TARGET_DIR -u PLAYWRIGHT_BROWSERS_PATH \
+		cargo fmt -p casperatatui -- --check
+
+# Short aliases (same recipes).
+run-tui: run-casperatatui
+build-tui-release: build-casperatatui-release
+check-lint-tui: check-lint-casperatatui
+
+.PHONY: run-casperatatui build-casperatatui-release check-lint-casperatatui \
+	run-tui build-tui-release check-lint-tui
+
 # --- Python bindings (python/ — maturin) ---
 
 python-develop:
