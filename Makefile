@@ -203,16 +203,25 @@ mcp-test-live:
 .PHONY: mcp-build mcp-http mcp-http-stop \
 	run-mcp run-mcp-http mcp-test mcp-test-live
 
-# --- Python bindings (python/ — maturin; not part of ci-test) ---
+# --- Python bindings (python/ — maturin) ---
 
 python-develop:
 	cd python && \
 		(test -d .venv || uv venv .venv) && \
 		. .venv/bin/activate && \
-		uv pip install 'maturin>=1.7,<2.0' && \
+		uv pip install 'maturin>=1.7,<2.0' 'pytest>=8,<9' && \
 		maturin develop
 
+# Offline unit: Rust params tests + pytest (no node).
 python-test: python-develop
-	cd python && . .venv/bin/activate && python tests/smoke_offline.py
+	cd python && . .venv/bin/activate && \
+		cargo test --manifest-path Cargo.toml --lib && \
+		pytest tests/test_unit_offline.py -q
 
-.PHONY: python-develop python-test
+# Live node integration. Needs SECRET_KEY_USER_1 (ci-test/e2e) or CASPER_SECRET_KEY_PEM_FILE.
+python-test-nctl: python-develop
+	cd python && . .venv/bin/activate && \
+		CASPER_RPC_URL=$${CASPER_RPC_URL:-http://127.0.0.1:11101/rpc} \
+		pytest tests/test_nctl_integration.py -m nctl -v --tb=short
+
+.PHONY: python-develop python-test python-test-nctl
