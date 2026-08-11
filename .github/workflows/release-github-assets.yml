@@ -1,4 +1,4 @@
-# Build Electron demos + MCP + Casperatatui binaries and attach them to a GitHub Release.
+# Build Electron + MCP + Casperatatui (+ tip Signing Desk) and attach to a GitHub Release.
 # Callers: release-github-stable (Latest) and release-github-preview (tip Pre-release).
 name: release-github-assets
 
@@ -6,13 +6,28 @@ on:
   workflow_call:
     inputs:
       tag:
-        description: GitHub Release tag to upload into
+        description: GitHub Release tag to upload into (ignored when attach_to_release is false)
         required: true
         type: string
       ref:
         description: Git ref to build (tag or commit SHA)
         required: true
         type: string
+      attach_to_release:
+        description: If true, upload built files to the GitHub Release for inputs.tag
+        required: false
+        type: boolean
+        default: true
+      include_signing_desk:
+        description: Build and stage Tauri Casper Signing Desk (tip / dev-preview)
+        required: false
+        type: boolean
+        default: false
+      artifact_name:
+        description: actions/upload-artifact name for staged release files
+        required: false
+        type: string
+        default: desktop-mcp-casperatatui
 
 permissions:
   contents: write
@@ -43,7 +58,10 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y pkg-config libssl-dev fuse libfuse2
+          sudo apt-get install -y \
+            pkg-config libssl-dev fuse libfuse2 \
+            libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev \
+            libayatana-appindicator3-dev libdbus-1-dev patchelf
           sudo snap install snapcraft --classic
 
       - name: Setup Rust
@@ -83,16 +101,26 @@ jobs:
       - name: Build Casperatatui release binary
         run: make build-casperatatui-release
 
-      - name: Upload assets to release
+      - name: Build Tauri Signing Desk (AppImage)
+        if: ${{ inputs.include_signing_desk }}
+        working-directory: examples/desktop/tauri
+        run: |
+          npm ci
+          # Workspace cargo target; AppImage only (linux runner).
+          env -u CARGO_TARGET_DIR npm run tauri -- build --bundles appimage
+
+      - name: Stage release asset filenames
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ inputs.tag }}
+          INCLUDE_SIGNING_DESK: ${{ inputs.include_signing_desk }}
         run: |
           set -euo pipefail
           RELEASE_DIR="examples/desktop/electron/release"
           # electron-builder output names come from examples/desktop/electron/package.json version.
           PKG_VERSION=$(jq -r .version examples/desktop/electron/package.json)
           ASSET_LABEL=${TAG#v}
+          STAGE=release-assets
+          mkdir -p "$STAGE"
 
           # Stable semver Releases must match package.json (GitHub Release files, not Render).
           if [[ "$ASSET_LABEL" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [ "$ASSET_LABEL" != "$PKG_VERSION" ]; then
@@ -104,9 +132,7 @@ jobs:
           APPIMAGE="$RELEASE_DIR/Casper Webclient-${PKG_VERSION}.AppImage"
           SNAP="$RELEASE_DIR/casper-webclient_${PKG_VERSION}_amd64.snap"
           MCP_SRC="target/release/casper-rust-wasm-sdk-mcp"
-          MCP_DST="casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
           CASPERATATUI_SRC="target/release/casperatatui"
-          CASPERATATUI_DST="casperatatui-${ASSET_LABEL}-linux-x86_64"
 
           for f in "$EXE" "$APPIMAGE" "$SNAP" "$MCP_SRC" "$CASPERATATUI_SRC"; do
             if [[ ! -f "$f" ]]; then
@@ -117,15 +143,49 @@ jobs:
             fi
           done
 
-          cp "$MCP_SRC" "$MCP_DST"
-          chmod +x "$MCP_DST"
-          cp "$CASPERATATUI_SRC" "$CASPERATATUI_DST"
-          chmod +x "$CASPERATATUI_DST"
+          cp "$EXE" "$STAGE/Casper.Webclient.${ASSET_LABEL}.exe"
+          cp "$APPIMAGE" "$STAGE/Casper.Webclient-${ASSET_LABEL}.AppImage"
+          cp "$SNAP" "$STAGE/casper-webclient_${ASSET_LABEL}_amd64.snap"
+          cp "$MCP_SRC" "$STAGE/casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
+          cp "$CASPERATATUI_SRC" "$STAGE/casperatatui-${ASSET_LABEL}-linux-x86_64"
+          chmod +x "$STAGE/casper-rust-wasm-sdk-mcp-${ASSET_LABEL}-linux-x86_64"
+          chmod +x "$STAGE/casperatatui-${ASSET_LABEL}-linux-x86_64"
 
-          gh release upload "$TAG" \
-            "$EXE#Casper.Webclient.${ASSET_LABEL}.exe" \
-            "$APPIMAGE#Casper.Webclient-${ASSET_LABEL}.AppImage" \
-            "$SNAP#casper-webclient_${ASSET_LABEL}_amd64.snap" \
-            "$MCP_DST" \
-            "$CASPERATATUI_DST" \
-            --clobber
+          if [ "$INCLUDE_SIGNING_DESK" = "true" ]; then
+            SIGNING_BIN="target/release/casper-signing-desk"
+            # Tauri 2 workspace: AppImage under target/release/bundle/appimage/
+            mapfile -t SIGNING_APPIMAGES < <(find target/release/bundle/appimage -type f -name '*.AppImage' 2>/dev/null | sort)
+            if [[ ! -f "$SIGNING_BIN" ]]; then
+              echo "Missing Signing Desk binary: $SIGNING_BIN"
+              ls -la target/release || true
+              exit 1
+            fi
+            if [[ ${#SIGNING_APPIMAGES[@]} -lt 1 ]]; then
+              echo "Missing Signing Desk AppImage under target/release/bundle/appimage"
+              find target/release/bundle -type f 2>/dev/null | head -50 || true
+              exit 1
+            fi
+            cp "$SIGNING_BIN" "$STAGE/casper-signing-desk-${ASSET_LABEL}-linux-x86_64"
+            cp "${SIGNING_APPIMAGES[0]}" "$STAGE/Casper.SigningDesk-${ASSET_LABEL}.AppImage"
+            chmod +x "$STAGE/casper-signing-desk-${ASSET_LABEL}-linux-x86_64"
+            chmod +x "$STAGE/Casper.SigningDesk-${ASSET_LABEL}.AppImage"
+          fi
+
+          ls -la "$STAGE"
+
+      - name: Upload staged assets as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: rustSDK/release-assets/*
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Upload assets to release
+        if: ${{ inputs.attach_to_release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" release-assets/* --clobber
