@@ -88,10 +88,10 @@ jobs:
           npm run build
 
       - name: Build Electron desktop assets
-        working-directory: rustSDK/examples/desktop/electron
         env:
           SNAPCRAFT_BUILD_ENVIRONMENT: host
         run: |
+          cd examples/desktop/electron
           npm install
           npx electron-builder --win portable --linux AppImage snap --publish never
 
@@ -103,8 +103,8 @@ jobs:
 
       - name: Build Tauri Signing Desk (AppImage)
         if: ${{ inputs.include_signing_desk }}
-        working-directory: rustSDK/examples/desktop/tauri
         run: |
+          cd examples/desktop/tauri
           npm ci
           # Workspace cargo target; AppImage only (linux runner).
           env -u CARGO_TARGET_DIR npm run tauri -- build --bundles appimage
